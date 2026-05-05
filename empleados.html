@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>dotacian app | Gestión de Dotación</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .filter-chip {
+      padding: 0.5rem 1.25rem;
+      border-radius: 999px;
+      background: white;
+      border: 1px solid var(--color-border);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .filter-chip:hover {
+      border-color: var(--color-cyan);
+      color: var(--color-cyan);
+      background: var(--color-smoke);
+    }
+
+    .filter-chip.active {
+      background: var(--color-cyan);
+      border-color: var(--color-cyan);
+      color: white;
+      font-weight: 600;
+      box-shadow: var(--shadow-cyan);
+    }
+
+    /* Custom Notification Style */
+    .notification-toast {
+      position: fixed;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 1rem 2rem;
+      border-radius: 100px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      border: 1px solid rgba(0, 180, 216, 0.1);
+    }
+
+    .notification-toast.active {
+      top: 2rem;
+    }
+
+    .notification-icon {
+      width: 24px;
+      height: 24px;
+      background: var(--color-cyan);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .notification-text {
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      color: var(--color-navy);
+      font-size: 0.9375rem;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Custom Notification Container -->
+  <div id="notificationToast" class="notification-toast">
+    <div class="notification-icon">✓</div>
+    <div class="notification-text" id="notificationText">Mensaje guardado</div>
+  </div>
+
+  <div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span>dotacian</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="app.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <rect width="7" height="9" x="3" y="3" rx="1" />
+              <rect width="7" height="5" x="14" y="3" rx="1" />
+              <rect width="7" height="9" x="14" y="12" rx="1" />
+              <rect width="7" height="5" x="3" y="16" rx="1" />
+            </svg></span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="roles.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg></span>
+          <span class="nav-label">Roles</span>
+        </a>
+        <div class="nav-group">
+          <a href="#" class="nav-item">
+            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path
+                  d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
+              </svg></span>
+            <span class="nav-label">Uniformes</span>
+            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor"
+                stroke-width="2" viewBox="0 0 24 24">
+                <path d="m6 9 6 6 6-6" />
+              </svg></span>
+          </a>
+          <div class="nav-sub-items">
+            <a href="uniformes.html" class="nav-sub-item">Marketplace</a>
+            <a href="mi_dotacion.html" class="nav-sub-item">Mi dotación</a>
+          </div>
+        </div>
+        <a href="sucursales.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
+              <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+              <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+              <path d="M10 6h4" />
+              <path d="M10 10h4" />
+              <path d="M10 14h4" />
+              <path d="M10 18h4" />
+            </svg></span>
+          <span class="nav-label">Sucursales</span>
+        </a>
+        <a href="empleados.html" class="nav-item active">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg></span>
+          <span class="nav-label">Empleados</span>
+        </a>
+        <div class="nav-group">
+          <a href="produccion.html" class="nav-item">
+            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path d="m7.5 4.27 9 5.15" />
+                <path
+                  d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                <path d="m3.3 7 8.7 5 8.7-5" />
+                <path d="M12 22V12" />
+              </svg></span>
+            <span class="nav-label">Producción</span>
+            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor"
+                stroke-width="2" viewBox="0 0 24 24">
+                <path d="m6 9 6 6 6-6" />
+              </svg></span>
+          </a>
+          <div class="nav-sub-items">
+            <a href="cotizaciones.html" class="nav-sub-item">Cotizaciones</a>
+            <a href="muestras.html" class="nav-sub-item">Solicitud de Muestras</a>
+            <a href="ordenes.html" class="nav-sub-item">Órdenes de Compra</a>
+            <a href="seguimiento.html" class="nav-sub-item">Seguimiento</a>
+          </div>
+        </div>
+        <a href="bodega.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <polyline points="21 8 21 21 3 21 3 8"></polyline>
+              <rect x="1" y="3" width="22" height="5"></rect>
+              <line x1="10" y1="12" x2="14" y2="12"></line>
+            </svg></span>
+          <span class="nav-label">Bodega</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+            </svg></span>
+          <span class="nav-label">Alertas</span>
+        </a>
+        <div class="sidebar-spacer"></div>
+        <a href="index.html" class="nav-item nav-item-secondary">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" x2="9" y1="12" y2="12" />
+            </svg></span>
+          <span class="nav-label">Cerrar Sesión</span>
+        </a>
+        <a href="#" class="nav-item nav-item-secondary">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path
+                d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg></span>
+          <span class="nav-label">Configuración</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="app-header">
+        <div class="header-left">
+          <h1>Directorio de Empleados</h1>
+          <p class="header-subtitle">Gestión de personal y asignación de dotaciones</p>
+        </div>
+        <div class="header-right">
+          <button class="btn btn-primary" onclick="openModal()">+ Crear Nuevo Empleado</button>
+        </div>
+      </header>
+
+      <div class="app-container">
+        <!-- Batch Action Bar -->
+        <div id="batchBar" class="app-card"
+          style="display: none; background: var(--color-navy); color: white; margin-bottom: 1.5rem; padding: 1rem 1.5rem; justify-content: space-between; align-items: center; border: none;">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="selectedCount" style="font-weight: 600; font-size: 1rem;">0 seleccionados</span>
+            <div style="height: 24px; width: 1px; background: rgba(255,255,255,0.2);"></div>
+            <button class="btn btn-primary"
+              style="padding: 0.5rem 1rem; background: var(--color-cyan); color: var(--color-navy);"
+              onclick="sendMagicLinkBulk()">Enviar WhatsApp a seleccionados</button>
+          </div>
+          <button class="btn-close" style="color: white; font-size: 1.25rem;" onclick="deselectAll()">✕</button>
+        </div>
+
+        <!-- Industry context bar -->
+        <div class="app-card"
+          style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+          <div>
+            <span style="font-size: 0.875rem; color: var(--color-text-muted);">Industria activa:</span>
+            <strong style="margin-left: 0.5rem; color: var(--color-navy);" id="currentIndustry">Restaurante</strong>
+          </div>
+          <select id="industry-select-context" onchange="changeIndustry(this.value)"
+            style="background: var(--color-smoke); border: 1px solid var(--color-border); border-radius: 8px; padding: 0.4rem 0.6rem; font-size: 0.875rem; font-family: inherit; font-weight: 500; cursor: pointer; outline: none;">
+            <option value="Restaurante" selected>Restaurante</option>
+            <option value="Limpieza">Limpieza</option>
+            <option value="Industrial">Industrial</option>
+          </select>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="app-card" style="margin-bottom: 1.5rem; padding: 1rem;">
+          <div style="display: flex; gap: 1rem;">
+            <div style="flex: 1; position: relative;">
+              <input type="text" placeholder="Buscar empleado por nombre o ID..." onkeyup="filterSearch(this.value)"
+                style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-md);">
+              <span
+                style="position: absolute; left: 0.875rem; top: 50%; transform: translateY(-50%); color: var(--color-text-muted);">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+              </span>
+            </div>
+            <select
+              style="width: 200px; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: var(--radius-md);">
+              <option>Todas las Sucursales</option>
+              <option>Reforma</option>
+              <option>Polanco</option>
+              <option>Condesa</option>
+            </select>
+          </div>
+
+          <div
+            style="display: flex; gap: 0.75rem; margin-top: 1.25rem; align-items: center; overflow-x: auto; padding-bottom: 0.25rem;">
+            <span
+              style="font-size: 0.8125rem; font-weight: 600; color: var(--color-text-muted); margin-right: 0.25rem;">Filtrar
+              por:</span>
+            <button class="filter-chip active" onclick="filterByStatus('all', this)">Todos</button>
+            <button class="filter-chip" onclick="filterByStatus('RENOVAR PRONTO', this)">⚠️ Renovar Pronto</button>
+            <button class="filter-chip" onclick="filterByStatus('VENCIDO', this)">⚠️ Vencidos</button>
+            <button class="filter-chip" onclick="filterByStatus('BUEN ESTADO', this)">✓ Al Día</button>
+          </div>
+        </div>
+
+        <!-- Employee Table -->
+        <div class="app-card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 40px;"><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
+                <th style="cursor: pointer;" onclick="sortTable(1)">Nombre Completo ↕</th>
+                <th style="cursor: pointer;" onclick="sortTable(2)">Rol / Puesto ↕</th>
+                <th style="cursor: pointer;" onclick="sortTable(3)">Alerta Renovación ↕</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="employees-tbody">
+              <!-- Data will be populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal: Crear Empleado -->
+  <div class="modal-overlay" id="employeeModal">
+    <div class="modal-content-lg" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2>Registrar Nuevo Empleado</h2>
+        <button class="btn-close" onclick="closeModal()">✕</button>
+      </div>
+      <div style="padding: 2rem;">
+        <form class="modal-form" onsubmit="saveEmployee(event)">
+          <div style="display: flex; gap: 1rem; margin-bottom: 1.25rem;">
+            <div style="flex: 1;">
+              <label>Nombre</label>
+              <input type="text" id="empName" placeholder="ej. Juan" required>
+            </div>
+            <div style="flex: 1;">
+              <label>Apellido</label>
+              <input type="text" id="empLastName" placeholder="ej. Pérez" required>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 1.25rem;">
+            <label>Fecha de Nacimiento</label>
+            <input type="date" id="empBirthDate" required>
+          </div>
+
+          <div style="margin-bottom: 1.25rem;">
+            <label>Celular</label>
+            <input type="text" id="empPhone" placeholder="55 0000 0000" required>
+          </div>
+
+          <div style="margin-bottom: 1.25rem;">
+            <label>Sucursal de Entrega</label>
+            <select id="empAddress" required>
+              <option value="">Selecciona una sucursal...</option>
+              <option value="Reforma">Reforma</option>
+              <option value="Polanco">Polanco</option>
+              <option value="Condesa">Condesa</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom: 1.25rem;">
+            <label>Rol / Puesto</label>
+            <select id="empRole" required>
+              <option value="">Selecciona un rol...</option>
+              <option>Mesero</option>
+              <option>Chef</option>
+              <option>Barista</option>
+              <option>Ama de Llaves</option>
+              <option>Recepcionista</option>
+            </select>
+          </div>
+
+          <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+            <div style="flex: 1;">
+              <label>Talla Camisa</label>
+              <input type="text" id="empShirtSize" placeholder="ej. M" required>
+            </div>
+            <div style="flex: 1;">
+              <label>Talla Pantalón</label>
+              <input type="text" id="empPantsSize" placeholder="ej. 32" required>
+            </div>
+            <div style="flex: 1;">
+              <label>Talla Zapatos</label>
+              <input type="text" id="empShoeSize" placeholder="ej. 27" required>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+            <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar Empleado</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Detalles de Empleado -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal-content-lg" style="max-width: 600px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <h2 id="detailTitle" style="margin: 0;">Detalles del Empleado</h2>
+          <button class="btn btn-outline"
+            style="padding: 0.4rem 0.8rem; font-size: 0.75rem; display: flex; align-items: center; gap: 0.5rem;"
+            onclick="downloadAssignmentHistory()">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" x2="12" y1="15" y2="3" />
+            </svg>
+            Historial (PDF)
+          </button>
+        </div>
+        <button class="btn-close" onclick="closeDetailModal()">✕</button>
+      </div>
+      <div style="padding: 2rem;">
+        <!-- Employee Info -->
+        <div
+          style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--color-border);">
+          <div id="detailAvatar"
+            style="width: 64px; height: 64px; border-radius: 50%; background: var(--color-smoke-mid); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; color: var(--color-navy);">
+            JS</div>
+          <div>
+            <h3 id="detailName" style="font-size: 1.25rem; margin-bottom: 0.25rem;">Juan Sánchez</h3>
+            <div style="display: flex; gap: 0.75rem; align-items: center;">
+              <p id="detailRole" style="color: var(--color-text-secondary); font-size: 0.875rem;">Mesero</p>
+              <span style="color: var(--color-border);">|</span>
+              <p id="detailPhone" style="color: var(--color-text-secondary); font-size: 0.875rem;">55 1234 5678</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Uniform Info Section -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+          <div class="app-card" style="padding: 1rem; margin: 0; background: #f8fafc; border: 1px solid var(--color-border);">
+            <label style="font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-bottom: 0.25rem;">Talla Camisa</label>
+            <input type="text" id="detailShirtSize" style="font-size: 0.875rem; color: var(--color-navy); font-weight: 800; border: 1px solid var(--color-border); border-radius: 6px; padding: 0.35rem 0.5rem; width: 100%; background: white;" value="M">
+          </div>
+          <div class="app-card" style="padding: 1rem; margin: 0; background: #f8fafc; border: 1px solid var(--color-border);">
+            <label style="font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-bottom: 0.25rem;">Talla Pantalón</label>
+            <input type="text" id="detailPantsSize" style="font-size: 0.875rem; color: var(--color-navy); font-weight: 800; border: 1px solid var(--color-border); border-radius: 6px; padding: 0.35rem 0.5rem; width: 100%; background: white;" value="32">
+          </div>
+          <div class="app-card" style="padding: 1rem; margin: 0; background: #f8fafc; border: 1px solid var(--color-border);">
+            <label style="font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-bottom: 0.25rem;">Talla Zapatos</label>
+            <input type="text" id="detailShoeSize" style="font-size: 0.875rem; color: var(--color-navy); font-weight: 800; border: 1px solid var(--color-border); border-radius: 6px; padding: 0.35rem 0.5rem; width: 100%; background: white;" value="27">
+          </div>
+          <div class="app-card" style="padding: 1rem; margin: 0; background: #f8fafc; border: 1px solid var(--color-border); grid-column: span 3;">
+            <label style="font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-bottom: 0.25rem;">Fecha de Nacimiento</label>
+            <strong id="detailBirthDate" style="font-size: 0.875rem; color: var(--color-navy);">15 Ene 1990</strong>
+          </div>
+          <div class="app-card"
+            style="padding: 1rem; margin: 0; background: #f8fafc; border: 1px solid var(--color-border); grid-column: span 2;">
+            <label
+              style="font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-bottom: 0.75rem;">Última
+              dotación entregada</label>
+            <div id="detailKitList" style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <!-- Dynamically filled -->
+            </div>
+          </div>
+          <div class="app-card"
+            style="padding: 1rem; margin: 0; background: #f8fafc; border: 1px solid var(--color-border);">
+            <label
+              style="font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-bottom: 0.25rem;">Fecha
+              de Entrega</label>
+            <strong id="detailLastDelivery" style="font-size: 0.875rem; color: var(--color-navy);">15 Mayo 2025</strong>
+            <button id="recoveryBtn" class="btn btn-outline"
+              style="width: 100%; margin-top: 0.75rem; padding: 0.4rem; font-size: 0.7rem; border-color: var(--color-coral); color: var(--color-coral); display: none; align-items: center; justify-content: center; gap: 0.4rem;"
+              onclick="recoverUniform()">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                <path d="M3 3v5h5" />
+              </svg>
+              Recuperar Uniforme
+            </button>
+          </div>
+          <div class="app-card"
+            style="padding: 1rem; margin: 0; background: #f8fafc; border: 1px solid var(--color-border);">
+            <label
+              style="font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-bottom: 0.25rem;">Próxima
+              Entrega</label>
+            <strong id="detailNextDelivery" style="font-size: 0.875rem; color: #F59E0B;">15 Nov 2026</strong>
+          </div>
+        </div>
+
+        <!-- Signature Section -->
+        <div
+          style="margin-bottom: 2rem; padding: 1.25rem; border-radius: var(--radius-md); background: white; border: 1px solid var(--color-border);">
+          <label style="font-weight: 600; color: var(--color-navy); display: block; margin-bottom: 1rem;">Firma de
+            Recibido (Última Entrega)</label>
+          <div id="signatureContainer"
+            style="width: 100%; height: 120px; background: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px dashed var(--color-border); padding: 1rem;">
+            <!-- SVG Signature dynamically injected -->
+          </div>
+          <p style="font-size: 0.7rem; color: var(--color-text-muted); margin-top: 0.5rem; text-align: center;">Firmado
+            digitalmente el <span id="signatureDate">15 Mayo 2025</span></p>
+        </div>
+
+        <!-- Usage Bar Section -->
+        <div style="margin-bottom: 2rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <label style="font-weight: 600; color: var(--color-navy);">Consumo de Uniforme Anterior</label>
+            <span id="usageText" style="font-weight: 600; color: var(--color-coral);">85%</span>
+          </div>
+          <div class="usage-bar">
+            <div id="usageFill" class="usage-fill" style="width: 85%;"></div>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.5rem;">
+            * Basado en la fecha de última entrega: 15 Mayo 2025. Vida útil estimada: 12 meses.
+          </p>
+        </div>
+
+        <!-- Unified Section: Assign New Kit -->
+        <div style="border-top: 2px dashed var(--color-border); padding-top: 2rem; margin-top: 1rem;">
+
+          <!-- Kit Header -->
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+            <div>
+              <h4 style="color: var(--color-navy); font-size: 1.125rem; margin-bottom: 0.25rem;">Dotación a Cotizar</h4>
+              <p style="font-size: 0.8125rem; color: var(--color-text-secondary);">Ítems pre-cargados según el rol asignado. Edita, elimina o agrega prendas antes de enviar.</p>
+            </div>
+            <span id="kitRoleTag" style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: #e0f2fe; color: #0369a1; padding: 5px 12px; border-radius: 20px; white-space: nowrap;"></span>
+          </div>
+
+          <!-- Kit Items List -->
+          <div id="availableKitList" style="display: flex; flex-direction: column; gap: 0.625rem;"></div>
+
+          <!-- Add Custom Item Button -->
+          <button onclick="addCustomKitItem()" style="width: 100%; margin-top: 0.875rem; padding: 0.75rem; border: 1.5px dashed #cbd5e1; border-radius: 12px; background: #f8fafc; color: #475569; font-size: 0.875rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s;" onmouseover="this.style.borderColor='#06B6D4';this.style.color='#0891b2';this.style.background='#f0f9ff';" onmouseout="this.style.borderColor='#cbd5e1';this.style.color='#475569';this.style.background='#f8fafc';">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Agregar prenda personalizada
+          </button>
+
+          <!-- Summary Bar -->
+          <div id="kitSummaryBar" style="margin-top: 1.25rem; padding: 0.875rem 1.25rem; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; color: #0369a1;">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              <span id="kitSummaryText" style="font-weight: 600;">0 prendas seleccionadas</span>
+            </div>
+            <span style="font-size: 0.75rem; color: #0891b2; font-weight: 500;">Listo para cotizar →</span>
+          </div>
+
+          <!-- CTA -->
+          <button id="confirmBtn" onclick="assignNewKit()" style="width: 100%; margin-top: 1rem; padding: 1rem 1.5rem; background: #06B6D4; color: white; border: none; border-radius: 14px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(6,182,212,0.35); display: flex; align-items: center; justify-content: center; gap: 0.75rem;" onmouseover="this.style.background='#0891B2';this.style.transform='translateY(-1px)';" onmouseout="this.style.background='#06B6D4';this.style.transform='translateY(0)';">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.51 0 2.93.37 4.18 1.02"/></svg>
+            Confirmar y Enviar a Cotizar
+          </button>
+
+          <!-- Danger Zone -->
+          <div style="margin-top: 3rem; padding-top: 1.5rem; border-top: 2px solid #fee2e2; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 700; color: #991b1b; font-size: 0.875rem;">Acciones de Cuenta</div>
+              <div style="color: var(--color-text-muted); font-size: 0.75rem;">Dar de baja elimina al empleado del listado activo</div>
+            </div>
+            <button class="btn btn-outline" style="border-color: #ef4444; color: #ef4444; padding: 0.6rem 1.25rem; font-size: 0.8125rem; font-weight: 700; background: #fff5f5;" onclick="terminateEmployee()">
+              Dar de Baja
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showNotification(message) {
+      const toast = document.getElementById('notificationToast');
+      const text = document.getElementById('notificationText');
+      text.textContent = message;
+      toast.classList.add('active');
+
+      setTimeout(() => {
+        toast.classList.remove('active');
+      }, 3000);
+    }
+
+    function downloadAssignmentHistory() {
+      const name = document.getElementById('detailName').textContent;
+      showNotification("Generando historial de " + name + "...");
+
+      setTimeout(() => {
+        showNotification("Historial descargado exitosamente.");
+      }, 1500);
+    }
+
+    function openModal() {
+      document.getElementById('employeeModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('employeeModal').classList.remove('active');
+    }
+
+    function openDetailModal(name, role, usage, address, phone, empStatus) {
+      const detailName = document.getElementById('detailName');
+      const detailRole = document.getElementById('detailRole');
+      const detailPhone = document.getElementById('detailPhone');
+      const detailAvatar = document.getElementById('detailAvatar');
+      const detailShirtSize = document.getElementById('detailShirtSize');
+      const detailPantsSize = document.getElementById('detailPantsSize');
+      const detailShoeSize = document.getElementById('detailShoeSize');
+      const detailBirthDate = document.getElementById('detailBirthDate');
+      const detailLastDelivery = document.getElementById('detailLastDelivery');
+      const detailNextDelivery = document.getElementById('detailNextDelivery');
+      const signatureDate = document.getElementById('signatureDate');
+      const usageText = document.getElementById('usageText');
+      const fill = document.getElementById('usageFill');
+
+      detailName.textContent = name;
+      detailRole.textContent = role;
+      detailPhone.textContent = phone;
+      detailAvatar.textContent = name.split(' ').map(n => n[0]).join('');
+      detailBirthDate.textContent = name === 'Juan Sánchez' ? '12 Oct 1992' : '25 Mar 1995';
+
+      const usageVal = parseInt(usage);
+      usageText.textContent = usage;
+      fill.style.width = usage;
+      if (usageVal > 80) {
+        fill.classList.add('warning');
+        usageText.style.color = 'var(--color-coral)';
+      } else {
+        fill.classList.remove('warning');
+        usageText.style.color = 'var(--color-cyan)';
+      }
+
+      // Dynamic Kit Rendering
+      const kitList = document.getElementById('detailKitList');
+      const availableKitList = document.getElementById('availableKitList');
+
+      const roleKitData = {
+        'Mesero': [
+          { name: 'Camisa Oxford', img: 'assets/oxford_shirt.png', qty: 2 },
+          { name: 'Pantalón Gabardina', img: 'assets/pants_black.png', qty: 1 }
+        ],
+        'Chef': [
+          { name: 'Filipina Chef Classic', img: 'assets/chef_coat.png', qty: 2 },
+          { name: 'Pantalón de Cocina Pro', img: 'assets/chef_pants_black.png', qty: 1 }
+        ],
+        'Barista': [
+          { name: 'Mandil Barista', img: 'assets/barista_apron.png', qty: 1 },
+          { name: 'Polo Premium', img: 'assets/polo_shirt.png', qty: 1 }
+        ],
+        'Operario Limpieza': [
+          { name: 'Filipina de Trabajo', img: 'assets/scrub_top.png', qty: 2 },
+          { name: 'Pantalón Cargo', img: 'assets/cargo_pants.png', qty: 2 }
+        ],
+        'Supervisor Zona': [
+          { name: 'Chaleco Reflectante', img: 'assets/safety_vest.png', qty: 1 },
+          { name: 'Calzado de Seguridad', img: 'assets/safety_shoes.png', qty: 1 }
+        ],
+        'Mantenimiento': [
+          { name: 'Camisola Industrial', img: 'assets/work_shirt.png', qty: 2 },
+          { name: 'Pantalón Reforzado', img: 'assets/work_pants.png', qty: 2 }
+        ],
+        'Operario Producción': [
+          { name: 'Overol de Algodón', img: 'assets/coverall.png', qty: 2 },
+          { name: 'Calzado Casquillo', img: 'assets/safety_boots.png', qty: 1 }
+        ],
+        'Operario Logística': [
+          { name: 'Chaleco Clase 2', img: 'assets/hi_vis_vest.png', qty: 1 },
+          { name: 'Faja Lumbar', img: 'assets/back_brace.png', qty: 1 }
+        ],
+        'Mantenimiento Elec': [
+          { name: 'Ropa Ignífuga', img: 'assets/fire_resistant.png', qty: 2 },
+          { name: 'Calzado Dieléctrico', img: 'assets/dielectric_shoes.png', qty: 1 }
+        ]
+      };
+
+      const items = roleKitData[role] || roleKitData['Mesero'];
+
+      kitList.innerHTML = items.map(item => `
+        <div style="display: flex; align-items: center; gap: 0.75rem; background: white; padding: 0.5rem; border-radius: 8px; border: 1px solid var(--color-border);">
+          <img src="${item.img}" style="width: 32px; height: 32px; object-fit: contain; background: #f1f5f9; border-radius: 4px;" onerror="this.src='https://placehold.co/32x32?text=Kit'">
+          <div style="flex: 1;">
+            <div style="font-size: 0.8125rem; font-weight: 600; color: var(--color-navy);">${item.name}</div>
+            <div style="font-size: 0.7rem; color: var(--color-text-muted);">Cantidad: ${item.qty}</div>
+          </div>
+        </div>
+      `).join('');
+
+      // Set role tag
+      const kitRoleTag = document.getElementById('kitRoleTag');
+      if (kitRoleTag) kitRoleTag.textContent = role;
+
+      // Render the available kit as premium editable rows
+      availableKitList.innerHTML = '';
+      items.forEach((item, index) => {
+        availableKitList.appendChild(buildKitRow(item.name, item.qty, item.img, index));
+      });
+      updateKitSummary();
+
+      // Button state
+      document.getElementById('confirmBtn').disabled = false;
+      document.getElementById('confirmBtn').style.opacity = '1';
+
+      // Recovery Logic Condition (less than 1 month AND Good Condition)
+      const recoveryBtn = document.getElementById('recoveryBtn');
+      const eligibleNames = ['Juan Sánchez', 'María López', 'Carlos Ruiz', 'Diego Luna'];
+
+      if (eligibleNames.includes(name) && empStatus === 'success') {
+        detailLastDelivery.textContent = '2 Mayo 2026'; // Recent delivery
+        recoveryBtn.style.display = 'flex';
+      } else {
+        detailLastDelivery.textContent = '15 May 2025';
+        recoveryBtn.style.display = 'none';
+      }
+
+      detailNextDelivery.textContent = '15 Nov 2026';
+      detailNextDelivery.style.color = empStatus === 'critical' ? 'var(--color-coral)' : '#F59E0B';
+
+      detailShirtSize.value = 'M';
+      detailPantsSize.value = '32';
+      detailShoeSize.value = '27';
+
+      document.getElementById('signatureContainer').innerHTML = getSignature(name);
+      signatureDate.textContent = '15 May 2025';
+
+      document.getElementById('detailModal').classList.add('active');
+    }
+
+    function buildKitRow(name, qty, img, id) {
+      const wrapper = document.createElement('div');
+      wrapper.dataset.kitId = id;
+      wrapper.style.cssText = 'display:flex; align-items:center; gap:0.75rem; background:white; padding:0.75rem 1rem; border-radius:12px; border:1px solid #e2e8f0; transition:all 0.2s;';
+      wrapper.onmouseover = () => wrapper.style.borderColor = '#bae6fd';
+      wrapper.onmouseout  = () => wrapper.style.borderColor = '#e2e8f0';
+
+      wrapper.innerHTML = `
+        <!-- Checkbox -->
+        <label style="display:flex; align-items:center; cursor:pointer; flex-shrink:0;">
+          <input type="checkbox" checked
+            style="width:18px; height:18px; accent-color:#06B6D4; cursor:pointer; border-radius:5px;"
+            onchange="updateKitSummary()">
+        </label>
+
+        <!-- Thumbnail -->
+        <div style="width:44px; height:44px; background:#f1f5f9; border-radius:10px; overflow:hidden; flex-shrink:0; display:flex; align-items:center; justify-content:center;">
+          <img src="${img}" style="width:100%; height:100%; object-fit:contain;"
+            onerror="this.parentElement.style.background='#e2e8f0'; this.parentElement.innerHTML='<span style=\\'font-size:0.65rem; font-weight:700; color:#94a3b8;\\'>Kit</span>';">
+        </div>
+
+        <!-- Name (editable) -->
+        <div style="flex:1; min-width:0;">
+          <input type="text" value="${name}"
+            style="width:100%; font-size:0.875rem; font-weight:600; color:#0f172a; border:none; background:transparent; outline:none; padding:0;"
+            placeholder="Nombre de la prenda"
+            onfocus="this.style.background='#f0f9ff'; this.style.borderRadius='6px'; this.style.padding='2px 6px';"
+            onblur="this.style.background='transparent'; this.style.padding='0';">
+          <div style="font-size:0.7rem; color:#94a3b8; margin-top:1px;">Toca para editar</div>
+        </div>
+
+        <!-- Qty Stepper -->
+        <div style="display:flex; align-items:center; gap:2px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:3px;" onclick="event.stopPropagation();">
+          <button type="button" onclick="stepQty(this, -1)"
+            style="width:26px; height:26px; border:none; background:none; cursor:pointer; color:#475569; font-size:1rem; display:flex; align-items:center; justify-content:center; border-radius:5px; transition:background 0.15s;"
+            onmouseover="this.style.background='#e2e8f0';" onmouseout="this.style.background='none';">−</button>
+          <input type="number" value="${qty}" min="1" max="99" onchange="updateKitSummary()"
+            style="width:32px; border:none; text-align:center; font-size:0.875rem; font-weight:700; color:#0f172a; background:transparent; -moz-appearance:textfield; outline:none;">
+          <button type="button" onclick="stepQty(this, 1)"
+            style="width:26px; height:26px; border:none; background:none; cursor:pointer; color:#475569; font-size:1rem; display:flex; align-items:center; justify-content:center; border-radius:5px; transition:background 0.15s;"
+            onmouseover="this.style.background='#e2e8f0';" onmouseout="this.style.background='none';">+</button>
+        </div>
+
+        <!-- Delete -->
+        <button type="button" onclick="removeKitRow(this)"
+          style="width:32px; height:32px; border:none; background:#fff5f5; color:#ef4444; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all 0.15s;"
+          onmouseover="this.style.background='#fee2e2';" onmouseout="this.style.background='#fff5f5';" title="Eliminar">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      `;
+      return wrapper;
+    }
+
+    function stepQty(btn, delta) {
+      const input = btn.parentElement.querySelector('input[type="number"]');
+      const v = parseInt(input.value) + delta;
+      if (v >= 1 && v <= 99) { input.value = v; updateKitSummary(); }
+    }
+
+    function removeKitRow(btn) {
+      btn.closest('[data-kit-id]').remove();
+      updateKitSummary();
+    }
+
+    let _customKitId = 1000;
+    function addCustomKitItem() {
+      const list = document.getElementById('availableKitList');
+      const row = buildKitRow('', 1, '', _customKitId++);
+      list.appendChild(row);
+      // Focus the name input immediately
+      const input = row.querySelector('input[type="text"]');
+      if (input) { input.focus(); input.style.background='#f0f9ff'; input.style.borderRadius='6px'; input.style.padding='2px 6px'; }
+      updateKitSummary();
+    }
+
+    function updateKitSummary() {
+      const rows   = document.querySelectorAll('#availableKitList [data-kit-id]');
+      let count = 0, total = 0;
+      rows.forEach(row => {
+        const cb  = row.querySelector('input[type="checkbox"]');
+        const qty = parseInt(row.querySelector('input[type="number"]')?.value || 0);
+        if (cb && cb.checked) { count++; total += qty; }
+      });
+      const txt = document.getElementById('kitSummaryText');
+      if (txt) txt.textContent = `${count} prenda${count !== 1 ? 's' : ''} · ${total} unidad${total !== 1 ? 'es' : ''} total`;
+    }
+
+    function terminateEmployee() {
+      if (confirm('¿Está seguro de que desea dar de baja a este empleado? Esta acción lo eliminará de la lista de empleados activos.')) {
+        showToast("Empleado de Baja", "El empleado ha sido dado de baja exitosamente.");
+        document.getElementById('detailModal').classList.remove('active');
+        // Mock logic: finding the row in the table would go here in a real app
+      }
+    }
+
+    function getSignature(name) {
+      const signatures = [
+        `<svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;"><path d="M20 60 Q 40 10, 60 50 T 100 50 Q 120 90, 150 40 T 180 60" stroke="#334155" stroke-width="3" fill="none" stroke-linecap="round" /></svg>`,
+        `<svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;"><path d="M30 40 C 50 40, 50 80, 80 80 S 110 20, 140 20 S 170 60, 170 60" stroke="#334155" stroke-width="3" fill="none" stroke-linecap="round" /></svg>`,
+        `<svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;"><path d="M40 70 L 60 30 L 80 70 L 100 30 L 120 70 L 140 30 L 160 70" stroke="#334155" stroke-width="2.5" fill="none" stroke-linecap="round" /></svg>`,
+        `<svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;"><path d="M20 50 Q 50 80, 80 50 T 140 50 T 180 50" stroke="#334155" stroke-width="3" fill="none" stroke-linecap="round" /></svg>`,
+        `<svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;"><path d="M30 60 Q 30 20, 70 20 T 110 60 T 150 20 T 170 60" stroke="#334155" stroke-width="3" fill="none" stroke-linecap="round" /></svg>`,
+        `<svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;"><path d="M25 50 Q 40 20, 60 50 T 100 50 T 140 50 T 175 50" stroke="#334155" stroke-width="3" fill="none" stroke-linecap="round" /></svg>`,
+        `<svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;"><path d="M40 80 Q 40 40, 80 40 T 120 80 T 160 40" stroke="#334155" stroke-width="3" fill="none" stroke-linecap="round" /></svg>`,
+        `<svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;"><path d="M20 30 L 180 70 M 20 70 L 180 30" stroke="#334155" stroke-width="2" opacity="0.5" /><path d="M40 50 Q 100 10, 160 50" stroke="#334155" stroke-width="4" fill="none" stroke-linecap="round" /></svg>`
+      ];
+      let hash = 0;
+      for (let i = 0; i < name.length; i++) {
+        hash = name.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      return signatures[Math.abs(hash) % signatures.length];
+    }
+
+    function assignNewKit() {
+      showToast("Dotación Asignada", "Nueva dotación asignada exitosamente. Se ha generado una nueva cotización.");
+      closeDetailModal();
+    }
+
+    function recoverUniform() {
+      const name = document.getElementById('detailName').textContent;
+      showToast("Recuperación Iniciada", `Se ha notificado a ${name} para la devolución. El stock se sumará a bodega como 'Seminuevo'.`);
+      closeDetailModal();
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detailModal').classList.remove('active');
+    }
+
+    function sendMagicLink() {
+      showToast("Link Enviado", "Magic Link enviado exitosamente por WhatsApp.");
+
+      const statusBox = document.getElementById('magicLinkStatus');
+      const statusLabel = document.getElementById('statusLabel');
+      const statusDate = document.getElementById('statusDate');
+      const statusIconContainer = document.getElementById('statusIconContainer');
+      const resendBtn = document.getElementById('resendBtn');
+
+      statusBox.style.background = '#fff7ed';
+      statusBox.style.borderColor = '#ffedd5';
+      statusLabel.style.color = '#9a3412';
+      statusLabel.textContent = 'ESPERANDO TALLA';
+      statusDate.style.color = '#c2410c';
+      statusDate.textContent = 'Enviado hoy, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      statusIconContainer.style.color = '#f59e0b';
+      statusIconContainer.innerHTML = `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>`;
+      resendBtn.style.color = '#c2410c';
+      resendBtn.style.borderColor = '#fdba74';
+      resendBtn.style.background = 'white';
+    }
+
+    function sendMagicLinkBulk() {
+      const count = document.querySelectorAll('.emp-checkbox:checked').length;
+      showToast("Procesando Envíos", `Enviando Magic Links a ${count} empleados seleccionados...`);
+      deselectAll();
+    }
+
+    function toggleAll(source) {
+      const checkboxes = document.querySelectorAll('.emp-checkbox');
+      checkboxes.forEach(cb => cb.checked = source.checked);
+      updateSelection();
+    }
+
+    function updateSelection() {
+      const selected = document.querySelectorAll('.emp-checkbox:checked').length;
+      const bar = document.getElementById('batchBar');
+      const countTxt = document.getElementById('selectedCount');
+
+      if (selected > 0) {
+        bar.style.display = 'flex';
+        countTxt.textContent = `${selected} seleccionados`;
+      } else {
+        bar.style.display = 'none';
+        document.getElementById('selectAll').checked = false;
+      }
+    }
+
+    function deselectAll() {
+      document.getElementById('selectAll').checked = false;
+      document.querySelectorAll('.emp-checkbox').forEach(cb => cb.checked = false);
+      updateSelection();
+    }
+
+    function sortTable(n) {
+      const table = document.querySelector(".data-table");
+      let rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+      switching = true;
+      dir = "asc";
+      while (switching) {
+        switching = false;
+        rows = table.rows;
+        for (i = 2; i < (rows.length - 1); i++) {
+          shouldSwitch = false;
+          x = rows[i].getElementsByTagName("TD")[n];
+          y = rows[i + 1].getElementsByTagName("TD")[n];
+
+          let xValue = x.textContent.toLowerCase().trim();
+          let yValue = y.textContent.toLowerCase().trim();
+
+          if (dir == "asc") {
+            if (xValue > yValue) {
+              shouldSwitch = true;
+              break;
+            }
+          } else if (dir == "desc") {
+            if (xValue < yValue) {
+              shouldSwitch = true;
+              break;
+            }
+          }
+        }
+        if (shouldSwitch) {
+          rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+          switching = true;
+          switchcount++;
+        } else {
+          if (switchcount == 0 && dir == "asc") {
+            dir = "desc";
+            switching = true;
+          }
+        }
+      }
+    }
+
+    function filterByStatus(status, btn) {
+      // Update active state of buttons
+      document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const rows = document.querySelectorAll('.data-table tbody tr');
+      rows.forEach(row => {
+        if (status === 'all') {
+          row.style.display = '';
+          return;
+        }
+
+        const cells = row.getElementsByTagName('td');
+        if (cells.length < 4) return;
+
+        const alertaText = cells[3].innerText.toUpperCase().trim();
+        const targetStatus = status.toUpperCase().trim();
+
+        if (alertaText.includes(targetStatus)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    function filterSearch(query) {
+      const rows = document.querySelectorAll('.data-table tbody tr');
+      const q = query.toLowerCase().trim();
+
+      rows.forEach(row => {
+        const name = row.cells[1].innerText.toLowerCase();
+        if (name.includes(q)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    function saveEmployee(e) {
+      e.preventDefault();
+      const name = document.getElementById('empName').value;
+      const lastName = document.getElementById('empLastName').value;
+      const shirt = document.getElementById('empShirtSize').value;
+      const pants = document.getElementById('empPantsSize').value;
+      const shoes = document.getElementById('empShoeSize').value;
+
+      showToast("Registro Exitoso", `Empleado ${name} ${lastName} (C: ${shirt}, P: ${pants}, Z: ${shoes}) registrado exitosamente.`);
+      closeModal();
+    }
+    const allEmployees = [
+      { id: 'JS', name: 'Juan Sánchez', sucursal: 'Reforma', status: 'warning', statusText: 'RENOVAR PRONTO', address: 'Reforma 123', phone: '55 1234 5678' },
+      { id: 'ML', name: 'María López', sucursal: 'Polanco', status: 'success', statusText: 'BUEN ESTADO', address: 'Polanco 456', phone: '55 8765 4321' },
+      { id: 'RG', name: 'Ricardo Gómez', sucursal: 'Condesa', status: 'critical', statusText: 'VENCIDO', address: 'Condesa 789', phone: '55 4433 2211' },
+      { id: 'CR', name: 'Carlos Ruiz', sucursal: 'Reforma', status: 'success', statusText: 'BUEN ESTADO', address: 'Reforma 101', phone: '55 1122 3344' },
+      { id: 'AB', name: 'Ana Beltrán', sucursal: 'Polanco', status: 'warning', statusText: 'RENOVAR PRONTO', address: 'Polanco 202', phone: '55 2233 4455' },
+      { id: 'DL', name: 'Diego Luna', sucursal: 'Condesa', status: 'success', statusText: 'BUEN ESTADO', address: 'Condesa 101', phone: '55 3344 5566' }
+    ];
+
+    const industryAssignments = {
+      'Restaurante': [
+        { role: 'Mesero', kit: '2 Camisas Oxford, 1 Pantalón Gabardina' },
+        { role: 'Chef', kit: '2 Filipinas Classic, 2 Pantalones, 1 Mandil' },
+        { role: 'Barista', kit: '1 Mandil Barista, 1 Polo Premium' },
+        { role: 'Mesero', kit: '2 Camisas Oxford, 1 Pantalón Gabardina' },
+        { role: 'Chef', kit: '2 Filipinas Classic, 2 Pantalones, 1 Mandil' },
+        { role: 'Barista', kit: '1 Mandil Barista, 1 Polo Premium' }
+      ],
+      'Limpieza': [
+        { role: 'Operario Limpieza', kit: '2 Filipinas, 2 Pantalones, 1 Calzado' },
+        { role: 'Supervisor Zona', kit: '1 Chaleco Reflectante, 1 Calzado' },
+        { role: 'Mantenimiento', kit: '2 Pantalones Cargo, 2 Camisolas' },
+        { role: 'Operario Limpieza', kit: '2 Filipinas, 2 Pantalones, 1 Calzado' },
+        { role: 'Supervisor Zona', kit: '1 Chaleco Reflectante, 1 Calzado' },
+        { role: 'Mantenimiento', kit: '2 Pantalones Cargo, 2 Camisolas' }
+      ],
+      'Industrial': [
+        { role: 'Operario Producción', kit: '2 Overoles Algodón, 1 Calzado Casquillo' },
+        { role: 'Operario Logística', kit: '1 Chaleco Clase 2, 1 Faja Lumbar' },
+        { role: 'Mantenimiento Elec', kit: '2 Ropa Ignífuga, 1 Calzado Dieléctrico' },
+        { role: 'Operario Producción', kit: '2 Overoles Algodón, 1 Calzado Casquillo' },
+        { role: 'Operario Logística', kit: '1 Chaleco Clase 2, 1 Faja Lumbar' },
+        { role: 'Mantenimiento Elec', kit: '2 Ropa Ignífuga, 1 Calzado Dieléctrico' }
+      ]
+    };
+
+    function changeIndustry(industry) {
+      document.getElementById('currentIndustry').textContent = industry;
+      renderEmployees(industry);
+      showToast('Industria Cambiada', 'Se ha actualizado la dotación sugerida para ' + industry);
+    }
+
+    function renderEmployees(industry) {
+      const tbody = document.getElementById('employees-tbody');
+      tbody.innerHTML = '';
+
+      const assignments = industryAssignments[industry] || industryAssignments['Restaurante'];
+
+      allEmployees.forEach((emp, index) => {
+        const assign = assignments[index];
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td><input type="checkbox" class="emp-checkbox" onclick="updateSelection()"></td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <div style="width: 32px; height: 32px; border-radius: 50%; background: #E2E8F0; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.75rem; color: var(--color-navy);">${emp.id}</div>
+              <span>${emp.name}</span>
+            </div>
+          </td>
+          <td><span style="font-weight: 600; color: var(--color-navy);">${assign.role}</span></td>
+          <td><span class="status-badge status-${emp.status}">${emp.status === 'success' ? '' : '⚠️ '}${emp.statusText}</span></td>
+          <td>
+            <div style="display: flex; gap: 0.5rem; justify-content: flex-start;">
+              <button class="btn btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.75rem; min-width: 60px;" onclick="openDetailModal('${emp.name}', '${assign.role}', '85%', '${emp.address}', '${emp.phone}', '${emp.status}')">Ver</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // Initial render
+    window.onload = () => {
+      renderEmployees('Restaurante');
+    };
+  </script>
+  <script src="assets/js/utils.js"></script>
+</body>
+
+</html>
