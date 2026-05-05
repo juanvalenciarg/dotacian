@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>dotacian app | Órdenes de Compra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .oc-grid {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 2rem;
+    }
+
+    .source-selection {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .source-card {
+      padding: 2rem;
+      border: 2px dashed var(--color-border);
+      border-radius: var(--radius-lg);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .source-card:hover {
+      border-color: var(--color-cyan);
+      background: rgba(6, 182, 212, 0.02);
+      transform: translateY(-2px);
+    }
+
+    .source-card.active {
+      border-color: var(--color-cyan);
+      background: rgba(6, 182, 212, 0.05);
+      border-style: solid;
+    }
+
+    .quote-search-item {
+      padding: 1rem;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .quote-search-item:hover {
+      background: var(--color-smoke);
+      border-color: var(--color-cyan);
+    }
+
+    .file-upload-zone {
+      width: 100%;
+      padding: 3rem 1rem;
+      border: 2px dashed var(--color-border);
+      border-radius: 12px;
+      text-align: center;
+      background: var(--color-smoke);
+      color: var(--color-text-muted);
+    }
+
+    .order-summary-box {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--color-border);
+      padding: 1.5rem;
+      position: sticky;
+      top: 1.5rem;
+      max-height: calc(100vh - 3rem);
+      overflow-y: auto;
+    }
+
+    .detail-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      font-size: 0.75rem;
+    }
+
+    .detail-table th {
+      text-align: left;
+      color: var(--color-text-muted);
+      font-weight: 600;
+      padding: 0.5rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .detail-table td {
+      padding: 0.75rem 0.5rem;
+      border-bottom: 1px solid var(--color-smoke-mid);
+      color: var(--color-navy);
+      font-weight: 500;
+    }
+
+    .detail-table .row-total {
+      font-weight: 700;
+      color: var(--color-cyan);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span>dotacian</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="app.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <rect width="7" height="9" x="3" y="3" rx="1" />
+              <rect width="7" height="5" x="14" y="3" rx="1" />
+              <rect width="7" height="9" x="14" y="12" rx="1" />
+              <rect width="7" height="5" x="3" y="16" rx="1" />
+            </svg></span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="roles.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg></span>
+          <span class="nav-label">Roles</span>
+        </a>
+        <div class="nav-group">
+          <a href="#" class="nav-item">
+            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
+            </svg></span>
+            <span class="nav-label">Uniformes</span>
+            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
+          </a>
+          <div class="nav-sub-items">
+            <a href="uniformes.html" class="nav-sub-item">Marketplace</a>
+            <a href="mi_dotacion.html" class="nav-sub-item">Mi dotación</a>
+          </div>
+        </div>
+        <a href="sucursales.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
+              <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+              <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+              <path d="M10 6h4" />
+              <path d="M10 10h4" />
+              <path d="M10 14h4" />
+              <path d="M10 18h4" />
+            </svg></span>
+          <span class="nav-label">Sucursales</span>
+        </a>
+        <a href="empleados.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg></span>
+          <span class="nav-label">Empleados</span>
+        </a>
+        <div class="nav-group active">
+          <a href="produccion.html" class="nav-item active">
+            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path d="m7.5 4.27 9 5.15" />
+                <path
+                  d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                <path d="m3.3 7 8.7 5 8.7-5" />
+                <path d="M12 22V12" />
+              </svg></span>
+            <span class="nav-label">Producción</span>
+            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
+          </a>
+          <div class="nav-sub-items">
+            <a href="cotizaciones.html" class="nav-sub-item">Cotizaciones</a>
+            <a href="muestras.html" class="nav-sub-item">Solicitud de Muestras</a>
+            <a href="ordenes.html" class="nav-sub-item active">Órdenes de Compra</a>
+            <a href="seguimiento.html" class="nav-sub-item">Seguimiento</a>
+          </div>
+        </div>
+        <a href="bodega.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg></span>
+          <span class="nav-label">Bodega</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+            </svg></span>
+          <span class="nav-label">Alertas</span>
+        </a>
+        <div class="sidebar-spacer"></div>
+        <a href="index.html" class="nav-item nav-item-secondary">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" x2="9" y1="12" y2="12" />
+            </svg></span>
+          <span class="nav-label">Cerrar Sesión</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="app-header">
+        <div class="header-left">
+          <h1>Gestión de Órdenes de Compra</h1>
+          <p class="header-subtitle">Formaliza pedidos desde cotizaciones previas o documentos externos</p>
+        </div>
+      </header>
+
+      <div class="app-container">
+        <div class="oc-grid">
+          
+          <!-- Column 1: Source Selection -->
+          <div class="source-panel">
+            <div class="source-selection">
+              <div class="source-card active" id="source-quote" onclick="setSource('quote')">
+                <div style="color: var(--color-cyan);"><svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+                <div>
+                  <h3 style="font-size: 1rem; margin-bottom: 0.25rem;">Desde Cotización</h3>
+                  <p style="font-size: 0.75rem; color: var(--color-text-muted);">Carga un presupuesto interno existente</p>
+                </div>
+              </div>
+              <div class="source-card" id="source-file" onclick="setSource('file')">
+                <div style="color: var(--color-navy);"><svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg></div>
+                <div>
+                  <h3 style="font-size: 1rem; margin-bottom: 0.25rem;">Subir Archivo</h3>
+                  <p style="font-size: 0.75rem; color: var(--color-text-muted);">Adjunta OC externa del cliente (PDF/IMG)</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dynamic Content: Quote Search -->
+            <div id="quote-search-area" class="app-card">
+              <div style="margin-bottom: 1.5rem;">
+                <input type="text" placeholder="Buscar cotización por ID o Cliente..." style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px;">
+              </div>
+              <div class="quote-list">
+                <div class="quote-search-item" onclick="selectQuote('#COT-8820', 'Restaurante Reforma', '$12,450.00')">
+                  <div>
+                    <div style="font-weight: 700; color: var(--color-navy);">#COT-8820</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Restaurante Reforma • 12 Abr 2026</div>
+                  </div>
+                  <div style="font-weight: 600; color: var(--color-cyan);">$12,450.00</div>
+                </div>
+                <div class="quote-search-item" onclick="selectQuote('#COT-8791', 'Hotel Marina', '$8,900.00')">
+                  <div>
+                    <div style="font-weight: 700; color: var(--color-navy);">#COT-8791</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Hotel Marina • 10 Abr 2026</div>
+                  </div>
+                  <div style="font-weight: 600; color: var(--color-cyan);">$8,900.00</div>
+                </div>
+                <div class="quote-search-item" onclick="selectQuote('#COT-8755', 'Corporativo Polanco', '$24,100.00')">
+                  <div>
+                    <div style="font-weight: 700; color: var(--color-navy);">#COT-8755</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Corporativo Polanco • 05 Abr 2026</div>
+                  </div>
+                  <div style="font-weight: 600; color: var(--color-cyan);">$24,100.00</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dynamic Content: File Upload -->
+            <div id="file-upload-area" class="app-card" style="display: none;">
+              <div class="file-upload-zone">
+                <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin-bottom: 1rem;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                <h3>Arrastra la Orden de Compra aquí</h3>
+                <p style="font-size: 0.875rem;">O haz clic para buscar en tus archivos (PDF, JPG, PNG)</p>
+                <input type="file" style="display: none;">
+                <button class="btn btn-outline" style="margin-top: 1.5rem;" onclick="simulateFileUpload()">Seleccionar Archivo</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2: Order Summary -->
+          <div class="summary-panel">
+            <div class="order-summary-box">
+              <h2 style="font-size: 1.25rem; margin-bottom: 1.5rem;">Resumen de Confirmación</h2>
+              
+              <div id="summary-empty" style="text-align: center; color: var(--color-text-muted); padding: 2rem 0;">
+                <p>Selecciona una cotización o sube un archivo para continuar</p>
+              </div>
+
+              <div id="summary-content" style="display: none;">
+                <div style="background: var(--color-smoke); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                  <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--color-text-muted); font-weight: 700;">Origen del Pedido</div>
+                  <div id="summary-source-type" style="font-weight: 700; color: var(--color-navy); margin-top: 0.25rem;">#COT-8820</div>
+                  <div id="summary-client" style="font-size: 0.875rem; color: var(--color-text-secondary);">Restaurante Reforma</div>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                  <h4 style="font-size: 0.8125rem; color: var(--color-text-secondary); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em;">Desglose de Productos</h4>
+                  <table class="detail-table">
+                    <thead>
+                      <tr>
+                        <th>Producto</th>
+                        <th>Cant.</th>
+                        <th>Talla</th>
+                        <th>Color</th>
+                        <th>Unit.</th>
+                        <th>Total</th>
+                      </tr>
+                    </thead>
+                    <tbody id="summary-items-body">
+                      <!-- Filled by selectQuote -->
+                    </tbody>
+                  </table>
+                </div>
+
+                <div style="margin-bottom: 1.5rem; padding-top: 1rem; border-top: 2px dashed var(--color-border);">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                    <span>Subtotal (antes de IVA):</span>
+                    <span id="summary-subtotal" style="font-weight: 600;">$10,732.76</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                    <span>IVA (16%):</span>
+                    <span id="summary-tax" style="font-weight: 600;">$1,717.24</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 1rem; margin-top: 0.5rem; border-top: 1px solid var(--color-border); padding-top: 0.5rem;">
+                    <span style="font-weight: 700;">Total de la Orden:</span>
+                    <span id="summary-amount" style="font-weight: 800; color: var(--color-cyan);">$12,450.00</span>
+                  </div>
+                </div>
+
+                <div style="border-top: 1px solid var(--color-border); padding-top: 1.5rem; margin-top: 1.5rem;">
+
+                  
+                  <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-bottom: 1.5rem;">
+                    <input type="checkbox" checked>
+                    <span style="font-size: 0.8125rem;">He validado que los montos coinciden con la OC</span>
+                  </label>
+
+                  <button class="btn btn-primary" style="width: 100%;" onclick="confirmOrder()">Confirmar Pedido</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function setSource(type) {
+      document.querySelectorAll('.source-card').forEach(c => c.classList.remove('active'));
+      document.getElementById('source-' + type).classList.add('active');
+      
+      if (type === 'quote') {
+        document.getElementById('quote-search-area').style.display = 'block';
+        document.getElementById('file-upload-area').style.display = 'none';
+      } else {
+        document.getElementById('quote-search-area').style.display = 'none';
+        document.getElementById('file-upload-area').style.display = 'block';
+      }
+    }
+
+    function selectQuote(id, client, amount) {
+      document.getElementById('summary-empty').style.display = 'none';
+      document.getElementById('summary-content').style.display = 'block';
+      document.getElementById('summary-source-type').textContent = id;
+      document.getElementById('summary-client').textContent = client;
+
+      // Map specific quotes to specific item sets to ensure totals match the list
+      const quoteData = {
+        '#COT-8820': [
+          { name: 'Filipina Chef Classic', qty: 10, talla: 'M', color: 'Blanco', unit: 500 },
+          { name: 'Pantalón Cocina Pro', qty: 10, talla: '32', color: 'Negro', unit: 400 },
+          { name: 'Mandil Barista Plus', qty: 5, talla: 'U', color: 'Café', unit: 346.551 }
+        ],
+        '#COT-8791': [
+          { name: 'Camisa Oxford', qty: 10, talla: 'L', color: 'Azul', unit: 450 },
+          { name: 'Pantalón Chino', qty: 8, talla: '34', color: 'Beige', unit: 396.55 }
+        ],
+        '#COT-8755': [
+          { name: 'Chaqueta Industrial', qty: 20, talla: 'XL', color: 'Azul Navy', unit: 800 },
+          { name: 'Overol de Seguridad', qty: 10, talla: 'L', color: 'Naranja', unit: 474.13 }
+        ]
+      };
+
+      const itemsBody = document.getElementById('summary-items-body');
+      itemsBody.innerHTML = '';
+
+      const items = quoteData[id] || quoteData['#COT-8820'];
+
+      let subtotal = 0;
+      items.forEach(item => {
+        const totalItem = item.qty * item.unit;
+        subtotal += totalItem;
+        itemsBody.innerHTML += `
+          <tr>
+            <td>${item.name}</td>
+            <td>${item.qty}</td>
+            <td>${item.talla}</td>
+            <td>${item.color}</td>
+            <td>$${item.unit.toFixed(2)}</td>
+            <td class="row-total">$${totalItem.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</td>
+          </tr>
+        `;
+      });
+
+      const tax = subtotal * 0.16;
+      const total = subtotal + tax;
+
+      document.getElementById('summary-subtotal').textContent = `$${subtotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
+      document.getElementById('summary-tax').textContent = `$${tax.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
+      document.getElementById('summary-amount').textContent = `$${total.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
+    }
+
+    function simulateFileUpload() {
+      showToast("Cargando Archivo", "Simulando carga de archivo OC_Cliente_Reforma.pdf...");
+      document.getElementById('summary-empty').style.display = 'none';
+      document.getElementById('summary-content').style.display = 'block';
+      document.getElementById('summary-source-type').textContent = "ARCHIVO: OC_Reforma.pdf";
+      document.getElementById('summary-client').textContent = "Restaurante Reforma (Externo)";
+      document.getElementById('summary-amount').textContent = "$15,200.00";
+    }
+
+    function confirmOrder() {
+      document.getElementById('confirmModal').style.display = 'flex';
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirmModal').style.display = 'none';
+    }
+
+    function processOrder() {
+      closeConfirmModal();
+      showToast("Pedido Confirmado", "¡Pedido confirmado! Se ha notificado al taller central.");
+      setTimeout(() => {
+        window.location.href = "produccion.html";
+      }, 2000);
+    }
+  </script>
+
+  <!-- Modal de Confirmación -->
+  <div id="confirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 16px; width: 90%; max-width: 400px; padding: 2rem; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: scaleIn 0.3s ease-out forwards; position: relative;">
+      
+      <div style="width: 48px; height: 48px; background: rgba(6, 182, 212, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; color: var(--color-cyan);">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
+      </div>
+
+      <h3 style="font-size: 1.25rem; font-family: 'Outfit', sans-serif; color: var(--color-navy); margin-bottom: 0.75rem;">¿Confirmar y enviar a taller?</h3>
+      <p style="font-size: 0.9375rem; color: var(--color-text-secondary); line-height: 1.5; margin-bottom: 2rem;">Al confirmar, se generará la orden de producción inmediata y se notificará al taller central. Esta acción no se puede deshacer.</p>
+
+      <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+        <button class="btn btn-outline" onclick="closeConfirmModal()" style="flex: 1;">Cancelar</button>
+        <button class="btn btn-primary" onclick="processOrder()" style="flex: 1;">Sí, confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes scaleIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+<script src="assets/js/utils.js"></script>
+</body>
+
+</html>
