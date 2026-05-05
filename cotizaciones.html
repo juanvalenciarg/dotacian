@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>dotacian app | Generar Cotización</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .quote-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .quote-item:last-child {
+      border-bottom: none;
+    }
+
+    .item-qty-control {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--color-smoke);
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+    }
+
+    .qty-btn {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .qty-btn:hover {
+      background: var(--color-cyan);
+      color: white;
+      border-color: var(--color-cyan);
+    }
+
+    .price-tag {
+      font-weight: 700;
+      color: var(--color-navy);
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 1rem;
+      margin-top: 1rem;
+      border-top: 2px dashed var(--color-border);
+      font-family: var(--font-family-heading);
+    }
+    .tab-btn {
+      padding: 0.75rem 1.5rem;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: var(--color-navy);
+    }
+
+    .tab-btn.active {
+      color: var(--color-cyan);
+      border-bottom-color: var(--color-cyan);
+    }
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 1.5rem;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      position: relative;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span>dotacian</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="app.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <rect width="7" height="9" x="3" y="3" rx="1" />
+              <rect width="7" height="5" x="14" y="3" rx="1" />
+              <rect width="7" height="9" x="14" y="12" rx="1" />
+              <rect width="7" height="5" x="3" y="16" rx="1" />
+            </svg></span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="roles.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg></span>
+          <span class="nav-label">Roles</span>
+        </a>
+        <div class="nav-group">
+          <a href="#" class="nav-item">
+            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
+            </svg></span>
+            <span class="nav-label">Uniformes</span>
+            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
+          </a>
+          <div class="nav-sub-items">
+            <a href="uniformes.html" class="nav-sub-item">Marketplace</a>
+            <a href="mi_dotacion.html" class="nav-sub-item">Mi dotación</a>
+          </div>
+        </div>
+        <a href="sucursales.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
+              <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+              <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+              <path d="M10 6h4" />
+              <path d="M10 10h4" />
+              <path d="M10 14h4" />
+              <path d="M10 18h4" />
+            </svg></span>
+          <span class="nav-label">Sucursales</span>
+        </a>
+        <a href="empleados.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg></span>
+          <span class="nav-label">Empleados</span>
+        </a>
+        <div class="nav-group active">
+          <a href="produccion.html" class="nav-item active">
+            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path d="m7.5 4.27 9 5.15" />
+                <path
+                  d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                <path d="m3.3 7 8.7 5 8.7-5" />
+                <path d="M12 22V12" />
+              </svg></span>
+            <span class="nav-label">Producción</span>
+            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor"
+                stroke-width="2" viewBox="0 0 24 24">
+                <path d="m6 9 6 6 6-6" />
+              </svg></span>
+          </a>
+          <div class="nav-sub-items">
+            <a href="cotizaciones.html" class="nav-sub-item active">Cotizaciones</a>
+            <a href="muestras.html" class="nav-sub-item">Solicitud de Muestras</a>
+            <a href="ordenes.html" class="nav-sub-item">Órdenes de Compra</a>
+            <a href="seguimiento.html" class="nav-sub-item">Seguimiento</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <a href="#" class="nav-item">
+            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <polyline points="21 8 21 21 3 21 3 8"></polyline>
+                <rect x="1" y="3" width="22" height="5"></rect>
+                <line x1="10" y1="12" x2="14" y2="12"></line>
+              </svg></span>
+            <span class="nav-label">Bodega</span>
+            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor"
+                stroke-width="2" viewBox="0 0 24 24">
+                <path d="m6 9 6 6 6-6" />
+              </svg></span>
+          </a>
+          <div class="nav-sub-items">
+            <a href="bodega.html" class="nav-sub-item">Inventario</a>
+            <a href="entregas.html" class="nav-sub-item">Entregas</a>
+          </div>
+        </div>
+        <a href="#" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+            </svg></span>
+          <span class="nav-label">Alertas</span>
+        </a>
+        <div class="sidebar-spacer"></div>
+        <a href="index.html" class="nav-item nav-item-secondary">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" x2="9" y1="12" y2="12" />
+            </svg></span>
+          <span class="nav-label">Cerrar Sesión</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="app-header" style="margin-bottom: 1rem;">
+        <div class="header-left">
+          <h1>Gestión de Cotizaciones</h1>
+          <p class="header-subtitle">Administra presupuestos manuales y solicitudes automáticas de empleados</p>
+        </div>
+        <div class="header-right" style="display: flex; gap: 1rem;">
+          <button class="btn btn-outline">Ver Historial</button>
+        </div>
+      </header>
+
+      <div class="app-container">
+        <div class="tabs-container"
+          style="margin-bottom: 2rem; display: flex; gap: 0.5rem; border-bottom: 1px solid var(--color-border);">
+          <button id="tab-automatic" class="tab-btn active" onclick="switchTab('automatic')">Cotizaciones Automáticas</button>
+          <button id="tab-manual" class="tab-btn" onclick="switchTab('manual')">Cotizaciones Manuales</button>
+          <button id="tab-historial" class="tab-btn" onclick="switchTab('historial')">Historial de Cotizaciones</button>
+        </div>
+
+        <!-- Manual Section -->
+        <div id="manualSection" style="display: none; grid-template-columns: 1fr 400px; gap: 2rem;">
+
+          <!-- Column 1: Catalog Selection -->
+          <div class="selection-column">
+            <!-- Search & Filters -->
+            <div class="app-card" style="margin-bottom: 2rem; padding: 1.25rem;">
+              <div style="display: flex; gap: 1rem;">
+                <div style="flex: 1; position: relative;">
+                  <span
+                    style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-muted);">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <circle cx="11" cy="11" r="8" />
+                      <path d="m21 21-4.3-4.3" />
+                    </svg>
+                  </span>
+                  <input type="text" placeholder="Buscar por nombre, código o categoría..."
+                    style="width: 100%; padding: 0.875rem 1rem 0.875rem 3rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); outline: none;">
+                </div>
+                <select
+                <select id="industryManualFilter" onchange="filterManualCatalog()"
+                  style="padding: 0.875rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); outline: none; background: white;">
+                  <option value="all">Todas las Industrias</option>
+                  <option value="Restaurante">Restaurantes</option>
+                  <option value="Limpieza">Limpieza</option>
+                  <option value="Industrial">Industrial</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div id="manualCatalogGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+
+              <!-- Item 1 (Chef) -->
+              <div class="catalog-card" data-industry="Restaurante">
+                <div class="catalog-img-wrap">
+                  <img src="assets/chef_coat.png" alt="Filipina Chef Classic" class="catalog-img">
+                  <span class="catalog-badge">$580 MXN</span>
+                </div>
+                <div class="catalog-content">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <h3 style="font-size: 1rem; margin: 0;">Filipina Chef Classic - Mujer</h3>
+                    <span
+                      style="font-size: 0.65rem; background: #FFF7ED; color: #C2410C; padding: 2px 6px; border-radius: 4px; font-weight: 700;">RESTAURANTE</span>
+                  </div>
+                  <p class="catalog-desc">Tela transpirable, anti-manchas. Corte ergonómico diseñado para largas
+                    jornadas.</p>
+                  <button class="btn btn-outline"
+                    style="border-color: var(--color-cyan); color: var(--color-cyan); padding: 0.6rem;"
+                    onclick="addToQuote('Filipina Chef Classic', 580)">Añadir a Cotización</button>
+                </div>
+              </div>
+
+              <!-- Item 2 (Mesero) -->
+              <div class="catalog-card" data-industry="Restaurante">
+                <div class="catalog-img-wrap">
+                  <img src="assets/oxford_shirt_black.png" alt="Camisa Oxford Ejecutiva" class="catalog-img">
+                  <span class="catalog-badge">$450 MXN</span>
+                </div>
+                <div class="catalog-content">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <h3 style="font-size: 1rem; margin: 0;">Camisa Oxford Ejecutiva - Hombre</h3>
+                    <span
+                      style="font-size: 0.65rem; background: #EEF2FF; color: #4338CA; padding: 2px 6px; border-radius: 4px; font-weight: 700;">RESTAURANTE</span>
+                  </div>
+                  <p class="catalog-desc">Algodón premium de alta durabilidad. Acabado planchado fácil y corte moderno.
+                  </p>
+                  <button class="btn btn-outline"
+                    style="border-color: var(--color-cyan); color: var(--color-cyan); padding: 0.6rem;"
+                    onclick="addToQuote('Camisa Oxford Ejecutiva', 450)">Añadir a Cotización</button>
+                </div>
+              </div>
+
+              <!-- Item 3 (Limpieza) -->
+              <div class="catalog-card" data-industry="Limpieza">
+                <div class="catalog-img-wrap">
+                  <img src="assets/antifluidoMujerAzul.jpg" alt="Conjunto Antifluido" class="catalog-img">
+                  <span class="catalog-badge">$520 MXN</span>
+                </div>
+                <div class="catalog-content">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <h3 style="font-size: 1rem; margin: 0;">Conjunto Antifluido - Mujer</h3>
+                    <span
+                      style="font-size: 0.65rem; background: #ECFDF5; color: #047857; padding: 2px 6px; border-radius: 4px; font-weight: 700;">LIMPIEZA</span>
+                  </div>
+                  <p class="catalog-desc">Tejido técnico repelente a líquidos. Comodidad y protección para personal operativo.</p>
+                  <button class="btn btn-outline"
+                    style="border-color: var(--color-cyan); color: var(--color-cyan); padding: 0.6rem;"
+                    onclick="addToQuote('Conjunto Antifluido', 520)">Añadir a Cotización</button>
+                </div>
+              </div>
+
+              <!-- Item 4 (Industrial - Overol) -->
+              <div class="catalog-card" data-industry="Industrial">
+                <div class="catalog-img-wrap">
+                  <img src="assets/overloHombre.jpg" alt="Overol Mantenimiento" class="catalog-img">
+                  <span class="catalog-badge">$980 MXN</span>
+                </div>
+                <div class="catalog-content">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <h3 style="font-size: 1rem; margin: 0;">Overol de Mantenimiento Industrial</h3>
+                    <span
+                      style="font-size: 0.65rem; background: #FEE2E2; color: #991B1B; padding: 2px 6px; border-radius: 4px; font-weight: 700;">INDUSTRIAL</span>
+                  </div>
+                  <p class="catalog-desc">Protección contra arco eléctrico y fuego. Certificado para uso rudo.</p>
+                  <button class="btn btn-outline"
+                    style="border-color: var(--color-cyan); color: var(--color-cyan); padding: 0.6rem;"
+                    onclick="addToQuote('Overol Industrial', 980)">Añadir a Cotización</button>
+                </div>
+              </div>
+
+              <!-- Item 5 (Industrial - Casco) -->
+              <div class="catalog-card" data-industry="Industrial">
+                <div class="catalog-img-wrap">
+                  <img src="assets/cascoBlanco.jpg" alt="Casco de Seguridad" class="catalog-img">
+                  <span class="catalog-badge">$350 MXN</span>
+                </div>
+                <div class="catalog-content">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <h3 style="font-size: 1rem; margin: 0;">Casco de Seguridad Blanco</h3>
+                    <span
+                      style="font-size: 0.65rem; background: #FEE2E2; color: #991B1B; padding: 2px 6px; border-radius: 4px; font-weight: 700;">INDUSTRIAL</span>
+                  </div>
+                  <p class="catalog-desc">Protección craneal de alta resistencia. Ajuste ergonómico tipo rachet.</p>
+                  <button class="btn btn-outline"
+                    style="border-color: var(--color-cyan); color: var(--color-cyan); padding: 0.6rem;"
+                    onclick="addToQuote('Casco de Seguridad', 350)">Añadir a Cotización</button>
+                </div>
+              </div>
+
+              <!-- Item 6 (Industrial - Botas) -->
+              <div class="catalog-card" data-industry="Industrial">
+                <div class="catalog-img-wrap">
+                  <img src="assets/botasSeguridadCafes.jpg" alt="Botas de Seguridad" class="catalog-img">
+                  <span class="catalog-badge">$1,150 MXN</span>
+                </div>
+                <div class="catalog-content">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <h3 style="font-size: 1rem; margin: 0;">Botas de Seguridad Dieléctricas</h3>
+                    <span
+                      style="font-size: 0.65rem; background: #FEE2E2; color: #991B1B; padding: 2px 6px; border-radius: 4px; font-weight: 700;">INDUSTRIAL</span>
+                  </div>
+                  <p class="catalog-desc">Punta de acero, suela antideslizante y protección eléctrica.</p>
+                  <button class="btn btn-outline"
+                    style="border-color: var(--color-cyan); color: var(--color-cyan); padding: 0.6rem;"
+                    onclick="addToQuote('Botas de Seguridad', 1150)">Añadir a Cotización</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Column 2: Quote Summary Panel -->
+          <div class="summary-column">
+            <div class="app-card" style="position: sticky; top: 1.5rem; border-top: 4px solid var(--color-cyan);">
+              <h2 style="font-size: 1.25rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                  <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+                </svg>
+                Borrador de Cotización
+              </h2>
+
+              <div style="margin-bottom: 1.5rem;">
+                <label
+                  style="font-size: 0.75rem; color: var(--color-text-muted); font-weight: 600; text-transform: uppercase;">Cliente
+                  / Proyecto</label>
+                <select
+                  style="width: 100%; padding: 0.6rem; border: 1px solid var(--color-border); border-radius: 6px; margin-top: 0.25rem;">
+                  <option>Reforma</option>
+                  <option>Polanco</option>
+                  <option>Condesa</option>
+                </select>
+              </div>
+
+              <!-- List of selected items -->
+              <div id="quote-items-container"
+                style="min-height: 100px; max-height: 400px; overflow-y: auto; margin-bottom: 1.5rem;">
+                <!-- Dynamically rendered by JS -->
+                <div style="text-align: center; color: var(--color-text-muted); padding: 2rem; font-size: 0.875rem;">
+                  No hay productos en la cotización
+                </div>
+              </div>
+
+              <!-- Totals -->
+              <div style="background: var(--color-smoke); padding: 1rem; border-radius: 12px;">
+                <div
+                  style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--color-text-secondary);">
+                  <span>Subtotal:</span>
+                  <span id="subtotal-label">$0.00</span>
+                </div>
+                <div
+                  style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--color-text-secondary);">
+                  <span>IVA (16%):</span>
+                  <span id="iva-label">$0.00</span>
+                </div>
+                <div class="total-row">
+                  <span style="font-weight: 700; font-size: 1.125rem;">TOTAL:</span>
+                  <span id="total-label" style="font-weight: 800; font-size: 1.25rem; color: var(--color-cyan);">$0.00</span>
+                </div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem;">
+                <button class="btn btn-primary" style="width: 100%;"
+                  onclick="showToast('Generando PDF', 'Generando documento PDF de Cotización...')">Generar Cotización PDF</button>
+                <button class="btn btn-outline" style="width: 100%; border-style: dashed;">Guardar como
+                  Borrador</button>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- End Manual Section -->
+
+        <!-- Automatic Section -->
+        <div id="automaticSection" style="display: block;">
+          <div id="autoBulkBar" class="app-card" style="display: none; background: var(--color-navy); color: white; margin-bottom: 1.5rem; padding: 1rem 1.5rem; justify-content: space-between; align-items: center; border: none;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <span id="autoSelectedCount" style="font-weight: 600;">0 seleccionados</span>
+              <div style="height: 24px; width: 1px; background: rgba(255,255,255,0.2);"></div>
+              <button class="btn btn-primary" style="padding: 0.5rem 1rem; background: var(--color-cyan); color: var(--color-navy);" onclick="consolidateQuotes()">Consolidar en una sola Cotización</button>
+            </div>
+            <button class="btn-close" style="color: white; font-size: 1.25rem;" onclick="deselectAllAuto()">✕</button>
+          </div>
+          <div class="app-card" style="padding: 0;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 40px;"><input type="checkbox" id="selectAllAuto" onclick="toggleAllAuto(this)"></th>
+                  <th>Empleado (Destino)</th>
+                  <th>Detalle de Prendas</th>
+                  <th>Fecha de Solicitud</th>
+                  <th>Valor Estimado</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><input type="checkbox" class="auto-checkbox" onclick="updateAutoSelection()"></td>
+                  <td>
+                    <div style="font-weight: 600; color: var(--color-navy);">Juan Sánchez</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Mesero | Sucursal Reforma</div>
+                  </td>
+                  <td>
+                    <div style="font-weight: 600;">3 Prendas Solicitadas</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-secondary);">2 Camisas Oxford, 1 Pantalón</div>
+                  </td>
+                  <td>01 Mayo 2024</td>
+                  <td style="font-weight: 700; color: var(--color-navy);">$1,380.00</td>
+                  <td><span class="status-badge status-warning">POR COTIZAR</span></td>
+                  <td>
+                    <div style="display: flex; gap: 0.5rem;">
+                      <button class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="generateAutomaticQuote()">Generar Cotización</button>
+                      <button class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="openBreakdownModal('Juan Sánchez', 'Mesero | Reforma', [['Camisa Oxford', 2, 450, 'assets/oxford_shirt_black.png'], ['Pantalón', 1, 480, 'assets/chef_pants_black.png']])">Ver Detalles</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="auto-checkbox" onclick="updateAutoSelection()"></td>
+                  <td>
+                    <div style="font-weight: 600; color: var(--color-navy);">Ricardo Gómez</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Barista | Sucursal Condesa</div>
+                  </td>
+                  <td>
+                    <div style="font-weight: 600;">2 Prendas Solicitadas</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-secondary);">1 Mandil Barista, 1 Polo Premium</div>
+                  </td>
+                  <td>30 Abr 2024</td>
+                  <td style="font-weight: 700; color: var(--color-navy);">$610.00</td>
+                  <td><span class="status-badge status-warning">POR COTIZAR</span></td>
+                  <td>
+                    <div style="display: flex; gap: 0.5rem;">
+                      <button class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="generateAutomaticQuote()">Generar Cotización</button>
+                      <button class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="openBreakdownModal('Ricardo Gómez', 'Barista | Condesa', [['Mandil Barista', 1, 320, 'assets/barista_apron.png'], ['Polo Premium', 1, 290, '/Users/juanvalencia/.gemini/antigravity/brain/8559e5d1-494a-43a6-8e4a-46626c0396c2/polo_shirt_premium_1777430879967.png']])">Ver Detalles</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="auto-checkbox" onclick="updateAutoSelection()"></td>
+                  <td>
+                    <div style="font-weight: 600; color: var(--color-navy);">Ana Beltrán</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Chef | Sucursal Polanco</div>
+                  </td>
+                  <td>
+                    <div style="font-weight: 600;">4 Prendas Solicitadas</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-secondary);">2 Filipinas, 2 Pantalones Pro</div>
+                  </td>
+                  <td>28 Abr 2024</td>
+                  <td style="font-weight: 700; color: var(--color-navy);">$2,120.00</td>
+                  <td><span class="status-badge status-success">COTIZADO</span></td>
+                  <td>
+                    <div style="display: flex; gap: 0.5rem;">
+                      <button class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="viewQuotationDetail('#COT-2404-28', 'Ana Beltrán', 'Chef | Polanco', [{name: 'Filipina Executive', qty: 2, price: 580, ref: 'FIL-02', color: 'Blanco', talla: 'M', img: 'assets/chef_coat.png'}, {name: 'Pantalón Pro', qty: 2, price: 480, ref: 'PAN-05', color: 'Negro', talla: '32', img: 'assets/chef_pants_black.png'}])">Ver Detalle</button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div><!-- End Automatic Section -->
+
+        <!-- Historial Section -->
+        <div id="historialSection" style="display: none;">
+          <div class="app-card" style="padding: 0;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Folio</th>
+                  <th>Cliente / Sucursal</th>
+                  <th>Fecha Emisión</th>
+                  <th>Total (c/IVA)</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="historialTableBody">
+                <tr>
+                  <td style="font-weight: 600; color: var(--color-cyan);">#COT-2405-01</td>
+                  <td>
+                    <div style="font-weight: 600;">Sucursal Reforma</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Proyecto: Renovación Primavera</div>
+                  </td>
+                  <td>01 May 2024</td>
+                  <td style="font-weight: 700;">$15,420.00</td>
+                  <td><span class="status-badge status-success">ENVIADA</span></td>
+                  <td>
+                    <div style="display: flex; gap: 0.5rem;">
+                      <button class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="viewQuotationDetail('#COT-2405-01', 'Sucursal Reforma', 'Renovación Primavera', [{name: 'Camisa Oxford', qty: 12, price: 450, ref: 'OX-01', color: 'Azul Navy', talla: 'Varias', img: 'assets/oxford_shirt_black.png'}, {name: 'Pantalón Chino', qty: 12, price: 480, ref: 'CH-01', color: 'Beige', talla: 'Varias', img: 'assets/chef_pants_black.png'}])">Ver Detalle</button>
+                      <button class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="showToast('Descargando', 'Descargando Cotización #COT-2405-01...')">Descargar</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600; color: var(--color-cyan);">#COT-2404-15</td>
+                  <td>
+                    <div style="font-weight: 600;">Sucursal Polanco</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Proyecto: Apertura Nuevos Roles</div>
+                  </td>
+                  <td>15 Abr 2024</td>
+                  <td style="font-weight: 700;">$8,900.50</td>
+                  <td><span class="status-badge status-warning">PENDIENTE</span></td>
+                  <td>
+                    <div style="display: flex; gap: 0.5rem;">
+                      <button class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="viewQuotationDetail('#COT-2404-15', 'Sucursal Polanco', 'Apertura Nuevos Roles', [{name: 'Filipina Chef', qty: 6, price: 580, ref: 'FIL-01', color: 'Negro', talla: 'L', img: 'assets/chef_coat.png'}])">Ver Detalle</button>
+                      <button class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="showToast('Descargando', 'Descargando Cotización #COT-2404-15...')">Descargar</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600; color: var(--color-cyan);">#COT-2404-10</td>
+                  <td>
+                    <div style="font-weight: 600;">Sucursal Condesa</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Proyecto: Reposición Stock</div>
+                  </td>
+                  <td>10 Abr 2024</td>
+                  <td style="font-weight: 700;">$4,250.00</td>
+                  <td><span class="status-badge status-success" style="background: #E0F2FE; color: #0369A1;">APROBADA</span></td>
+                  <td>
+                    <div style="display: flex; gap: 0.5rem;">
+                      <button class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="viewQuotationDetail('#COT-2404-10', 'Sucursal Condesa', 'Reposición Stock', [{name: 'Polo Premium', qty: 10, price: 290, ref: 'POL-01', color: 'Azul', talla: 'L', img: '/Users/juanvalencia/.gemini/antigravity/brain/8559e5d1-494a-43a6-8e4a-46626c0396c2/polo_shirt_premium_1777430879967.png'}])">Ver Detalle</button>
+                      <button class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Ver OC</button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div><!-- End Historial Section -->
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let quoteItems = [];
+
+    function switchTab(tab) {
+      const manual = document.getElementById('manualSection');
+      const automatic = document.getElementById('automaticSection');
+      const historial = document.getElementById('historialSection');
+      const tabManual = document.getElementById('tab-manual');
+      const tabAutomatic = document.getElementById('tab-automatic');
+      const tabHistorial = document.getElementById('tab-historial');
+
+      // Reset all
+      manual.style.display = 'none';
+      automatic.style.display = 'none';
+      historial.style.display = 'none';
+      tabManual.classList.remove('active');
+      tabAutomatic.classList.remove('active');
+      tabHistorial.classList.remove('active');
+
+      if (tab === 'manual') {
+        manual.style.display = 'grid';
+        tabManual.classList.add('active');
+      } else if (tab === 'automatic') {
+        automatic.style.display = 'block';
+        tabAutomatic.classList.add('active');
+      } else if (tab === 'historial') {
+        historial.style.display = 'block';
+        tabHistorial.classList.add('active');
+      }
+    }
+
+    function filterManualCatalog() {
+      const industry = document.getElementById('industryManualFilter').value;
+      const cards = document.querySelectorAll('#manualCatalogGrid .catalog-card');
+      
+      cards.forEach(card => {
+        const cardIndustry = card.getAttribute('data-industry');
+        if (industry === 'all' || cardIndustry === industry) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    function generateAutomaticQuote() {
+      showToast('Cotización Generada', 'La solicitud se ha procesado correctamente. Ahora puedes revisar el borrador.');
+      setTimeout(() => {
+        switchTab('manual');
+      }, 1000);
+    }
+
+    function openBreakdownModal(name, role, items) {
+      document.getElementById('breakdownTitle').textContent = `Desglose: ${name}`;
+      document.getElementById('breakdownSubtitle').textContent = role;
+      
+      const container = document.getElementById('breakdownItems');
+      container.innerHTML = '';
+      
+      let grandTotal = 0;
+      items.forEach((item, index) => {
+        // Handle both old array format and new object format for backward compatibility if needed
+        let itemName, qty, price, imgSrc, ref, color, talla;
+        if (Array.isArray(item)) {
+          [itemName, qty, price, imgSrc] = item;
+          ref = 'REF-' + (index + 101);
+          color = 'N/A';
+          talla = 'N/A';
+        } else {
+          ({name: itemName, qty, price, img: imgSrc, ref, color, talla} = item);
+        }
+
+        const total = qty * price;
+        grandTotal += total;
+        
+        container.innerHTML += `
+          <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--color-border);">
+            <img src="${imgSrc || 'assets/placeholder.png'}" style="width: 50px; height: 50px; object-fit: contain; background: #f8fafc; border-radius: 8px; border: 1px solid var(--color-border);">
+            <div style="flex: 1;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="font-weight: 700; color: var(--color-navy); font-size: 0.9375rem;">${itemName}</div>
+                <div style="font-weight: 800; color: var(--color-navy); font-size: 0.9375rem;">$${total.toFixed(2)}</div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
+                <div style="font-size: 0.75rem; color: var(--color-text-muted);"><span style="font-weight: 600; color: var(--color-text-secondary);">REF:</span> ${ref}</div>
+                <div style="font-size: 0.75rem; color: var(--color-text-muted);"><span style="font-weight: 600; color: var(--color-text-secondary);">Color:</span> ${color}</div>
+                <div style="font-size: 0.75rem; color: var(--color-text-muted);"><span style="font-weight: 600; color: var(--color-text-secondary);">Cant:</span> ${qty}</div>
+                <div style="font-size: 0.75rem; color: var(--color-text-muted);"><span style="font-weight: 600; color: var(--color-text-secondary);">Talla:</span> ${talla}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      
+      currentBreakdownItems = items;
+      currentBreakdownName = name;
+      currentBreakdownRole = role;
+      
+      document.getElementById('breakdownTotal').textContent = `$${grandTotal.toFixed(2)}`;
+      document.getElementById('breakdownModal').classList.add('active');
+    }
+
+    function viewQuotationDetail(id, client, project, items) {
+      document.getElementById('breakdownTitle').textContent = `Cotización ${id}`;
+      document.getElementById('breakdownSubtitle').textContent = `${client} | ${project}`;
+      
+      const container = document.getElementById('breakdownItems');
+      container.innerHTML = '';
+      
+      let grandTotal = 0;
+      items.forEach((item) => {
+        const total = item.qty * item.price;
+        grandTotal += total;
+        
+        container.innerHTML += `
+          <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--color-border);">
+            <img src="${item.img || 'assets/placeholder.png'}" style="width: 50px; height: 50px; object-fit: contain; background: #f8fafc; border-radius: 8px; border: 1px solid var(--color-border);">
+            <div style="flex: 1;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="font-weight: 700; color: var(--color-navy); font-size: 0.9375rem;">${item.name}</div>
+                <div style="font-weight: 800; color: var(--color-navy); font-size: 0.9375rem;">$${total.toFixed(2)}</div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
+                <div style="font-size: 0.75rem; color: var(--color-text-muted);"><span style="font-weight: 600; color: var(--color-text-secondary);">REF:</span> ${item.ref}</div>
+                <div style="font-size: 0.75rem; color: var(--color-text-muted);"><span style="font-weight: 600; color: var(--color-text-secondary);">Color:</span> ${item.color}</div>
+                <div style="font-size: 0.75rem; color: var(--color-text-muted);"><span style="font-weight: 600; color: var(--color-text-secondary);">Cant:</span> ${item.qty}</div>
+                <div style="font-size: 0.75rem; color: var(--color-text-muted);"><span style="font-weight: 600; color: var(--color-text-secondary);">Talla:</span> ${item.talla}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      
+      document.getElementById('breakdownTotal').textContent = `$${grandTotal.toFixed(2)}`;
+      
+      // Update the button to show "Download" instead of "Understood"
+      const footerBtn = document.querySelector('#breakdownModal .btn-primary');
+      footerBtn.textContent = 'Descargar Cotización (PDF)';
+      footerBtn.onclick = function() {
+        showToast('Descargando', `Descargando detalle de cotización ${id}...`);
+        closeBreakdownModal();
+      };
+      
+      document.getElementById('breakdownModal').classList.add('active');
+    }
+
+    function closeBreakdownModal() {
+      document.getElementById('breakdownModal').classList.remove('active');
+    }
+
+    let currentBreakdownItems = [];
+    let currentBreakdownName = '';
+    let currentBreakdownRole = '';
+
+    function updateBreakdownQty(index, delta) {
+      currentBreakdownItems[index][1] = Math.max(0, currentBreakdownItems[index][1] + delta);
+      if (currentBreakdownItems[index][1] <= 0) {
+        currentBreakdownItems.splice(index, 1);
+      }
+      openBreakdownModal(currentBreakdownName, currentBreakdownRole, currentBreakdownItems);
+    }
+
+    function updateBreakdownPrice(index, newPrice) {
+      const parsed = parseFloat(newPrice);
+      if (!isNaN(parsed) && parsed >= 0) {
+        currentBreakdownItems[index][2] = parsed;
+        // Recalculate total displayed without full re-render
+        const qty = currentBreakdownItems[index][1];
+        const itemTotal = qty * parsed;
+        const el = document.getElementById(`item-total-${index}`);
+        if (el) el.textContent = `$${itemTotal.toFixed(2)}`;
+        // Recalculate grand total
+        const grand = currentBreakdownItems.reduce((sum, it) => sum + it[1] * it[2], 0);
+        document.getElementById('breakdownTotal').textContent = `$${grand.toFixed(2)}`;
+      }
+    }
+
+    function removeBreakdownItem(index) {
+      currentBreakdownItems.splice(index, 1);
+      openBreakdownModal(currentBreakdownName, currentBreakdownRole, currentBreakdownItems);
+    }
+
+    function toggleAllAuto(master) {
+      const checkboxes = document.querySelectorAll('.auto-checkbox');
+      checkboxes.forEach(cb => cb.checked = master.checked);
+      updateAutoSelection();
+    }
+
+    function updateAutoSelection() {
+      const count = document.querySelectorAll('.auto-checkbox:checked').length;
+      const bar = document.getElementById('autoBulkBar');
+      const countLabel = document.getElementById('autoSelectedCount');
+      
+      if (count > 0) {
+        bar.style.display = 'flex';
+        countLabel.textContent = `${count} seleccionado${count > 1 ? 's' : ''}`;
+      } else {
+        bar.style.display = 'none';
+      }
+    }
+
+    function deselectAllAuto() {
+      document.getElementById('selectAllAuto').checked = false;
+      document.querySelectorAll('.auto-checkbox').forEach(cb => cb.checked = false);
+      updateAutoSelection();
+    }
+
+    function consolidateQuotes() {
+      showToast('Consolidando', 'Mezclando cotizaciones seleccionadas...');
+      
+      setTimeout(() => {
+        const tbody = document.getElementById('historialTableBody');
+        const newRow = document.createElement('tr');
+        
+        // Total of the 3 in the screenshot is $4,110.00
+        newRow.innerHTML = `
+          <td style="font-weight: 600; color: var(--color-cyan);">#COT-CONS-01</td>
+          <td>
+            <div style="font-weight: 600;">Consolidado Multi-Empleado</div>
+            <div style="font-size: 0.75rem; color: var(--color-text-muted);">Juan Sánchez, Ricardo Gómez, Ana Beltrán</div>
+          </td>
+          <td>${new Date().toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+          <td style="font-weight: 700;">$4,110.00</td>
+          <td><span class="status-badge status-warning">PENDIENTE</span></td>
+          <td>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="viewQuotationDetail('#COT-CONS-01', 'Consolidado', 'Multi-Empleado', [{name: 'Kits Varios', qty: 3, price: 1370, ref: 'CONS-01', color: 'Varios', talla: 'Varias', img: 'assets/chef_coat.png'}])">Ver Detalle</button>
+              <button class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Descargar PDF</button>
+            </div>
+          </td>
+        `;
+        
+        // Insert at top of history
+        tbody.insertBefore(newRow, tbody.firstChild);
+        
+        switchTab('historial');
+        deselectAllAuto();
+      }, 1200);
+    }
+
+    function addToQuote(name, price) {
+      const existingItem = quoteItems.find(item => item.name === name);
+      if (existingItem) {
+        existingItem.qty++;
+      } else {
+        quoteItems.push({ name, price, qty: 1 });
+      }
+      renderQuote();
+    }
+
+    function updateQuantity(index, delta) {
+      quoteItems[index].qty += delta;
+      if (quoteItems[index].qty <= 0) {
+        quoteItems.splice(index, 1);
+      }
+      renderQuote();
+    }
+
+    function formatCurrency(val) {
+      return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(val);
+    }
+
+    function renderQuote() {
+      const container = document.getElementById('quote-items-container');
+      const subtotalLabel = document.getElementById('subtotal-label');
+      const ivaLabel = document.getElementById('iva-label');
+      const totalLabel = document.getElementById('total-label');
+
+      if (quoteItems.length === 0) {
+        container.innerHTML = `<div style="text-align: center; color: var(--color-text-muted); padding: 2rem; font-size: 0.875rem;">No hay productos en la cotización</div>`;
+        subtotalLabel.textContent = formatCurrency(0);
+        ivaLabel.textContent = formatCurrency(0);
+        totalLabel.textContent = formatCurrency(0);
+        return;
+      }
+
+      let subtotal = 0;
+      container.innerHTML = '';
+
+      quoteItems.forEach((item, index) => {
+        const itemTotal = item.price * item.qty;
+        subtotal += itemTotal;
+
+        const itemEl = document.createElement('div');
+        itemEl.className = 'quote-item';
+        itemEl.innerHTML = `
+          <div style="flex: 1;">
+            <div style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy);">${item.name}</div>
+            <div style="font-size: 0.75rem; color: var(--color-text-muted);">Unit: ${formatCurrency(item.price)}</div>
+          </div>
+          <div style="text-align: right;">
+            <div class="item-qty-control">
+              <button class="qty-btn" onclick="updateQuantity(${index}, -1)">-</button>
+              <span style="font-size: 0.875rem; font-weight: 700; min-width: 20px; text-align: center;">${item.qty}</span>
+              <button class="qty-btn" onclick="updateQuantity(${index}, 1)">+</button>
+            </div>
+            <div class="price-tag" style="margin-top: 0.25rem;">${formatCurrency(itemTotal)}</div>
+          </div>
+        `;
+        container.appendChild(itemEl);
+      });
+
+      const iva = subtotal * 0.16;
+      const total = subtotal + iva;
+
+      subtotalLabel.textContent = formatCurrency(subtotal);
+      ivaLabel.textContent = formatCurrency(iva);
+      totalLabel.textContent = formatCurrency(total);
+    }
+  </script>
+  <script src="assets/js/utils.js"></script>
+
+  <!-- Modal: Desglose de Precios -->
+  <div id="breakdownModal" class="modal">
+    <div class="modal-content" style="max-width: 450px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+        <div>
+          <h2 id="breakdownTitle" style="font-size: 1.25rem; margin-bottom: 0.25rem;">Desglose de Pedido</h2>
+          <p id="breakdownSubtitle" class="header-subtitle" style="margin: 0;"></p>
+        </div>
+        <button class="btn-close" onclick="closeBreakdownModal()">✕</button>
+      </div>
+
+      <div id="breakdownItems" style="margin-bottom: 1.5rem;">
+        <!-- Dynamically filled -->
+      </div>
+
+      <div style="background: var(--color-smoke); padding: 1rem; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-weight: 600; color: var(--color-text-secondary);">Total Estimado:</span>
+        <span id="breakdownTotal" style="font-size: 1.25rem; font-weight: 800; color: var(--color-cyan);">$0.00</span>
+      </div>
+
+      <div style="margin-top: 2rem;">
+        <button class="btn btn-primary" style="width: 100%;" onclick="closeBreakdownModal()">Entendido</button>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
