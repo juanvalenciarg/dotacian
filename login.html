@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iniciar sesión | dotacian</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="logo">
+          <a href="index.html">dotacian</a>
+        </div>
+        <p>Gestiona la gestión y entrega de uniformes con inteligencia.</p>
+      </div>
+
+      <form class="auth-form" action="app.html">
+        <div class="form-group">
+          <label for="email">Correo Electrónico</label>
+          <input type="email" id="email" placeholder="ejemplo@empresa.com" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" placeholder="••••••••" required>
+        </div>
+        <div style="display: flex; justify-content: flex-end;">
+          <a href="#" style="font-size: 0.8125rem; color: var(--color-brand-accent);">¿Olvidaste tu contraseña?</a>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; margin-top: 1rem;">Iniciar
+          Sesión</button>
+      </form>
+
+      <div class="auth-footer">
+        ¿Aún no eres cliente? <a href="index.html#agendar-demo">Agenda una demo</a>
+      </div>
+    </div>
+  </div>
+<script src="assets/js/utils.js"></script>
+</body>
+
+</html>
