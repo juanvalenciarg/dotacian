@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>dotacian app | Configuración de Roles</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .roles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .role-card {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      transition: all 0.2s;
+    }
+
+    .role-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--color-cyan);
+    }
+
+    .role-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .role-title {
+      font-family: var(--font-family-heading);
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--color-navy);
+    }
+
+    .role-desc {
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+      line-height: 1.4;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #CBD5E1;
+      transition: .4s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked+.slider {
+      background-color: var(--color-cyan);
+    }
+
+    input:checked+.slider:before {
+      transform: translateX(20px);
+    }
+
+    .industry-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.6rem;
+      background: var(--color-smoke-mid);
+      color: var(--color-text-secondary);
+      border-radius: 4px;
+    }
+
+    .role-stats {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      border-top: 1px solid var(--color-border);
+      padding-top: 1rem;
+      margin-top: auto;
+    }
+
+    .status-active {
+      color: #10B981;
+      font-weight: 600;
+    }
+
+    .status-inactive {
+      color: var(--color-text-muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span>dotacian</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="app.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <rect width="7" height="9" x="3" y="3" rx="1" />
+              <rect width="7" height="5" x="14" y="3" rx="1" />
+              <rect width="7" height="9" x="14" y="12" rx="1" />
+              <rect width="7" height="5" x="3" y="16" rx="1" />
+            </svg></span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="roles.html" class="nav-item active">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg></span>
+          <span class="nav-label">Roles</span>
+        </a>
+        <div class="nav-group">
+          <a href="#" class="nav-item">
+            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path
+                  d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
+              </svg></span>
+            <span class="nav-label">Uniformes</span>
+            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor"
+                stroke-width="2" viewBox="0 0 24 24">
+                <path d="m6 9 6 6 6-6" />
+              </svg></span>
+          </a>
+          <div class="nav-sub-items">
+            <a href="uniformes.html" class="nav-sub-item">Marketplace</a>
+            <a href="mi_dotacion.html" class="nav-sub-item">Mi dotación</a>
+          </div>
+        </div>
+        <a href="sucursales.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
+              <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+              <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+              <path d="M10 6h4" />
+              <path d="M10 10h4" />
+              <path d="M10 14h4" />
+              <path d="M10 18h4" />
+            </svg></span>
+          <span class="nav-label">Sucursales</span>
+        </a>
+        <a href="empleados.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg></span>
+          <span class="nav-label">Empleados</span>
+        </a>
+        <div class="nav-group">
+          <a href="produccion.html" class="nav-item">
+            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path d="m7.5 4.27 9 5.15" />
+                <path
+                  d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                <path d="m3.3 7 8.7 5 8.7-5" />
+                <path d="M12 22V12" />
+              </svg></span>
+            <span class="nav-label">Producción</span>
+            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor"
+                stroke-width="2" viewBox="0 0 24 24">
+                <path d="m6 9 6 6 6-6" />
+              </svg></span>
+          </a>
+          <div class="nav-sub-items">
+            <a href="cotizaciones.html" class="nav-sub-item">Cotizaciones</a>
+            <a href="muestras.html" class="nav-sub-item">Solicitud de Muestras</a>
+            <a href="ordenes.html" class="nav-sub-item">Órdenes de Compra</a>
+            <a href="seguimiento.html" class="nav-sub-item">Seguimiento</a>
+          </div>
+        </div>
+        <a href="bodega.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <polyline points="21 8 21 21 3 21 3 8"></polyline>
+              <rect x="1" y="3" width="22" height="5"></rect>
+              <line x1="10" y1="12" x2="14" y2="12"></line>
+            </svg></span>
+          <span class="nav-label">Bodega</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+            </svg></span>
+          <span class="nav-label">Alertas</span>
+        </a>
+        <div class="sidebar-spacer"></div>
+        <a href="index.html" class="nav-item nav-item-secondary">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" x2="9" y1="12" y2="12" />
+            </svg></span>
+          <span class="nav-label">Cerrar Sesión</span>
+        </a>
+        <a href="#" class="nav-item nav-item-secondary">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path
+                d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg></span>
+          <span class="nav-label">Configuración</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="app-header">
+        <div class="header-left">
+          <h1>Configuración de Roles por Industria</h1>
+          <p class="header-subtitle">Habilita roles predeterminados para tu operación</p>
+        </div>
+        <div class="header-right">
+        </div>
+      </header>
+
+      <div class="app-container">
+        <!-- Industry context bar -->
+        <div class="app-card"
+          style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+          <div>
+            <span style="font-size: 0.875rem; color: var(--color-text-muted);">Industria detectada:</span>
+            <strong style="margin-left: 0.5rem; color: var(--color-navy);" id="currentIndustry">Restaurante</strong>
+          </div>
+          <button class="btn btn-outline" style="padding: 0.4rem 1rem; font-size: 0.875rem;"
+            onclick="openIndustryModal()">Cambiar Industria</button>
+        </div>
+
+        <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Roles disponibles para tu empresa</h2>
+
+        <!-- Industry Selection Modal -->
+        <div class="modal-overlay" id="industryModal">
+          <div class="modal-content-lg" style="max-width: 500px;">
+            <div class="modal-header">
+              <h2>Seleccionar Industria</h2>
+              <button class="btn-close" onclick="closeIndustryModal()">✕</button>
+            </div>
+            <div style="padding: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
+              <p style="font-size: 0.875rem; color: var(--color-text-secondary); margin-bottom: 0.5rem;">Selecciona tu
+                industria para habilitar los roles predeterminados:</p>
+              <button class="btn btn-outline" style="text-align: left; justify-content: flex-start;"
+                onclick="selectIndustry('Restaurante')">Restaurante</button>
+              <button class="btn btn-outline" style="text-align: left; justify-content: flex-start;"
+                onclick="selectIndustry('Limpieza')">Limpieza</button>
+              <button class="btn btn-outline" style="text-align: left; justify-content: flex-start;"
+                onclick="selectIndustry('Industrial')">Industrial</button>
+              <button class="btn btn-outline"
+                style="text-align: left; justify-content: flex-start; opacity: 0.6; cursor: not-allowed;"
+                disabled>Hotelería <span
+                  style="margin-left: auto; font-size: 0.7rem; font-weight: 600; color: var(--color-cyan);">PRONTO</span></button>
+              <button class="btn btn-outline"
+                style="text-align: left; justify-content: flex-start; opacity: 0.6; cursor: not-allowed;"
+                disabled>Retail <span
+                  style="margin-left: auto; font-size: 0.7rem; font-weight: 600; color: var(--color-cyan);">PRONTO</span></button>
+              <button class="btn btn-outline"
+                style="text-align: left; justify-content: flex-start; opacity: 0.6; cursor: not-allowed;" disabled>Salud
+                <span
+                  style="margin-left: auto; font-size: 0.7rem; font-weight: 600; color: var(--color-cyan);">PRONTO</span></button>
+              <button class="btn btn-outline"
+                style="text-align: left; justify-content: flex-start; opacity: 0.6; cursor: not-allowed;"
+                disabled>Seguridad <span
+                  style="margin-left: auto; font-size: 0.7rem; font-weight: 600; color: var(--color-cyan);">PRONTO</span></button>
+              <button class="btn btn-outline"
+                style="text-align: left; justify-content: flex-start; opacity: 0.6; cursor: not-allowed;"
+                disabled>Corporativa <span
+                  style="margin-left: auto; font-size: 0.7rem; font-weight: 600; color: var(--color-cyan);">PRONTO</span></button>
+              <button class="btn btn-outline"
+                style="text-align: left; justify-content: flex-start; opacity: 0.6; cursor: not-allowed;" disabled>Otra
+                <span
+                  style="margin-left: auto; font-size: 0.7rem; font-weight: 600; color: var(--color-cyan);">PRONTO</span></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="roles-grid" id="rolesGrid">
+          <!-- Roles will be rendered dynamically here -->
+        </div>
+      </div>
+
+      <!-- Role Configuration Modal -->
+      <div class="modal-overlay" id="roleConfigModal">
+        <div class="modal-content-lg" style="max-width: 550px;">
+          <div class="modal-header">
+            <div>
+              <h2 id="configRoleTitle">Configurar Uniformes</h2>
+              <p style="font-size: 0.8125rem; color: var(--color-text-secondary); margin: 0;">Define las prendas que
+                componen la plantilla base de este rol.</p>
+            </div>
+            <button class="btn-close" onclick="closeRoleConfig()">✕</button>
+          </div>
+          <div style="padding: 1.5rem;">
+            <div id="roleUniformList" style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <!-- Uniform items rendered here -->
+            </div>
+
+            <button class="btn btn-outline"
+              style="width: 100%; margin-top: 1.25rem; border-style: dashed; color: var(--color-text-secondary); height: 50px;"
+              onclick="addUniformItem()">
+              + Añadir prenda a la plantilla
+            </button>
+
+            <div
+              style="margin-top: 2rem; padding: 1.25rem; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                <div
+                  style="width: 32px; height: 32px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--color-cyan); border: 1px solid #e2e8f0;">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.875rem; color: var(--color-navy);">Periodo de Renovación
+                  </div>
+                  <div style="font-size: 0.75rem; color: var(--color-text-secondary);">Frecuencia de entrega de dotación
+                  </div>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 0.5rem;">
+                <button class="period-chip" onclick="setPeriod(3, this)"
+                  style="flex: 1; padding: 0.6rem; border-radius: 8px; border: 1px solid #e2e8f0; background: white; font-size: 0.8125rem; cursor: pointer; transition: all 0.2s;">3
+                  Meses</button>
+                <button class="period-chip active" onclick="setPeriod(6, this)"
+                  style="flex: 1; padding: 0.6rem; border-radius: 8px; border: 1px solid var(--color-cyan); background: var(--color-cyan-dim); color: var(--color-cyan); font-weight: 600; font-size: 0.8125rem; cursor: pointer; transition: all 0.2s;">6
+                  Meses</button>
+                <button class="period-chip" onclick="setPeriod(12, this)"
+                  style="flex: 1; padding: 0.6rem; border-radius: 8px; border: 1px solid #e2e8f0; background: white; font-size: 0.8125rem; cursor: pointer; transition: all 0.2s;">12
+                  Meses</button>
+              </div>
+            </div>
+
+            <div class="modal-footer"
+              style="margin-top: 2rem; display: flex; justify-content: flex-end; gap: 1rem; border-top: 1px solid var(--color-smoke); padding-top: 1.5rem;">
+              <button class="btn btn-outline" onclick="closeRoleConfig()">Cancelar</button>
+              <button class="btn btn-primary" onclick="saveRoleConfig()">Guardar Cambios</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- New Role Modal -->
+      <div class="modal-overlay" id="newRoleModal">
+        <div class="modal-content-lg" style="max-width: 450px;">
+          <div class="modal-header">
+            <div>
+              <h2>Crear Nuevo Rol</h2>
+              <p style="font-size: 0.8125rem; color: var(--color-text-secondary); margin: 0;">Define un nuevo perfil
+                operativo para tu empresa.</p>
+            </div>
+            <button class="btn-close" onclick="closeNewRoleModal()">✕</button>
+          </div>
+          <div style="padding: 1.5rem;">
+            <div class="modal-form" style="display: flex; flex-direction: column; gap: 1.25rem;">
+              <div class="form-row">
+                <label>Nombre del Rol</label>
+                <input type="text" id="newRoleName" placeholder="Ej. Supervisor de Piso">
+              </div>
+              <div class="form-row">
+                <label>Descripción</label>
+                <textarea id="newRoleDesc" placeholder="Describe brevemente las funciones de este rol..."
+                  style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); font-family: var(--font-family-primary); height: 80px; resize: none;"></textarea>
+              </div>
+              <div style="display: flex; gap: 1rem;">
+                <div class="form-row" style="flex: 1;">
+                  <label>Prendas Base</label>
+                  <input type="number" value="3"
+                    style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md);">
+                </div>
+                <div class="form-row" style="flex: 1;">
+                  <label>Frecuencia (Meses)</label>
+                  <input type="number" value="6"
+                    style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md);">
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer"
+              style="margin-top: 2rem; display: flex; justify-content: flex-end; gap: 1rem; border-top: 1px solid var(--color-smoke); padding-top: 1.5rem;">
+              <button class="btn btn-outline" onclick="closeNewRoleModal()">Cancelar</button>
+              <button class="btn btn-primary" onclick="createNewRole()">Habilitar Rol</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+        <div style="margin-top: 3rem; text-align: center;">
+          <button class="btn btn-primary" style="padding: 1rem 3rem;" onclick="saveRoles()">Guardar Configuración de
+            Roles</button>
+        </div>
+  </div>
+  </main>
+  </div>
+
+  <script>
+    function openIndustryModal() {
+      document.getElementById('industryModal').classList.add('active');
+    }
+
+    function closeIndustryModal() {
+      document.getElementById('industryModal').classList.remove('active');
+    }
+
+    function selectIndustry(industry) {
+      document.getElementById('currentIndustry').textContent = industry;
+      closeIndustryModal();
+      renderRoles(industry);
+      showToast('Industria Actualizada', 'Se han cargado los roles para: ' + industry);
+    }
+
+    const rolesByIndustry = {
+      'Restaurante': [
+        { title: 'Mesero / Server', desc: 'Atención directa a mesa, manejo de comandas y estándares de servicio.', base: 3, freq: 6, enabled: true },
+        { title: 'Chef / Cocina', desc: 'Personal de cocina con requerimientos de seguridad e higiene altos.', base: 4, freq: 6, enabled: true },
+        { title: 'Barista / Bartender', desc: 'Preparación de bebidas, manejo de barra y atención al cliente.', base: 2, freq: 6, enabled: true },
+        { title: 'Limpieza / Steward', desc: 'Personal operativo de mantenimiento, limpieza y áreas comunes.', base: 3, freq: 6, enabled: false },
+        { title: 'Seguridad / Valet', desc: 'Personal de vigilancia, control de accesos y servicios de valet parking.', base: 4, freq: 6, enabled: false },
+        { title: 'Hostess / Greeter', desc: 'Primera línea de contacto, gestión de reservaciones y asignación de mesas.', base: 2, freq: 6, enabled: false }
+      ],
+      'Limpieza': [
+        { title: 'Operario(a) de Limpieza General', desc: 'Personal operativo para tareas de limpieza y desinfección estándar.', base: 3, freq: 4, enabled: true },
+        { title: 'Supervisor(a) de Zona / Cuadrilla', desc: 'Coordinación de equipos y supervisión de estándares de limpieza.', base: 2, freq: 6, enabled: true },
+        { title: 'Personal de Limpieza en Alturas', desc: 'Personal especializado en limpieza de vidrios y fachadas con equipo de seguridad.', base: 3, freq: 6, enabled: false },
+        { title: 'Mantenimiento / Servicios Generales', desc: 'Reparaciones menores y mantenimiento preventivo de instalaciones.', base: 3, freq: 6, enabled: true },
+        { title: 'Especialista en Manejo de Químicos', desc: 'Personal capacitado para el uso y mezcla de agentes químicos industriales.', base: 4, freq: 6, enabled: false }
+      ],
+      'Industrial': [
+        { title: 'Operario de Producción', desc: 'Personal operativo en líneas de ensamble y procesos de manufactura.', base: 3, freq: 6, enabled: true },
+        { title: 'Operario de Logística', desc: 'Operación de maquinaria pesada y gestión de flujo de materiales.', base: 2, freq: 6, enabled: true },
+        { title: 'Personal de Mantenimiento', desc: 'Mantenimiento preventivo y correctivo de maquinaria industrial.', base: 3, freq: 6, enabled: false },
+        { title: 'Personal de Calidad', desc: 'Encargados de asegurar que los productos cumplan con los estándares de calidad.', base: 3, freq: 6, enabled: true },
+        { title: 'Personal de Supervisión', desc: 'Personal encargado de supervisar las operaciones diarias.', base: 3, freq: 6, enabled: true }
+      ]
+    };
+
+    const roleUniforms = {
+      // Restaurante
+      'Mesero / Server': [
+        { name: 'Camisa Oxford Ejecutiva', qty: 2 },
+        { name: 'Pantalón Gabardina Premium', qty: 1 }
+      ],
+      'Chef / Cocina': [
+        { name: 'Filipina Blanca Classic', qty: 2 },
+        { name: 'Pantalón de Cocina Negro', qty: 2 },
+        { name: 'Mandil de Pecho Pro', qty: 1 },
+        { name: 'Calzado Antideslizante Plus', qty: 1 }
+      ],
+      'Barista / Bartender': [
+        { name: 'Mandil Barista Premium', qty: 1 },
+        { name: 'Polo Shirt Premium', qty: 1 }
+      ],
+      'Limpieza / Steward': [
+        { name: 'Conjunto Operativo Anti-fluidos', qty: 2 },
+        { name: 'Guantes de Protección', qty: 1 }
+      ],
+
+      // Limpieza (Facilities)
+      'Operario(a) de Limpieza General': [
+        { name: 'Filipina/Camisola de Limpieza', qty: 2 },
+        { name: 'Pantalón con Elástico', qty: 2 },
+        { name: 'Calzado Antiderrapante', qty: 1 }
+      ],
+      'Supervisor(a) de Zona / Cuadrilla': [
+        { name: 'Chaleco Distintivo Reflectante', qty: 1 },
+        { name: 'Calzado de Seguridad Ligero', qty: 1 }
+      ],
+      'Personal de Limpieza en Alturas': [
+        { name: 'Overol Técnico Reforzado', qty: 1 },
+        { name: 'Calzado con Agarre Especial', qty: 1 }
+      ],
+      'Mantenimiento / Servicios Generales': [
+        { name: 'Pantalón Tipo Cargo Industrial', qty: 2 },
+        { name: 'Camisola Reforzada Trabajo', qty: 2 }
+      ],
+      'Especialista en Manejo de Químicos': [
+        { name: 'Bata Resistente a Ácidos/Cloro', qty: 2 },
+        { name: 'Guantes de Nitrilo Especializados', qty: 1 },
+        { name: 'Careta de Protección Facial', qty: 1 }
+      ],
+
+      // Industrial (Production)
+      'Operario Producción': [
+        { name: 'Overol de Algodón Industrial', qty: 2 },
+        { name: 'Camisola y Pantalón Reforzado', qty: 1 },
+        { name: 'Calzado con Casquillo de Acero', qty: 1 }
+      ],
+      'Montacarguista / Logística': [
+        { name: 'Chaleco de Alta Visibilidad Clase 2', qty: 1 },
+        { name: 'Faja Lumbar Ergonómica', qty: 1 },
+        { name: 'Calzado Industrial de Seguridad', qty: 1 }
+      ],
+      'Ingeniero(a) de Planta / Calidad': [
+        { name: 'Bata de Laboratorio con Logo', qty: 1 },
+        { name: 'Camisa Tipo Columbia Bordada', qty: 2 },
+        { name: 'Botas de Seguridad Ejecutivas', qty: 1 }
+      ],
+      'Personal de Mantenimiento Electromecánico': [
+        { name: 'Ropa Ignífuga (Flame Resistant)', qty: 2 },
+        { name: 'Calzado Dieléctrico (Sin Metal)', qty: 1 }
+      ],
+      'Almacenista': [
+        { name: 'Guantes de Protección Mecánica', qty: 1 },
+        { name: 'Faja de Carga Reforzada', qty: 1 },
+        { name: 'Calzado Industrial Reforzado', qty: 1 }
+      ],
+      'Soldador / Pailero': [
+        { name: 'Peto de Carnaza Reforzado', qty: 1 },
+        { name: 'Mangas de Protección Térmica', qty: 1 },
+        { name: 'Careta de Soldar Automática', qty: 1 },
+        { name: 'Botas Especiales para Calor', qty: 1 }
+      ],
+
+      'Seguridad / Valet': [
+        { name: 'Chaqueta de Seguridad Térmica', qty: 1 },
+        { name: 'Camisa Uniforme Seguridad', qty: 2 },
+        { name: 'Pantalón Táctico', qty: 1 }
+      ],
+      'Hostess / Greeter': [
+        { name: 'Vestido Corporativo / Traje', qty: 2 },
+        { name: 'Pañoleta / Accesorio', qty: 1 }
+      ]
+    };
+
+    function renderRoles(industry) {
+      const grid = document.getElementById('rolesGrid');
+      grid.innerHTML = '';
+
+      const roles = rolesByIndustry[industry] || [];
+      roles.forEach(role => {
+        const card = document.createElement('div');
+        card.className = 'role-card';
+        if (role.enabled) card.style.borderColor = 'var(--color-cyan)';
+
+        card.innerHTML = `
+          <div class="role-card-header">
+            <span class="role-title">${role.title}</span>
+            <label class="toggle-switch">
+              <input type="checkbox" ${role.enabled ? 'checked' : ''} onchange="updateRoleCount()">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <p class="role-desc">${role.desc}</p>
+          <div class="role-stats">
+            <span>Plantilla base: <strong>${role.base} prendas</strong></span>
+            <span>•</span>
+            <span>Renovación: <strong>Cada ${role.freq} meses</strong></span>
+            <span>•</span>
+            <span class="${role.enabled ? 'status-active' : 'status-inactive'}">${role.enabled ? 'Habilitado' : 'Inhabilitado'}</span>
+          </div>
+          <div style="margin-top: 1.25rem; border-top: 1px solid var(--color-smoke); padding-top: 1rem;">
+            <button class="btn btn-outline" style="width: 100%; font-size: 0.8125rem; padding: 0.5rem;" onclick="openRoleConfig('${role.title}')">Configurar Uniformes</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      // Add "Create New Role" card
+      const addCard = document.createElement('div');
+      addCard.className = 'role-card add-role-card';
+      addCard.style = "border: 2px dashed var(--color-smoke-mid); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 250px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: var(--color-smoke); opacity: 0.8;";
+      addCard.onmouseover = function () { this.style.opacity = '1'; this.style.borderColor = 'var(--color-cyan)'; this.style.background = 'white'; this.style.transform = 'translateY(-4px)'; };
+      addCard.onmouseout = function () { this.style.opacity = '0.8'; this.style.borderColor = 'var(--color-smoke-mid)'; this.style.background = 'var(--color-smoke)'; this.style.transform = 'translateY(0)'; };
+      addCard.onclick = openNewRoleModal;
+      addCard.innerHTML = `
+        <div style="width: 56px; height: 56px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; color: var(--color-cyan); margin-bottom: 1.25rem; border: 1px solid var(--color-smoke-mid); box-shadow: var(--shadow-sm);">
+          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        </div>
+        <div style="text-align: center;">
+          <span style="font-weight: 600; color: var(--color-navy); display: block; margin-bottom: 0.25rem;">Crear Nuevo Rol</span>
+          <span style="font-size: 0.75rem; color: var(--color-text-secondary);">Personaliza la estructura de tu equipo</span>
+        </div>
+      `;
+      grid.appendChild(addCard);
+
+      updateRoleCount();
+    }
+
+    // Initial render
+    window.onload = () => {
+      renderRoles('Restaurante');
+    };
+
+    function openRoleConfig(roleName) {
+      document.getElementById('configRoleTitle').innerText = `Configurar: ${roleName}`;
+      const list = document.getElementById('roleUniformList');
+      list.innerHTML = '';
+
+      const uniforms = roleUniforms[roleName] || [];
+      uniforms.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = "role-uniform-item";
+        div.style = "display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: var(--color-smoke); border-radius: 12px; border: 1px solid var(--color-smoke-mid);";
+        div.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 44px; height: 44px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--color-cyan); box-shadow: var(--shadow-sm);">
+              <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" /></svg>
+            </div>
+            <div>
+              <div style="font-weight: 600; font-size: 0.9375rem; color: var(--color-navy); margin-bottom: 0.125rem;">${item.name}</div>
+              <div style="font-size: 0.75rem; color: var(--color-text-secondary);">Prenda base para plantilla</div>
+            </div>
+          </div>
+          
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; background: white; padding: 0.35rem 0.75rem; border-radius: 8px; border: 1px solid var(--color-smoke-mid);">
+              <button onclick="changeQty(this, -1)" style="border: none; background: none; cursor: pointer; color: var(--color-text-secondary); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">-</button>
+              <span class="qty-val" style="min-width: 24px; text-align: center; font-weight: 700; color: var(--color-navy); font-size: 0.875rem;">${item.qty}</span>
+              <button onclick="changeQty(this, 1)" style="border: none; background: none; cursor: pointer; color: var(--color-cyan); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">+</button>
+            </div>
+            <button class="btn-close" style="font-size: 0.9rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.4" onclick="this.closest('.role-uniform-item').remove()">✕</button>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+
+      document.getElementById('roleConfigModal').classList.add('active');
+    }
+
+    function changeQty(btn, delta) {
+      const span = btn.parentElement.querySelector('.qty-val');
+      let current = parseInt(span.innerText);
+      current = Math.max(1, current + delta);
+      span.innerText = current;
+    }
+
+    function closeRoleConfig() {
+      document.getElementById('roleConfigModal').classList.remove('active');
+    }
+
+    function addUniformItem() {
+      const list = document.getElementById('roleUniformList');
+      const div = document.createElement('div');
+      div.className = "role-uniform-item";
+      div.style = "display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: var(--color-smoke); border-radius: 12px; border: 1px solid var(--color-smoke-mid);";
+      div.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
+          <div style="width: 44px; height: 44px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--color-cyan); box-shadow: var(--shadow-sm);">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          </div>
+          <input type="text" placeholder="Nombre de la prenda..." style="flex: 1; border: none; background: transparent; font-size: 0.9375rem; font-weight: 600; color: var(--color-navy); outline: none;">
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem; background: white; padding: 0.35rem 0.75rem; border-radius: 8px; border: 1px solid var(--color-smoke-mid);">
+            <button onclick="changeQty(this, -1)" style="border: none; background: none; cursor: pointer; color: var(--color-text-secondary); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">-</button>
+            <span class="qty-val" style="min-width: 24px; text-align: center; font-weight: 700; color: var(--color-navy); font-size: 0.875rem;">1</span>
+            <button onclick="changeQty(this, 1)" style="border: none; background: none; cursor: pointer; color: var(--color-cyan); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">+</button>
+          </div>
+          <button class="btn-close" style="font-size: 0.9rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.4" onclick="this.closest('.role-uniform-item').remove()">✕</button>
+        </div>
+      `;
+      list.appendChild(div);
+      div.querySelector('input').focus();
+    }
+
+    function saveRoleConfig() {
+      showToast("Configuración Guardada", "La plantilla de uniformes para este rol ha sido actualizada.");
+      closeRoleConfig();
+    }
+
+    function openNewRoleModal() {
+      document.getElementById('newRoleModal').classList.add('active');
+    }
+
+    function closeNewRoleModal() {
+      document.getElementById('newRoleModal').classList.remove('active');
+    }
+
+    function createNewRole() {
+      const name = document.getElementById('newRoleName').value;
+      if (!name) {
+        alert("Por favor ingresa el nombre del rol");
+        return;
+      }
+      showToast("Rol Creado", `El rol "${name}" ha sido habilitado exitosamente.`);
+      closeNewRoleModal();
+    }
+
+    function setPeriod(months, btn) {
+      document.querySelectorAll('.period-chip').forEach(b => {
+        b.style.background = 'white';
+        b.style.borderColor = '#e2e8f0';
+        b.style.color = 'var(--color-text-secondary)';
+        b.style.fontWeight = '400';
+      });
+
+      btn.style.background = 'var(--color-cyan-dim)';
+      btn.style.borderColor = 'var(--color-cyan)';
+      btn.style.color = 'var(--color-cyan)';
+      btn.style.fontWeight = '600';
+    }
+
+    function updateRoleCount() {
+      const cards = document.querySelectorAll('.role-card');
+      cards.forEach(card => {
+        const checkbox = card.querySelector('input[type="checkbox"]');
+        const statusSpan = card.querySelector('.role-stats span:last-child');
+
+        if (checkbox.checked) {
+          statusSpan.textContent = 'Habilitado';
+          statusSpan.className = 'status-active';
+          card.style.borderColor = 'var(--color-cyan)';
+        } else {
+          statusSpan.textContent = 'Inhabilitado';
+          statusSpan.className = 'status-inactive';
+          card.style.borderColor = 'var(--color-border)';
+        }
+      });
+    }
+
+    function saveRoles() {
+      const enabledRoles = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+        .map(input => input.closest('.role-card').querySelector('.role-title').textContent);
+
+      showToast('Configuración Guardada', 'Roles actualizados: ' + (enabledRoles.join(', ') || 'Ninguno'));
+    }
+  </script>
+  <script src="assets/js/utils.js"></script>
+</body>
+
+</html>
