@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>dotacian app | Control de Producción</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .production-steps {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+      position: relative;
+      padding: 0 1rem;
+    }
+
+    .production-steps::before {
+      content: "";
+      position: absolute;
+      top: 2rem;
+      left: 2rem;
+      right: 2rem;
+      height: 2px;
+      background: var(--color-border);
+      z-index: 0;
+    }
+
+    .step-node {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      z-index: 1;
+      position: relative;
+    }
+
+    .step-indicator {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-text-muted);
+      transition: all 0.3s ease;
+    }
+
+    .step-node.completed .step-indicator {
+      background: var(--color-cyan);
+      border-color: var(--color-cyan);
+      color: white;
+    }
+
+    .step-node.active .step-indicator {
+      border-color: var(--color-cyan);
+      color: var(--color-cyan);
+      box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.1);
+    }
+
+    .step-node.active .step-title {
+      color: var(--color-cyan);
+    }
+
+    .step-title {
+      font-family: var(--font-family-heading);
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--color-navy);
+      margin-bottom: 0.25rem;
+    }
+
+    .step-desc {
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+      max-width: 140px;
+    }
+
+    .progress-track {
+      height: 8px;
+      background: var(--color-smoke-mid);
+      border-radius: 4px;
+      margin-top: 0.75rem;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--color-cyan), #0ea5e9);
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    .mini-stepper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.75rem;
+      position: relative;
+      padding: 0 4px;
+    }
+
+    .mini-stepper::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--color-border);
+      transform: translateY(-50%);
+      z-index: 0;
+    }
+
+    .mini-step {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid var(--color-border);
+      z-index: 1;
+      position: relative;
+      transition: all 0.3s;
+    }
+
+    .mini-step.completed {
+      background: var(--color-cyan);
+      border-color: var(--color-cyan);
+    }
+
+    .mini-step.active {
+      background: white;
+      border-color: var(--color-cyan);
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+    }
+
+    .order-card-mini {
+      padding: 1.25rem;
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border);
+      transition: all 0.2s;
+    }
+
+    .order-card-mini:hover {
+      border-color: var(--color-cyan);
+      background: white;
+    }
+
+    .production-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .summary-item:last-child {
+      border-bottom: none;
+    }
+
+    .item-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .item-thumb {
+      width: 48px;
+      height: 48px;
+      background: var(--color-smoke-mid);
+      border-radius: 8px;
+      padding: 4px;
+    }
+
+    .item-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .item-name {
+      font-weight: 600;
+      color: var(--color-navy);
+      font-size: 0.9375rem;
+    }
+
+    .item-meta {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+
+    .order-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .dot-warning { background-color: #F59E0B; }
+    .dot-success { background-color: #10B981; }
+    .dot-info { background-color: var(--color-cyan); }
+  </style>
+</head>
+
+<body>
+  <div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span>dotacian</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="app.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <rect width="7" height="9" x="3" y="3" rx="1" />
+              <rect width="7" height="5" x="14" y="3" rx="1" />
+              <rect width="7" height="9" x="14" y="12" rx="1" />
+              <rect width="7" height="5" x="3" y="16" rx="1" />
+            </svg></span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="roles.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg></span>
+          <span class="nav-label">Roles</span>
+        </a>
+        <div class="nav-group">
+          <a href="#" class="nav-item">
+            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
+            </svg></span>
+            <span class="nav-label">Uniformes</span>
+            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
+          </a>
+          <div class="nav-sub-items">
+            <a href="uniformes.html" class="nav-sub-item">Marketplace</a>
+            <a href="mi_dotacion.html" class="nav-sub-item">Mi dotación</a>
+          </div>
+        </div>
+        <a href="sucursales.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
+              <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+              <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+              <path d="M10 6h4" />
+              <path d="M10 10h4" />
+              <path d="M10 14h4" />
+              <path d="M10 18h4" />
+            </svg></span>
+          <span class="nav-label">Sucursales</span>
+        </a>
+        <a href="empleados.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg></span>
+          <span class="nav-label">Empleados</span>
+        </a>
+        <div class="nav-group active">
+          <a href="produccion.html" class="nav-item active">
+            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path d="m7.5 4.27 9 5.15" />
+                <path
+                  d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                <path d="m3.3 7 8.7 5 8.7-5" />
+                <path d="M12 22V12" />
+              </svg></span>
+            <span class="nav-label">Producción</span>
+            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
+          </a>
+          <div class="nav-sub-items">
+            <a href="cotizaciones.html" class="nav-sub-item">Cotizaciones</a>
+            <a href="muestras.html" class="nav-sub-item">Solicitud de Muestras</a>
+            <a href="ordenes.html" class="nav-sub-item">Órdenes de Compra</a>
+            <a href="seguimiento.html" class="nav-sub-item">Seguimiento</a>
+          </div>
+        </div>
+        <a href="bodega.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg></span>
+          <span class="nav-label">Bodega</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+            </svg></span>
+          <span class="nav-label">Alertas</span>
+        </a>
+        <div class="sidebar-spacer"></div>
+        <a href="index.html" class="nav-item nav-item-secondary">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" x2="9" y1="12" y2="12" />
+            </svg></span>
+          <span class="nav-label">Cerrar Sesión</span>
+        </a>
+        <a href="#" class="nav-item nav-item-secondary">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path
+                d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg></span>
+          <span class="nav-label">Configuración</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="app-header">
+        <div class="header-left">
+          <h1>Control de Producción</h1>
+          <p class="header-subtitle">Desde la solicitud inteligente hasta la entrega final</p>
+        </div>
+        <div class="header-right">
+          <button class="btn btn-primary" onclick="requestOrder()">Solicitar Pedido IA</button>
+        </div>
+      </header>
+
+      <div class="app-container">
+        <!-- Dashboard de Producción: Resumen Ejecutivo Interactivo -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2.5rem;">
+          
+          <!-- Card: Cotizaciones -->
+          <div class="app-card" 
+               style="margin: 0; background: white; border-top: 4px solid var(--color-cyan); padding: 2rem; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;"
+               onclick="window.location.href='cotizaciones.html'">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+              <div>
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 0.5rem;">Cotizaciones</span>
+                <div style="font-size: 2.25rem; font-weight: 800; color: var(--color-navy);">$42,850</div>
+              </div>
+              <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(6, 182, 212, 0.1); display: flex; align-items: center; justify-content: center; color: var(--color-cyan);">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem;">
+              <span style="background: #ECFDF5; color: #047857; padding: 4px 8px; border-radius: 100px; font-weight: 700;">+12%</span>
+              <span style="color: var(--color-text-muted);">vs. mes anterior</span>
+            </div>
+            <div style="margin-top: 1.5rem; display: flex; align-items: center; gap: 0.5rem; color: var(--color-cyan); font-size: 0.875rem; font-weight: 600;">
+              Ir a Cotizador <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+            </div>
+          </div>
+
+          <!-- Card: Órdenes de Compra -->
+          <div class="app-card" 
+               style="margin: 0; background: white; border-top: 4px solid var(--color-navy); padding: 2rem; cursor: pointer; transition: all 0.3s ease;"
+               onclick="window.location.href='ordenes.html'">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+              <div>
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 0.5rem;">Órdenes de Compra</span>
+                <div style="font-size: 2.25rem; font-weight: 800; color: var(--color-navy);">8 Activas</div>
+              </div>
+              <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(15, 23, 42, 0.05); display: flex; align-items: center; justify-content: center; color: var(--color-navy);">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem;">
+              <span style="background: #FFFBEB; color: #B45309; padding: 4px 8px; border-radius: 100px; font-weight: 700;">2 Pendientes</span>
+              <span style="color: var(--color-text-muted);">requieren firma</span>
+            </div>
+            <div style="margin-top: 1.5rem; display: flex; align-items: center; gap: 0.5rem; color: var(--color-navy); font-size: 0.875rem; font-weight: 600;">
+              Confirmar Pedidos <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+            </div>
+          </div>
+
+          <!-- Card: Seguimiento -->
+          <div class="app-card" 
+               style="margin: 0; background: white; border-top: 4px solid #8B5CF6; padding: 2rem; cursor: pointer; transition: all 0.3s ease;"
+               onclick="window.location.href='seguimiento.html'">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+              <div>
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 0.5rem;">Seguimiento</span>
+                <div style="font-size: 2.25rem; font-weight: 800; color: var(--color-navy);">65% Avg.</div>
+              </div>
+              <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(139, 92, 246, 0.1); display: flex; align-items: center; justify-content: center; color: #8B5CF6;">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem;">
+              <span style="background: #F5F3FF; color: #6D28D9; padding: 4px 8px; border-radius: 100px; font-weight: 700;">4 Activos</span>
+              <span style="color: var(--color-text-muted);">en producción</span>
+            </div>
+            <div style="margin-top: 1.5rem; display: flex; align-items: center; gap: 0.5rem; color: #8B5CF6; font-size: 0.875rem; font-weight: 600;">
+              Rastrear Talleres <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function updateOrder() {
+      showToast("Analizando", "La IA está analizando las faltantes de personal en tus sucursales...");
+      setTimeout(() => {
+        showToast("Pedido Actualizado", "¡Pedido sugerido actualizado! Se detectaron 2 nuevos empleados sin dotación completa en la sucursal Reforma.");
+        document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = '22';
+      }, 2000);
+    }
+  </script>
+<script src="assets/js/utils.js"></script>
+</body>
+
+</html>
