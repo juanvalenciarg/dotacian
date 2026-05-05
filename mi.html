@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>mi dotacian | Mi Dotación</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* === MI PORTAL — PERSONAL DASHBOARD === */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-family: var(--font-family-primary);
+      background: #F0FAFB;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .mi-dashboard {
+      min-height: 100vh;
+      max-width: 420px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* --- Top Header Bar --- */
+    .mi-topbar {
+      background: var(--color-navy);
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mi-topbar .logo-text {
+      font-family: var(--font-family-heading);
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: white;
+    }
+
+    .mi-topbar .logo-text span {
+      color: var(--color-cyan);
+    }
+
+    .mi-topbar .logout-btn {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.5);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-family-primary);
+      text-decoration: none;
+    }
+
+    /* --- Hero / Greeting --- */
+    .mi-hero {
+      background: linear-gradient(145deg, var(--color-navy) 0%, #0E3354 100%);
+      padding: 1.75rem 1.5rem 1.75rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mi-hero::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .mi-hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .mi-greeting {
+      color: rgba(255, 255, 255, 0.65);
+      font-size: 0.875rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .mi-name {
+      font-family: var(--font-family-heading);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 0.25rem;
+    }
+
+    .mi-role {
+      font-size: 0.8125rem;
+      color: var(--color-cyan);
+      font-weight: 500;
+    }
+
+    /* --- Cards Container --- */
+    .mi-cards {
+      flex: 1;
+      padding: 1.25rem 1.25rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .mi-card {
+      background: white;
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+    }
+
+    .mi-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      margin-bottom: 1rem;
+    }
+
+    .mi-card-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--color-cyan-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .mi-card-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-secondary);
+    }
+
+    /* --- IA Size Suggestion Card --- */
+    .size-suggestion {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .size-value {
+      font-family: var(--font-family-heading);
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: var(--color-navy);
+      line-height: 1;
+    }
+
+    .size-details {
+      flex: 1;
+    }
+
+    .size-details .size-label {
+      font-size: 0.8125rem;
+      color: var(--color-text-secondary);
+      margin-bottom: 0.25rem;
+    }
+
+    .ia-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-cyan);
+      background: var(--color-cyan-dim);
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+    }
+
+    .confidence-bar {
+      margin-top: 0.75rem;
+    }
+
+    .confidence-bar .conf-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+      margin-bottom: 0.375rem;
+    }
+
+    .conf-track {
+      height: 6px;
+      background: var(--color-smoke-mid);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .conf-fill {
+      height: 100%;
+      width: 94%;
+      background: linear-gradient(90deg, var(--color-cyan), #06D6A0);
+      border-radius: 999px;
+    }
+
+    /* --- CTA Button --- */
+    .confirm-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      width: 100%;
+      padding: 1.25rem;
+      background: var(--color-cyan);
+      color: var(--color-navy);
+      border: none;
+      border-radius: 1rem;
+      font-family: var(--font-family-heading);
+      font-size: 1.125rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 18px rgba(6, 182, 212, 0.35);
+      margin-top: 1.25rem;
+    }
+
+    .confirm-btn:hover {
+      background: var(--color-cyan-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(6, 182, 212, 0.45);
+    }
+
+    .confirm-btn.confirmed {
+      background: #10B981;
+      color: white;
+      box-shadow: 0 4px 18px rgba(16, 185, 129, 0.3);
+    }
+
+    /* --- Status Card --- */
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.875rem 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .status-row:last-child {
+      border-bottom: none;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .status-dot.green {
+      background: #10B981;
+    }
+
+    .status-dot.amber {
+      background: #F59E0B;
+    }
+
+    .status-dot.red {
+      background: var(--color-coral);
+    }
+
+    .status-row-content {
+      flex: 1;
+    }
+
+    .status-row-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--color-navy);
+    }
+
+    .status-row-sub {
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+    }
+
+    .status-row-badge {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      padding: 0.2rem 0.65rem;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+
+    .badge-done {
+      background: #D1FAE5;
+      color: #065F46;
+    }
+
+    .badge-wait {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+
+    .badge-alert {
+      background: var(--color-coral-dim);
+      color: var(--color-coral);
+    }
+
+    /* --- Quick Actions --- */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .quick-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem;
+      background: var(--color-smoke);
+      border: 1.5px solid var(--color-border);
+      border-radius: 1rem;
+      font-family: var(--font-family-primary);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--color-navy);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .quick-btn:hover {
+      border-color: var(--color-cyan);
+      background: var(--color-cyan-dim);
+    }
+
+    .quick-btn .q-icon {
+      font-size: 1.375rem;
+    }
+
+    /* --- Dynamic Form --- */
+    .kit-info {
+      background: var(--color-smoke);
+      border: 1px solid var(--color-border);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .kit-info-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-navy);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .kit-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .kit-list li {
+      font-size: 0.8125rem;
+      color: var(--color-text-secondary);
+      padding: 0.25rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .kit-list li::before {
+      content: '•';
+      color: var(--color-cyan);
+      font-weight: bold;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--color-navy);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1.5px solid var(--color-border);
+      border-radius: 0.5rem;
+      background: var(--color-smoke);
+      font-family: var(--font-family-primary);
+      font-size: 0.875rem;
+      color: var(--color-navy);
+      transition: all 0.2s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--color-cyan);
+      background: white;
+      box-shadow: 0 0 0 3px var(--color-cyan-dim);
+    }
+
+    .fit-options {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .fit-btn {
+      flex: 1;
+      padding: 0.6rem;
+      border: 1.5px solid var(--color-border);
+      background: var(--color-smoke);
+      border-radius: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+
+    .fit-btn.active {
+      border-color: var(--color-cyan);
+      background: var(--color-cyan-dim);
+      color: var(--color-cyan-hover);
+      font-weight: 700;
+    }
+
+    /* --- Signature Pad --- */
+    .signature-area {
+      margin-top: 1.5rem;
+      border: 1.5px dashed var(--color-border);
+      border-radius: 1rem;
+      background: #f8fafc;
+      padding: 1rem;
+    }
+
+    .signature-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-navy);
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+      display: block;
+      text-align: center;
+    }
+
+    .signature-pad {
+      width: 100%;
+      height: 120px;
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 0.5rem;
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    .signature-actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+
+    .clear-btn {
+      font-size: 0.7rem;
+      color: var(--color-text-secondary);
+      background: none;
+      border: none;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    /* --- Checklist Items --- */
+    .kit-list li {
+      font-size: 0.875rem;
+      color: var(--color-navy);
+      padding: 0.75rem 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .kit-list li:last-child {
+      border-bottom: none;
+    }
+
+    .kit-list input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--color-cyan);
+      cursor: pointer;
+    }
+
+    .confirm-btn:disabled {
+      background: #cbd5e1;
+      box-shadow: none;
+      cursor: not-allowed;
+      color: #64748b;
+    }
+  </style>
+  <style>
+    /* --- Custom Modal --- */
+    .mi-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 2rem;
+    }
+
+    .mi-modal-overlay.active {
+      display: flex;
+    }
+
+    .mi-modal {
+      background: white;
+      width: 100%;
+      max-width: 320px;
+      border-radius: 1.5rem;
+      padding: 2rem;
+      text-align: center;
+      animation: modalScale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes modalScale {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .mi-modal-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .mi-modal-title {
+      font-family: var(--font-family-heading);
+      font-size: 1.5rem;
+      color: var(--color-navy);
+      margin-bottom: 0.5rem;
+    }
+
+    .mi-modal-text {
+      font-size: 0.9375rem;
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+
+    .mi-modal-btn {
+      width: 100%;
+      padding: 1rem;
+      background: var(--color-cyan);
+      color: var(--color-navy);
+      border: none;
+      border-radius: 1rem;
+      font-family: var(--font-family-heading);
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="mi-dashboard">
+    <!-- Success Modal -->
+    <div id="successModal" class="mi-modal-overlay">
+      <div class="mi-modal">
+        <div class="mi-modal-icon">✨</div>
+        <h3 class="mi-modal-title">¡Confirmado!</h3>
+        <p class="mi-modal-text">Tu dotación ha sido recibida y firmada correctamente.</p>
+        <button class="mi-modal-btn" onclick="closeSuccessModal()">Entendido</button>
+      </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="historyModal" class="mi-modal-overlay">
+      <div class="mi-modal" style="max-width: 380px;">
+        <div class="mi-card-header" style="justify-content: center;">
+          <div class="mi-card-icon">📋</div>
+          <h3 class="mi-modal-title" style="margin-bottom: 0;">Historial Completo</h3>
+        </div>
+        <div style="text-align: left; margin: 1.5rem 0;">
+          <div class="status-row">
+            <div class="status-dot green"></div>
+            <div class="status-row-content">
+              <div class="status-row-label">Dotación Semestral #42</div>
+              <div class="status-row-sub">Recibido el 15 Mayo 2024</div>
+            </div>
+            <span class="status-row-badge badge-done">Vale #F92</span>
+          </div>
+          <div class="status-row">
+            <div class="status-dot green"></div>
+            <div class="status-row-content">
+              <div class="status-row-label">Kit Calzado de Seguridad</div>
+              <div class="status-row-sub">Recibido el 3 Ene 2024</div>
+            </div>
+            <span class="status-row-badge badge-done">Vale #F81</span>
+          </div>
+          <div class="status-row">
+            <div class="status-dot green"></div>
+            <div class="status-row-content">
+              <div class="status-row-label">Reposición: Filipina Chef</div>
+              <div class="status-row-sub">Recibido el 12 Oct 2023</div>
+            </div>
+            <span class="status-row-badge badge-done">Vale #F12</span>
+          </div>
+        </div>
+        <button class="mi-modal-btn" onclick="closeHistoryModal()">Cerrar</button>
+      </div>
+    </div>
+
+    <!-- Report Damage Modal -->
+    <div id="reportModal" class="mi-modal-overlay">
+      <div class="mi-modal" style="max-width: 380px; text-align: left;">
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+          <div class="mi-card-icon">📸</div>
+          <h3 class="mi-modal-title" style="margin-bottom: 0;">Reportar Daño</h3>
+        </div>
+
+        <!-- Photo Upload Area -->
+        <input type="file" id="damagePhotoInput" accept="image/*" capture="environment" style="display:none"
+          onchange="previewPhoto(event)">
+        <div id="photoUploadArea" onclick="document.getElementById('damagePhotoInput').click()"
+          style="border: 2px dashed var(--color-cyan); border-radius: 1rem; background: var(--color-cyan-dim, #ecfeff); padding: 2rem 1rem; text-align: center; cursor: pointer; margin-bottom: 1rem; transition: all 0.2s;">
+          <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📷</div>
+          <p style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.25rem;">Toca para
+            tomar o subir foto</p>
+          <p style="font-size: 0.75rem; color: var(--color-text-secondary);">Muestra el artículo dañado claramente</p>
+        </div>
+
+        <!-- Preview -->
+        <div id="photoPreview"
+          style="display: none; margin-bottom: 1rem; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--color-border);">
+          <img id="previewImg" style="width: 100%; max-height: 180px; object-fit: cover; display: block;" />
+          <button onclick="clearPhoto()"
+            style="width: 100%; padding: 0.5rem; background: #fee2e2; color: #b91c1c; border: none; font-size: 0.75rem; font-weight: 600; cursor: pointer;">✕
+            Quitar foto</button>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <label
+            style="display: block; font-size: 0.8125rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem;">¿Qué
+            artículo está dañado?</label>
+          <select id="damagedItem"
+            style="width: 100%; padding: 0.75rem; border: 1.5px solid var(--color-border); border-radius: 0.5rem; font-family: inherit; font-size: 0.875rem; color: var(--color-navy); background: white;">
+            <option value="">Selecciona un artículo...</option>
+            <option>Filipina Blanca (Manga 3/4)</option>
+            <option>Pantalón de Cocina (Negro)</option>
+            <option>Mandil de Pecho</option>
+            <option>Zapatos Antideslizantes</option>
+          </select>
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label
+            style="display: block; font-size: 0.8125rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem;">Descripción
+            del daño</label>
+          <textarea id="damageDesc" rows="2" placeholder="Ej: Desgaste en el cuello, rotura en la costura..."
+            style="width: 100%; padding: 0.75rem; border: 1.5px solid var(--color-border); border-radius: 0.5rem; font-family: inherit; font-size: 0.875rem; resize: none;"></textarea>
+        </div>
+
+        <!-- Replacement Request Toggle -->
+        <label
+          style="display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; background: #f0fdfa; border: 1.5px solid #99f6e4; border-radius: 0.75rem; cursor: pointer; margin-bottom: 1.5rem;">
+          <input type="checkbox" id="requestReplacement"
+            style="width: 18px; height: 18px; accent-color: var(--color-cyan); cursor: pointer; flex-shrink: 0;">
+          <div>
+            <div style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy);">Solicitar reemplazo</div>
+            <div style="font-size: 0.75rem; color: var(--color-text-secondary); margin-top: 0.1rem;">El artículo ya no
+              puede usarse y necesito uno nuevo</div>
+          </div>
+        </label>
+
+        <div style="display: flex; gap: 0.75rem;">
+          <button onclick="closeReportModal()"
+            style="flex: 1; padding: 0.875rem; background: #f1f5f9; border: none; border-radius: 0.75rem; font-weight: 600; color: var(--color-text-secondary); cursor: pointer;">Cancelar</button>
+          <button onclick="submitReport()"
+            style="flex: 2; padding: 0.875rem; background: var(--color-navy); border: none; border-radius: 0.75rem; font-weight: 700; color: white; cursor: pointer; font-family: inherit;">Enviar
+            Reporte</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Bar -->
+    <div class="mi-topbar">
+      <div class="logo-text">mi <span>dotacian</span></div>
+      <a href="mi-login.html" class="logout-btn">Cerrar sesión</a>
+    </div>
+
+    <!-- Hero Greeting -->
+    <div class="mi-hero">
+      <div class="mi-hero-content">
+        <p class="mi-greeting">Bienvenida de vuelta 👋</p>
+        <h1 class="mi-name">María López</h1>
+        <p class="mi-role">Chef — Condesa </p>
+      </div>
+    </div>
+
+    <!-- Floating Cards -->
+    <div class="mi-cards">
+
+      <!-- Dynamic Flow Card -->
+      <div class="mi-card">
+        
+        <!-- TALLA FLOW -->
+        <div id="view-talla" style="display: none;">
+          <div class="mi-card-header">
+            <div class="mi-card-icon">📏</div>
+            <span class="mi-card-title">Confirma tus Medidas</span>
+          </div>
+          <div class="kit-info" style="margin-bottom: 1rem;">
+            <p style="font-size: 0.8125rem; color: var(--color-text-secondary); margin-bottom: 1.25rem; line-height: 1.5;">Hemos sugerido tus tallas usando nuestra IA y tu historial. Revísalas o actualízalas antes de confirmar.</p>
+            
+            <div class="form-group">
+              <label class="form-label">Talla de Camisa/Filipina</label>
+              <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 0.5rem;">
+                <input type="text" class="form-control" value="M" style="width: 80px; text-align: center; font-weight: 700; font-size: 1rem;">
+                <div style="flex: 1; display: flex; align-items: center; gap: 0.4rem; padding: 0.6rem; background: #f0fdfa; color: #0f766e; border: 1px solid #ccfbf1; font-size: 0.75rem; border-radius: 0.5rem; font-weight: 600;"><span>✨</span> Sugerido por IA: M</div>
+              </div>
+            </div>
+            
+            <div class="form-group" style="display: flex; gap: 1rem;">
+              <div style="flex: 1;">
+                <label class="form-label">Talla Pantalón</label>
+                <input type="number" class="form-control" value="32" style="text-align: center; font-weight: 700; font-size: 1rem;">
+              </div>
+              <div style="flex: 1;">
+                <label class="form-label">Calzado (cm)</label>
+                <input type="number" class="form-control" value="27" style="text-align: center; font-weight: 700; font-size: 1rem;">
+              </div>
+            </div>
+          </div>
+          <button class="confirm-btn" onclick="submitTalla()" id="submitTallaBtn">
+            <span>✅</span> Confirmar Tallas
+          </button>
+        </div>
+
+        <!-- FIRMA FLOW -->
+        <div id="view-firma" style="display: none;">
+          <div class="mi-card-header">
+            <div class="mi-card-icon">📦</div>
+            <span class="mi-card-title">Dotación asignada a tu rol</span>
+          </div>
+
+          <div class="kit-info">
+            <div class="kit-info-title"><span>📋</span> Confirma los artículos recibidos</div>
+            <ul class="kit-list">
+              <li><input type="checkbox" onchange="checkItems()"> 2x Filipinas Blancas (Manga 3/4)</li>
+              <li><input type="checkbox" onchange="checkItems()"> 2x Pantalones de Cocina (Negro)</li>
+              <li><input type="checkbox" onchange="checkItems()"> 1x Mandil de Pecho</li>
+              <li><input type="checkbox" onchange="checkItems()"> 1x Zapatos Antideslizantes (Negro)</li>
+            </ul>
+          </div>
+
+          <div class="signature-area">
+            <span class="signature-label">Firma aquí para confirmar recepción</span>
+            <canvas id="signaturePad" class="signature-pad"></canvas>
+            <div class="signature-actions">
+              <button class="clear-btn" onclick="clearSignature()">Limpiar firma</button>
+            </div>
+          </div>
+
+          <!-- Partial Receipt Toggle -->
+          <label id="partialToggleLabel"
+            style="display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 0.75rem; cursor: pointer; margin-top: 1.5rem; margin-bottom: 1rem;">
+            <input type="checkbox" id="partialReceipt" onchange="checkItems()"
+              style="width: 18px; height: 18px; accent-color: #f59e0b; cursor: pointer; flex-shrink: 0;">
+            <div>
+              <div style="font-size: 0.875rem; font-weight: 600; color: #92400e;">Recepción parcial</div>
+              <div style="font-size: 0.75rem; color: #b45309; margin-top: 0.1rem;">No se entregaron todos los artículos.
+                Firmaré con los recibidos.</div>
+            </div>
+          </label>
+
+          <button class="confirm-btn" id="startConfirmBtn" onclick="submitConfirmation()" disabled>
+            <span>✍️</span> Confirmar Recepción y Firmar
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="mi-card">
+        <div class="mi-card-header">
+          <div class="mi-card-icon">⚡</div>
+          <span class="mi-card-title">Accesos rápidos</span>
+        </div>
+        <div class="quick-actions">
+          <button onclick="openHistoryModal()" class="quick-btn">
+            <span class="q-icon">📋</span>
+            Historial
+          </button>
+          <button onclick="openReportModal()" class="quick-btn">
+            <span class="q-icon">📸</span>
+            Reportar daño
+          </button>
+        </div>
+      </div>
+
+
+
+      <script>
+        // Set mode logic on load
+        document.addEventListener('DOMContentLoaded', () => {
+          const params = new URLSearchParams(window.location.search);
+          const mode = params.get('mode') || 'talla';
+          
+          if (mode === 'talla') {
+            document.getElementById('view-talla').style.display = 'block';
+          } else {
+            document.getElementById('view-firma').style.display = 'block';
+            resizeCanvas(); // Ensure canvas is sized if firma mode
+          }
+        });
+
+        // Submit Talla logic
+        function submitTalla() {
+          const btn = document.getElementById('submitTallaBtn');
+          btn.classList.add('confirmed');
+          btn.disabled = true;
+          btn.innerHTML = '<span>✅</span> Tallas Guardadas';
+          
+          document.querySelector('#successModal .mi-modal-icon').textContent = '📏';
+          document.querySelector('#successModal .mi-modal-title').textContent = 'Medidas Confirmadas';
+          document.querySelector('#successModal .mi-modal-text').textContent = 'Tus tallas se han guardado exitosamente para la producción de tu próxima dotación.';
+          setTimeout(showSuccessModal, 300);
+        }
+
+        let canvas = document.getElementById('signaturePad');
+        let ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        // Initialize canvas size
+        function resizeCanvas() {
+          if (!canvas) return;
+          const rect = canvas.getBoundingClientRect();
+          if (rect.width === 0) return; // Hidden element
+          canvas.width = rect.width;
+          canvas.height = rect.height;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e.touches[0]); });
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); });
+        canvas.addEventListener('touchend', stopDrawing);
+
+        function startDrawing(e) {
+          drawing = true;
+          draw(e);
+          checkItems();
+        }
+
+        function stopDrawing() {
+          drawing = false;
+          ctx.beginPath();
+        }
+
+        function draw(e) {
+          if (!drawing) return;
+          const rect = canvas.getBoundingClientRect();
+          ctx.lineWidth = 2;
+          ctx.lineCap = 'round';
+          ctx.strokeStyle = '#0f172a';
+
+          ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function clearSignature() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          checkItems();
+        }
+
+        function checkItems() {
+          const checkboxes = document.querySelectorAll('.kit-list input[type="checkbox"]');
+          const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+          const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+          const isPartial = document.getElementById('partialReceipt').checked;
+          const isSigned = !isCanvasBlank(canvas);
+
+          const confirmBtn = document.getElementById('startConfirmBtn');
+          const canConfirm = isSigned && (allChecked || (isPartial && anyChecked));
+          confirmBtn.disabled = !canConfirm;
+
+          if (isPartial && !allChecked) {
+            confirmBtn.style.background = '#f59e0b';
+            confirmBtn.style.color = '#1e1e1e';
+            confirmBtn.style.boxShadow = '0 4px 18px rgba(245,158,11,0.35)';
+            confirmBtn.innerHTML = '<span>⚠️</span> Confirmar Recepción Parcial';
+          } else {
+            confirmBtn.style.background = '';
+            confirmBtn.style.color = '';
+            confirmBtn.style.boxShadow = '';
+            confirmBtn.innerHTML = '<span>✍️</span> Confirmar Recepción y Firmar';
+          }
+        }
+
+        function isCanvasBlank(canvas) {
+          const pixelBuffer = new Uint32Array(ctx.getImageData(0, 0, canvas.width, canvas.height).data.buffer);
+          return !pixelBuffer.some(color => color !== 0);
+        }
+
+        function submitConfirmation() {
+          const isPartial = document.getElementById('partialReceipt').checked;
+          const startBtn = document.getElementById('startConfirmBtn');
+          const date = new Date().toLocaleDateString();
+
+          startBtn.classList.add('confirmed');
+          startBtn.disabled = true;
+
+          if (isPartial) {
+            startBtn.style.background = '#f59e0b';
+            startBtn.style.color = '#1e1e1e';
+            startBtn.innerHTML = '<span>⚠️</span> Recepción Parcial Firmada — ' + date;
+          } else {
+            startBtn.innerHTML = '<span>✅</span> Entrega Confirmada — ' + date;
+          }
+
+          // Lock all interactions
+          document.querySelector('.signature-area').style.opacity = '0.5';
+          document.querySelector('.signature-area').style.pointerEvents = 'none';
+          document.querySelectorAll('.kit-list input').forEach(cb => cb.disabled = true);
+          document.getElementById('partialReceipt').disabled = true;
+
+          // Customize success modal text
+          if (isPartial) {
+            document.querySelector('#successModal .mi-modal-icon').textContent = '⚠️';
+            document.querySelector('#successModal .mi-modal-title').textContent = 'Recepción Parcial Registrada';
+            document.querySelector('#successModal .mi-modal-text').textContent = 'Se han registrado los artículos recibidos y tu firma. El supervisor será notificado de los artículos pendientes.';
+          } else {
+            document.querySelector('#successModal .mi-modal-icon').textContent = '✨';
+            document.querySelector('#successModal .mi-modal-title').textContent = '¡Confirmado!';
+            document.querySelector('#successModal .mi-modal-text').textContent = 'Tu dotación ha sido recibida y firmada correctamente.';
+          }
+
+          setTimeout(() => { showSuccessModal(); }, 300);
+        }
+
+        function showSuccessModal() {
+          document.getElementById('successModal').classList.add('active');
+        }
+
+        function closeSuccessModal() {
+          document.getElementById('successModal').classList.remove('active');
+        }
+
+        function openHistoryModal() {
+          document.getElementById('historyModal').classList.add('active');
+        }
+
+        function closeHistoryModal() {
+          document.getElementById('historyModal').classList.remove('active');
+        }
+
+        function openReportModal() {
+          document.getElementById('reportModal').classList.add('active');
+        }
+
+        function closeReportModal() {
+          document.getElementById('reportModal').classList.remove('active');
+          clearPhoto();
+          document.getElementById('damagedItem').value = '';
+          document.getElementById('damageDesc').value = '';
+        }
+
+        function previewPhoto(event) {
+          const file = event.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            document.getElementById('previewImg').src = e.target.result;
+            document.getElementById('photoPreview').style.display = 'block';
+            document.getElementById('photoUploadArea').style.display = 'none';
+          };
+          reader.readAsDataURL(file);
+        }
+
+        function clearPhoto() {
+          document.getElementById('damagePhotoInput').value = '';
+          document.getElementById('previewImg').src = '';
+          document.getElementById('photoPreview').style.display = 'none';
+          document.getElementById('photoUploadArea').style.display = 'block';
+        }
+
+        function submitReport() {
+          const item = document.getElementById('damagedItem').value;
+          if (!item) { alert('Por favor selecciona el artículo dañado.'); return; }
+          closeReportModal();
+          setTimeout(() => {
+            const modal = document.getElementById('successModal');
+            document.querySelector('#successModal .mi-modal-icon').textContent = '📬';
+            document.querySelector('#successModal .mi-modal-title').textContent = '¡Reporte Enviado!';
+            document.querySelector('#successModal .mi-modal-text').textContent = 'Tu reporte de daño ha sido enviado al supervisor de sucursal.';
+            modal.classList.add('active');
+          }, 300);
+        }
+      </script>
+      <!-- Help Banner -->
+      <div class="mi-help-banner"
+        style="margin: 2rem 1.25rem 2rem; background: white; border: 1px solid var(--color-border); border-radius: 1rem; padding: 1rem 1.25rem; display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.8125rem; color: var(--color-text-secondary); line-height: 1.5;">
+        <span class="help-icon" style="font-size: 1.125rem; flex-shrink: 0; margin-top: 0.1rem;">💬</span>
+        <span>
+          ¿Tienes algún problema con la plataforma?
+          <a href="#" style="color: var(--color-cyan); font-weight: 600; text-decoration: none;">Reportar problema</a>
+          <script src="assets/js/utils.js"></script>
+</body>
+
+</html>
