@@ -52,6 +52,11 @@
           onmouseout="this.style.color='var(--color-text-secondary)'">Iniciar sesión</a>
         <a href="onboarding.html" class="btn btn-primary" style="padding: 0.6rem 1.25rem; font-size: 0.9rem;">Crea tu
           cuenta</a>
+        <button class="header-mobile-toggle" id="mobile-menu-toggle" aria-label="Abrir menú">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </div>
     </div>
   </header>
@@ -316,10 +321,10 @@
       style="position: absolute; top: -100px; right: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%); border-radius: 50%;">
     </div>
 
-    <div class="container api-grid-container" style="display: grid; gap: 4rem; align-items: center;">
+    <div class="container api-grid-container">
 
       <!-- Text & Code Side -->
-      <div class="api-content" style="position: relative; z-index: 2;">
+      <div class="api-content">
         <div
           style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 1rem; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: 100px; color: var(--color-cyan); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.5rem;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -338,7 +343,8 @@
         </p>
 
         <!-- Code Terminal Mockup -->
-        <div class="code-terminal">
+        <div class="api-element-wrapper">
+          <div class="code-terminal">
           <div class="terminal-header">
             <div style="width: 10px; height: 10px; border-radius: 50%; background: #FF5F56;"></div>
             <div style="width: 10px; height: 10px; border-radius: 50%; background: #FFBD2E;"></div>
@@ -361,12 +367,10 @@
       </div>
 
       <!-- Visual Side -->
-      <div class="api-visual"
-        style="position: relative; height: 400px; display: flex; align-items: center; justify-content: center;">
-
-        <!-- Dashboard Mockup (Background) -->
-        <div
-          style="width: 100%; max-width: 480px; height: 320px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; box-shadow: 0 24px 48px rgba(0,0,0,0.5); backdrop-filter: blur(10px); padding: 1.5rem; position: relative; z-index: 1;">
+      <div class="api-visual">
+        <div class="api-element-wrapper">
+          <!-- Dashboard Mockup (Background) -->
+          <div class="api-dashboard-mockup">
           <!-- Skeleton UI -->
           <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
             <div style="width: 40px; height: 40px; border-radius: 8px; background: rgba(255,255,255,0.05);"></div>
@@ -392,70 +396,6 @@
         </div>
 
         <!-- Floating Logos -->
-        <style>
-          @keyframes float1 {
-
-            0%,
-            100% {
-              transform: translateY(0px) rotate(0deg);
-            }
-
-            50% {
-              transform: translateY(-15px) rotate(2deg);
-            }
-          }
-
-          @keyframes float2 {
-
-            0%,
-            100% {
-              transform: translateY(0px) rotate(0deg);
-            }
-
-            50% {
-              transform: translateY(-10px) rotate(-2deg);
-            }
-          }
-
-          @keyframes float3 {
-
-            0%,
-            100% {
-              transform: translateY(0px);
-            }
-
-            50% {
-              transform: translateY(-20px);
-            }
-          }
-
-          .float-logo {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 1.25rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            z-index: 5;
-          }
-
-          /* For mobile responsiveness */
-          @media (max-width: 900px) {
-            .api-integrations .container {
-              grid-template-columns: 1fr !important;
-              gap: 3rem !important;
-            }
-
-            .api-visual {
-              height: 350px !important;
-            }
-          }
-        </style>
-
         <!-- Workday -->
         <div class="float-logo" title="Workday" style="top: 5%; left: 0%; animation: float1 6s ease-in-out infinite;">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2"
@@ -494,6 +434,7 @@
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
             <polyline points="22 4 12 14.01 9 11.01" />
           </svg>
+        </div>
         </div>
       </div>
 
@@ -993,6 +934,50 @@
     }
   </script>
   <script src="assets/js/utils.js"></script>
+  <!-- Mobile Drawer Overlay -->
+  <div class="mobile-drawer" id="mobile-drawer">
+    <div class="drawer-header">
+      <div class="logo">dotacian</div>
+      <button class="drawer-close" id="drawer-close">&times;</button>
+    </div>
+    <nav class="drawer-nav">
+      <a href="#problema">Problema</a>
+      <a href="#solucion">Solución</a>
+      <a href="pricing.html">Precios</a>
+      <a href="#impacto">Impacto</a>
+      <div class="drawer-divider"></div>
+      <a href="login.html">Iniciar sesión</a>
+      <a href="onboarding.html" class="btn btn-primary">Crea tu cuenta</a>
+    </nav>
+  </div>
+
+  <script>
+    const toggleBtn = document.getElementById('mobile-menu-toggle');
+    const closeBtn = document.getElementById('drawer-close');
+    const drawer = document.getElementById('mobile-drawer');
+    const drawerLinks = document.querySelectorAll('.drawer-nav a');
+
+    const toggleMenu = () => {
+      drawer.classList.toggle('active');
+      toggleBtn.classList.toggle('open');
+      document.body.style.overflow = drawer.classList.contains('active') ? 'hidden' : '';
+    };
+
+    toggleBtn.addEventListener('click', toggleMenu);
+    closeBtn.addEventListener('click', () => {
+      drawer.classList.remove('active');
+      toggleBtn.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+
+    drawerLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        drawer.classList.remove('active');
+        toggleBtn.classList.remove('open');
+        document.body.style.overflow = '';
+      });
+    });
+  </script>
 </body>
 
 </html>
