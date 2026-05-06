@@ -845,6 +845,22 @@
     </div>
   </footer>
 
+  <!-- Custom Success Toast -->
+  <div id="success-toast" class="toast">
+    <div class="toast-content">
+      <div class="toast-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <div class="toast-message">
+        <span class="toast-title">¡Datos recibidos con éxito!</span>
+        <p>Nos pondremos en contacto lo antes posible.</p>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Pricing Localization Logic
     const countrySelector = document.getElementById('country-selector');
@@ -939,7 +955,7 @@
   <script>
     // Supabase Configuration
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3dWh2ZXdvdG13ZWx1cm1qdm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwMzczNjksImV4cCI6MjA5MzYxMzM2OX0.eX_uAKfCCYneqst3XiSJW9wGy43lbDzoeUt9VJ3B_1Q';
+    const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // Contact Form Submission
@@ -970,7 +986,15 @@
 
           if (error) throw error;
 
-          alert('¡Gracias! Nos pondremos en contacto contigo pronto.');
+          // Show custom toast instead of alert
+          const toast = document.getElementById('success-toast');
+          if (toast) {
+            toast.classList.add('show');
+            setTimeout(() => {
+              toast.classList.remove('show');
+            }, 5000);
+          }
+          
           contactForm.reset();
 
         } catch (error) {
