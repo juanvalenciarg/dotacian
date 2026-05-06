@@ -1520,6 +1520,18 @@ ul {
   gap: 1.5rem;
 }
 
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
@@ -3181,16 +3193,4 @@ ul {
   box-shadow: 0 0 0 3px var(--color-cyan-dim);
 }
 
-/* Final Footer Mobile Fix */
-@media (max-width: 768px) {
-  .footer-content {
-    flex-direction: column !important;
-    gap: 1.5rem !important;
-    text-align: center !important;
-    align-items: center !important;
-  }
-  
-  .cta-box h2 {
-    font-size: 2rem !important;
-  }
-}
+/* Custom Toast Notification */
