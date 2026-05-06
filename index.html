@@ -71,7 +71,7 @@
         <p class="hero-subtitle">Elimina la carga administrativa y el error humano. IA y logística integrada para
           gestionar miles de uniformes sin esfuerzo.</p>
         <div class="hero-actions">
-          <button class="btn btn-primary">Agendar Demo</button>
+          <a href="#agendar-demo" class="btn btn-primary">Agendar Demo</a>
         </div>
       </div>
 
@@ -817,6 +817,13 @@
                 </select>
               </div>
             </div>
+            <div class="form-group">
+              <label for="country">País</label>
+              <select id="country">
+                <option value="México">México</option>
+                <option value="Colombia">Colombia</option>
+              </select>
+            </div>
             <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Solicitar
               información</button>
           </form>
@@ -976,6 +983,7 @@
           "company": document.getElementById('company').value,
           "industry": document.getElementById('industry').value,
           "employees": document.getElementById('employees').value,
+          "country": document.getElementById('country').value,
           "status": "nuevo"
         };
 
