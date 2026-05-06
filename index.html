@@ -1000,27 +1000,27 @@
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // Recolectamos los datos (asegúrate que los ID coincidan con tu HTML)
-      const formData = {
-        nombre: document.getElementById('first-name').value,
-        apellido: document.getElementById('last-name').value,
-        email: document.getElementById('email').value,
-        empresa: document.getElementById('company').value,
-        industria: document.getElementById('industry').value,
-        rango_empleados: document.getElementById('employees').value,
-      };
+      // Captura de los elementos del DOM por su ID exacto del HTML
+      const firstName = document.getElementById('first-name').value; //
+      const lastName = document.getElementById('last-name').value;  //
+      const email = document.getElementById('email').value;        //
+      const company = document.getElementById('company').value;    //
+      const industry = document.getElementById('industry').value;  //
+      const employees = document.getElementById('employees').value; //
 
-      const { data, error } = await _supabase
-        .from('leads_dotacian')
-        .insert([formData]);
-
-      if (!error) {
-        alert('Lead registrado y enviado a Notion exitosamente');
-        form.reset();
-      } else {
-        console.error('Error de experto:', error);
-      }
-    });
+      const { data, error } = await supabase
+        .from('leads_dotacian') //
+        .insert([
+          {
+            "first-name": firstName, // DEBE usar comillas por el guion
+            "last-name": lastName,   // DEBE usar comillas por el guion
+            "email": email,          //
+            "company": company,      //
+            "industry": industry,    //
+            "employees": employees,  //
+            "status": "nuevo"        // Opcional, ya que tiene valor por defecto
+          }
+        ]);
   </script>
 
 </body>
