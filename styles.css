@@ -1572,8 +1572,9 @@ ul {
 }
 
 .cta-box h2 {
-  font-size: 2.5rem;
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
   margin-bottom: 1.5rem;
+  line-height: 1.2;
 }
 
 .cta-box .btn {
@@ -1784,6 +1785,11 @@ ul {
     padding: 0 1.5rem;
     gap: 2rem;
   }
+
+  .cta-box {
+    padding: 3rem 2rem;
+    margin-bottom: 3rem;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1823,6 +1829,14 @@ ul {
     padding: 0.3rem 0.6rem;
     font-size: 0.7rem;
   }
+
+  .footer-content {
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+    align-items: center;
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1848,6 +1862,11 @@ ul {
   .api-content {
     padding: 0 1rem;
     width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  .cta-box {
+    padding: 2.5rem 1.5rem;
     margin-bottom: 2rem;
   }
 
@@ -3160,4 +3179,18 @@ ul {
 .filter-select:focus {
   border-color: var(--color-cyan);
   box-shadow: 0 0 0 3px var(--color-cyan-dim);
+}
+
+/* Final Footer Mobile Fix */
+@media (max-width: 768px) {
+  .footer-content {
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+    text-align: center !important;
+    align-items: center !important;
+  }
+  
+  .cta-box h2 {
+    font-size: 1.75rem !important;
+  }
 }
