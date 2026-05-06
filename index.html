@@ -938,11 +938,11 @@
 
   <script>
     // Supabase Configuration
-    const SUPABASE_URL = "https://awuhvewotmwelurmjvmu.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3dWh2ZXdvdG13ZWx1cm1qdm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwMzczNjksImV4cCI6MjA5MzYxMzM2OX0.eX_uAKfCCYneqst3XiSJW9wGy43lbDzoeUt9VJ3B_1Q";
+    const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3dWh2ZXdvdG13ZWx1cm1qdm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwMzczNjksImV4cCI6MjA5MzYxMzM2OX0.eX_uAKfCCYneqst3XiSJW9wGy43lbDzoeUt9VJ3B_1Q';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Contact Form Submission with Supabase
+    // Contact Form Submission
     const contactForm = document.getElementById('contact-form');
     if (contactForm) {
       contactForm.addEventListener('submit', async (e) => {
@@ -954,12 +954,13 @@
         submitBtn.disabled = true;
 
         const formData = {
-          nombre: document.getElementById('first-name').value,
-          apellido: document.getElementById('last-name').value,
-          email: document.getElementById('email').value,
-          empresa: document.getElementById('company').value,
-          industria: document.getElementById('industry').value,
-          rango_empleados: document.getElementById('employees').value,
+          "first-name": document.getElementById('first-name').value,
+          "last-name": document.getElementById('last-name').value,
+          "email": document.getElementById('email').value,
+          "company": document.getElementById('company').value,
+          "industry": document.getElementById('industry').value,
+          "employees": document.getElementById('employees').value,
+          "status": "nuevo"
         };
 
         try {
@@ -982,47 +983,6 @@
       });
     }
   </script>
-
-  <!-- 1. Primero cargamos la librería de Supabase desde el CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-
-  <!-- 2. Luego pegamos nuestra lógica personalizada -->
-  <script>
-    // Inicialización
-    const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3dWh2ZXdvdG13ZWx1cm1qdm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwMzczNjksImV4cCI6MjA5MzYxMzM2OX0.eX_uAKfCCYneqst3XiSJW9wGy43lbDzoeUt9VJ3B_1Q';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // Lógica del Formulario
-    const form = document.getElementById('contactForm');
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      // Captura de los elementos del DOM por su ID exacto del HTML
-      const firstName = document.getElementById('first-name').value; //
-      const lastName = document.getElementById('last-name').value;  //
-      const email = document.getElementById('email').value;        //
-      const company = document.getElementById('company').value;    //
-      const industry = document.getElementById('industry').value;  //
-      const employees = document.getElementById('employees').value; //
-
-      const { data, error } = await supabase
-        .from('leads_dotacian') //
-        .insert([
-          {
-            "first-name": firstName, // DEBE usar comillas por el guion
-            "last-name": lastName,   // DEBE usar comillas por el guion
-            "email": email,          //
-            "company": company,      //
-            "industry": industry,    //
-            "employees": employees,  //
-            "status": "nuevo"        // Opcional, ya que tiene valor por defecto
-          }
-        ]);
-  </script>
-
 </body>
 
 </html>
