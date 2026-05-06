@@ -982,6 +982,47 @@
       });
     }
   </script>
+
+  <!-- 1. Primero cargamos la librería de Supabase desde el CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+  <!-- 2. Luego pegamos nuestra lógica personalizada -->
+  <script>
+    // Inicialización
+    const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3dWh2ZXdvdG13ZWx1cm1qdm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwMzczNjksImV4cCI6MjA5MzYxMzM2OX0.eX_uAKfCCYneqst3XiSJW9wGy43lbDzoeUt9VJ3B_1Q';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Lógica del Formulario
+    const form = document.getElementById('contactForm');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Recolectamos los datos (asegúrate que los ID coincidan con tu HTML)
+      const formData = {
+        nombre: document.getElementById('first-name').value,
+        apellido: document.getElementById('last-name').value,
+        email: document.getElementById('email').value,
+        empresa: document.getElementById('company').value,
+        industria: document.getElementById('industry').value,
+        rango_empleados: document.getElementById('employees').value,
+      };
+
+      const { data, error } = await _supabase
+        .from('leads_dotacian')
+        .insert([formData]);
+
+      if (!error) {
+        alert('Lead registrado y enviado a Notion exitosamente');
+        form.reset();
+      } else {
+        console.error('Error de experto:', error);
+      }
+    });
+  </script>
+
 </body>
 
 </html>
