@@ -10,9 +10,96 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <!-- Supabase SDK & Utils -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/utils.js"></script>
 </head>
 
 <body>
+  <!-- Configuration Wizard Modal (Movido al inicio para prioridad de clics) -->
+  <div id="setup-wizard" class="modal-overlay" style="visibility: hidden; opacity: 0; display: flex !important; pointer-events: none;">
+    <div class="modal-card wizard-card" style="position: relative; pointer-events: all !important;">
+      <button class="modal-close-btn" onclick="closeWizard()" title="Cerrar">✕</button>
+      <div class="wizard-header">
+        <div class="wizard-progress">
+          <div id="wizard-progress-fill" class="progress-fill" style="width: 20%;"></div>
+        </div>
+        <div class="wizard-steps-count">Paso <span id="current-wizard-step">1</span> de 5</div>
+      </div>
+
+      <div class="wizard-body">
+        <!-- Step 1: Empresa -->
+        <div class="wizard-step-content active" data-step="1">
+          <div class="wizard-icon">🏢</div>
+          <h2>Cuéntanos de tu empresa</h2>
+          <p>Para empezar, necesitamos el nombre de tu organización.</p>
+          <div class="form-row" style="margin-top: 1.5rem;">
+            <label>Nombre de la Empresa</label>
+            <input type="text" id="wiz-company" placeholder="Ej. Tech Solutions S.A." class="wiz-input">
+          </div>
+        </div>
+
+        <!-- Step 2: Industria -->
+        <div class="wizard-step-content" data-step="2">
+          <div class="wizard-icon">🏭</div>
+          <h2>¿En qué sector operan?</h2>
+          <p>Esto nos ayuda a sugerirte los uniformes más adecuados.</p>
+          <div class="industry-grid-wiz" style="margin-top: 1.5rem;">
+            <div class="industry-opt-wiz" onclick="selectWizIndustry(this, 'restaurant')">🍽️ Restaurantes</div>
+            <div class="industry-opt-wiz" onclick="selectWizIndustry(this, 'limpieza')">🧹 Limpieza</div>
+            <div class="industry-opt-wiz" onclick="selectWizIndustry(this, 'industrial')">⚙️ Industrial</div>
+            <div class="industry-opt-wiz" onclick="selectWizIndustry(this, 'corporate')">💼 Corporativo</div>
+          </div>
+        </div>
+
+        <!-- Step 3: Roles -->
+        <div class="wizard-step-content" data-step="3">
+          <div class="wizard-icon">👥</div>
+          <h2>¿Qué roles necesitan dotación?</h2>
+          <p>Selecciona los perfiles que gestionas actualmente.</p>
+          <div id="wiz-roles-grid" class="roles-grid-wiz" style="margin-top: 1.5rem;">
+            <!-- Dinámico -->
+          </div>
+        </div>
+
+        <!-- Step 4: Escala -->
+        <div class="wizard-step-content" data-step="4">
+          <div class="wizard-icon">📏</div>
+          <h2>¿Cuántos colaboradores son?</h2>
+          <p>Ajusta el número aproximado de personas que recibirán dotación.</p>
+          <div class="slider-container-wiz" style="margin-top: 2rem;">
+            <div class="slider-val-wiz"><span id="wiz-emp-val">150</span> colaboradores</div>
+            <input type="range" id="wiz-emp-slider" min="10" max="2000" value="150" oninput="updateWizVal('wiz-emp-slider', 'wiz-emp-val')">
+          </div>
+        </div>
+
+        <!-- Step 5: Frecuencia -->
+        <div class="wizard-step-content" data-step="5">
+          <div class="wizard-icon">🔄</div>
+          <h2>Frecuencia de Renovación</h2>
+          <p>¿Cada cuántos meses entregan uniformes nuevos?</p>
+          <div class="freq-opts-wiz" style="margin-top: 1.5rem;">
+            <div class="freq-opt-wiz" onclick="selectWizFreq(this, 3)">Cada 3 meses</div>
+            <div class="freq-opt-wiz selected" onclick="selectWizFreq(this, 6)">Cada 6 meses</div>
+            <div class="freq-opt-wiz" onclick="selectWizFreq(this, 12)">Anual</div>
+          </div>
+          <div class="form-row" style="margin-top: 2rem;">
+            <label>Presupuesto anual estimado por persona (MXN)</label>
+            <div class="slider-container-wiz">
+              <div class="slider-val-wiz">$<span id="wiz-budget-val">2,500</span></div>
+              <input type="range" id="wiz-budget-slider" min="500" max="15000" step="500" value="2500" oninput="updateWizVal('wiz-budget-slider', 'wiz-budget-val')">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wizard-footer">
+        <button id="wiz-prev" class="btn btn-outline" style="visibility: hidden;" onclick="changeWizStep(-1)">Atrás</button>
+        <button id="wiz-next" class="btn btn-primary" onclick="changeWizStep(1)">Siguiente →</button>
+      </div>
+    </div>
+  </div>
+
   <div class="app-layout">
 
     <!-- Sidebar -->
@@ -116,7 +203,7 @@
             </svg></span>
           <span class="nav-label">Cerrar Sesión</span>
         </a>
-        <a href="#" class="nav-item nav-item-secondary">
+        <a href="javascript:void(0)" class="nav-item nav-item-secondary" onclick="showWizard()">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
               viewBox="0 0 24 24">
               <path
@@ -132,8 +219,8 @@
     <main class="main-content">
       <header class="app-header">
         <div class="header-left">
-          <h1>Resumen General</h1>
-          <p class="header-subtitle">Bienvenido de vuelta — Hoy, 26 Abr 2026</p>
+          <h1 id="user-greeting-title">Resumen General</h1>
+          <p class="header-subtitle" id="user-greeting-subtitle">Cargando sesión...</p>
         </div>
         <div class="header-right">
           <button class="btn btn-primary">+ Nueva Dotación</button>
@@ -141,6 +228,14 @@
       </header>
 
       <div class="app-container">
+        <!-- Dashboard Industry Context -->
+        <div class="app-card" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; padding: 1rem 1.5rem; background: linear-gradient(to right, #F8FAFC, #FFFFFF); border-left: 4px solid var(--color-cyan);">
+          <div style="font-size: 1.25rem;">🏢</div>
+          <div>
+            <div style="font-size: 0.75rem; color: #64748B; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Sector Configurado</div>
+            <div id="dash-industry-val" style="font-weight: 700; color: #0F172A; text-transform: capitalize;">Cargando...</div>
+          </div>
+        </div>
         <!-- Dashboard Controls -->
         <div class="dashboard-controls"
           style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
@@ -157,24 +252,23 @@
         <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr);">
           <div class="app-card kpi-card">
             <span class="kpi-label">No. Uniformes Pedidos</span>
-            <span class="kpi-value" id="kpi-pedidos">65</span>
-            <span class="kpi-change positive" id="kpi-pedidos-change">↑ 15% este mes</span>
+            <span class="kpi-value" id="kpi-pedidos">0</span>
+            <span class="kpi-change" id="kpi-pedidos-change">Sin pedidos aún</span>
           </div>
           <div class="app-card kpi-card">
             <span class="kpi-label">No. de Uniformes en Proceso</span>
-            <span class="kpi-value" id="kpi-proceso">8</span>
-            <span class="kpi-change alert" id="kpi-proceso-change">⏳ En confección</span>
+            <span class="kpi-value" id="kpi-proceso">0</span>
+            <span class="kpi-change" id="kpi-proceso-change">Sin procesos</span>
           </div>
           <div class="app-card kpi-card">
             <span class="kpi-label">No. de Uniformes Entregados</span>
-            <span class="kpi-value" id="kpi-entregados">62</span>
-            <span class="kpi-change positive" id="kpi-entregados-change">✅ A tiempo</span>
+            <span class="kpi-value" id="kpi-entregados">0</span>
+            <span class="kpi-change" id="kpi-entregados-change">Sin entregas</span>
           </div>
           <div class="app-card kpi-card">
             <span class="kpi-label">No. de Uniformes por Entregar</span>
-            <span class="kpi-value" id="kpi-pendientes">3</span>
-            <span class="kpi-change critical" id="kpi-pendientes-change" style="color: var(--color-coral);">⚠️ En
-              tránsito</span>
+            <span class="kpi-value" id="kpi-pendientes">0</span>
+            <span class="kpi-change" id="kpi-pendientes-change">Todo al día</span>
           </div>
         </div>
 
@@ -193,24 +287,11 @@
                 <th>Estatus</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="branches-table-body">
               <tr>
-                <td>Reforma</td>
-                <td>15/15</td>
-                <td>$13,420</td>
-                <td><span class="status-badge status-success">Completo</span></td>
-              </tr>
-              <tr>
-                <td>Polanco</td>
-                <td>6/14</td>
-                <td>$11,150</td>
-                <td><span class="status-badge status-warning">Faltante</span></td>
-              </tr>
-              <tr>
-                <td>Condesa</td>
-                <td>12/12</td>
-                <td>$12,100</td>
-                <td><span class="status-badge status-success">Completo</span></td>
+                <td colspan="4" style="text-align: center; padding: 2rem; color: #94A3B8;">
+                  No hay sucursales registradas.
+                </td>
               </tr>
             </tbody>
           </table>
@@ -219,27 +300,297 @@
     </main>
   </div>
 
+    
+
+  <style>
+    /* Wizard Specific Styles */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex; align-items: center; justify-content: center; z-index: 99999;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .wizard-card {
+      background: white; width: 100%; max-width: 540px; border-radius: 1.5rem;
+      padding: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    }
+    .wizard-header { margin-bottom: 2rem; }
+    .wizard-progress { height: 6px; background: #F1F5F9; border-radius: 3px; margin-bottom: 1rem; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--color-cyan); transition: width 0.3s ease; }
+    .wizard-steps-count { font-size: 0.75rem; color: #64748B; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    
+    .wizard-step-content { display: none; text-align: center; }
+    .wizard-step-content.active { display: block; animation: fadeIn 0.3s ease; }
+    .wizard-icon { font-size: 3rem; margin-bottom: 1.5rem; }
+    .modal-close-btn {
+      position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none;
+      font-size: 1.25rem; color: #94A3B8; cursor: pointer; transition: color 0.2s;
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+    }
+    .modal-close-btn:hover { background: #F1F5F9; color: #0F172A; }
+
+    .wizard-card h2 { font-family: var(--font-family-secondary); color: #0F172A; margin-bottom: 0.5rem; }
+    .wizard-card p { color: #64748B; font-size: 0.9375rem; }
+    
+    .wiz-input {
+      width: 100%; padding: 1rem; border: 1.5px solid #E2E8F0; border-radius: 0.75rem;
+      font-size: 1rem; outline: none; transition: border-color 0.2s; margin-top: 0.5rem;
+    }
+    .wiz-input:focus { border-color: var(--color-cyan); }
+    
+    .industry-grid-wiz, .freq-opts-wiz { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .industry-opt-wiz, .freq-opt-wiz {
+      padding: 1.25rem; border: 1.5px solid #E2E8F0; border-radius: 1rem;
+      cursor: pointer; transition: all 0.2s; font-weight: 500; font-size: 0.9rem;
+    }
+    .industry-opt-wiz:hover, .freq-opt-wiz:hover { border-color: var(--color-cyan); background: #F0FDFA; }
+    .industry-opt-wiz.selected, .freq-opt-wiz.selected { border-color: var(--color-cyan); background: #F0FDFA; color: var(--color-brand-primary); box-shadow: 0 0 0 1px var(--color-cyan); }
+    
+    .roles-grid-wiz { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; max-height: 200px; overflow-y: auto; padding-right: 0.5rem; }
+    .role-opt-wiz {
+      padding: 0.75rem; border: 1.5px solid #E2E8F0; border-radius: 0.75rem;
+      cursor: pointer; font-size: 0.75rem; text-align: center; transition: all 0.2s;
+    }
+    .role-opt-wiz.selected { border-color: var(--color-cyan); background: #F0FDFA; }
+
+    .slider-container-wiz input { width: 100%; accent-color: var(--color-cyan); }
+    .slider-val-wiz { font-size: 1.5rem; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 0.5rem; }
+
+    .wizard-footer { display: flex; justify-content: space-between; margin-top: 3rem; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+
   <script>
+    // Supabase Initialization
+    const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function initDashboard() {
+      try {
+        // 1. Verificar sesión
+        const { data: { session }, error: sessionError } = await _supabase.auth.getSession();
+        
+        if (sessionError || !session) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        // 2. Obtener perfil completo
+        const { data: profile, error: profileError } = await _supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profileError) throw profileError;
+
+        // 3. Verificar si falta configuración
+        if (!profile.company_name) {
+          showWizard();
+        }
+
+        // 4. Personalizar Saludo
+        const firstName = profile.first_name || 'Admin';
+        document.getElementById('user-greeting-subtitle').innerHTML = 
+          `¡Hola <span style="color: var(--color-cyan); font-weight: 700; font-size: 1.1rem;">${firstName}</span>! 👋 Qué bueno volverte a ver`;
+        
+        // Actualizar industria en el dashboard
+        document.getElementById('dash-industry-val').textContent = profile.industry || 'No configurado';
+        
+        // Estilo extra para el subtítulo
+        document.getElementById('user-greeting-subtitle').style.fontSize = "1rem";
+        document.getElementById('user-greeting-subtitle').style.marginTop = "0.4rem";
+        
+        // Actualizar fecha
+        const options = { day: 'numeric', month: 'short', year: 'numeric' };
+        const today = new Date().toLocaleDateString('es-ES', options);
+        document.getElementById('user-greeting-title').textContent = 'Resumen General';
+
+      } catch (err) {
+        console.error('Error al cargar dashboard:', err.message);
+        document.getElementById('user-greeting-subtitle').textContent = 'Bienvenido de vuelta';
+      }
+    }
+
+    // Wizard Logic
+    let wizStep = 1;
+    let wizData = {
+      industry: null,
+      roles: [],
+      freq: 6
+    };
+
+    function showWizard() {
+      console.log('--- FORZANDO APERTURA DE ASISTENTE ---');
+      wizStep = 1; 
+      const modal = document.getElementById('setup-wizard');
+      if (modal) {
+        // Forzar visibilidad total e interacción
+        modal.style.visibility = 'visible';
+        modal.style.opacity = '1';
+        modal.style.zIndex = '99999';
+        modal.style.pointerEvents = 'all';
+        
+        const steps = document.querySelectorAll('.wizard-step-content');
+        steps.forEach(s => s.classList.remove('active'));
+        if (steps[0]) steps[0].classList.add('active');
+        
+        document.getElementById('current-wizard-step').textContent = '1';
+        document.getElementById('wizard-progress-fill').style.width = '20%';
+        document.getElementById('wiz-prev').style.visibility = 'hidden';
+        document.getElementById('wiz-next').textContent = 'Siguiente →';
+
+        populateWizRoles('restaurant');
+      } else {
+        alert('Error: No se encontró el componente del asistente en la página.');
+      }
+    }
+
+    function closeWizard() {
+      console.log('Cerrando asistente...');
+      const modal = document.getElementById('setup-wizard');
+      if (modal) {
+        modal.style.visibility = 'hidden';
+        modal.style.opacity = '0';
+        modal.style.pointerEvents = 'none';
+      }
+    }
+
+    function changeWizStep(n) {
+      if (n === 1 && !validateWizStep()) return;
+
+      const steps = document.querySelectorAll('.wizard-step-content');
+      steps[wizStep - 1].classList.remove('active');
+      
+      wizStep += n;
+      
+      if (wizStep > 5) {
+        saveWizardData();
+        return;
+      }
+
+      steps[wizStep - 1].classList.add('active');
+      document.getElementById('current-wizard-step').textContent = wizStep;
+      document.getElementById('wizard-progress-fill').style.width = (wizStep * 20) + '%';
+      
+      document.getElementById('wiz-prev').style.visibility = wizStep === 1 ? 'hidden' : 'visible';
+      document.getElementById('wiz-next').textContent = wizStep === 5 ? 'Finalizar ✅' : 'Siguiente →';
+    }
+
+    function validateWizStep() {
+      if (wizStep === 1) {
+        if (!document.getElementById('wiz-company').value.trim()) {
+          showToast('Campo requerido', 'Por favor ingresa el nombre de tu empresa.', 'error');
+          return false;
+        }
+      }
+      if (wizStep === 2 && !wizData.industry) {
+        showToast('Selección requerida', 'Por favor selecciona un sector.', 'error');
+        return false;
+      }
+      return true;
+    }
+
+    function selectWizIndustry(el, val) {
+      document.querySelectorAll('.industry-opt-wiz').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+      wizData.industry = val;
+      populateWizRoles(val);
+    }
+
+    function populateWizRoles(ind) {
+      const roles = {
+        restaurant: ['Mesero', 'Chef', 'Bartender', 'Limpieza', 'Hostess'],
+        limpieza: ['Operario', 'Supervisor', 'Mantenimiento', 'Alturas'],
+        industrial: ['Operario', 'Mantenimiento', 'Calidad', 'Logística'],
+        corporate: ['Recepción', 'Ejecutivo', 'Soporte', 'Seguridad']
+      };
+      const grid = document.getElementById('wiz-roles-grid');
+      grid.innerHTML = '';
+      (roles[ind] || roles.restaurant).forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'role-opt-wiz';
+        div.textContent = r;
+        div.onclick = () => div.classList.toggle('selected');
+        grid.appendChild(div);
+      });
+    }
+
+    function selectWizFreq(el, val) {
+      document.querySelectorAll('.freq-opt-wiz').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+      wizData.freq = val;
+    }
+
+    function updateWizVal(sid, vid) {
+      document.getElementById(vid).textContent = document.getElementById(sid).value;
+    }
+
+    async function saveWizardData() {
+      const btn = document.getElementById('wiz-next');
+      btn.disabled = true;
+      btn.textContent = 'Guardando...';
+
+      try {
+        const { data: { session } } = await _supabase.auth.getSession();
+        
+        const selectedRoles = Array.from(document.querySelectorAll('.role-opt-wiz.selected')).map(el => el.textContent);
+        
+        const updateData = {
+          company_name: document.getElementById('wiz-company').value.trim(),
+          industry: wizData.industry,
+          selected_roles: selectedRoles,
+          employee_count: parseInt(document.getElementById('wiz-emp-slider').value),
+          monthly_budget: parseInt(document.getElementById('wiz-budget-slider').value),
+          renewal_frequency: wizData.freq
+        };
+
+        const { error } = await _supabase
+          .from('profiles')
+          .update(updateData)
+          .eq('id', session.user.id);
+
+        if (error) throw error;
+
+        showToast('¡Configuración lista!', 'Tu cuenta ha sido configurada correctamente.', 'success');
+        document.getElementById('setup-wizard').style.display = 'none';
+        
+        // Refrescar saludo con nombre de empresa si se desea
+        initDashboard();
+
+      } catch (err) {
+        showToast('Error', 'No se pudo guardar la configuración.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Finalizar ✅';
+      }
+    }
+
+    // Inicializar al cargar
+    document.addEventListener('DOMContentLoaded', initDashboard);
+
     const dataByPeriod = {
       mes: {
-        pedidos: { val: '1,250', change: '↑ 15% este mes' },
-        proceso: { val: '420', change: '⏳ En confección' },
-        entregados: { val: '830', change: '✅ A tiempo' }
+        pedidos: { val: '0', change: 'Sin pedidos' },
+        proceso: { val: '0', change: 'Sin procesos' },
+        entregados: { val: '0', change: 'Sin entregas' }
       },
       trimestre: {
-        pedidos: { val: '3,800', change: '↑ 8% este trimestre' },
-        proceso: { val: '1,100', change: '⏳ En confección' },
-        entregados: { val: '2,700', change: '✅ A tiempo' }
+        pedidos: { val: '0', change: 'Sin pedidos' },
+        proceso: { val: '0', change: 'Sin procesos' },
+        entregados: { val: '0', change: 'Sin entregas' }
       },
       ano: {
-        pedidos: { val: '14,500', change: '↑ 22% vs año pasado' },
-        proceso: { val: '1,400', change: '⏳ En confección' },
-        entregados: { val: '13,100', change: '✅ A tiempo' }
+        pedidos: { val: '0', change: 'Sin pedidos' },
+        proceso: { val: '0', change: 'Sin procesos' },
+        entregados: { val: '0', change: 'Sin entregas' }
       },
       total: {
-        pedidos: { val: '32,400', change: 'Desde el inicio' },
-        proceso: { val: '1,400', change: '⏳ En confección' },
-        entregados: { val: '31,000', change: '✅ A tiempo' }
+        pedidos: { val: '0', change: 'Sin pedidos' },
+        proceso: { val: '0', change: 'Sin procesos' },
+        entregados: { val: '0', change: 'Sin entregas' }
       }
     };
 
@@ -258,7 +609,6 @@
       document.getElementById('kpi-entregados-change').textContent = data.entregados.change;
     }
   </script>
-<script src="assets/js/utils.js"></script>
 </body>
 
 </html>
