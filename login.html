@@ -4,1081 +4,118 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>dotacian | Configuración Inicial</title>
+  <title>iniciar sesión | dotacian</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap"
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <!-- SDKs & Utils -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/utils.js"></script>
-  <style>
-    /* =============================================
-       ONBOARDING GLOBAL STYLES
-    ============================================= */
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html,
-    body {
-      height: 100%;
-      font-family: var(--font-family-primary);
-      background-color: #F8FAFC;
-      color: #0F172A;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .onboarding-shell {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ---- Progress Header ---- */
-    .ob-header {
-      background: white;
-      border-bottom: 1px solid #E2E8F0;
-      padding: 1rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
-
-    .ob-logo {
-      font-family: var(--font-family-heading);
-      font-size: 1.375rem;
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      color: #0F172A;
-    }
-
-    .ob-logo span {
-      color: #06B6D4;
-    }
-
-    .ob-progress-wrap {
-      flex: 1;
-      max-width: 340px;
-      margin: 0 2rem;
-    }
-
-    .ob-progress-meta {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #64748B;
-      margin-bottom: 0.4rem;
-    }
-
-    .ob-progress-track {
-      height: 6px;
-      background: #E2E8F0;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .ob-progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #06B6D4, #0891B2);
-      border-radius: 999px;
-      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-      width: 0%;
-    }
-
-    .ob-skip {
-      font-size: 0.8125rem;
-      color: #94A3B8;
-      text-decoration: none;
-      font-weight: 500;
-      white-space: nowrap;
-    }
-
-    .ob-skip:hover {
-      color: #475569;
-    }
-
-    /* ---- Main Content Area ---- */
-    .ob-content {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 3rem 1.5rem;
-    }
-
-    /* ---- Step Wrapper ---- */
-    .ob-step {
-      display: none;
-      width: 100%;
-      max-width: 560px;
-      animation: stepIn 0.4s ease forwards;
-    }
-
-    .ob-step.active {
-      display: block;
-    }
-
-    @keyframes stepIn {
-      from {
-        opacity: 0;
-        transform: translateY(18px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* ---- Welcome Step ---- */
-    .welcome-center {
-      text-align: center;
-      padding: 2rem 0;
-    }
-
-    .welcome-icon-wrap {
-      width: 96px;
-      height: 96px;
-      background: rgba(6, 182, 212, 0.1);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 2rem;
-      font-size: 2.5rem;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-
-      0%,
-      100% {
-        box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.2);
-      }
-
-      50% {
-        box-shadow: 0 0 0 16px rgba(6, 182, 212, 0);
-      }
-    }
-
-    .welcome-center h1 {
-      font-family: var(--font-family-heading);
-      font-size: 2rem;
-      font-weight: 800;
-      color: #0F172A;
-      line-height: 1.25;
-      margin-bottom: 1rem;
-    }
-
-    .welcome-center h1 span {
-      color: #06B6D4;
-    }
-
-    .welcome-center p {
-      font-size: 1.0625rem;
-      color: #475569;
-      line-height: 1.65;
-      margin-bottom: 2.5rem;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .time-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      background: white;
-      border: 1.5px solid #E2E8F0;
-      padding: 0.4rem 1rem;
-      border-radius: 999px;
-      font-size: 0.8125rem;
-      font-weight: 600;
-      color: #475569;
-      margin-bottom: 2rem;
-    }
-
-    /* ---- Card Step (Form) ---- */
-    .ob-card {
-      background: white;
-      border: 1.5px solid #E2E8F0;
-      border-radius: 1.5rem;
-      padding: 2.5rem;
-      box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
-    }
-
-    .ob-card-icon {
-      width: 52px;
-      height: 52px;
-      background: rgba(6, 182, 212, 0.1);
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      margin-bottom: 1.25rem;
-    }
-
-    .ob-card h2 {
-      font-family: var(--font-family-heading);
-      font-size: 1.375rem;
-      font-weight: 700;
-      color: #0F172A;
-      margin-bottom: 0.4rem;
-    }
-
-    .ob-card .ob-sub {
-      font-size: 0.9375rem;
-      color: #64748B;
-      margin-bottom: 2rem;
-      line-height: 1.5;
-    }
-
-    /* ---- Form Controls ---- */
-    .form-row {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .form-row label {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: #0F172A;
-    }
-
-    .form-row input[type="text"],
-    .form-row input[type="number"],
-    .form-row input[type="email"],
-    .form-row input[type="password"] {
-      width: 100%;
-      padding: 0.9rem 1.1rem;
-      border: 1.5px solid #E2E8F0;
-      border-radius: 0.75rem;
-      font-size: 1rem;
-      font-family: var(--font-family-primary);
-      color: #0F172A;
-      background: #F8FAFC;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .form-row input:focus {
-      border-color: #06B6D4;
-      background: white;
-      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.12);
-    }
-
-    /* ---- Industry Selector ---- */
-    .industry-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.75rem;
-    }
-
-    .industry-opt {
-      border: 1.5px solid #E2E8F0;
-      border-radius: 1rem;
-      padding: 1rem 0.75rem;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      background: white;
-    }
-
-    .industry-opt:hover {
-      border-color: #06B6D4;
-      background: rgba(6, 182, 212, 0.05);
-    }
-
-    .industry-opt.selected {
-      border-color: #06B6D4;
-      background: rgba(6, 182, 212, 0.08);
-      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
-    }
-
-    .industry-opt .ind-icon {
-      font-size: 1.75rem;
-      margin-bottom: 0.4rem;
-      display: block;
-    }
-
-    .industry-opt .ind-label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #0F172A;
-    }
-
-    .industry-opt.selected .ind-label {
-      color: #0891B2;
-    }
-
-    .industry-opt.disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .industry-opt.disabled:hover {
-      border-color: #E2E8F0;
-      background: white;
-    }
-
-    .ind-soon {
-      font-size: 0.55rem;
-      font-weight: 700;
-      color: #94A3B8;
-      text-transform: uppercase;
-      margin-top: 0.25rem;
-      display: block;
-      background: #F1F5F9;
-      border-radius: 4px;
-      padding: 2px 4px;
-      display: inline-block;
-    }
-
-    /* ---- Sliders ---- */
-    .slider-wrap {
-      margin-bottom: 1.75rem;
-    }
-
-    .slider-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.75rem;
-    }
-
-    .slider-header label {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.9375rem;
-      font-weight: 600;
-      color: #0F172A;
-    }
-
-    .slider-header label .slabel-icon {
-      font-size: 1.1rem;
-    }
-
-    .slider-val {
-      font-family: var(--font-family-heading);
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #06B6D4;
-    }
-
-    input[type="range"] {
-      width: 100%;
-      height: 6px;
-      appearance: none;
-      background: #E2E8F0;
-      border-radius: 999px;
-      outline: none;
-      cursor: pointer;
-    }
-
-    input[type="range"]::-webkit-slider-thumb {
-      appearance: none;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: #06B6D4;
-      cursor: pointer;
-      border: 3px solid white;
-      box-shadow: 0 0 0 2px #06B6D4, 0 2px 6px rgba(6, 182, 212, 0.4);
-      transition: transform 0.1s;
-    }
-
-    input[type="range"]::-webkit-slider-thumb:hover {
-      transform: scale(1.15);
-    }
-
-    .slider-ticks {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 0.4rem;
-      font-size: 0.6875rem;
-      color: #94A3B8;
-      font-weight: 500;
-    }
-
-    /* ---- Frequency Selector ---- */
-    .freq-options {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.75rem;
-    }
-
-    .freq-opt {
-      border: 1.5px solid #E2E8F0;
-      border-radius: 1rem;
-      padding: 1.25rem 0.75rem;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      background: white;
-    }
-
-    .freq-opt:hover {
-      border-color: #06B6D4;
-      background: rgba(6, 182, 212, 0.04);
-    }
-
-    .freq-opt.selected {
-      border-color: #06B6D4;
-      background: rgba(6, 182, 212, 0.08);
-    }
-
-    .freq-opt .freq-num {
-      font-family: var(--font-family-heading);
-      font-size: 1.75rem;
-      font-weight: 800;
-      color: #06B6D4;
-      line-height: 1;
-      margin-bottom: 0.2rem;
-    }
-
-    .freq-opt .freq-label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #475569;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .freq-opt.selected .freq-label {
-      color: #0891B2;
-    }
-
-    /* ---- AI Thinking Screen ---- */
-    .ai-thinking {
-      text-align: center;
-      padding: 2rem 0;
-    }
-
-    .ai-orb {
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 2rem;
-      position: relative;
-    }
-
-    .ai-orb-inner {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, #67E8F9, #06B6D4 50%, #0891B2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.5rem;
-      animation: orbPulse 1.5s ease-in-out infinite;
-      box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.4);
-    }
-
-    @keyframes orbPulse {
-
-      0%,
-      100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.4);
-      }
-
-      50% {
-        transform: scale(1.06);
-        box-shadow: 0 0 0 20px rgba(6, 182, 212, 0);
-      }
-    }
-
-    .ai-ring {
-      position: absolute;
-      inset: -12px;
-      border-radius: 50%;
-      border: 2px dashed rgba(6, 182, 212, 0.3);
-      animation: spin 8s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .ai-thinking h2 {
-      font-family: var(--font-family-heading);
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #0F172A;
-      margin-bottom: 0.5rem;
-    }
-
-    .thinking-dots {
-      display: inline-flex;
-      gap: 0.35rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .thinking-dots span {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #06B6D4;
-      animation: blink 1.2s infinite;
-    }
-
-    .thinking-dots span:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-
-    .thinking-dots span:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-
-    @keyframes blink {
-
-      0%,
-      80%,
-      100% {
-        opacity: 0.2;
-        transform: scale(0.8);
-      }
-
-      40% {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    .thinking-status {
-      font-size: 0.875rem;
-      color: #94A3B8;
-      font-style: italic;
-    }
-
-    /* ---- Results Screen ---- */
-    .ob-results {
-      text-align: center;
-    }
-
-    .ob-results h2 {
-      font-family: var(--font-family-heading);
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: #0F172A;
-      margin-bottom: 0.5rem;
-    }
-
-    .ob-results .result-sub {
-      font-size: 1rem;
-      color: #64748B;
-      margin-bottom: 2rem;
-      line-height: 1.6;
-    }
-
-    .result-cards {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-
-    .result-card {
-      background: white;
-      border: 1.5px solid #E2E8F0;
-      border-radius: 1.25rem;
-      padding: 1.5rem 1rem;
-      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.05);
-    }
-
-    .result-icon {
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .result-metric {
-      font-family: var(--font-family-heading);
-      font-size: 2.25rem;
-      font-weight: 800;
-      color: #06B6D4;
-      line-height: 1;
-      margin-bottom: 0.25rem;
-    }
-
-    .result-desc {
-      font-size: 0.8125rem;
-      color: #64748B;
-      line-height: 1.4;
-    }
-
-    /* ---- Profile Selection ---- */
-    .profile-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.75rem;
-      margin-bottom: 2rem;
-      text-align: left;
-    }
-
-    .profile-opt {
-      background: white;
-      border: 1.5px solid #E2E8F0;
-      border-radius: 0.75rem;
-      padding: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .profile-opt:hover {
-      border-color: #06B6D4;
-      background: rgba(6, 182, 212, 0.02);
-    }
-
-    .profile-opt.selected {
-      border-color: #06B6D4;
-      background: rgba(6, 182, 212, 0.08);
-      box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.15);
-    }
-
-    .profile-icon {
-      font-size: 1.5rem;
-      width: 40px;
-      height: 40px;
-      border-radius: 0.5rem;
-      background: #F8FAFC;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .profile-name {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: #0F172A;
-      line-height: 1.2;
-    }
-
-    .ai-disclaimer {
-      font-size: 0.75rem;
-      color: #94A3B8;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.35rem;
-      margin-bottom: 2rem;
-    }
-
-    /* ---- Navigation Buttons ---- */
-    .ob-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 2rem;
-      gap: 1rem;
-    }
-
-    .ob-nav.centered {
-      justify-content: center;
-    }
-
-    .btn-ob-next {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.9rem 2rem;
-      background: #06B6D4;
-      color: #0F172A;
-      border: none;
-      border-radius: 0.875rem;
-      font-family: var(--font-family-primary);
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 14px rgba(6, 182, 212, 0.35);
-    }
-
-    .btn-ob-next:hover {
-      background: #0891B2;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.45);
-    }
-
-    .btn-ob-next.full {
-      width: 100%;
-      justify-content: center;
-      font-size: 1.0625rem;
-    }
-
-    .btn-ob-back {
-      padding: 0.9rem 1.5rem;
-      background: transparent;
-      color: #64748B;
-      border: 1.5px solid #E2E8F0;
-      border-radius: 0.875rem;
-      font-family: var(--font-family-primary);
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-ob-back:hover {
-      background: #F8FAFC;
-      color: #0F172A;
-    }
-
-    /* ---- Confetti-like success header ---- */
-    .success-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: #D1FAE5;
-      color: #065F46;
-      font-size: 0.8125rem;
-      font-weight: 700;
-      padding: 0.35rem 1rem;
-      border-radius: 999px;
-      margin-bottom: 1rem;
-    }
-  </style>
 </head>
 
 <body>
-  <div class="onboarding-shell">
-
-    <!-- Header with Progress -->
-    <header class="ob-header">
-      <div class="ob-logo"><span>dotacian</span></div>
-      <div class="ob-progress-wrap">
-        <div class="ob-progress-meta">
-          <span id="stepLabel">Cuenta</span>
-          <span id="stepCount">1 / 5</span>
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="logo">
+          <a href="index.html">dotacian</a>
         </div>
-        <div class="ob-progress-track">
-          <div class="ob-progress-fill" id="progressFill"></div>
-        </div>
-      </div>
-      <a href="app.html" class="ob-skip">Omitir configuración →</a>
-    </header>
-
-    <!-- Content -->
-    <div class="ob-content">
-
-      <!-- STEP 0: Account Creation -->
-      <div class="ob-step active" id="step-0">
-        <div class="ob-card" style="width: 100%; max-width: 480px; margin: 0 auto;">
-          <div class="ob-card-icon">👤</div>
-          <h2>Crea tu cuenta de administrador</h2>
-          <p class="ob-sub">Ingresa tus datos para empezar a configurar tu plataforma.</p>
-
-          <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-            <div class="form-row" style="flex: 1; margin-bottom: 0;">
-              <label for="firstName">Nombre</label>
-              <input type="text" id="firstName" placeholder="Ej. Ana" required>
-            </div>
-            <div class="form-row" style="flex: 1; margin-bottom: 0;">
-              <label for="lastName">Apellido</label>
-              <input type="text" id="lastName" placeholder="Ej. García" required>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <label for="email">Correo Corporativo</label>
-            <input type="email" id="email" placeholder="ana@empresa.com" required>
-          </div>
-
-          <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
-            <div class="form-row" style="flex: 1; margin-bottom: 0;">
-              <label for="password">Contraseña</label>
-              <input type="password" id="password" placeholder="••••••••" required>
-            </div>
-            <div class="form-row" style="flex: 1; margin-bottom: 0;">
-              <label for="confirmPassword">Confirmar</label>
-              <input type="password" id="confirmPassword" placeholder="••••••••" required>
-              <span id="passwordError"
-                style="color: #EF4444; font-size: 0.725rem; font-weight: 500; margin-top: 0.4rem; display: none; line-height: 1.3;">Tu
-                contraseña no coincide, revisa nuevamente</span>
-            </div>
-          </div>
-
-          <div class="form-row" style="margin-bottom: 2rem;">
-            <label for="reg-country">País</label>
-            <select id="reg-country"
-              style="width: 100%; padding: 0.9rem 1.1rem; border: 1.5px solid #E2E8F0; border-radius: 0.75rem; font-size: 1rem; font-family: var(--font-family-primary); color: #0F172A; background: #F8FAFC; outline: none; transition: border-color 0.2s, box-shadow 0.2s;">
-              <option value="México">México</option>
-              <option value="Colombia">Colombia</option>
-            </select>
-          </div>
-
-          <div class="ob-nav">
-            <button class="btn-ob-next full" onclick="goStep(1)">Crear cuenta y continuar →</button>
-          </div>
-
-          <div style="text-align: center; margin-top: 1.5rem; font-size: 0.8125rem; color: #64748B;">
-            ¿Ya tienes cuenta? <a href="login.html"
-              style="color: #06B6D4; font-weight: 600; text-decoration: none;">Inicia sesión</a>
-          </div>
-        </div>
+        <p>Gestiona la gestión y entrega de uniformes con inteligencia.</p>
       </div>
 
+      <form class="auth-form" action="app.html">
+        <div id="login-error-alert" style="display: none; background: #FEF2F2; border: 1.5px solid #FCA5A5; color: #991B1B; padding: 1rem; border-radius: 0.75rem; margin-bottom: 1.5rem; font-size: 0.875rem; font-weight: 500; align-items: center; gap: 0.75rem;">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span id="error-message-text"></span>
+        </div>
+        <div class="form-group">
+          <label for="email">Correo Electrónico</label>
+          <input type="email" id="email" placeholder="ejemplo@empresa.com" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" placeholder="••••••••" required>
+        </div>
+        <div style="display: flex; justify-content: flex-end;">
+          <a href="#" style="font-size: 0.8125rem; color: var(--color-brand-accent);">¿Olvidaste tu contraseña?</a>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; margin-top: 1rem;">Iniciar
+          Sesión</button>
+      </form>
 
-
+      <div class="auth-footer">
+        ¿Aún no eres cliente? <a href="index.html#agendar-demo">Agenda una demo</a>
+      </div>
     </div>
   </div>
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/utils.js"></script>
 
   <script>
-    // State
-    let currentStep = 0;
-    let selectedIndustry = null;
-    let selectedFreq = 6;
-    const totalSteps = 1;
-    let userId = null;
-
-    const stepLabels = ['Registro'];
-
     // Supabase Configuration
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    async function goStep(n) {
-      if (n === 1) {
-        const firstName = document.getElementById('firstName').value.trim();
-        const lastName = document.getElementById('lastName').value.trim();
+    const loginForm = document.querySelector('.auth-form');
+    if (loginForm) {
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
         const email = document.getElementById('email').value.trim();
-        const pass = document.getElementById('password').value;
-        const confirm = document.getElementById('confirmPassword').value;
+        const password = document.getElementById('password').value;
+        const submitBtn = loginForm.querySelector('button[type="submit"]');
 
-        if (!firstName || !lastName || !email || !pass || !confirm) {
-          showToast('Campos incompletos', 'Por favor, completa todos los campos.', 'error');
-          return;
-        }
-
-        if (pass.length < 6) {
-          showToast('Contraseña débil', 'La contraseña debe tener al menos 6 caracteres.', 'error');
-          return;
-        }
-
-        if (pass !== confirm) {
-          validatePasswords();
-          return;
-        }
-
-        const submitBtn = document.querySelector('#step-0 .btn-ob-next');
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Procesando...';
+        submitBtn.textContent = 'Iniciando sesión...';
+
+        const errorAlert = document.getElementById('login-error-alert');
+        const errorText = document.getElementById('error-message-text');
+        errorAlert.style.display = 'none';
 
         try {
-          console.log('Intentando registrar usuario...');
-          const { data: authData, error: authError } = await _supabase.auth.signUp({
+          const { data, error } = await _supabase.auth.signInWithPassword({
             email: email,
-            password: pass,
-            options: {
-              data: { first_name: firstName, last_name: lastName }
-            }
+            password: password,
           });
 
-          if (authError) throw authError;
-          if (!authData.user) throw new Error('No se recibió información del usuario.');
+          if (error) {
+            console.error('Login error:', error);
+            let msg = 'Correo o contraseña incorrectos.';
+            
+            // Mensajes específicos según el error de Supabase
+            if (error.message.includes('Email not confirmed')) {
+              msg = 'Por favor, confirma tu correo electrónico.';
+            } else if (error.status === 400 || error.message.includes('Invalid login credentials')) {
+              msg = 'Credenciales inválidas. Revisa tu correo y contraseña.';
+            }
 
-          userId = authData.user.id;
-          console.log('Auth exitoso, ID:', userId);
-
-          // Guardar en profiles
-          const profileData = {
-            id: userId,
-            first_name: firstName,
-            last_name: lastName,
-            email: email,
-            country: document.getElementById('reg-country').value,
-            created_at: new Date().toISOString()
-          };
-
-          const { error: profileError } = await _supabase
-            .from('profiles')
-            .upsert([profileData], { onConflict: 'id' });
-
-          if (profileError) {
-            console.error('Error crítico en tabla profiles:', profileError);
-            alert('ERROR EN BASE DE DATOS: ' + profileError.message);
-            throw profileError;
+            errorText.textContent = msg;
+            errorAlert.style.display = 'flex';
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Iniciar Sesión';
+            return;
           }
 
-          console.log('Perfil guardado con éxito.');
-          showToast('¡Éxito!', 'Cuenta creada correctamente.', 'success');
+          showToast('¡Bienvenido!', 'Sesión iniciada correctamente', 'success');
           
           setTimeout(() => {
             window.location.href = 'app.html';
           }, 1000);
 
         } catch (err) {
-          console.error('Error detallado:', err);
-          showToast('Error', err.message || 'Fallo en el registro', 'error');
+          showToast('Error', 'Hubo un fallo en la conexión.', 'error');
           submitBtn.disabled = false;
-          submitBtn.textContent = 'Crear cuenta y continuar →';
+          submitBtn.textContent = 'Iniciar Sesión';
         }
-      }
-    }
-
-
-
-    function validatePasswords() {
-      const pass = document.getElementById('password').value;
-      const confirm = document.getElementById('confirmPassword').value;
-      const passErr = document.getElementById('passwordError');
-      const confirmInput = document.getElementById('confirmPassword');
-
-      if (confirm.length > 0 && pass !== confirm) {
-        passErr.style.display = 'block';
-        confirmInput.style.borderColor = '#EF4444';
-      } else {
-        passErr.style.display = 'none';
-        confirmInput.style.borderColor = '#E2E8F0';
-      }
-    }
-
-    // Add listeners for real-time validation
-    document.addEventListener('DOMContentLoaded', () => {
-      const p1 = document.getElementById('password');
-      const p2 = document.getElementById('confirmPassword');
-      if (p1 && p2) {
-        p1.addEventListener('input', validatePasswords);
-        p2.addEventListener('input', validatePasswords);
-      }
-    });
-
-    function updateProgress(n) {
-      const pct = 100;
-      document.getElementById('progressFill').style.width = pct + '%';
-      document.getElementById('stepLabel').textContent = stepLabels[n] || 'Registro';
-      document.getElementById('stepCount').textContent = '1 / 1';
-    }
-
-    function populateProfiles() {
-      const industryProfiles = {
-        restaurant: [
-          { icon: '🍽️', label: 'Mesero / Server' },
-          { icon: '👨‍🍳', label: 'Chef / Cocina' },
-          { icon: '🍸', label: 'Barista / Bartender' },
-          { icon: '✨', label: 'Limpieza / Steward' },
-          { icon: '🛡️', label: 'Seguridad / Valet' },
-          { icon: '💁‍♀️', label: 'Hostess / Greeter' }
-        ],
-        limpieza: [
-          { icon: '🧹', label: 'Operario(a) de Limpieza General' },
-          { icon: '📋', label: 'Supervisor(a) de Zona / Cuadrilla' },
-          { icon: '🏗️', label: 'Personal de Limpieza en Alturas' },
-          { icon: '🛠️', label: 'Mantenimiento / Servicios Generales' },
-          { icon: '🧪', label: 'Especialista en Manejo de Químicos' }
-        ],
-        industrial: [
-          { icon: '⚙️', label: 'Operario de Producción' },
-          { icon: '📦', label: 'Operario de Logística' },
-          { icon: '🛠️', label: 'Personal de Mantenimiento' },
-          { icon: '✅', label: 'Personal de Calidad' },
-          { icon: '👥', label: 'Personal de Supervisión' }
-        ]
-      };
-
-      const ind = selectedIndustry || 'restaurant';
-      const profiles = industryProfiles[ind] || industryProfiles['restaurant'];
-      const grid = document.getElementById('profileGrid');
-      grid.innerHTML = '';
-
-      profiles.forEach(p => {
-        const div = document.createElement('div');
-        div.className = 'profile-opt';
-        div.onclick = function () { this.classList.toggle('selected'); };
-        div.innerHTML = `
-          <div class="profile-icon">${p.icon}</div>
-          <div class="profile-name">${p.label}</div>
-        `;
-        grid.appendChild(div);
       });
     }
-
-    function selectIndustry(el, val) {
-      document.querySelectorAll('.industry-opt').forEach(o => o.classList.remove('selected'));
-      el.classList.add('selected');
-      selectedIndustry = val;
-    }
-
-    function selectFreq(el, val) {
-      document.querySelectorAll('.freq-opt').forEach(o => o.classList.remove('selected'));
-      el.classList.add('selected');
-      selectedFreq = val;
-    }
-
-    function updateSlider(sliderId, valId, formatter) {
-      const v = parseInt(document.getElementById(sliderId).value);
-      document.getElementById(valId).textContent = formatter ? formatter(v) : v;
-    }
-
-    function updateBudget() {
-      const v = parseInt(document.getElementById('budgetSlider').value);
-      document.getElementById('budgetVal').textContent = '$' + v.toLocaleString('es-MX') + ' MXN';
-    }
-
-    // AI Thinking flow
-    const thinkingMessages = [
-      'Procesando tu plantilla...',
-      'Analizando benchmarks del sector...',
-      'Calculando frecuencia de renovación óptima...',
-      'Evaluando eficiencias potenciales...',
-      'Generando tu perfil logístico...',
-    ];
-
-    function startAI() {
-      goStep(6);
-      let i = 0;
-      const statusEl = document.getElementById('thinkingStatus');
-      const interval = setInterval(() => {
-        i++;
-        if (i < thinkingMessages.length) {
-          statusEl.textContent = thinkingMessages[i];
-        } else {
-          clearInterval(interval);
-          computeResults();
-          setTimeout(() => goStep(7), 300);
-        }
-      }, 700);
-    }
-
-    function computeResults() {
-      const employees = parseInt(document.getElementById('empSlider').value);
-      const budget = parseInt(document.getElementById('budgetSlider').value);
-
-      // Heuristic calculations
-      const wastePct = employees < 100 ? 28 : employees < 500 ? 34 : 41;
-      const hours = Math.round((employees / 10) * (12 / selectedFreq) * 1.4);
-      const annualSave = Math.round(employees * budget * (wastePct / 100) * 0.65);
-
-      document.getElementById('savingPct').textContent = wastePct + '%';
-      document.getElementById('hoursMonth').textContent = hours + 'h';
-      document.getElementById('annualSave').textContent = '$' + annualSave.toLocaleString('es-MX');
-    }
-
-    // Init
-    updateProgress(0);
   </script>
-
 </body>
 
 </html>
