@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Seller | dotacian</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --sidebar-width: 280px;
+    }
+
+    .app-layout {
+      display: flex;
+      min-height: 100vh;
+      background: #F8FAFC;
+    }
+
+    /* Sidebar Refinement */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--color-navy);
+      color: white;
+      padding: 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      z-index: 100;
+    }
+
+    .sidebar .logo a {
+      color: white;
+      font-size: 1.5rem;
+      font-family: var(--font-family-secondary);
+      font-weight: 700;
+    }
+
+    .sidebar .logo span {
+      color: var(--color-cyan);
+    }
+
+    .sidebar-nav {
+      margin-top: 3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.875rem 1rem;
+      border-radius: 0.75rem;
+      color: #94A3B8;
+      text-decoration: none;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: white;
+    }
+
+    .nav-item.active {
+      background: rgba(6, 182, 212, 0.1);
+      color: var(--color-cyan);
+    }
+
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Main Content Refinement */
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      padding: 2.5rem;
+    }
+
+    .app-header {
+      margin-bottom: 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .header-left h1 {
+      font-size: 2rem;
+      color: var(--color-navy);
+      margin-bottom: 0.5rem;
+      font-family: var(--font-family-secondary);
+    }
+
+    .header-subtitle {
+      color: var(--color-text-secondary);
+      font-size: 1rem;
+    }
+
+    /* Stat Cards Horizontal */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .stat-card-premium {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 1.25rem;
+      border: 1px solid #E2E8F0;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stat-card-premium:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-icon-box {
+      width: 56px;
+      height: 56px;
+      border-radius: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stat-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-label-p {
+      font-size: 0.8125rem;
+      color: var(--color-text-secondary);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-value-p {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-navy);
+      font-family: var(--font-family-secondary);
+    }
+
+    .stat-trend {
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    /* Table Section */
+    .card-section {
+      background: white;
+      border-radius: 1.25rem;
+      border: 1px solid #E2E8F0;
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-navy);
+    }
+
+    .data-table-p {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table-p th {
+      text-align: left;
+      padding: 1rem;
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid #F1F5F9;
+    }
+
+    .data-table-p td {
+      padding: 1.25rem 1rem;
+      font-size: 0.875rem;
+      color: var(--color-text-primary);
+      border-bottom: 1px solid #F1F5F9;
+    }
+
+    .order-id {
+      font-weight: 600;
+      color: var(--color-brand-primary);
+    }
+
+    .client-box {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .client-avatar {
+      width: 32px;
+      height: 32px;
+      background: #F1F5F9;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-navy);
+    }
+
+    .status-pill {
+      padding: 0.35rem 0.75rem;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .status-production { background: #E0F2FE; color: #0369A1; }
+    .status-shipped { background: #DCFCE7; color: #15803D; }
+    .status-pending { background: #FEF3C7; color: #92400E; }
+
+    @media (max-width: 1200px) {
+      .stats-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <a href="#">dotacian.<span>seller</span></a>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active">
+          <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>
+          <span class="nav-label">Órdenes Activas</span>
+          <span style="margin-left: auto; background: var(--color-coral); color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem;">3</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M3 9h18"/></svg></span>
+          <span class="nav-label">Catálogo Seller</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
+          <span class="nav-label">Logística</span>
+        </a>
+        <div class="sidebar-spacer" style="flex: 1;"></div>
+        <a href="login.seller.html" class="nav-item">
+          <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>
+          <span class="nav-label">Cerrar Sesión</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="app-header">
+        <div class="header-left">
+          <h1 id="seller-factory-name">Mi Fábrica</h1>
+          <p id="seller-welcome-msg" class="header-subtitle">Bienvenido al panel de producción.</p>
+        </div>
+        <div class="header-right">
+          <button class="btn btn-primary" style="padding: 0.75rem 1.5rem;">Actualizar Inventario</button>
+        </div>
+      </header>
+
+      <!-- Stats Grid -->
+      <div class="stats-row">
+        <div class="stat-card-premium">
+          <div class="stat-icon-box" style="background: #E0F2FE; color: #0369A1;">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7h-9l-3-3H2v16h20V7z"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label-p">Órdenes Activas</span>
+            <span class="stat-value-p">12</span>
+            <span class="stat-trend" style="color: #10B981;">↑ 2 nuevas</span>
+          </div>
+        </div>
+        <div class="stat-card-premium">
+          <div class="stat-icon-box" style="background: #F0FDFA; color: #0D9488;">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label-p">Prendas Producidas</span>
+            <span class="stat-value-p">1,240</span>
+            <span class="stat-trend" style="color: #0D9488;">Este mes</span>
+          </div>
+        </div>
+        <div class="stat-card-premium">
+          <div class="stat-icon-box" style="background: #F5F3FF; color: #7C3AED;">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label-p">Pago Pendiente</span>
+            <span class="stat-value-p">$142,500</span>
+            <span class="stat-trend" style="color: #64748B;">MXN</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Orders Table -->
+      <div class="card-section">
+        <div class="section-header">
+          <h2 class="section-title">Órdenes en Producción</h2>
+          <a href="#" style="color: var(--color-cyan); font-weight: 600; font-size: 0.875rem; text-decoration: none;">Ver todo el historial</a>
+        </div>
+        
+        <div style="overflow-x: auto;">
+          <table class="data-table-p">
+            <thead>
+              <tr>
+                <th>Referencia</th>
+                <th>Cliente</th>
+                <th>Lote</th>
+                <th>Entrega Estimada</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="order-id">#ORD-9901</span></td>
+                <td>
+                  <div class="client-box">
+                    <div class="client-avatar">H</div>
+                    <span>Hotel Grand Velas</span>
+                  </div>
+                </td>
+                <td>120 Unidades</td>
+                <td>12 Mayo, 2024</td>
+                <td><span class="status-pill status-production">En Confección</span></td>
+              </tr>
+              <tr>
+                <td><span class="order-id">#ORD-9882</span></td>
+                <td>
+                  <div class="client-box">
+                    <div class="client-avatar" style="background: #FEE2E2; color: #991B1B;">R</div>
+                    <span>Restaurante El Faro</span>
+                  </div>
+                </td>
+                <td>45 Unidades</td>
+                <td>18 Mayo, 2024</td>
+                <td><span class="status-pill status-pending">Esperando Insumos</span></td>
+              </tr>
+              <tr>
+                <td><span class="order-id">#ORD-9875</span></td>
+                <td>
+                  <div class="client-box">
+                    <div class="client-avatar" style="background: #FEF3C7; color: #92400E;">I</div>
+                    <span>Industrial MX S.A.</span>
+                  </div>
+                </td>
+                <td>800 Unidades</td>
+                <td>02 Junio, 2024</td>
+                <td><span class="status-pill status-production">En Corte</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/utils.js"></script>
+  <script>
+    const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function initPortal() {
+      try {
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (!session) {
+          window.location.href = 'login.seller.html';
+          return;
+        }
+
+        const { data: profile } = await _supabase.from('seller_profile').select('*').eq('id', session.user.id).single();
+        const { data: company } = await _supabase.from('seller_company').select('*').eq('id', session.user.id).single();
+
+        if (company) {
+          document.getElementById('seller-factory-name').textContent = `Fábrica: ${company.company_name}`;
+        }
+        if (profile) {
+          document.getElementById('seller-welcome-msg').innerHTML = `¡Hola, <strong>${profile.first_name}</strong>! Tienes 3 órdenes críticas esta semana.`;
+        }
+      } catch (err) {
+        console.error('Error init portal:', err);
+      }
+    }
+
+    initPortal();
+  </script>
+</body>
+</html>
