@@ -34,19 +34,7 @@
         <a href="#impacto">impacto</a>
       </nav>
       <div class="header-actions">
-        <div class="country-select-wrapper" style="position: relative; display: flex; align-items: center;">
-          <select id="country-selector"
-            style="appearance: none; -webkit-appearance: none; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.5rem 2.25rem 0.5rem 0.875rem; font-size: 0.8125rem; font-family: inherit; font-weight: 600; color: #334155; cursor: pointer; outline: none; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-            <option value="MX" data-currency="MXN" data-symbol="$" selected>🇲🇽 México</option>
-            <option value="CO" data-currency="COP" data-symbol="$">🇨🇴 Colombia</option>
-          </select>
-          <div
-            style="position: absolute; right: 0.75rem; pointer-events: none; color: #64748b; display: flex; align-items: center;">
-            <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
-              <path d="m6 9 6 6 6-6" />
-            </svg>
-          </div>
-        </div>
+
         <a href="login.html" style="font-weight: 600; color: var(--color-text-secondary); transition: color 0.2s;"
           onmouseover="this.style.color='var(--color-brand-primary)'"
           onmouseout="this.style.color='var(--color-text-secondary)'">Iniciar sesión</a>
@@ -425,6 +413,13 @@
       <div class="section-header center">
         <h2>Planes que crecen contigo</h2>
         <p>Desde startups hasta corporaciones globales. Elige el nivel de automatización que tu operación necesita.</p>
+        
+        <div class="pricing-country-selector" style="display: flex; justify-content: center; margin-top: 2rem;">
+          <div style="background: #e2e8f0; padding: 0.25rem; border-radius: 100px; display: flex; gap: 0.25rem;">
+            <button class="country-btn active" data-country="MX" style="border: none; background: white; padding: 0.6rem 1.75rem; border-radius: 100px; font-size: 0.875rem; font-weight: 700; color: var(--color-navy); cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 6px rgba(0,0,0,0.05);">🇲🇽 México</button>
+            <button class="country-btn" data-country="CO" style="border: none; background: transparent; padding: 0.6rem 1.75rem; border-radius: 100px; font-size: 0.875rem; font-weight: 600; color: #64748b; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">🇨🇴 Colombia</button>
+          </div>
+        </div>
       </div>
 
       <style>
@@ -885,7 +880,7 @@
 
   <script>
     // Pricing Localization Logic
-    const countrySelector = document.getElementById('country-selector');
+    const countryBtns = document.querySelectorAll('.country-btn');
     const priceStarter = document.getElementById('price-starter');
     const priceMedium = document.getElementById('price-medium');
     const priceScale = document.getElementById('price-scale');
@@ -895,8 +890,9 @@
       CO: { starter: 199000, medium: 779000, scale: 1950000, code: 'COP' }
     };
 
+    let selectedCountry = 'MX';
+
     function updatePricing() {
-      const selectedCountry = countrySelector.value;
       const config = countryPricing[selectedCountry];
       const formatter = new Intl.NumberFormat(selectedCountry === 'MX' ? 'es-MX' : 'es-CO', {
         style: 'decimal',
@@ -919,10 +915,30 @@
       }
     }
 
-    if (countrySelector) {
-      countrySelector.addEventListener('change', updatePricing);
-      updatePricing();
-    }
+    countryBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Update UI
+        countryBtns.forEach(b => {
+          b.classList.remove('active');
+          b.style.background = 'transparent';
+          b.style.color = '#64748b';
+          b.style.boxShadow = 'none';
+          b.style.fontWeight = '600';
+        });
+        
+        btn.classList.add('active');
+        btn.style.background = 'white';
+        btn.style.color = 'var(--color-navy)';
+        btn.style.boxShadow = '0 4px 6px rgba(0,0,0,0.05)';
+        btn.style.fontWeight = '700';
+        
+        // Update Pricing
+        selectedCountry = btn.dataset.country;
+        updatePricing();
+      });
+    });
+
+    updatePricing();
   </script>
   <script src="assets/js/utils.js"></script>
   <!-- Mobile Drawer Overlay -->
