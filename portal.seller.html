@@ -273,7 +273,6 @@
         <a href="#" class="nav-item">
           <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>
           <span class="nav-label">Órdenes Activas</span>
-          <span style="margin-left: auto; background: var(--color-coral); color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem;">3</span>
         </a>
         <a href="#" class="nav-item">
           <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M3 9h18"/></svg></span>
@@ -311,8 +310,8 @@
           </div>
           <div class="stat-info">
             <span class="stat-label-p">Órdenes Activas</span>
-            <span class="stat-value-p">12</span>
-            <span class="stat-trend" style="color: #10B981;">↑ 2 nuevas</span>
+            <span class="stat-value-p">0</span>
+            <span class="stat-trend" style="color: #64748B;">Sin actividad</span>
           </div>
         </div>
         <div class="stat-card-premium">
@@ -321,8 +320,8 @@
           </div>
           <div class="stat-info">
             <span class="stat-label-p">Prendas Producidas</span>
-            <span class="stat-value-p">1,240</span>
-            <span class="stat-trend" style="color: #0D9488;">Este mes</span>
+            <span class="stat-value-p">0</span>
+            <span class="stat-trend" style="color: #64748B;">Este mes</span>
           </div>
         </div>
         <div class="stat-card-premium">
@@ -331,7 +330,7 @@
           </div>
           <div class="stat-info">
             <span class="stat-label-p">Pago Pendiente</span>
-            <span class="stat-value-p">$142,500</span>
+            <span class="stat-value-p">$0</span>
             <span class="stat-trend" style="color: #64748B;">MXN</span>
           </div>
         </div>
@@ -357,40 +356,12 @@
             </thead>
             <tbody>
               <tr>
-                <td><span class="order-id">#ORD-9901</span></td>
-                <td>
-                  <div class="client-box">
-                    <div class="client-avatar">H</div>
-                    <span>Hotel Grand Velas</span>
+                <td colspan="5" style="text-align: center; padding: 4rem; color: #94A3B8;">
+                  <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                    <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="opacity: 0.3;"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l5 5v11a2 2 0 0 1-2 2z"/></svg>
+                    <span>No hay órdenes en producción todavía.</span>
                   </div>
                 </td>
-                <td>120 Unidades</td>
-                <td>12 Mayo, 2024</td>
-                <td><span class="status-pill status-production">En Confección</span></td>
-              </tr>
-              <tr>
-                <td><span class="order-id">#ORD-9882</span></td>
-                <td>
-                  <div class="client-box">
-                    <div class="client-avatar" style="background: #FEE2E2; color: #991B1B;">R</div>
-                    <span>Restaurante El Faro</span>
-                  </div>
-                </td>
-                <td>45 Unidades</td>
-                <td>18 Mayo, 2024</td>
-                <td><span class="status-pill status-pending">Esperando Insumos</span></td>
-              </tr>
-              <tr>
-                <td><span class="order-id">#ORD-9875</span></td>
-                <td>
-                  <div class="client-box">
-                    <div class="client-avatar" style="background: #FEF3C7; color: #92400E;">I</div>
-                    <span>Industrial MX S.A.</span>
-                  </div>
-                </td>
-                <td>800 Unidades</td>
-                <td>02 Junio, 2024</td>
-                <td><span class="status-pill status-production">En Corte</span></td>
               </tr>
             </tbody>
           </table>
@@ -421,7 +392,7 @@
           document.getElementById('seller-factory-name').textContent = `Fábrica: ${company.company_name}`;
         }
         if (profile) {
-          document.getElementById('seller-welcome-msg').innerHTML = `¡Hola, <strong>${profile.first_name}</strong>! Tienes 3 órdenes críticas esta semana.`;
+          document.getElementById('seller-welcome-msg').innerHTML = `¡Hola, <strong>${profile.first_name}</strong>! Bienvenido a tu panel de administración.`;
         }
       } catch (err) {
         console.error('Error init portal:', err);
