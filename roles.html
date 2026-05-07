@@ -1,6 +1,3 @@
-<!DOCTYPE html>
-<html lang="es">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -126,6 +123,7 @@
       color: var(--color-text-muted);
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -270,15 +268,7 @@
 
       <div class="app-container">
         <!-- Industry context bar -->
-        <div class="app-card"
-          style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-          <div>
-            <span style="font-size: 0.875rem; color: var(--color-text-muted);">Industria detectada:</span>
-            <strong style="margin-left: 0.5rem; color: var(--color-navy);" id="currentIndustry">Restaurante</strong>
-          </div>
-          <button class="btn btn-outline" style="padding: 0.4rem 1rem; font-size: 0.875rem;"
-            onclick="openIndustryModal()">Cambiar Industria</button>
-        </div>
+        <!-- Industry context bar removed and moved to Dashboard -->
 
         <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Roles disponibles para tu empresa</h2>
 
@@ -456,13 +446,11 @@
 
     function selectIndustry(industry) {
       document.getElementById('currentIndustry').textContent = industry;
-      closeIndustryModal();
       renderRoles(industry);
-      showToast('Industria Actualizada', 'Se han cargado los roles para: ' + industry);
     }
 
     const rolesByIndustry = {
-      'Restaurante': [
+      'restaurant': [
         { title: 'Mesero / Server', desc: 'Atención directa a mesa, manejo de comandas y estándares de servicio.', base: 3, freq: 6, enabled: true },
         { title: 'Chef / Cocina', desc: 'Personal de cocina con requerimientos de seguridad e higiene altos.', base: 4, freq: 6, enabled: true },
         { title: 'Barista / Bartender', desc: 'Preparación de bebidas, manejo de barra y atención al cliente.', base: 2, freq: 6, enabled: true },
@@ -470,19 +458,24 @@
         { title: 'Seguridad / Valet', desc: 'Personal de vigilancia, control de accesos y servicios de valet parking.', base: 4, freq: 6, enabled: false },
         { title: 'Hostess / Greeter', desc: 'Primera línea de contacto, gestión de reservaciones y asignación de mesas.', base: 2, freq: 6, enabled: false }
       ],
-      'Limpieza': [
+      'limpieza': [
         { title: 'Operario(a) de Limpieza General', desc: 'Personal operativo para tareas de limpieza y desinfección estándar.', base: 3, freq: 4, enabled: true },
         { title: 'Supervisor(a) de Zona / Cuadrilla', desc: 'Coordinación de equipos y supervisión de estándares de limpieza.', base: 2, freq: 6, enabled: true },
         { title: 'Personal de Limpieza en Alturas', desc: 'Personal especializado en limpieza de vidrios y fachadas con equipo de seguridad.', base: 3, freq: 6, enabled: false },
         { title: 'Mantenimiento / Servicios Generales', desc: 'Reparaciones menores y mantenimiento preventivo de instalaciones.', base: 3, freq: 6, enabled: true },
         { title: 'Especialista en Manejo de Químicos', desc: 'Personal capacitado para el uso y mezcla de agentes químicos industriales.', base: 4, freq: 6, enabled: false }
       ],
-      'Industrial': [
+      'industrial': [
         { title: 'Operario de Producción', desc: 'Personal operativo en líneas de ensamble y procesos de manufactura.', base: 3, freq: 6, enabled: true },
         { title: 'Operario de Logística', desc: 'Operación de maquinaria pesada y gestión de flujo de materiales.', base: 2, freq: 6, enabled: true },
         { title: 'Personal de Mantenimiento', desc: 'Mantenimiento preventivo y correctivo de maquinaria industrial.', base: 3, freq: 6, enabled: false },
         { title: 'Personal de Calidad', desc: 'Encargados de asegurar que los productos cumplan con los estándares de calidad.', base: 3, freq: 6, enabled: true },
         { title: 'Personal de Supervisión', desc: 'Personal encargado de supervisar las operaciones diarias.', base: 3, freq: 6, enabled: true }
+      ],
+      'corporate': [
+        { title: 'Recepción / Front Desk', desc: 'Atención a visitantes y gestión de accesos.', base: 2, freq: 12, enabled: true },
+        { title: 'Ejecutivo de Ventas', desc: 'Personal administrativo con imagen corporativa.', base: 2, freq: 12, enabled: true },
+        { title: 'Seguridad Corporativa', desc: 'Vigilancia y protocolos de seguridad de oficina.', base: 3, freq: 6, enabled: true }
       ]
     };
 
@@ -574,12 +567,16 @@
       ]
     };
 
-    function renderRoles(industry) {
+    function renderRoles(industry, activeRoles = []) {
       const grid = document.getElementById('rolesGrid');
       grid.innerHTML = '';
 
       const roles = rolesByIndustry[industry] || [];
       roles.forEach(role => {
+        // Match partial (e.g. 'Mesero' in 'Mesero / Server')
+        const isEnabled = activeRoles.some(ar => role.title.toLowerCase().includes(ar.toLowerCase()));
+        role.enabled = isEnabled;
+
         const card = document.createElement('div');
         card.className = 'role-card';
         if (role.enabled) card.style.borderColor = 'var(--color-cyan)';
@@ -588,7 +585,7 @@
           <div class="role-card-header">
             <span class="role-title">${role.title}</span>
             <label class="toggle-switch">
-              <input type="checkbox" ${role.enabled ? 'checked' : ''} onchange="updateRoleCount()">
+              <input type="checkbox" ${role.enabled ? 'checked' : ''} onchange="updateRoleInSupabase(this, '${role.title}')">
               <span class="slider"></span>
             </label>
           </div>
@@ -598,7 +595,7 @@
             <span>•</span>
             <span>Renovación: <strong>Cada ${role.freq} meses</strong></span>
             <span>•</span>
-            <span class="${role.enabled ? 'status-active' : 'status-inactive'}">${role.enabled ? 'Habilitado' : 'Inhabilitado'}</span>
+            <span class="${role.enabled ? 'status-active' : 'status-inactive'} role-status-label">${role.enabled ? 'Habilitado' : 'Inhabilitado'}</span>
           </div>
           <div style="margin-top: 1.25rem; border-top: 1px solid var(--color-smoke); padding-top: 1rem;">
             <button class="btn btn-outline" style="width: 100%; font-size: 0.8125rem; padding: 0.5rem;" onclick="openRoleConfig('${role.title}')">Configurar Uniformes</button>
@@ -624,14 +621,79 @@
         </div>
       `;
       grid.appendChild(addCard);
-
-      updateRoleCount();
     }
 
-    // Initial render
-    window.onload = () => {
-      renderRoles('Restaurante');
+    // Initial render and Supabase Integration
+    let _supabase = null;
+    window.onload = async () => {
+      const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+      const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+      _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      try {
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (!session) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        const { data: profile, error } = await _supabase
+          .from('profiles')
+          .select('industry, selected_roles')
+          .eq('id', session.user.id)
+          .single();
+
+        if (error || !profile.industry) {
+          console.warn('No se detectó industria, usando restaurante por defecto');
+          selectIndustry('restaurant', []);
+        } else {
+          selectIndustry(profile.industry, profile.selected_roles || []);
+        }
+
+      } catch (err) {
+        console.error('Error al cargar industria:', err);
+        renderRoles('restaurant', []);
+      }
     };
+
+    function selectIndustry(industry, activeRoles) {
+      renderRoles(industry, activeRoles);
+    }
+
+    async function updateRoleInSupabase(checkbox, roleTitle) {
+      const card = checkbox.closest('.role-card');
+      const label = card.querySelector('.role-status-label');
+      
+      if (checkbox.checked) {
+        card.style.borderColor = 'var(--color-cyan)';
+        label.textContent = 'Habilitado';
+        label.className = 'status-active role-status-label';
+      } else {
+        card.style.borderColor = 'var(--color-border)';
+        label.textContent = 'Inhabilitado';
+        label.className = 'status-inactive role-status-label';
+      }
+
+      // Guardar cambios en el perfil
+      try {
+        const { data: { user } } = await _supabase.auth.getUser();
+        const { data: profile } = await _supabase.from('profiles').select('selected_roles').eq('id', user.id).single();
+        
+        let currentRoles = profile.selected_roles || [];
+        const shortName = roleTitle.split(' / ')[0]; // Limpiamos el nombre para el match
+
+        if (checkbox.checked) {
+          if (!currentRoles.includes(shortName)) currentRoles.push(shortName);
+        } else {
+          currentRoles = currentRoles.filter(r => r !== shortName);
+        }
+
+        await _supabase.from('profiles').update({ selected_roles: currentRoles }).eq('id', user.id);
+        showToast('Actualizado', `Rol ${checkbox.checked ? 'habilitado' : 'inhabilitado'}`);
+      } catch (err) {
+        console.error('Error al actualizar rol:', err);
+      }
+    }
 
     function openRoleConfig(roleName) {
       document.getElementById('configRoleTitle').innerText = `Configurar: ${roleName}`;
@@ -747,15 +809,18 @@
       const cards = document.querySelectorAll('.role-card');
       cards.forEach(card => {
         const checkbox = card.querySelector('input[type="checkbox"]');
-        const statusSpan = card.querySelector('.role-stats span:last-child');
+        if (!checkbox) return; // Saltar tarjeta de "Crear Nuevo Rol"
+
+        const statusSpan = card.querySelector('.role-status-label');
+        if (!statusSpan) return;
 
         if (checkbox.checked) {
           statusSpan.textContent = 'Habilitado';
-          statusSpan.className = 'status-active';
+          statusSpan.className = 'status-active role-status-label';
           card.style.borderColor = 'var(--color-cyan)';
         } else {
           statusSpan.textContent = 'Inhabilitado';
-          statusSpan.className = 'status-inactive';
+          statusSpan.className = 'status-inactive role-status-label';
           card.style.borderColor = 'var(--color-border)';
         }
       });
