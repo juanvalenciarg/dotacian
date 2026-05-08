@@ -83,6 +83,25 @@
       box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.1);
     }
 
+    .input-group {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-group .input-prefix {
+      position: absolute;
+      left: 1rem;
+      color: #64748B;
+      font-weight: 600;
+      pointer-events: none;
+    }
+
+    .input-group input {
+      padding-left: 2rem !important;
+      width: 100%;
+    }
+
     .btn-action {
       padding: 0.75rem 1.5rem;
       border-radius: 12px;
@@ -227,8 +246,11 @@
                   <input type="number" id="employee_count" disabled>
                 </div>
                 <div class="form-group">
-                  <label>Presupuesto Mensual</label>
-                  <input type="number" id="monthly_budget" disabled>
+                  <label>Presupuesto Mensual por Empleado</label>
+                  <div class="input-group">
+                    <span class="input-prefix">$</span>
+                    <input type="number" id="monthly_budget" disabled>
+                  </div>
                 </div>
               </div>
             </div>
@@ -364,25 +386,3 @@
         tax_id: document.getElementById('tax_id').value,
         delivery_address: document.getElementById('delivery_address').value,
         contact_phone: document.getElementById('contact_phone').value,
-        country: document.getElementById('country').value,
-        selected_roles: currentProfile ? currentProfile.selected_roles : []
-      };
-
-      const { error } = await _supabase.from('company_profile').upsert(updates);
-
-      if (!error) {
-        showToast('Éxito', 'Configuración guardada correctamente.', 'success');
-        toggleEdit();
-      } else {
-        showToast('Error', 'No se pudo guardar: ' + error.message, 'error');
-      }
-
-      btn.disabled = false;
-      btn.innerHTML = '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Guardar Cambios';
-    }
-
-    init();
-  </script>
-</body>
-
-</html>
