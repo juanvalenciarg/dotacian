@@ -16,138 +16,6 @@
 </head>
 
 <body>
-  <!-- Configuration Wizard Modal (Movido al inicio para prioridad de clics) -->
-  <div id="setup-wizard" class="modal-overlay"
-    style="visibility: hidden; opacity: 0; display: flex !important; pointer-events: none;">
-    <div class="modal-card wizard-card" style="position: relative; pointer-events: all !important;">
-      <button class="modal-close-btn" onclick="closeWizard()" title="Cerrar">✕</button>
-      <div class="wizard-header">
-        <div class="wizard-progress">
-          <div id="wizard-progress-fill" class="progress-fill" style="width: 20%;"></div>
-        </div>
-        <div class="wizard-steps-count">Paso <span id="current-wizard-step">1</span> de 4</div>
-      </div>
-
-      <div class="wizard-body">
-        <!-- Step 1: Empresa -->
-        <div class="wizard-step-content active" data-step="1">
-          <div class="wizard-icon">🏢</div>
-          <h2>Datos de la Empresa</h2>
-          <p>Completa la información básica para facturación y logística.</p>
-          
-          <div class="form-row" style="margin-top: 1.5rem;">
-            <label>Nombre de la Empresa</label>
-            <input type="text" id="wiz-company" placeholder="Ej: Dotacian S.A.S" class="wiz-input">
-          </div>
-
-          <div class="form-row" style="margin-top: 1rem;">
-            <label id="wiz-tax-label">ID Fiscal (NIT/RFC)</label>
-            <input type="text" id="wiz-tax-id" placeholder="Ingresa el identificador oficial" class="wiz-input">
-          </div>
-
-          <div class="form-row" style="margin-top: 1rem;">
-            <label>Dirección de Entrega</label>
-            <input type="text" id="wiz-address" placeholder="Calle, Número, Ciudad, Estado" class="wiz-input">
-          </div>
-
-          <div class="form-row" style="margin-top: 1rem;">
-            <label>Teléfono / WhatsApp de Contacto</label>
-            <input type="tel" id="wiz-contact" placeholder="+57 / +52 ..." class="wiz-input">
-          </div>
-        </div>
-
-        <!-- Step 2: Industria -->
-        <div class="wizard-step-content" data-step="2">
-          <div class="wizard-icon">🏭</div>
-          <h2>¿En qué sector operan?</h2>
-          <p>Esto nos ayuda a sugerirte los uniformes más adecuados.</p>
-          <div class="industry-grid-wiz" style="margin-top: 1.5rem;">
-            <div class="industry-opt-wiz" onclick="selectWizIndustry(this, 'restaurantes')">🍽️ Restaurantes</div>
-            <div class="industry-opt-wiz" onclick="selectWizIndustry(this, 'limpieza')">🧹 Limpieza</div>
-            <div class="industry-opt-wiz" onclick="selectWizIndustry(this, 'industrial')">⚙️ Industrial</div>
-            <div class="industry-opt-wiz" onclick="selectWizIndustry(this, 'corporate')">💼 Corporativo</div>
-          </div>
-        </div>
-
-
-        <!-- Step 3: Escala -->
-        <div class="wizard-step-content" data-step="3">
-          <div class="wizard-icon">📏</div>
-          <h2>¿Cuántos colaboradores son?</h2>
-          <p>Ajusta el número aproximado de personas que recibirán dotación.</p>
-          <div class="slider-container-wiz" style="margin-top: 2rem;">
-            <div class="slider-val-wiz"><span id="wiz-emp-val">150</span> colaboradores</div>
-            <input type="range" id="wiz-emp-slider" min="10" max="2000" value="150"
-              oninput="updateWizVal('wiz-emp-slider', 'wiz-emp-val')">
-          </div>
-        </div>
-
-        <!-- Step 4: Frecuencia -->
-        <div class="wizard-step-content" data-step="4">
-          <div class="wizard-icon">🔄</div>
-          <h2>Frecuencia de Renovación</h2>
-          <p>¿Cada cuántos meses entregan uniformes nuevos?</p>
-          <div class="form-row" style="margin-top: 2rem; text-align: center;">
-            <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1.5rem;">
-              <input type="number" id="wiz-freq-input" min="1" max="12" value="6" 
-                oninput="updateWizFreq(this.value)"
-                style="font-size: 2.25rem; font-weight: 800; width: 90px; text-align: center; border: 2px solid var(--color-cyan); border-radius: 16px; color: var(--color-brand-primary); padding: 0.5rem; outline: none; background: #F0FDFA;">
-              <span style="font-size: 1.25rem; font-weight: 600; color: #64748B;">meses</span>
-            </div>
-            <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
-              <button type="button" class="freq-chip" onclick="setWizFreq(3)">3 meses</button>
-              <button type="button" class="freq-chip" onclick="setWizFreq(4)">4 meses</button>
-              <button type="button" class="freq-chip active" id="chip-6" onclick="setWizFreq(6)">6 meses</button>
-              <button type="button" class="freq-chip" onclick="setWizFreq(12)">12 meses</button>
-            </div>
-          </div>
-
-          <div class="slider-container-wiz" style="margin-top: 3rem; border-top: 1px solid #F1F5F9; padding-top: 2rem;">
-            <div id="wiz-budget-label" style="font-size: 0.875rem; font-weight: 700; color: #475569; margin-bottom: 1rem; text-align: center;">Presupuesto anual estimado por persona (COP)</div>
-            <div class="slider-val-wiz" style="text-align: center; font-size: 2rem; margin-bottom: 1rem;">$ <span id="wiz-budget-val">800.000</span></div>
-            <input type="range" id="wiz-budget-slider" min="100000" max="5000000" step="50000" value="800000"
-              oninput="updateWizVal('wiz-budget-slider', 'wiz-budget-val')" style="width: 100%; accent-color: var(--color-cyan);">
-          </div>
-        </div>
-
-          <style>
-            .freq-chip {
-              padding: 0.6rem 1.25rem;
-              border-radius: 100px;
-              border: 1.5px solid #E2E8F0;
-              background: white;
-              font-size: 0.875rem;
-              font-weight: 700;
-              color: #64748B;
-              cursor: pointer;
-              transition: all 0.2s;
-            }
-            .freq-chip:hover {
-              border-color: var(--color-cyan);
-              color: var(--color-cyan);
-              background: #F0FDFA;
-            }
-            .freq-chip.active {
-              background: var(--color-cyan);
-              border-color: var(--color-cyan);
-              color: white;
-              box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);
-            }
-            input[type=number]::-webkit-inner-spin-button, 
-            input[type=number]::-webkit-outer-spin-button { 
-              -webkit-appearance: none; 
-              margin: 0; 
-            }
-          </style>
-      </div> <!-- Cierra wizard-body -->
-
-      <div class="wizard-footer">
-        <button id="wiz-prev" class="btn btn-outline" style="visibility: hidden;"
-          onclick="changeWizStep(-1)">Atrás</button>
-        <button id="wiz-next" class="btn btn-primary" onclick="changeWizStep(1)">Siguiente →</button>
-      </div>
-    </div> <!-- Cierra modal-card -->
-  </div> <!-- Cierra modal-overlay -->
 
   <!-- Dedicated Role Selector Modal -->
   <div id="role-selector-modal" class="modal-overlay" style="visibility: hidden; opacity: 0; display: flex !important; pointer-events: none;">
@@ -305,9 +173,29 @@
         </div>
       </header>
 
+      <!-- Alert Banner for Missing Configuration -->
+      <div id="config-alert-banner" style="display: none; background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); border: 1px solid #FDE68A; padding: 1rem 1.5rem; border-radius: 1rem; margin: -1.5rem 0 2rem 0; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(251, 191, 36, 0.08); animation: slideDown 0.5s ease-out;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div style="width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">⚠️</div>
+          <div>
+            <h4 style="margin: 0; color: #92400E; font-size: 0.95rem; font-weight: 700;">Configuración Inicial Pendiente</h4>
+            <p style="margin: 0; color: #B45309; font-size: 0.8rem; font-weight: 500;">Completa los datos de tu empresa para habilitar la gestión de pedidos y logística.</p>
+          </div>
+        </div>
+        <a href="configuracion.html" class="btn btn-primary" style="background: #D97706; border: none; padding: 0.6rem 1.2rem; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+          Configurar ahora
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <style>
+        @keyframes slideDown {
+          from { transform: translateY(-20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+      </style>
+
       <div class="app-container">
-        <!-- Setup Guide (Hidden per user request) -->
-        <div id="setup-guide" style="display: none;"></div>
         <!-- Dashboard Industry Context Removed and moved to Header -->
         <!-- Dashboard Controls -->
         <div class="dashboard-controls"
@@ -412,34 +300,7 @@
       overflow: hidden;
     }
 
-    .progress-fill {
-      height: 100%;
-      background: var(--color-cyan);
-      transition: width 0.3s ease;
-    }
 
-    .wizard-steps-count {
-      font-size: 0.75rem;
-      color: #64748B;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .wizard-step-content {
-      display: none;
-      text-align: center;
-    }
-
-    .wizard-step-content.active {
-      display: block;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .wizard-icon {
-      font-size: 3rem;
-      margin-bottom: 1.5rem;
-    }
 
     .modal-close-btn {
       position: absolute;
@@ -475,52 +336,6 @@
       font-size: 0.9375rem;
     }
 
-    .wiz-input {
-      width: 100%;
-      padding: 1rem;
-      border: 1.5px solid #E2E8F0;
-      border-radius: 0.75rem;
-      font-size: 1rem;
-      outline: none;
-      transition: border-color 0.2s;
-      margin-top: 0.5rem;
-    }
-
-    .wiz-input:focus {
-      border-color: var(--color-cyan);
-    }
-
-    .industry-grid-wiz,
-    .freq-opts-wiz {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
-
-    .industry-opt-wiz,
-    .freq-opt-wiz {
-      padding: 1.25rem;
-      border: 1.5px solid #E2E8F0;
-      border-radius: 1rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-weight: 500;
-      font-size: 0.9rem;
-    }
-
-    .industry-opt-wiz:hover,
-    .freq-opt-wiz:hover {
-      border-color: var(--color-cyan);
-      background: #F0FDFA;
-    }
-
-    .industry-opt-wiz.selected,
-    .freq-opt-wiz.selected {
-      border-color: var(--color-cyan);
-      background: #F0FDFA;
-      color: var(--color-brand-primary);
-      box-shadow: 0 0 0 1px var(--color-cyan);
-    }
 
     .roles-grid-wiz {
       display: grid;
@@ -670,16 +485,8 @@
         currentCompanyProfile = companyProfile;
         currentUserProfile = userProfile;
 
-        // 4. Verificar si falta configuración empresarial
-        const floatingBtn = document.getElementById('floating-resume-wiz');
-        if (!companyProfile || !companyProfile.company_name) {
-          console.log('--- PERFIL INCOMPLETO, MOSTRANDO WIZARD ---');
-          if (floatingBtn) floatingBtn.style.display = 'flex';
-          // Auto-abrir wizard si es cuenta nueva
-          openWizard();
-        } else {
-          if (floatingBtn) floatingBtn.style.display = 'none';
-        }
+        // 4. Verificar si falta configuración empresarial (El Banner se encarga vía initSetupGuide)
+        // Eliminado: openWizard() y floating-resume-wiz
 
         // 5. Personalizar Saludo (Priorizando user_profile.first_name)
         let firstName = 'Admin';
@@ -722,578 +529,34 @@
         document.getElementById('user-greeting-subtitle').style.fontSize = "1.85rem";
         document.getElementById('user-greeting-subtitle').style.marginTop = "0";
 
-        // 6. Ajustar asistente y versión (Priorizar país de la empresa)
+        // 6. Ajustar versión (Priorizar país de la empresa)
         const sessionCountry = (companyProfile && companyProfile.country) ? companyProfile.country : (userProfile ? userProfile.country : 'CO');
-        adjustWizardByCountry(sessionCountry);
         updateVersionIndicator(sessionCountry);
 
-        // 7. Inicializar Guía de Configuración
+        // 7. Inicializar Alerta de Configuración
         initSetupGuide(session, companyProfile);
-        initSetupGuideLogic(session, companyProfile);
-
       } catch (err) {
         console.error('Error al cargar dashboard:', err.message);
-        document.getElementById('user-greeting-subtitle').textContent = 'Bienvenido de vuelta';
-        
-        // Intentar inicializar la guía aunque falle el perfil
-        try {
-          const { data: { session: fallbackSession } } = await _supabase.auth.getSession();
-          initSetupGuide(fallbackSession, null);
-        } catch (e) {}
       }
     }
 
-    function openWizard() {
-      const wiz = document.getElementById('setup-wizard');
-      if (wiz) {
-        wiz.style.display = 'flex';
-        wizStep = 1;
-        showWizard();
-      }
-    }
-
-    // Wizard Logic
-    let wizStep = 1;
-    let wizData = {
-      industry: null,
-      roles: [],
-      freq: 6
-    };
-
-    function showWizard(step = 1) {
-      // Pre-llenar con datos existentes si están disponibles
-      if (currentCompanyProfile) {
-        if (document.getElementById('wiz-company')) document.getElementById('wiz-company').value = currentCompanyProfile.company_name || '';
-        if (document.getElementById('wiz-tax-id')) document.getElementById('wiz-tax-id').value = currentCompanyProfile.tax_id || '';
-        if (document.getElementById('wiz-address')) document.getElementById('wiz-address').value = currentCompanyProfile.delivery_address || '';
-        if (document.getElementById('wiz-contact')) document.getElementById('wiz-contact').value = currentCompanyProfile.contact_phone || '';
-        
-        if (currentCompanyProfile.industry) {
-          wizData.industry = currentCompanyProfile.industry;
-          document.querySelectorAll('.industry-opt-wiz').forEach(opt => {
-            if (opt.getAttribute('onclick').includes(currentCompanyProfile.industry)) {
-              opt.classList.add('selected');
-            } else {
-              opt.classList.remove('selected');
-            }
-          });
-        }
-        
-        if (currentCompanyProfile.employee_count && document.getElementById('wiz-emp-slider')) {
-          document.getElementById('wiz-emp-slider').value = currentCompanyProfile.employee_count;
-          updateWizVal('wiz-emp-slider', 'wiz-emp-val');
-        }
-
-        if (currentCompanyProfile.renewal_frequency) {
-          setWizFreq(currentCompanyProfile.renewal_frequency);
-        }
-
-        if (currentCompanyProfile.monthly_budget && document.getElementById('wiz-budget-slider')) {
-          document.getElementById('wiz-budget-slider').value = currentCompanyProfile.monthly_budget;
-          updateWizVal('wiz-budget-slider', 'wiz-budget-val');
-        }
-
-        if (currentCompanyProfile.selected_roles) {
-          wizData.roles = currentCompanyProfile.selected_roles;
-        }
-      }
-      showWizardStep(step);
-    }
-
-    function showWizardStep(step) {
-      console.log('--- ABRIENDO ASISTENTE EN PASO ' + step + ' ---');
-      const modal = document.getElementById('setup-wizard');
-      if (modal) {
-        modal.style.visibility = 'visible';
-        modal.style.opacity = '1';
-        modal.style.zIndex = '99999';
-        modal.style.pointerEvents = 'all';
-
-        wizStep = step;
-        const steps = document.querySelectorAll('.wizard-step-content');
-        steps.forEach(s => s.classList.remove('active'));
-        if (steps[wizStep - 1]) steps[wizStep - 1].classList.add('active');
-
-        document.getElementById('current-wizard-step').textContent = wizStep;
-        document.getElementById('wizard-progress-fill').style.width = (wizStep * 25) + '%';
-        document.getElementById('wiz-prev').style.visibility = wizStep === 1 ? 'hidden' : 'visible';
-        document.getElementById('wiz-next').textContent = wizStep === 4 ? 'Finalizar ✅' : 'Siguiente →';
-      } else {
-        alert('Error: No se encontró el componente del asistente en la página.');
-      }
-    }
-
-    function closeWizard() {
-      console.log('Cerrando asistente...');
-      const modal = document.getElementById('setup-wizard');
-      if (modal) {
-        modal.style.visibility = 'hidden';
-        modal.style.opacity = '0';
-        modal.style.pointerEvents = 'none';
-      }
-    }
-
-    function changeWizStep(n) {
-      if (n === 1 && !validateWizStep()) return;
-
-      const steps = document.querySelectorAll('.wizard-step-content');
-      steps[wizStep - 1].classList.remove('active');
-
-      wizStep += n;
-      
-      if (wizStep > 4) {
-        saveWizardData();
-        return;
-      }
-
-      steps[wizStep - 1].classList.add('active');
-      document.getElementById('current-wizard-step').textContent = wizStep;
-      document.getElementById('wizard-progress-fill').style.width = (wizStep * 25) + '%';
-
-      document.getElementById('wiz-prev').style.visibility = wizStep === 1 ? 'hidden' : 'visible';
-      document.getElementById('wiz-next').textContent = wizStep === 4 ? 'Finalizar ✅' : 'Siguiente →';
-    }
-
-    function validateWizStep() {
-      if (wizStep === 1) {
-        if (!document.getElementById('wiz-company').value.trim()) {
-          showToast('Campo requerido', 'Por favor ingresa el nombre de tu empresa.', 'error');
-          return false;
-        }
-      }
-      if (wizStep === 2) {
-        if (!wizData.industry) {
-          showToast('Selección requerida', 'Por favor selecciona un sector.', 'error');
-          return false;
-        }
-      }
-      return true;
-    }
-
-    const wizRolesByIndustry = {
-      'restaurantes': [
-        { title: 'Mesero / Server', emoji: '🍽️' },
-        { title: 'Chef / Cocina', emoji: '👨‍🍳' },
-        { title: 'Barista / Bartender', emoji: '☕' },
-        { title: 'Limpieza / Steward', emoji: '🧼' },
-        { title: 'Seguridad / Valet', emoji: '🚗' },
-        { title: 'Hostess / Greeter', emoji: '👋' }
-      ],
-      'limpieza': [
-        { title: 'Operario de Limpieza', emoji: '🧹' },
-        { title: 'Supervisor de Zona', emoji: '📋' },
-        { title: 'Limpieza en Alturas', emoji: '🏗️' },
-        { title: 'Mantenimiento', emoji: '🔧' },
-        { title: 'Manejo de Químicos', emoji: '🧪' }
-      ],
-      'industrial': [
-        { title: 'Operario Producción', emoji: '⚙️' },
-        { title: 'Operario Logística', emoji: '📦' },
-        { title: 'Mantenimiento', emoji: '🛠️' },
-        { title: 'Control de Calidad', emoji: '✅' },
-        { title: 'Supervisor', emoji: '👮' }
-      ],
-      'corporate': [
-        { title: 'Recepción', emoji: '🏢' },
-        { title: 'Ventas', emoji: '💼' },
-        { title: 'Seguridad', emoji: '🛡️' }
-      ]
-    };
-
-    function renderWizRoles(industry) {
-      const grid = document.getElementById('wiz-roles-grid');
-      if (!grid) return;
-      grid.innerHTML = '';
-      
-      const roles = wizRolesByIndustry[industry] || [];
-      if (roles.length === 0) {
-        grid.innerHTML = '<div style="grid-column: 1/-1; padding: 2rem; color: #94A3B8;">No hay roles predefinidos para esta industria.</div>';
-        return;
-      }
-
-      roles.forEach(role => {
-        const div = document.createElement('div');
-        div.className = 'role-opt-wiz';
-        if (wizData.roles.includes(role.title)) div.classList.add('selected');
-        div.onclick = () => toggleWizRole(div, role.title);
-        div.innerHTML = `
-          <div class="role-emoji-wiz">${role.emoji}</div>
-          <div class="role-name-wiz">${role.title}</div>
-        `;
-        grid.appendChild(div);
-      });
-    }
-
-    // Role Selector Logic
-    let tempSelectedRoles = [];
-
-    async function showRoleSelector() {
-      const modal = document.getElementById('role-selector-modal');
-      const grid = document.getElementById('modal-roles-grid');
-      
-      if (!currentCompanyProfile || !currentCompanyProfile.industry) {
-        showToast('Falta configuración', 'Primero debes configurar los datos de tu empresa.', 'warning');
-        showWizard(1);
-        return;
-      }
-
-      modal.style.visibility = 'visible';
-      modal.style.opacity = '1';
-      modal.style.pointerEvents = 'all';
-
-      tempSelectedRoles = currentCompanyProfile.selected_roles || [];
-      renderModalRoles(currentCompanyProfile.industry);
-    }
-
-    function renderModalRoles(industry) {
-      const grid = document.getElementById('modal-roles-grid');
-      grid.innerHTML = '';
-      
-      const roles = wizRolesByIndustry[industry] || [];
-      roles.forEach(role => {
-        const div = document.createElement('div');
-        div.className = 'role-opt-wiz';
-        if (tempSelectedRoles.includes(role.title)) div.classList.add('selected');
-        div.onclick = () => {
-          div.classList.toggle('selected');
-          if (div.classList.contains('selected')) {
-            if (!tempSelectedRoles.includes(role.title)) tempSelectedRoles.push(role.title);
-          } else {
-            tempSelectedRoles = tempSelectedRoles.filter(r => r !== role.title);
-          }
-        };
-        div.innerHTML = `
-          <div class="role-emoji-wiz">${role.emoji}</div>
-          <div class="role-name-wiz">${role.title}</div>
-        `;
-        grid.appendChild(div);
-      });
-    }
-
-    function closeRoleSelector() {
-      const modal = document.getElementById('role-selector-modal');
-      modal.style.visibility = 'hidden';
-      modal.style.opacity = '0';
-      modal.style.pointerEvents = 'none';
-    }
-
-    async function saveSelectedRoles() {
-      const btn = document.getElementById('save-roles-btn');
-      if (!btn) return;
-      
-      btn.disabled = true;
-      btn.textContent = 'Guardando...';
-
-      try {
-        const { data: { session } } = await _supabase.auth.getSession();
-        if (!session) throw new Error('No se encontró una sesión activa.');
-        
-        // 1. Actualizar perfil de empresa (selected_roles array)
-        const { error: profileError } = await _supabase
-          .from('company_profile')
-          .update({ selected_roles: tempSelectedRoles })
-          .eq('id', session.user.id);
-
-        if (profileError) throw profileError;
-
-        // 2. Sincronizar tabla relacional company_roles
-        if (tempSelectedRoles.length > 0) {
-          const rolesToInsert = tempSelectedRoles.map(roleTitle => ({
-            company_id: session.user.id,
-            role_name: roleTitle,
-            base_items: 3,
-            renewal_frequency: (currentCompanyProfile && currentCompanyProfile.renewal_frequency) ? currentCompanyProfile.renewal_frequency : 6
-          }));
-
-          const { error: rolesError } = await _supabase
-            .from('company_roles')
-            .upsert(rolesToInsert, { onConflict: 'company_id,role_name' });
-          
-          if (rolesError) {
-            console.warn('Aviso: Los roles individuales no se guardaron, pero el perfil sí.', rolesError);
-            // No lanzamos error aquí para no bloquear al usuario si la tabla no existe aún
-          }
-        }
-
-        showToast('¡Éxito!', 'Los roles han sido configurados correctamente.', 'success');
-        
-        // Actualizar estado local
-        if (currentCompanyProfile) {
-          currentCompanyProfile.selected_roles = [...tempSelectedRoles];
-        }
-        
-        // Cerrar después de éxito
-        setTimeout(() => {
-          closeRoleSelector();
-          initDashboard(); // Recargar para actualizar la guía
-        }, 800);
-
-      } catch (err) {
-        console.error('Error al guardar roles:', err);
-        showToast('Error', err.message || 'No se pudieron guardar los roles.', 'error');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Guardar Roles ✅';
-      }
-    }
-
-    function toggleWizRole(el, role) {
-      el.classList.toggle('selected');
-      if (el.classList.contains('selected')) {
-        if (!wizData.roles.includes(role)) wizData.roles.push(role);
-      } else {
-        wizData.roles = wizData.roles.filter(r => r !== role);
-      }
-    }
-
-    function selectWizIndustry(el, val) {
-      document.querySelectorAll('.industry-opt-wiz').forEach(o => o.classList.remove('selected'));
-      el.classList.add('selected');
-      wizData.industry = val;
-    }
-
-    function setWizFreq(val) {
-      document.getElementById('wiz-freq-input').value = val;
-      updateWizFreq(val);
-    }
-
-    function updateWizFreq(val) {
-      let num = parseInt(val);
-      if (isNaN(num)) num = 1;
-      if (num < 1) num = 1;
-      if (num > 12) num = 12;
-      
-      wizData.freq = num;
-      
-      // Update chips UI
-      document.querySelectorAll('.freq-chip').forEach(c => {
-        c.classList.remove('active');
-        if (c.textContent.trim() === num + ' meses') {
-          c.classList.add('active');
-        }
-      });
-    }
-
-    function updateWizVal(sid, vid) {
-      const val = parseInt(document.getElementById(sid).value);
-      document.getElementById(vid).textContent = val.toLocaleString('es-ES');
-    }
-
-    function adjustWizardByCountry(country) {
-      const budgetLabel = document.getElementById('wiz-budget-label');
-      const budgetSlider = document.getElementById('wiz-budget-slider');
-      const budgetVal = document.getElementById('wiz-budget-val');
-
-      const taxLabel = document.getElementById('wiz-tax-label');
-      const taxInput = document.getElementById('wiz-tax-id');
-
-      if (country === 'CO' || country === 'Colombia') {
-        if (taxLabel) taxLabel.textContent = 'NIT de la Empresa';
-        if (taxInput) taxInput.placeholder = 'Ej: 900.123.456-1';
-
-        budgetLabel.textContent = 'Presupuesto anual estimado por persona (COP)';
-        budgetSlider.min = 100000;
-        budgetSlider.max = 5000000;
-        budgetSlider.step = 50000;
-        budgetSlider.value = 800000;
-        budgetVal.textContent = (800000).toLocaleString('es-ES');
-      } else {
-        if (taxLabel) taxLabel.textContent = 'RFC de la Empresa';
-        if (taxInput) taxInput.placeholder = 'Ej: ABC123456789';
-
-        budgetLabel.textContent = 'Presupuesto anual estimado por persona (MXN)';
-        budgetSlider.min = 500;
-        budgetSlider.max = 20000;
-        budgetSlider.step = 500;
-        budgetSlider.value = 2500;
-        budgetVal.textContent = (2500).toLocaleString('es-ES');
-      }
-    }
-
-    async function saveWizardData() {
-      const btn = document.getElementById('wiz-next');
-      btn.disabled = true;
-      btn.textContent = 'Guardando...';
-
-      try {
-        const { data: { session } } = await _supabase.auth.getSession();
-        const budgetLabel = document.getElementById('wiz-budget-label');
-        const isColombia = budgetLabel && budgetLabel.textContent.includes('COP');
-        const finalCountry = isColombia ? 'CO' : 'MX';
-
-        const companyData = {
-          id: session.user.id,
-          company_name: document.getElementById('wiz-company').value.trim(),
-          tax_id: document.getElementById('wiz-tax-id').value.trim(),
-          delivery_address: document.getElementById('wiz-address').value.trim(),
-          contact_phone: document.getElementById('wiz-contact').value.trim(),
-          industry: wizData.industry || 'General',
-          employee_count: parseInt(document.getElementById('wiz-emp-slider').value) || 0,
-          monthly_budget: parseInt(document.getElementById('wiz-budget-slider').value) || 0,
-          country: finalCountry,
-          renewal_frequency: wizData.freq || 6,
-          selected_roles: wizData.roles || []
-        };
-
-        console.log('Guardando perfil de empresa:', companyData);
-
-        // 1. Guardar perfil de empresa (Esto es lo crítico)
-        const { error: companyError } = await _supabase
-          .from('company_profile')
-          .upsert(companyData, { onConflict: 'id' });
-
-        if (companyError) {
-          console.error('Error al guardar perfil:', companyError);
-          throw companyError;
-        }
-
-        console.log('Perfil guardado con éxito. Recargando...');
-        
-        // 2. Cerrar wizard e informar éxito
-        if (document.getElementById('setup-wizard')) {
-          document.getElementById('setup-wizard').style.display = 'none';
-        }
-        
-        // 3. Forzar recarga inmediata para activar el Dashboard real
-        window.location.reload();
-
-      } catch (err) {
-        console.error('Error crítico en Wizard:', err);
-        showToast('Error', 'No se pudo guardar la configuración. Revisa la consola.', 'error');
-        btn.disabled = false;
-        btn.textContent = 'Finalizar ✅';
-      }
-    }
 
     async function initSetupGuide(session, companyProfile) {
-      const setupGuide = document.getElementById('setup-guide-container');
-      const wizard = document.getElementById('setup-wizard');
+      const banner = document.getElementById('config-alert-banner');
 
-      // Si ya tiene perfil básico (nombre y tax_id), ocultar asistente por completo
-      if (companyProfile && companyProfile.company_name && companyProfile.tax_id) {
-        if (setupGuide) setupGuide.style.display = 'block'; // Mostrar la guía de pasos pero no el modal
-        if (wizard) wizard.style.display = 'none';
-        
-        // Marcar pasos como completados visualmente
-        const step1 = document.getElementById('step-company-check');
-        if (step1) step1.classList.add('completed');
-        
+      // Si ya tiene perfil básico (nombre e industria), ocultar banner
+      if (companyProfile && companyProfile.company_name && companyProfile.industry) {
+        if (banner) banner.style.display = 'none';
         return;
       }
 
-      // Si no tiene perfil, mostrar Wizard
-      if (wizard) wizard.style.display = 'flex';
+      // Si no tiene perfil, mostrar Banner
+      if (banner) banner.style.display = 'flex';
     } 
 
-    async function initSetupGuideLogic(session, companyProfile) {
-      const guide = document.getElementById('setup-guide');
-      if (!guide) return;
-      
-      const isGuideClosed = sessionStorage.getItem('dotacian_setup_guide_closed') === 'true';
-      if (!isGuideClosed) guide.style.display = 'block';
-
-      let stepsCompleted = 0;
-      const totalSteps = 4;
-
-      if (!session) return; // No podemos verificar sin sesión
-
-      // 1. Check Company Profile
-      console.log('Verificando perfil de empresa:', companyProfile);
-      const isCompanyComplete = companyProfile && companyProfile.company_name && companyProfile.tax_id;
-      console.log('¿Empresa completa?:', isCompanyComplete);
-      
-      if (isCompanyComplete) {
-        console.log('Marcando paso de empresa como completado');
-        markStepCompleted('guide-step-company');
-        stepsCompleted++;
-      }
-
-      // 2. Check Roles (Fetch from company_roles or check profile)
-      try {
-        const hasRolesInProfile = companyProfile && companyProfile.selected_roles && companyProfile.selected_roles.length > 0;
-
-        const { count: rolesCount, error: rError } = await _supabase
-          .from('company_roles')
-          .select('*', { count: 'exact', head: true })
-          .eq('company_id', session.user.id);
-        
-        if (hasRolesInProfile || (!rError && rolesCount > 0)) {
-          markStepCompleted('guide-step-roles');
-          stepsCompleted++;
-        }
-      } catch (e) { console.warn('Error checking roles:', e); }
-
-      // 3. Check Locations (Fetch from DB)
-      try {
-        const { count, error: sError } = await _supabase
-          .from('company_locations')
-          .select('*', { count: 'exact', head: true })
-          .eq('company_id', session.user.id);
-        
-        if (!sError && count > 0) {
-          markStepCompleted('guide-step-branches');
-          stepsCompleted++;
-        }
-      } catch (e) { console.warn('Error checking locations:', e); }
-
-      // 4. Check Employees (Fetch from DB)
-      try {
-        const { count, error: eError } = await _supabase
-          .from('company_employees')
-          .select('*', { count: 'exact', head: true })
-          .eq('company_id', session.user.id);
-        
-        if (!eError && count > 0) {
-          markStepCompleted('guide-step-employees');
-          stepsCompleted++;
-        }
-      } catch (e) { console.warn('Error checking employees:', e); }
-
-      // Show logic
-      const isAllDone = stepsCompleted === totalSteps;
-
-      if (isAllDone) {
-        guide.style.display = 'none';
-        // Opcional: Guardar en localStorage que ya terminó todo para siempre
-        localStorage.setItem('dotacian_setup_finished', 'true');
-        return;
-      }
-
-      // Si no ha terminado todo, mostrar si no se ha cerrado en esta sesión
-      if (!isGuideClosed) {
-        guide.style.display = 'block';
-      } else {
-        guide.style.display = 'none';
-      }
-    }
-
-    function markStepCompleted(stepId) {
-      const step = document.getElementById(stepId);
-      if (step) {
-        step.classList.add('completed');
-        step.style.background = '#F0FDFA';
-        step.style.borderColor = '#10B981';
-        step.style.pointerEvents = 'none'; // Desactivar clics para evitar cambios
-        step.style.cursor = 'default';
-        
-        const check = step.querySelector('.step-check');
-        if (check) {
-          check.innerHTML = '✓';
-          check.style.background = '#10B981';
-          check.style.borderColor = '#10B981';
-          check.style.color = 'white';
-        }
-        const action = step.querySelector('.step-action');
-        if (action) {
-          action.textContent = 'Completado';
-          action.style.color = '#059669';
-        }
-      }
-    }
-
     function closeSetupGuide() {
-      document.getElementById('setup-guide').style.display = 'none';
-      sessionStorage.setItem('dotacian_setup_guide_closed', 'true');
+      const banner = document.getElementById('config-alert-banner');
+      if (banner) banner.style.display = 'none';
     }
 
     // Inicializar al cargar
@@ -1337,10 +600,6 @@
       document.getElementById('kpi-entregados-change').textContent = data.entregados.change;
     }
   </script>
-  <!-- Floating Resume Button -->
-  <button id="floating-resume-wiz" class="floating-resume-btn" onclick="openWizard()" style="display: none;">
-    <span style="font-size: 1.25rem;">✨</span>
-    <span>Retomar Configuración</span>
-  </button></body>
+</body>
 
 </html>
