@@ -1,784 +1,440 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="es">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>dotacian app | Gestión de Dotación</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
-    rel="stylesheet">
+  <title>Marketplace | Dotacian</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/utils.js"></script>
   <style>
-    /* Custom Notification Style */
-    .notification-toast {
-      position: fixed;
-      top: -100px;
-      left: 50%;
-      transform: translateX(-50%);
+    .marketplace-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      padding: 0.5rem;
+    }
+
+    .product-card {
       background: white;
-      padding: 1rem 2rem;
-      border-radius: 100px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-      z-index: 9999;
+      border-radius: 1.25rem;
+      border: 1px solid #E2E8F0;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-      border: 1px solid rgba(0, 180, 216, 0.1);
+      flex-direction: column;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
-    .notification-toast.active {
-      top: 2rem;
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.1);
+      border-color: var(--color-cyan);
     }
 
-    .notification-icon {
-      width: 24px;
-      height: 24px;
-      background: var(--color-cyan);
-      color: white;
-      border-radius: 50%;
+    .product-image {
+      width: 100%;
+      aspect-ratio: 4/5;
+      background: #F8FAFC;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 0.5rem;
+      transition: transform 0.5s ease;
+    }
+
+    .product-card:hover .product-image img {
+      transform: scale(1.05);
+    }
+
+    .product-info {
+      padding: 1.25rem;
+      flex: 1;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
+      flex-direction: column;
     }
 
-    .notification-text {
-      font-family: 'Inter', sans-serif;
-      font-weight: 500;
+    .product-category {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--color-cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    .product-title {
+      font-size: 1.125rem;
+      font-weight: 700;
       color: var(--color-navy);
-      font-size: 0.9375rem;
+      margin-bottom: 0.75rem;
+      line-height: 1.3;
+    }
+
+    .product-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .tag {
+      background: #F1F5F9;
+      color: #475569;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .tag.material {
+      background: #ECFEFF;
+      color: #0891B2;
+    }
+
+    .product-sku {
+      font-size: 0.75rem;
+      color: #94A3B8;
+      margin-bottom: 1.25rem;
+    }
+
+    .product-footer {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding-top: 1rem;
+      border-top: 1px solid #F1F5F9;
+    }
+
+    .product-price {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--color-navy);
+    }
+
+    .product-price small {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #94A3B8;
+      margin-left: 0.2rem;
+    }
+
+    .product-min {
+      font-size: 0.75rem;
+      color: #64748B;
+      font-weight: 500;
+    }
+
+    .seller-badge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.4rem 0.8rem;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(4px);
+      border-radius: 100px;
+      font-size: 0.65rem;
+      color: white;
+      font-weight: 600;
+      z-index: 2;
+    }
+
+    .card-body {
+      padding: 1.5rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-navy);
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+    }
+
+    .card-desc {
+      font-size: 0.875rem;
+      color: #64748B;
+      margin-bottom: 1.5rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-footer {
+      margin-top: auto;
+      padding-top: 1.5rem;
+      border-top: 1px solid #F1F5F9;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .price-tag {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--color-navy);
+    }
+
+    .price-tag span {
+      font-size: 0.875rem;
+      color: #94A3B8;
+      font-weight: 500;
+      margin-left: 0.25rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 8rem 2rem;
+      background: white;
+      border-radius: 2rem;
+      border: 2px dashed #E2E8F0;
+      grid-column: 1 / -1;
+    }
+
+    .filter-bar {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 1.25rem;
+      border: 1px solid #E2E8F0;
+      margin-bottom: 2rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-select {
+      padding: 0.6rem 1rem;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 10px;
+      font-size: 0.875rem;
+      color: #64748B;
+      outline: none;
+      min-width: 160px;
     }
   </style>
 </head>
 
 <body>
-  <!-- Custom Notification Container -->
-  <div id="notificationToast" class="notification-toast">
-    <div class="notification-icon">✓</div>
-    <div class="notification-text" id="notificationText">Mensaje guardado</div>
-  </div>
-
   <div class="app-layout">
-
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-brand">
-        <span>dotacian</span>
+        <img src="assets/logos/logo_dotacian.png" alt="dotacian logo" style="width: 130px; height: auto;">
       </div>
       <nav class="sidebar-nav">
         <a href="app.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <rect width="7" height="9" x="3" y="3" rx="1" />
-              <rect width="7" height="5" x="14" y="3" rx="1" />
-              <rect width="7" height="9" x="14" y="12" rx="1" />
-              <rect width="7" height="5" x="3" y="16" rx="1" />
-            </svg></span>
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
           <span class="nav-label">Dashboard</span>
         </a>
         <a href="roles.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            </svg></span>
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
           <span class="nav-label">Roles</span>
         </a>
-        <div class="nav-group active">
-          <a href="#" class="nav-item">
-            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path
-                  d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
-              </svg></span>
+        <div class="nav-group">
+          <a href="#" class="nav-item active">
+            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg></span>
             <span class="nav-label">Uniformes</span>
-            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor"
-                stroke-width="2" viewBox="0 0 24 24">
-                <path d="m6 9 6 6 6-6" />
-              </svg></span>
           </a>
-          <div class="nav-sub-items">
+          <div class="nav-sub-items" style="display: block;">
             <a href="uniformes.html" class="nav-sub-item active">Marketplace</a>
             <a href="mi_dotacion.html" class="nav-sub-item">Mi dotación</a>
           </div>
         </div>
-        <a href="sucursales.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
-              <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
-              <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
-              <path d="M10 6h4" />
-              <path d="M10 10h4" />
-              <path d="M10 14h4" />
-              <path d="M10 18h4" />
-            </svg></span>
-          <span class="nav-label">Sucursales</span>
-        </a>
         <a href="empleados.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg></span>
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
           <span class="nav-label">Empleados</span>
         </a>
-        <div class="nav-group">
-          <a href="produccion.html" class="nav-item">
-            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="m7.5 4.27 9 5.15" />
-                <path
-                  d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-                <path d="m3.3 7 8.7 5 8.7-5" />
-                <path d="M12 22V12" />
-              </svg></span>
-            <span class="nav-label">Producción</span>
-            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor"
-                stroke-width="2" viewBox="0 0 24 24">
-                <path d="m6 9 6 6 6-6" />
-              </svg></span>
-          </a>
-          <div class="nav-sub-items">
-            <a href="cotizaciones.html" class="nav-sub-item">Cotizaciones</a>
-            <a href="muestras.html" class="nav-sub-item">Solicitud de Muestras</a>
-            <a href="ordenes.html" class="nav-sub-item">Órdenes de Compra</a>
-            <a href="seguimiento.html" class="nav-sub-item">Seguimiento</a>
-          </div>
-        </div>
+        <a href="produccion.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></span>
+          <span class="nav-label">Producción</span>
+        </a>
         <a href="bodega.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <polyline points="21 8 21 21 3 21 3 8"></polyline>
-              <rect x="1" y="3" width="22" height="5"></rect>
-              <line x1="10" y1="12" x2="14" y2="12"></line>
-            </svg></span>
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg></span>
           <span class="nav-label">Bodega</span>
         </a>
         <a href="#" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-            </svg></span>
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></span>
           <span class="nav-label">Alertas</span>
         </a>
         <div class="sidebar-spacer"></div>
-        <a href="index.html" class="nav-item nav-item-secondary">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" x2="9" y1="12" y2="12" />
-            </svg></span>
-          <span class="nav-label">Cerrar Sesión</span>
-        </a>
-        <a href="#" class="nav-item nav-item-secondary">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path
-                d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg></span>
+        <a href="configuracion.html" class="nav-item nav-item-secondary">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1-1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span>
           <span class="nav-label">Configuración</span>
         </a>
+        <a href="index.html" class="nav-item nav-item-secondary">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg></span>
+          <span class="nav-label">Cerrar Sesión</span>
+        </a>
+        <div id="version-tag"></div>
       </nav>
     </aside>
 
-    <!-- Main Content -->
     <main class="main-content">
       <header class="app-header">
         <div class="header-left">
-          <h1>Configuración de Uniformes por Rol</h1>
-          <p class="header-subtitle">Gestión de plantillas base y parametrización de kits</p>
-        </div>
-        <div class="header-right" style="display: flex; gap: 1rem; align-items: center;">
-          <button onclick="openProviderModal()" style="background: white; border: 1px solid var(--color-border); border-radius: 12px; padding: 0.75rem 1rem; font-family: inherit; font-weight: 600; color: var(--color-navy); cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);" onmouseover="this.style.borderColor='var(--color-cyan)'" onmouseout="this.style.borderColor='var(--color-border)'">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-            Usar mi proveedor actual
-          </button>
-          <a href="https://wa.me/1234567890?text=Hola,%20necesito%20asesor%C3%ADa%20para%20un%20uniforme%20personalizado%20para%20mi%20empresa."
-            target="_blank" class="whatsapp-btn">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
-              <path
-                d="M12 0C5.373 0 0 5.373 0 12c0 2.123.556 4.116 1.528 5.845L.057 23.714a.5.5 0 0 0 .614.644l5.993-1.57A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-5.002-1.369l-.36-.214-3.713.974.992-3.617-.235-.371A9.818 9.818 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z" />
-            </svg>
-            Hablar con Diseño
-          </a>
+          <h1>Marketplace de Uniformes</h1>
+          <p class="header-subtitle">Explora las colecciones exclusivas de nuestros fabricantes certificados.</p>
         </div>
       </header>
 
       <div class="app-container">
-        <!-- Roles Quick Selection -->
-        <div class="marketplace-filters">
-          <div class="search-input-wrap">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.3-4.3" />
-            </svg>
-            <input type="text" id="marketplaceSearch" class="search-input"
-              placeholder="Buscar por nombre de uniforme..." oninput="applyFilters()">
-          </div>
-
-          <div class="filter-group">
-            <select id="industryFilter" class="filter-select" onchange="applyFilters()">
-              <option value="all">Todas las Industrias</option>
-              <option value="Restaurante">Restaurante</option>
-              <option value="Limpieza">Limpieza</option>
-              <option value="Industrial">Industrial</option>
-            </select>
-
-            <select id="brandFilter" class="filter-select" onchange="applyFilters()">
-              <option value="all">Todas las Marcas</option>
-              <option value="Colombia Chef">Colombia Chef</option>
-              <option value="Uniformes Pro">Uniformes Pro</option>
-              <option value="TextilCorp">TextilCorp</option>
-              <option value="BaristaGear">BaristaGear</option>
-              <option value="ActiveWear B2B">ActiveWear B2B</option>
-              <option value="ChefOutfitters">ChefOutfitters</option>
-              <option value="SafeStep">SafeStep</option>
-              <option value="SafeTech">SafeTech</option>
-              <option value="FireSafe">FireSafe</option>
-              <option value="SafeStep Industrial">SafeStep Industrial</option>
-            </select>
-
-            <select id="roleFilter" class="filter-select" onchange="applyFilters()">
-              <option value="all">Todos los Roles</option>
-              <option value="chef">Chef</option>
-              <option value="mesero">Mesero</option>
-              <option value="barista">Barista</option>
-              <option value="limpieza">Limpieza</option>
-              <option value="industrial">Industrial</option>
-              <option value="recepcion">Recepción</option>
-            </select>
-
-            <select id="colorFilter" class="filter-select" onchange="applyFilters()">
-              <option value="all">Todos los Colores</option>
-              <option value="Blanco">Blanco</option>
-              <option value="Negro">Negro</option>
-              <option value="Azul Navy">Azul Navy</option>
-              <option value="Azul Marino">Azul Marino</option>
-              <option value="Azul Rey">Azul Rey</option>
-              <option value="Gris Marengo">Gris Marengo</option>
-              <option value="Café">Café</option>
-            </select>
-
-            <select id="sizeFilter" class="filter-select" onchange="applyFilters()">
-              <option value="all">Todas las Tallas</option>
-              <option value="XS">XS</option>
-              <option value="S">S</option>
-              <option value="M">M</option>
-              <option value="L">L</option>
-              <option value="XL">XL</option>
-              <option value="38">38</option>
-              <option value="39">39</option>
-              <option value="40">40</option>
-              <option value="41">41</option>
-              <option value="42">42</option>
-              <option value="43">43</option>
-              <option value="44">44</option>
-            </select>
-          </div>
+        <div class="filter-bar">
+          <select class="filter-select">
+            <option>Todas las Industrias</option>
+            <option>Restaurantes</option>
+            <option>Limpieza</option>
+            <option>Industrial</option>
+          </select>
+          <select class="filter-select">
+            <option>Todos los Fabricantes</option>
+          </select>
+          <select class="filter-select">
+            <option>Categoría</option>
+          </select>
         </div>
 
-        <script>
-          function applyFilters() {
-            const searchTerm = document.getElementById('marketplaceSearch').value.toLowerCase();
-            const industryFilter = document.getElementById('industryFilter').value;
-            const brandFilter = document.getElementById('brandFilter').value;
-            const roleFilter = document.getElementById('roleFilter').value;
-            const colorFilter = document.getElementById('colorFilter').value;
-            const sizeFilter = document.getElementById('sizeFilter').value;
-
-            const cards = document.querySelectorAll('.catalog-card');
-
-            cards.forEach(card => {
-              const title = card.querySelector('h3').textContent.toLowerCase();
-              const industry = card.getAttribute('data-industry');
-              const brand = card.getAttribute('data-brand');
-              const role = card.getAttribute('data-role');
-              const colors = card.getAttribute('data-colors').split(',');
-              const sizes = card.getAttribute('data-sizes').split(',');
-
-              const matchesSearch = title.includes(searchTerm);
-              const matchesIndustry = industryFilter === 'all' || industry.split(',').map(i => i.trim()).includes(industryFilter);
-              const matchesBrand = brandFilter === 'all' || brand === brandFilter;
-              const matchesRole = roleFilter === 'all' || role === roleFilter || role === 'all';
-              const matchesColor = colorFilter === 'all' || colors.includes(colorFilter);
-              const matchesSize = sizeFilter === 'all' || sizes.includes(sizeFilter);
-
-              if (matchesSearch && matchesIndustry && matchesBrand && matchesRole && matchesColor && matchesSize) {
-                card.style.display = 'flex';
-              } else {
-                card.style.display = 'none';
-              }
-            });
-          }
-        </script>
-
-        <!-- Uniforms Grid -->
-        <div class="catalog-grid">
-
-          <!-- Card 1 (Chef) -->
-          <div class="catalog-card" data-industry="Restaurante" data-role="chef" data-brand="Uniformes Pro"
-            data-colors="Blanco" data-sizes="S,M,L,XL">
-            <div class="catalog-img-wrap">
-              <img src="assets/chef_coat.png" alt="Filipina Chef Classic" class="catalog-img">
-              <span class="catalog-badge">Vendido por: Uniformes Pro</span>
-            </div>
-            <div class="catalog-content">
-              <h3>Filipina Chef Classic - Mujer</h3>
-              <p class="catalog-desc">Tela transpirable, anti-manchas. Corte ergonómico.</p>
-              <button class="btn btn-primary" style="width: 100%; margin-top: auto;"
-                onclick="openModal('assets/chef_coat.png', 'Filipina Chef Classic', ['Blanco'])">Personalizar y Asignar
-                a Rol</button>
-            </div>
+        <div class="marketplace-grid" id="marketplace-grid">
+          <!-- Dinamically loaded from seller_catalog -->
+          <div class="empty-state">
+            <div style="font-size: 3.5rem; margin-bottom: 1.5rem;">🔍</div>
+            <h3 style="font-size: 1.5rem; color: var(--color-navy); margin-bottom: 0.5rem;">Buscando nuevas colecciones...</h3>
+            <p style="color: #64748B;">Estamos conectando con los catálogos de nuestros fabricantes.</p>
           </div>
-
-          <!-- Card 2 (Mesero) -->
-          <div class="catalog-card" data-industry="Restaurante" data-role="mesero" data-brand="TextilCorp"
-            data-colors="Negro,Azul Marino,Gris Marengo" data-sizes="XS,S,M,L,XL">
-            <div class="catalog-img-wrap">
-              <img src="assets/oxford_shirt_black.png" alt="Camisa Oxford Ejecutiva" class="catalog-img">
-              <span class="catalog-badge">Vendido por: TextilCorp</span>
-            </div>
-            <div class="catalog-content">
-              <h3>Camisa Oxford Ejecutiva - Hombre</h3>
-              <p class="catalog-desc">Algodón premium de alta durabilidad. Acabado planchado fácil.</p>
-              <button class="btn btn-primary" style="width: 100%; margin-top: auto;"
-                onclick="openModal('assets/oxford_shirt_black.png', 'Camisa Oxford Ejecutiva', ['Negro', 'Azul Marino', 'Gris Marengo'])">Personalizar
-                y Asignar a Rol</button>
-            </div>
-          </div>
-
-          <!-- Card 3 (Barista) -->
-          <div class="catalog-card" data-industry="Restaurante" data-role="barista" data-brand="BaristaGear"
-            data-colors="Gris Marengo" data-sizes="S,M,L">
-            <div class="catalog-img-wrap">
-              <img src="assets/barista_apron.png" alt="Mandil Barista Premium" class="catalog-img">
-              <span class="catalog-badge">Vendido por: BaristaGear</span>
-            </div>
-            <div class="catalog-content">
-              <h3>Mandil Barista Premium - Unisex</h3>
-              <p class="catalog-desc">Lona resistente con correas ajustables de cuero sintético.</p>
-              <button class="btn btn-primary" style="width: 100%; margin-top: auto;"
-                onclick="openModal('assets/barista_apron.png', 'Mandil Barista Premium', ['Gris Marengo'])">Personalizar
-                y Asignar a Rol</button>
-            </div>
-          </div>
-
-          <!-- Card 4 (Polo) -->
-          <div class="catalog-card" data-industry="Restaurante,Limpieza,Industrial" data-role="all" data-brand="ActiveWear B2B"
-            data-colors="Azul Navy,Negro" data-sizes="S,M,L,XL">
-            <div class="catalog-img-wrap">
-              <img
-                src="/Users/juanvalencia/.gemini/antigravity/brain/8559e5d1-494a-43a6-8e4a-46626c0396c2/polo_shirt_premium_1777430879967.png"
-                alt="Polo Shirt Premium" class="catalog-img">
-              <span class="catalog-badge">Vendido por: ActiveWear B2B</span>
-            </div>
-            <div class="catalog-content">
-              <h3>Polo Shirt Premium - Unisex</h3>
-              <p class="catalog-desc">Tejido piqué transpirable. Máxima frescura y durabilidad.</p>
-              <button class="btn btn-primary" style="width: 100%; margin-top: auto;"
-                onclick="openModal('/Users/juanvalencia/.gemini/antigravity/brain/8559e5d1-494a-43a6-8e4a-46626c0396c2/polo_shirt_premium_1777430879967.png', 'Polo Shirt Premium', ['Azul Navy', 'Negro'])">Personalizar
-                y Asignar a Rol</button>
-            </div>
-          </div>
-
-          <!-- Card 5 (Colombia Chef) -->
-          <div class="catalog-card" data-industry="Restaurante" data-role="chef" data-brand="Colombia Chef"
-            data-colors="Blanco" data-sizes="S,M,L,XL">
-            <div class="catalog-img-wrap">
-              <img src="assets/colombia_chef_coat.jpg" alt="Chaqueta Clásica Blanca Manga Corta" class="catalog-img">
-              <span class="catalog-badge">Vendido por: Colombia Chef</span>
-            </div>
-            <div class="catalog-content">
-              <h3 style="font-size: 1.1rem; line-height: 1.3; margin-bottom: 0.25rem;">Filipina Clásica Blanca Manga
-                Corta Embone Negro</h3>
-              <p class="catalog-desc" style="font-size: 0.8rem; margin-bottom: 0.75rem;">Filipina, Embonada, Manga
-                corta</p>
-              <button class="btn btn-primary" style="width: 100%; margin-top: auto;"
-                onclick="openModal('assets/colombia_chef_coat.jpg', 'Chaqueta Clásica Blanca Manga Corta Embone Negro', ['Blanco con embono negro'])">Personalizar
-                y Asignar a Rol</button>
-            </div>
-          </div>
-
-          <!-- Card 5 (Pantalón) -->
-          <div class="catalog-card" data-industry="Restaurante" data-role="chef" data-brand="ChefOutfitters"
-            data-colors="Negro" data-sizes="S,M,L,XL">
-            <div class="catalog-img-wrap">
-              <img src="assets/chef_pants_black.png" alt="Pantalón de Cocina Pro" class="catalog-img">
-              <span class="catalog-badge">Vendido por: ChefOutfitters</span>
-            </div>
-            <div class="catalog-content">
-              <h3>Pantalón de Cocina Pro - Negro</h3>
-              <p class="catalog-desc">Corte ergonómico, tela anti-fluidos y refuerzo en costuras.</p>
-              <button class="btn btn-primary" style="width: 100%; margin-top: auto;"
-                onclick="openModal('assets/chef_pants_black.png', 'Pantalón de Cocina Pro', ['Negro'])">Personalizar y
-                Asignar a Rol</button>
-            </div>
-          </div>
-
-          <!-- Card 6 (Calzado) -->
-          <div class="catalog-card" data-industry="Restaurante" data-role="all" data-brand="SafeStep"
-            data-colors="Negro" data-sizes="S,M,L,XL">
-            <div class="catalog-img-wrap">
-              <img src="assets/non_slip_shoes.png" alt="Calzado Antideslizante Plus" class="catalog-img">
-              <span class="catalog-badge">Vendido por: SafeStep</span>
-            </div>
-            <div class="catalog-content">
-              <h3>Calzado Antideslizante Plus</h3>
-              <p class="catalog-desc">Suela de máximo agarre y plantilla confort para largas jornadas.</p>
-              <button class="btn btn-primary" style="width: 100%; margin-top: auto;"
-                onclick="openModal('assets/non_slip_shoes.png', 'Calzado Antideslizante Plus', ['Negro'])">Personalizar
-                y Asignar a Rol</button>
-            </div>
-          </div>
-
-          <!-- LIMPIEZA SECTION -->
-          <div class="catalog-card" data-industry="Limpieza" data-role="limpieza" data-brand="SafeTech"
-            data-colors="Azul Rey" data-sizes="S,M,L,XL">
-            <div class="catalog-img-wrap">
-              <img src="assets/antifluidoMujerAzul.jpg" alt="Camiseta Antifluido Mujer" class="catalog-img">
-              <span class="catalog-badge">Vendido por: SafeTech</span>
-            </div>
-            <div class="catalog-content">
-              <h3>Conjunto Antifluido - Mujer</h3>
-              <p class="catalog-desc">Tejido técnico con acabado repelente a líquidos. Corte ergonómico para dama.</p>
-              <button class="btn btn-primary" style="width: 100%; margin-top: auto;"
-                onclick="openModal('assets/antifluidoMujerAzul.jpg', 'Conjunto Antifluido - Mujer', ['Azul Rey'])">Personalizar
-                y Asignar a Rol</button>
-            </div>
-          </div>
-
-          <div class="catalog-card" data-industry="Limpieza" data-role="limpieza" data-brand="SafeTech"
-            data-colors="Azul Marino" data-sizes="S,M,L,XL">
-            <div class="catalog-img-wrap">
-              <img src="assets/antifluidoHombreNegro.jpg" alt="Camiseta Antifluido Hombre" class="catalog-img">
-              <span class="catalog-badge">Vendido por: SafeTech</span>
-            </div>
-            <div class="catalog-content">
-              <h3>Conjunto Antifluido - Hombre</h3>
-              <p class="catalog-desc">Máxima durabilidad y protección contra fluidos. Ajuste cómodo para largas
-                jornadas.</p>
-              <button class="btn btn-primary" style="width: 100%; margin-top: auto;"
-                onclick="openModal('assets/antifluidoHombreNegro.jpg', 'Conjunto Antifluido - Hombre', ['Azul Marino'])">Personalizar
-                y Asignar a Rol</button>
-            </div>
-          </div>
-
-          <!-- INDUSTRIAL SECTION -->
-          <div class="catalog-card" data-industry="Industrial" data-role="industrial" data-brand="FireSafe"
-            data-colors="Azul Rey" data-sizes="M,L,XL">
-            <div class="catalog-img-wrap">
-              <img src="assets/overloHombre.jpg" alt="Overlo Mantenimiento" class="catalog-img">
-              <span class="catalog-badge">Vendido por: FireSafe</span>
-            </div>
-            <div class="catalog-content">
-              <h3>Overlo Mantenimiento</h3>
-              <p class="catalog-desc">Protección contra arco eléctrico y fuego. Certificado bajo normas.</p>
-              <button class="btn btn-primary" style="width: 100%; margin-top: auto;"
-                onclick="openModal('assets/overloHombre.jpg', 'Overlo Mantenimiento', ['Azul Rey'])">Personalizar
-                y Asignar a Rol</button>
-            </div>
-          </div>
-
-          <div class="catalog-card" data-industry="Industrial" data-role="industrial" data-brand="SafeStep Industrial" data-colors="Café" data-sizes="38,39,40,41,42,43,44">
-            <div class="catalog-img-wrap">
-              <img src="assets/botasSeguridadCafes.jpg" alt="Botas de Seguridad Cafes" class="catalog-img">
-              <span class="catalog-badge">Vendido por: SafeStep Industrial</span>
-            </div>
-            <div class="catalog-content">
-              <h3>Botas de Seguridad Cafes</h3>
-              <p class="catalog-desc">Cuero premium hidrofugado, punta de acero y suela dieléctrica antideslizante.</p>
-              <button class="btn btn-primary" style="width: 100%; margin-top: auto;" 
-                onclick="openModal('assets/botasSeguridadCafes.jpg', 'Botas de Seguridad Cafes', ['Café'])">Personalizar y Asignar a Rol</button>
-            </div>
-          </div>
-
-          <div class="catalog-card" data-industry="Industrial" data-role="industrial" data-brand="SafeStep Industrial" data-colors="Negro" data-sizes="38,39,40,41,42,43,44">
-            <div class="catalog-img-wrap">
-              <img src="assets/botasSeguridadNegras.jpg" alt="Botas Seguridad Negras" class="catalog-img">
-              <span class="catalog-badge">Vendido por: SafeStep Industrial</span>
-            </div>
-            <div class="catalog-content">
-              <h3>Botas Seguridad Negras</h3>
-              <p class="catalog-desc">Máxima protección con puntera reforzada y suela resistente a hidrocarburos.</p>
-              <button class="btn btn-primary" style="width: 100%; margin-top: auto;" 
-                onclick="openModal('assets/botasSeguridadNegras.jpg', 'Botas Seguridad Negras', ['Negro'])">Personalizar y Asignar a Rol</button>
-            </div>
-          </div>
-
-          <div class="catalog-card" data-industry="Industrial" data-role="industrial" data-brand="FireSafe" data-colors="Blanco" data-sizes="Única">
-            <div class="catalog-img-wrap">
-              <img src="assets/cascoBlanco.jpg" alt="Casco de Seguridad" class="catalog-img">
-              <span class="catalog-badge">Vendido por: FireSafe</span>
-            </div>
-            <div class="catalog-content">
-              <h3>Casco de Seguridad</h3>
-              <p class="catalog-desc">Protección craneal de alta resistencia con suspensión de 6 puntos y ajuste tipo rachet.</p>
-              <button class="btn btn-primary" style="width: 100%; margin-top: auto;" 
-                onclick="openModal('assets/cascoBlanco.jpg', 'Casco de Seguridad', ['Blanco'])">Personalizar y Asignar a Rol</button>
-            </div>
-          </div>
-
         </div>
       </div>
     </main>
   </div>
 
-  <!-- Modal Configuration -->
-  <div class="modal-overlay" id="configModal">
-    <div class="modal-content-lg">
-      <div class="modal-header" style="align-items: flex-start;">
-        <div>
-          <h2 style="margin-bottom: 0.25rem;">Configurar: <span id="modalTitle">Camisa Oxford</span></h2>
-          <p id="modalVendor" style="font-size: 0.875rem; color: var(--color-text-secondary); margin: 0;">Vendido por:
-            Marca</p>
-        </div>
-        <button class="btn-close" onclick="closeModal()" style="margin-top: 0.25rem;">✕</button>
-      </div>
-      <div class="modal-columns">
-
-        <!-- Left: Image & Colors -->
-        <div class="modal-visual">
-          <div class="visual-img-wrap">
-            <img id="modalImg" src="assets/oxford_shirt.png" alt="Preview">
-          </div>
-          <div class="color-picker">
-            <p style="font-size:0.875rem; font-weight:600; color:var(--color-navy); margin-bottom:0.5rem;">Variantes
-              Base:</p>
-            <div class="color-options" id="colorOptionsContainer">
-              <!-- Rendered dynamically -->
-            </div>
-          </div>
-        </div>
-
-        <!-- Right: Form -->
-        <div class="modal-form">
-          <div class="form-row">
-            <label for="roleName">Asignar este uniforme al Rol:</label>
-            <input type="text" id="roleName" placeholder="ej. Mesero Terraza">
-          </div>
-
-          <div class="form-row">
-            <label for="logoConfig">¿Deseas añadir logo?</label>
-            <select id="logoConfig" onchange="toggleLogoUpload()">
-              <option value="no">No</option>
-              <option value="bordado">Sí, bordado</option>
-              <option value="estampado">Sí, estampado</option>
-            </select>
-          </div>
-
-          <div class="form-row upload-box" id="logoUpload" style="display: none;">
-            <div class="upload-placeholder">
-              <span>📁 Haz clic o arrastra tu logo aquí (PNG/SVG)</span>
-            </div>
-          </div>
-
-
-
-          <div class="ai-info-box">
-            <div class="ai-info-icon">⚡</div>
-            <div class="ai-info-text">
-              <strong>Motor de Holgura IA activado</strong>
-              Este uniforme usará la lógica de tallado 'Regular/Movimiento' para garantizar la comodidad operativa y
-              reducir devoluciones.
-            </div>
-          </div>
-
-          <div class="modal-footer" style="margin-top:2rem; display:flex; justify-content:flex-end; gap:1rem;">
-            <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
-            <button class="btn btn-primary" onclick="saveConfig()">Guardar</button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- Provider Modal -->
-  <div class="modal-overlay" id="providerModal">
-    <div class="modal-content" style="max-width: 500px; background: white; padding: 2.5rem; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
-      <div class="modal-header" style="margin-bottom: 1.5rem;">
-        <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.5rem; color: var(--color-navy); margin: 0;">Integrar Mi Proveedor</h2>
-        <button class="btn-close" onclick="closeProviderModal()" style="background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--color-text-muted);">✕</button>
-      </div>
-      <p style="color: var(--color-text-secondary); font-size: 0.9375rem; margin-bottom: 2rem; line-height: 1.5;">Ingresa los datos de tu proveedor actual y nuestro equipo se encargará de contactarlos e incluir su catálogo en tu portal de Dotacian.</p>
-      
-      <div class="form-row" style="margin-bottom: 1.25rem;">
-        <label for="providerName" style="display: block; font-weight: 600; font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--color-navy);">Nombre del Proveedor *</label>
-        <input type="text" id="providerName" placeholder="Ej. Textiles Industriales S.A." style="width: 100%; padding: 0.875rem; border: 1px solid var(--color-border); border-radius: 10px; font-family: inherit; font-size: 0.9375rem; outline: none; transition: border-color 0.2s;">
-      </div>
-      
-      <div class="form-row" style="margin-bottom: 2rem;">
-        <label for="providerUrl" style="display: block; font-weight: 600; font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--color-navy);">Página Web o Catálogo (URL)</label>
-        <input type="url" id="providerUrl" placeholder="https://www.proveedor.com" style="width: 100%; padding: 0.875rem; border: 1px solid var(--color-border); border-radius: 10px; font-family: inherit; font-size: 0.9375rem; outline: none; transition: border-color 0.2s;">
-      </div>
-      
-      <button class="btn btn-primary" onclick="submitProvider()" style="width: 100%; padding: 1rem; border-radius: 12px; font-size: 1rem;">Enviar Solicitud</button>
-    </div>
-  </div>
-
   <script>
-    const colorMap = {
-      'Blanco': '#E2E8F0',
-      'Negro': '#0F172A',
-      'Azul Marino': '#1E3A8A',
-      'Azul Navy': '#1E3A8A',
-      'Azul Rey': '#0055A4',
-      'Gris Marengo': '#475569',
-      'Café': '#4B3621'
-    };
+    const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let currentSelectedColor = '';
+    async function loadMarketplace() {
+      const grid = document.getElementById('marketplace-grid');
+      
+      try {
+        // 1. Obtener sesión y país del cliente de forma segura
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (!session) return;
 
-    function openModal(imgSrc, title, availableColors) {
-      document.getElementById('modalImg').src = imgSrc;
-      document.getElementById('modalTitle').textContent = title;
-      currentSelectedColor = availableColors[0];
+        const { data: company } = await _supabase
+          .from('company_profile')
+          .select('*')
+          .eq('id', session.user.id)
+          .maybeSingle();
 
-      let vendorText = "";
-      if (window.event && window.event.target) {
-        const card = window.event.target.closest('.catalog-card');
-        if (card) {
-          const badge = card.querySelector('.catalog-badge');
-          if (badge) {
-            vendorText = badge.textContent;
-          }
+        const country = company ? company.country : 'CO';
+        const currency = (country === 'CO' || country === 'Colombia') ? 'COP' : 'MXN';
+        
+        // Actualizar indicador de versión
+        if (typeof updateVersionIndicator === 'function') {
+          updateVersionIndicator(country);
         }
+
+        // 2. Obtener vendedores del mismo país
+        const { data: localSellers } = await _supabase
+          .from('seller_company')
+          .select('id')
+          .eq('location', (country === 'CO' || country === 'Colombia') ? 'CO' : 'MX');
+
+        const sellerIds = localSellers ? localSellers.map(s => s.id) : [];
+
+        if (sellerIds.length === 0) {
+          grid.innerHTML = `
+            <div class="empty-state">
+              <div style="font-size: 3.5rem; margin-bottom: 1.5rem;">📍</div>
+              <h3 style="font-size: 1.5rem; color: var(--color-navy); margin-bottom: 0.5rem;">Sin fabricantes en tu región</h3>
+              <p style="color: #64748B;">Aún no tenemos fabricantes certificados registrados en <strong>${country}</strong>.</p>
+            </div>`;
+          return;
+        }
+
+        // 3. Cargar productos de esos vendedores filtrados por la industria del cliente
+        const clientIndustry = company ? company.industry : null;
+        console.log('Filtrando por industria:', clientIndustry);
+
+        let query = _supabase
+          .from('seller_catalog')
+          .select('*')
+          .in('seller_id', sellerIds)
+          .eq('is_active', true);
+        
+        if (clientIndustry) {
+          query = query.eq('industry', clientIndustry);
+        }
+
+        const { data: products, error } = await query.order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (products && products.length > 0) {
+          grid.innerHTML = '';
+          // Actualizar selector de industrias visualmente
+          const industrySelect = document.querySelector('.filter-select');
+          if (industrySelect && clientIndustry) {
+            // Intentar encontrar la opción que coincida con la industria del cliente
+            for(let opt of industrySelect.options) {
+              if(opt.value.toLowerCase() === clientIndustry.toLowerCase()) {
+                opt.selected = true;
+                break;
+              }
+            }
+          }
+
+          const currencyLabel = country === 'CO' ? 'COP' : 'MXN';
+
+          products.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+              <div class="product-image">
+                <img src="${p.image_url || 'https://images.unsplash.com/photo-1594932224828-b4b057b693e5?q=80&w=800'}" alt="${p.name}">
+              </div>
+              <div class="product-info">
+                <div class="product-category">${(p.category || 'General').toUpperCase()}</div>
+                <h3 class="product-title">${p.name}</h3>
+                <div class="product-tags">
+                  <span class="tag">Tallas: ${p.size || 'N/A'}</span>
+                  <span class="tag material">${p.material || 'Estándar'}</span>
+                </div>
+                <div class="product-sku">SKU: ${p.sku || 'N/A'}</div>
+                <div class="product-footer">
+                  <div class="product-price">
+                    $${(p.base_price || 0).toLocaleString()} <small>${currencyLabel}</small>
+                  </div>
+                  <div class="product-min">Mín. ${p.moq || 1}</div>
+                </div>
+                <button class="btn btn-primary" style="width: 100%; margin-top: 1rem; padding: 0.75rem;" onclick="openOrderModal('${p.id}')">Personalizar y Asignar a Rol</button>
+              </div>
+            `;
+            grid.appendChild(card);
+          });
+        } else {
+          grid.innerHTML = `
+            <div class="empty-state">
+              <div style="font-size: 3.5rem; margin-bottom: 1.5rem;">🔍</div>
+              <h3 style="font-size: 1.5rem; color: var(--color-navy); margin-bottom: 0.5rem;">No se encontraron productos</h3>
+              <p style="color: #64748B;">Los fabricantes locales aún no han subido prendas a su catálogo.</p>
+            </div>`;
+        }
+      } catch (err) {
+        console.error('Error loading marketplace:', err);
       }
-      const vendorEl = document.getElementById('modalVendor');
-      if (vendorEl) {
-        vendorEl.textContent = vendorText;
-        vendorEl.style.display = vendorText ? 'block' : 'none';
-      }
-
-      const colorContainer = document.getElementById('colorOptionsContainer');
-      colorContainer.innerHTML = '';
-
-      availableColors.forEach((color, index) => {
-        const circle = document.createElement('div');
-        circle.className = 'color-circle' + (index === 0 ? ' active' : '');
-        circle.style.backgroundColor = colorMap[color];
-        circle.onclick = function () { selectColor(this, color, title); };
-        colorContainer.appendChild(circle);
-      });
-
-      document.getElementById('configModal').classList.add('active');
     }
 
-    function closeModal() {
-      document.getElementById('configModal').classList.remove('active');
-    }
-
-    function selectColor(el, colorName, title) {
-      document.querySelectorAll('.color-circle').forEach(c => c.classList.remove('active'));
-      el.classList.add('active');
-      currentSelectedColor = colorName;
-
-      const img = document.getElementById('modalImg');
-
-      if (title === 'Camisa Oxford Ejecutiva') {
-        if (colorName === 'Blanco') img.src = 'assets/oxford_shirt.png';
-        else if (colorName === 'Negro') img.src = 'assets/oxford_shirt_black.png';
-        else if (colorName === 'Azul Marino') img.src = 'assets/oxford_shirt_navy.png';
-        else if (colorName === 'Gris Marengo') img.src = 'assets/oxford_shirt_grey.png';
-      }
-
-      console.log('Color seleccionado:', colorName);
-    }
-
-    function toggleLogoUpload() {
-      const val = document.getElementById('logoConfig').value;
-      const box = document.getElementById('logoUpload');
-      if (val !== 'no') {
-        box.style.display = 'block';
-      } else {
-        box.style.display = 'none';
-      }
-    }
-
-    function showNotification(message) {
-      const toast = document.getElementById('notificationToast');
-      const text = document.getElementById('notificationText');
-      text.textContent = message;
-      toast.classList.add('active');
-
-      setTimeout(() => {
-        toast.classList.remove('active');
-      }, 3000);
-    }
-
-    function saveConfig() {
-      const role = document.getElementById('roleName').value;
-      if (!role) {
-        showNotification("Por favor, ingresa el nombre del rol.");
-        return;
-      }
-
-      const assignment = {
-        role: role,
-        productName: document.getElementById('modalTitle').textContent,
-        img: document.getElementById('modalImg').src,
-        color: currentSelectedColor,
-        logo: document.getElementById('logoConfig').value,
-        vendor: document.getElementById('modalVendor').textContent,
-        date: new Date().toLocaleDateString()
-      };
-
-      // Persistence
-      let assignments = JSON.parse(localStorage.getItem('dotacianAssignments') || '[]');
-      assignments.push(assignment);
-      localStorage.setItem('dotacianAssignments', JSON.stringify(assignments));
-
-      showNotification("Configuración de " + role + " guardada exitosamente.");
-      closeModal();
-    }
-
-    // Provider Modal Logic
-    function openProviderModal() {
-      document.getElementById('providerModal').classList.add('active');
-    }
-
-    function closeProviderModal() {
-      document.getElementById('providerModal').classList.remove('active');
-    }
-
-    function submitProvider() {
-      const name = document.getElementById('providerName').value;
-      const url = document.getElementById('providerUrl').value;
-      
-      if (!name) {
-        showNotification("Por favor, ingresa el nombre del proveedor.");
-        return;
-      }
-      
-      showNotification("Solicitud enviada. Nuestro equipo contactará a " + name + " para integrarlo.");
-      closeProviderModal();
-      
-      // Clear fields
-      document.getElementById('providerName').value = '';
-      document.getElementById('providerUrl').value = '';
-    }
-
-    // Add focus styling for inputs in provider modal
-    document.querySelectorAll('#providerModal input').forEach(input => {
-      input.addEventListener('focus', function() {
-        this.style.borderColor = 'var(--color-cyan)';
-      });
-      input.addEventListener('blur', function() {
-        this.style.borderColor = 'var(--color-border)';
-      });
-    });
+    loadMarketplace();
   </script>
-  <script src="assets/js/utils.js"></script>
 </body>
-
 </html>
