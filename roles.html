@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -124,6 +127,7 @@
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/utils.js"></script>
 </head>
 
 <body>
@@ -132,7 +136,7 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-brand">
-        <span>dotacian</span>
+        <img src="assets/logos/logo_dotacian.png" alt="dotacian logo" style="width: 130px; height: auto;">
       </div>
       <nav class="sidebar-nav">
         <a href="app.html" class="nav-item">
@@ -170,19 +174,6 @@
             <a href="mi_dotacion.html" class="nav-sub-item">Mi dotación</a>
           </div>
         </div>
-        <a href="sucursales.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
-              <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
-              <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
-              <path d="M10 6h4" />
-              <path d="M10 10h4" />
-              <path d="M10 14h4" />
-              <path d="M10 18h4" />
-            </svg></span>
-          <span class="nav-label">Sucursales</span>
-        </a>
         <a href="empleados.html" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
               viewBox="0 0 24 24">
@@ -234,6 +225,15 @@
           <span class="nav-label">Alertas</span>
         </a>
         <div class="sidebar-spacer"></div>
+        <a href="configuracion.html" class="nav-item nav-item-secondary">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path
+                d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg></span>
+          <span class="nav-label">Configuración</span>
+        </a>
         <a href="index.html" class="nav-item nav-item-secondary">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
               viewBox="0 0 24 24">
@@ -243,78 +243,29 @@
             </svg></span>
           <span class="nav-label">Cerrar Sesión</span>
         </a>
-        <a href="#" class="nav-item nav-item-secondary">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path
-                d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg></span>
-          <span class="nav-label">Configuración</span>
-        </a>
+        <div id="version-tag"></div>
       </nav>
     </aside>
 
     <!-- Main Content -->
     <main class="main-content">
-      <header class="app-header">
+      <header class="app-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; padding-top: 1rem;">
         <div class="header-left">
-          <h1>Configuración de Roles por Industria</h1>
-          <p class="header-subtitle">Habilita roles predeterminados para tu operación</p>
+          <p class="header-subtitle" id="user-greeting-subtitle" style="font-size: 1.75rem; color: var(--color-navy); font-weight: 800; margin: 0; letter-spacing: -0.02em;">Cargando sesión...</p>
         </div>
-        <div class="header-right">
+        <div class="header-right" style="padding-right: 1rem;">
+          <div id="header-company-badge" style="background: white; padding: 0.3rem 0.8rem; border-radius: 0.8rem; border: 1px solid #E2E8F0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 0.6rem;">
+            <div id="badge-industry-icon" style="width: 28px; height: 28px; background: #F1F5F9; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">🏢</div>
+            <div style="display: flex; flex-direction: column;">
+              <span id="company-name-display" style="font-weight: 700; color: var(--color-navy); font-size: 0.85rem; line-height: 1.1;">Cargando...</span>
+              <span id="dash-industry-val" style="font-size: 0.6rem; color: var(--color-cyan); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 1px;">Sector</span>
+            </div>
+          </div>
         </div>
       </header>
 
       <div class="app-container">
-        <!-- Industry context bar -->
-        <!-- Industry context bar removed and moved to Dashboard -->
-
         <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Roles disponibles para tu empresa</h2>
-
-        <!-- Industry Selection Modal -->
-        <div class="modal-overlay" id="industryModal">
-          <div class="modal-content-lg" style="max-width: 500px;">
-            <div class="modal-header">
-              <h2>Seleccionar Industria</h2>
-              <button class="btn-close" onclick="closeIndustryModal()">✕</button>
-            </div>
-            <div style="padding: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
-              <p style="font-size: 0.875rem; color: var(--color-text-secondary); margin-bottom: 0.5rem;">Selecciona tu
-                industria para habilitar los roles predeterminados:</p>
-              <button class="btn btn-outline" style="text-align: left; justify-content: flex-start;"
-                onclick="selectIndustry('Restaurante')">Restaurante</button>
-              <button class="btn btn-outline" style="text-align: left; justify-content: flex-start;"
-                onclick="selectIndustry('Limpieza')">Limpieza</button>
-              <button class="btn btn-outline" style="text-align: left; justify-content: flex-start;"
-                onclick="selectIndustry('Industrial')">Industrial</button>
-              <button class="btn btn-outline"
-                style="text-align: left; justify-content: flex-start; opacity: 0.6; cursor: not-allowed;"
-                disabled>Hotelería <span
-                  style="margin-left: auto; font-size: 0.7rem; font-weight: 600; color: var(--color-cyan);">PRONTO</span></button>
-              <button class="btn btn-outline"
-                style="text-align: left; justify-content: flex-start; opacity: 0.6; cursor: not-allowed;"
-                disabled>Retail <span
-                  style="margin-left: auto; font-size: 0.7rem; font-weight: 600; color: var(--color-cyan);">PRONTO</span></button>
-              <button class="btn btn-outline"
-                style="text-align: left; justify-content: flex-start; opacity: 0.6; cursor: not-allowed;" disabled>Salud
-                <span
-                  style="margin-left: auto; font-size: 0.7rem; font-weight: 600; color: var(--color-cyan);">PRONTO</span></button>
-              <button class="btn btn-outline"
-                style="text-align: left; justify-content: flex-start; opacity: 0.6; cursor: not-allowed;"
-                disabled>Seguridad <span
-                  style="margin-left: auto; font-size: 0.7rem; font-weight: 600; color: var(--color-cyan);">PRONTO</span></button>
-              <button class="btn btn-outline"
-                style="text-align: left; justify-content: flex-start; opacity: 0.6; cursor: not-allowed;"
-                disabled>Corporativa <span
-                  style="margin-left: auto; font-size: 0.7rem; font-weight: 600; color: var(--color-cyan);">PRONTO</span></button>
-              <button class="btn btn-outline"
-                style="text-align: left; justify-content: flex-start; opacity: 0.6; cursor: not-allowed;" disabled>Otra
-                <span
-                  style="margin-left: auto; font-size: 0.7rem; font-weight: 600; color: var(--color-cyan);">PRONTO</span></button>
-            </div>
-          </div>
-        </div>
 
         <div class="roles-grid" id="rolesGrid">
           <!-- Roles will be rendered dynamically here -->
@@ -360,16 +311,21 @@
                 </div>
               </div>
 
-              <div style="display: flex; gap: 0.5rem;">
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
                 <button class="period-chip" onclick="setPeriod(3, this)"
                   style="flex: 1; padding: 0.6rem; border-radius: 8px; border: 1px solid #e2e8f0; background: white; font-size: 0.8125rem; cursor: pointer; transition: all 0.2s;">3
                   Meses</button>
-                <button class="period-chip active" onclick="setPeriod(6, this)"
-                  style="flex: 1; padding: 0.6rem; border-radius: 8px; border: 1px solid var(--color-cyan); background: var(--color-cyan-dim); color: var(--color-cyan); font-weight: 600; font-size: 0.8125rem; cursor: pointer; transition: all 0.2s;">6
+                <button class="period-chip" onclick="setPeriod(6, this)"
+                  style="flex: 1; padding: 0.6rem; border-radius: 8px; border: 1px solid #e2e8f0; background: white; font-size: 0.8125rem; cursor: pointer; transition: all 0.2s;">6
                   Meses</button>
                 <button class="period-chip" onclick="setPeriod(12, this)"
                   style="flex: 1; padding: 0.6rem; border-radius: 8px; border: 1px solid #e2e8f0; background: white; font-size: 0.8125rem; cursor: pointer; transition: all 0.2s;">12
                   Meses</button>
+                <div style="flex: 1; display: flex; align-items: center; gap: 0.4rem; background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0 0.6rem; height: 38px; transition: border-color 0.2s;" id="manual-period-container">
+                  <input type="number" id="manual-period" min="1" max="60" oninput="handleManualPeriod(this)" placeholder="Otro" 
+                    style="width: 100%; border: none; font-size: 0.8125rem; font-weight: 600; text-align: center; color: var(--color-navy); outline: none;">
+                  <span style="font-size: 0.75rem; color: #94A3B8; font-weight: 500;">meses</span>
+                </div>
               </div>
             </div>
 
@@ -427,28 +383,12 @@
         </div>
       </div>
 
-        <div style="margin-top: 3rem; text-align: center;">
-          <button class="btn btn-primary" style="padding: 1rem 3rem;" onclick="saveRoles()">Guardar Configuración de
-            Roles</button>
-        </div>
-  </div>
-  </main>
+
+      </div>
+    </main>
   </div>
 
   <script>
-    function openIndustryModal() {
-      document.getElementById('industryModal').classList.add('active');
-    }
-
-    function closeIndustryModal() {
-      document.getElementById('industryModal').classList.remove('active');
-    }
-
-    function selectIndustry(industry) {
-      document.getElementById('currentIndustry').textContent = industry;
-      renderRoles(industry);
-    }
-
     const rolesByIndustry = {
       'restaurant': [
         { title: 'Mesero / Server', desc: 'Atención directa a mesa, manejo de comandas y estándares de servicio.', base: 3, freq: 6, enabled: true },
@@ -460,7 +400,7 @@
       ],
       'limpieza': [
         { title: 'Operario(a) de Limpieza General', desc: 'Personal operativo para tareas de limpieza y desinfección estándar.', base: 3, freq: 4, enabled: true },
-        { title: 'Supervisor(a) de Zona / Cuadrilla', desc: 'Coordinación de equipos y supervisión de estándares de limpieza.', base: 2, freq: 6, enabled: true },
+        { title: 'Supervisor(a) de Zone / Cuadrilla', desc: 'Coordinación de equipos y supervisión de estándares de limpieza.', base: 2, freq: 6, enabled: true },
         { title: 'Personal de Limpieza en Alturas', desc: 'Personal especializado en limpieza de vidrios y fachadas con equipo de seguridad.', base: 3, freq: 6, enabled: false },
         { title: 'Mantenimiento / Servicios Generales', desc: 'Reparaciones menores y mantenimiento preventivo de instalaciones.', base: 3, freq: 6, enabled: true },
         { title: 'Especialista en Manejo de Químicos', desc: 'Personal capacitado para el uso y mezcla de agentes químicos industriales.', base: 4, freq: 6, enabled: false }
@@ -480,360 +420,370 @@
     };
 
     const roleUniforms = {
-      // Restaurante
-      'Mesero / Server': [
-        { name: 'Camisa Oxford Ejecutiva', qty: 2 },
-        { name: 'Pantalón Gabardina Premium', qty: 1 }
-      ],
-      'Chef / Cocina': [
-        { name: 'Filipina Blanca Classic', qty: 2 },
-        { name: 'Pantalón de Cocina Negro', qty: 2 },
-        { name: 'Mandil de Pecho Pro', qty: 1 },
-        { name: 'Calzado Antideslizante Plus', qty: 1 }
-      ],
-      'Barista / Bartender': [
-        { name: 'Mandil Barista Premium', qty: 1 },
-        { name: 'Polo Shirt Premium', qty: 1 }
-      ],
-      'Limpieza / Steward': [
-        { name: 'Conjunto Operativo Anti-fluidos', qty: 2 },
-        { name: 'Guantes de Protección', qty: 1 }
-      ],
-
-      // Limpieza (Facilities)
-      'Operario(a) de Limpieza General': [
-        { name: 'Filipina/Camisola de Limpieza', qty: 2 },
-        { name: 'Pantalón con Elástico', qty: 2 },
-        { name: 'Calzado Antiderrapante', qty: 1 }
-      ],
-      'Supervisor(a) de Zona / Cuadrilla': [
-        { name: 'Chaleco Distintivo Reflectante', qty: 1 },
-        { name: 'Calzado de Seguridad Ligero', qty: 1 }
-      ],
-      'Personal de Limpieza en Alturas': [
-        { name: 'Overol Técnico Reforzado', qty: 1 },
-        { name: 'Calzado con Agarre Especial', qty: 1 }
-      ],
-      'Mantenimiento / Servicios Generales': [
-        { name: 'Pantalón Tipo Cargo Industrial', qty: 2 },
-        { name: 'Camisola Reforzada Trabajo', qty: 2 }
-      ],
-      'Especialista en Manejo de Químicos': [
-        { name: 'Bata Resistente a Ácidos/Cloro', qty: 2 },
-        { name: 'Guantes de Nitrilo Especializados', qty: 1 },
-        { name: 'Careta de Protección Facial', qty: 1 }
-      ],
-
-      // Industrial (Production)
-      'Operario Producción': [
-        { name: 'Overol de Algodón Industrial', qty: 2 },
-        { name: 'Camisola y Pantalón Reforzado', qty: 1 },
-        { name: 'Calzado con Casquillo de Acero', qty: 1 }
-      ],
-      'Montacarguista / Logística': [
-        { name: 'Chaleco de Alta Visibilidad Clase 2', qty: 1 },
-        { name: 'Faja Lumbar Ergonómica', qty: 1 },
-        { name: 'Calzado Industrial de Seguridad', qty: 1 }
-      ],
-      'Ingeniero(a) de Planta / Calidad': [
-        { name: 'Bata de Laboratorio con Logo', qty: 1 },
-        { name: 'Camisa Tipo Columbia Bordada', qty: 2 },
-        { name: 'Botas de Seguridad Ejecutivas', qty: 1 }
-      ],
-      'Personal de Mantenimiento Electromecánico': [
-        { name: 'Ropa Ignífuga (Flame Resistant)', qty: 2 },
-        { name: 'Calzado Dieléctrico (Sin Metal)', qty: 1 }
-      ],
-      'Almacenista': [
-        { name: 'Guantes de Protección Mecánica', qty: 1 },
-        { name: 'Faja de Carga Reforzada', qty: 1 },
-        { name: 'Calzado Industrial Reforzado', qty: 1 }
-      ],
-      'Soldador / Pailero': [
-        { name: 'Peto de Carnaza Reforzado', qty: 1 },
-        { name: 'Mangas de Protección Térmica', qty: 1 },
-        { name: 'Careta de Soldar Automática', qty: 1 },
-        { name: 'Botas Especiales para Calor', qty: 1 }
-      ],
-
-      'Seguridad / Valet': [
-        { name: 'Chaqueta de Seguridad Térmica', qty: 1 },
-        { name: 'Camisa Uniforme Seguridad', qty: 2 },
-        { name: 'Pantalón Táctico', qty: 1 }
-      ],
-      'Hostess / Greeter': [
-        { name: 'Vestido Corporativo / Traje', qty: 2 },
-        { name: 'Pañoleta / Accesorio', qty: 1 }
-      ]
+      'Mesero / Server': [{ name: 'Camisa Oxford Ejecutiva', qty: 2 }, { name: 'Pantalón Gabardina Premium', qty: 1 }],
+      'Chef / Cocina': [{ name: 'Filipina Blanca Classic', qty: 2 }, { name: 'Pantalón de Cocina Negro', qty: 2 }],
+      'Barista / Bartender': [{ name: 'Mandil Barista Premium', qty: 1 }, { name: 'Polo Shirt Premium', qty: 1 }],
+      'Operario(a) de Limpieza General': [{ name: 'Filipina/Camisola de Limpieza', qty: 2 }, { name: 'Pantalón con Elástico', qty: 2 }],
+      'Supervisor(a) de Zone / Cuadrilla': [{ name: 'Chaleco Distintivo Reflectante', qty: 1 }, { name: 'Calzado de Seguridad Ligero', qty: 1 }],
+      'Mantenimiento / Servicios Generales': [{ name: 'Pantalón Tipo Cargo Industrial', qty: 2 }, { name: 'Camisola Reforzada Trabajo', qty: 2 }],
+      'Operario de Producción': [{ name: 'Overol de Algodón Industrial', qty: 2 }, { name: 'Camisola y Pantalón Reforzado', qty: 1 }],
+      'Operario de Logística': [{ name: 'Chaleco de Alta Visibilidad Clase 2', qty: 1 }, { name: 'Faja Lumbar Ergonómica', qty: 1 }]
     };
 
-    function renderRoles(industry, activeRoles = []) {
-      const grid = document.getElementById('rolesGrid');
-      grid.innerHTML = '';
-
-      const roles = rolesByIndustry[industry] || [];
-      roles.forEach(role => {
-        // Match partial (e.g. 'Mesero' in 'Mesero / Server')
-        const isEnabled = activeRoles.some(ar => role.title.toLowerCase().includes(ar.toLowerCase()));
-        role.enabled = isEnabled;
-
-        const card = document.createElement('div');
-        card.className = 'role-card';
-        if (role.enabled) card.style.borderColor = 'var(--color-cyan)';
-
-        card.innerHTML = `
-          <div class="role-card-header">
-            <span class="role-title">${role.title}</span>
-            <label class="toggle-switch">
-              <input type="checkbox" ${role.enabled ? 'checked' : ''} onchange="updateRoleInSupabase(this, '${role.title}')">
-              <span class="slider"></span>
-            </label>
-          </div>
-          <p class="role-desc">${role.desc}</p>
-          <div class="role-stats">
-            <span>Plantilla base: <strong>${role.base} prendas</strong></span>
-            <span>•</span>
-            <span>Renovación: <strong>Cada ${role.freq} meses</strong></span>
-            <span>•</span>
-            <span class="${role.enabled ? 'status-active' : 'status-inactive'} role-status-label">${role.enabled ? 'Habilitado' : 'Inhabilitado'}</span>
-          </div>
-          <div style="margin-top: 1.25rem; border-top: 1px solid var(--color-smoke); padding-top: 1rem;">
-            <button class="btn btn-outline" style="width: 100%; font-size: 0.8125rem; padding: 0.5rem;" onclick="openRoleConfig('${role.title}')">Configurar Uniformes</button>
-          </div>
-        `;
-        grid.appendChild(card);
-      });
-
-      // Add "Create New Role" card
-      const addCard = document.createElement('div');
-      addCard.className = 'role-card add-role-card';
-      addCard.style = "border: 2px dashed var(--color-smoke-mid); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 250px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: var(--color-smoke); opacity: 0.8;";
-      addCard.onmouseover = function () { this.style.opacity = '1'; this.style.borderColor = 'var(--color-cyan)'; this.style.background = 'white'; this.style.transform = 'translateY(-4px)'; };
-      addCard.onmouseout = function () { this.style.opacity = '0.8'; this.style.borderColor = 'var(--color-smoke-mid)'; this.style.background = 'var(--color-smoke)'; this.style.transform = 'translateY(0)'; };
-      addCard.onclick = openNewRoleModal;
-      addCard.innerHTML = `
-        <div style="width: 56px; height: 56px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; color: var(--color-cyan); margin-bottom: 1.25rem; border: 1px solid var(--color-smoke-mid); box-shadow: var(--shadow-sm);">
-          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-        </div>
-        <div style="text-align: center;">
-          <span style="font-weight: 600; color: var(--color-navy); display: block; margin-bottom: 0.25rem;">Crear Nuevo Rol</span>
-          <span style="font-size: 0.75rem; color: var(--color-text-secondary);">Personaliza la estructura de tu equipo</span>
-        </div>
-      `;
-      grid.appendChild(addCard);
-    }
-
-    // Initial render and Supabase Integration
     let _supabase = null;
+    let currentUser = null;
+
     window.onload = async () => {
       const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
       const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
       _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      try {
-        const { data: { session } } = await _supabase.auth.getSession();
-        if (!session) {
-          window.location.href = 'login.html';
-          return;
+      const { data: { session } } = await _supabase.auth.getSession();
+      if (!session) {
+        window.location.href = 'login.html';
+        return;
+      }
+      currentUser = session.user;
+
+      // 1. Cargar Perfiles
+      const { data: userProfile } = await _supabase.from('user_profile').select('*').eq('id', currentUser.id).maybeSingle();
+      const { data: companyProfile } = await _supabase.from('company_profile').select('*').eq('id', currentUser.id).maybeSingle();
+
+      // 2. Personalizar Saludo
+      let firstName = 'Admin';
+      if (userProfile && userProfile.first_name) {
+        firstName = userProfile.first_name;
+      } else if (session.user.user_metadata && session.user.user_metadata.full_name) {
+        firstName = session.user.user_metadata.full_name.split(' ')[0];
+      }
+      
+      const greetingSubtitle = document.getElementById('user-greeting-subtitle');
+      if (greetingSubtitle) {
+        greetingSubtitle.innerHTML = `¡Hola <span style="color: var(--color-cyan); font-weight: 800;">${firstName}</span>! 👋 Qué bueno volverte a ver`;
+        greetingSubtitle.style.fontSize = "1.85rem";
+        greetingSubtitle.style.marginTop = "0";
+      }
+
+      // 3. Actualizar Distintivo de Empresa
+      if (companyProfile) {
+        const industry = companyProfile.industry || 'No configurado';
+        const companyName = companyProfile.company_name || 'Mi Empresa';
+        
+        if (document.getElementById('dash-industry-val')) document.getElementById('dash-industry-val').textContent = industry;
+        if (document.getElementById('company-name-display')) document.getElementById('company-name-display').textContent = companyName;
+
+        const iconDisplay = document.getElementById('badge-industry-icon');
+        if (iconDisplay) {
+          const icons = {
+            'restaurantes': '🍴',
+            'hospitalidad': '🏨',
+            'industrial': '🏭',
+            'salud': '🏥',
+            'educacion': '🎓',
+            'servicios': '🛠️'
+          };
+          iconDisplay.textContent = icons[industry.toLowerCase()] || '🏢';
         }
 
-        const { data: profile, error } = await _supabase
-          .from('profiles')
-          .select('industry, selected_roles')
-          .eq('id', session.user.id)
-          .single();
-
-        if (error || !profile.industry) {
-          console.warn('No se detectó industria, usando restaurante por defecto');
-          selectIndustry('restaurant', []);
-        } else {
-          selectIndustry(profile.industry, profile.selected_roles || []);
+        if (companyProfile.country) {
+          updateVersionIndicator(companyProfile.country);
         }
-
-      } catch (err) {
-        console.error('Error al cargar industria:', err);
-        renderRoles('restaurant', []);
+        
+        const { data: roleDefs } = await _supabase.from('role_definition').select('*').eq('company_id', currentUser.id);
+        
+        const normIndustry = normalizeIndustry(companyProfile.industry);
+        renderRoles(normIndustry, companyProfile.selected_roles || [], roleDefs || []);
       }
     };
 
-    function selectIndustry(industry, activeRoles) {
-      renderRoles(industry, activeRoles);
+    function normalizeIndustry(ind) {
+      if (!ind) return 'restaurant';
+      const map = { 'restaurantes': 'restaurant', 'limpieza': 'limpieza', 'industrial': 'industrial', 'corporate': 'corporate' };
+      return map[ind.toLowerCase()] || 'restaurant';
+    }
+
+    function renderRoles(industry, activeRoles, definitions = []) {
+      const grid = document.getElementById('rolesGrid');
+      grid.innerHTML = '';
+      const roles = rolesByIndustry[industry] || [];
+
+      roles.forEach(role => {
+        const isEnabled = activeRoles.some(ar => role.title.toLowerCase().includes(ar.toLowerCase()));
+        const config = definitions.find(d => d.role_name === role.title);
+        
+        const plantillaText = config ? `${config.items.length} ${config.items.length === 1 ? 'prenda' : 'prendas'}` : 'por definir';
+        const frecuenciaText = config ? `Cada ${config.renewal_frequency} meses` : 'por definir';
+
+        const card = document.createElement('div');
+        card.className = 'role-card';
+        card.id = `role-card-${role.title.replace(/\s+/g, '-').replace(/\//g, '-')}`;
+        if (isEnabled) card.style.borderColor = 'var(--color-cyan)';
+
+        card.innerHTML = `
+          <div class="role-card-header">
+            <span class="role-title">${role.title}</span>
+            <label class="toggle-switch">
+              <input type="checkbox" ${isEnabled ? 'checked' : ''} onchange="handleToggleChange(this, '${role.title}')">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <p class="role-desc">${role.desc}</p>
+          <div class="role-stats" style="${isEnabled ? '' : 'opacity: 0.5; display: flex; flex-direction: column; gap: 0.25rem;'}">
+            <div style="font-size: 0.75rem;">Tipo de dotación: <strong class="stat-plantilla" style="color: var(--color-navy);">${plantillaText}</strong></div>
+            <div style="font-size: 0.75rem;">Frecuencia de entrega: <strong class="stat-frecuencia" style="color: var(--color-navy);">${frecuenciaText}</strong></div>
+          </div>
+          <div style="margin-top: 1rem; border-top: 1px solid var(--color-smoke); padding-top: 1rem;">
+            <button class="btn-config-uniform btn btn-outline" 
+              style="width: 100%; transition: all 0.3s; ${isEnabled ? '' : 'opacity: 0.5; cursor: not-allowed; border-color: #E2E8F0; color: #94A3B8;'}" 
+              ${isEnabled ? `onclick="openRoleConfig('${role.title}')"` : 'disabled'}>
+              Configurar Uniformes
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    async function handleToggleChange(checkbox, roleTitle) {
+      const isEnabled = checkbox.checked;
+      const card = checkbox.closest('.role-card');
+      const btn = card.querySelector('.btn-config-uniform');
+      const stats = card.querySelector('.role-stats');
+
+      // Actualización visual inmediata
+      if (isEnabled) {
+        card.style.borderColor = 'var(--color-cyan)';
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+        btn.style.borderColor = '';
+        btn.style.color = '';
+        btn.setAttribute('onclick', `openRoleConfig('${roleTitle}')`);
+        stats.style.opacity = '1';
+      } else {
+        card.style.borderColor = '';
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+        btn.style.borderColor = '#E2E8F0';
+        btn.style.color = '#94A3B8';
+        btn.removeAttribute('onclick');
+        stats.style.opacity = '0.5';
+      }
+
+      // Guardar en Supabase
+      await updateRoleInSupabase(checkbox, roleTitle);
     }
 
     async function updateRoleInSupabase(checkbox, roleTitle) {
-      const card = checkbox.closest('.role-card');
-      const label = card.querySelector('.role-status-label');
-      
+      const shortName = roleTitle.split(' / ')[0];
+      const { data: profile } = await _supabase.from('company_profile').select('selected_roles').eq('id', currentUser.id).single();
+      let currentRoles = profile.selected_roles || [];
+
       if (checkbox.checked) {
-        card.style.borderColor = 'var(--color-cyan)';
-        label.textContent = 'Habilitado';
-        label.className = 'status-active role-status-label';
+        if (!currentRoles.includes(shortName)) currentRoles.push(shortName);
       } else {
-        card.style.borderColor = 'var(--color-border)';
-        label.textContent = 'Inhabilitado';
-        label.className = 'status-inactive role-status-label';
+        currentRoles = currentRoles.filter(r => r !== shortName);
       }
 
-      // Guardar cambios en el perfil
-      try {
-        const { data: { user } } = await _supabase.auth.getUser();
-        const { data: profile } = await _supabase.from('profiles').select('selected_roles').eq('id', user.id).single();
-        
-        let currentRoles = profile.selected_roles || [];
-        const shortName = roleTitle.split(' / ')[0]; // Limpiamos el nombre para el match
+      await _supabase.from('company_profile').update({ selected_roles: currentRoles }).eq('id', currentUser.id);
+      showToast('Actualizado', `Rol ${checkbox.checked ? 'habilitado' : 'inhabilitado'}`);
+    }
 
-        if (checkbox.checked) {
-          if (!currentRoles.includes(shortName)) currentRoles.push(shortName);
+    let currentConfigRole = null;
+    let currentRenewalFrequency = 6;
+
+    async function openRoleConfig(roleName) {
+      currentConfigRole = roleName;
+      document.getElementById('configRoleTitle').innerText = roleName;
+      document.getElementById('roleConfigModal').classList.add('active');
+      
+      const list = document.getElementById('roleUniformList');
+      list.innerHTML = '<div style="text-align: center; padding: 2rem; color: #64748B;">Cargando configuración...</div>';
+
+      try {
+        const { data: config } = await _supabase
+          .from('role_definition')
+          .select('*')
+          .eq('company_id', currentUser.id)
+          .eq('role_name', roleName)
+          .maybeSingle();
+
+        let items = [];
+        let freq = 6;
+
+        if (config) {
+          items = config.items || [];
+          freq = config.renewal_frequency || 6;
         } else {
-          currentRoles = currentRoles.filter(r => r !== shortName);
+          items = roleUniforms[roleName] || [];
         }
 
-        await _supabase.from('profiles').update({ selected_roles: currentRoles }).eq('id', user.id);
-        showToast('Actualizado', `Rol ${checkbox.checked ? 'habilitado' : 'inhabilitado'}`);
+        renderUniformItems(items);
+        updateFrequencyUI(freq);
+        document.getElementById('manual-period').value = freq;
       } catch (err) {
-        console.error('Error al actualizar rol:', err);
+        console.error('Error loading role config:', err);
+        renderUniformItems([]);
       }
     }
 
-    function openRoleConfig(roleName) {
-      document.getElementById('configRoleTitle').innerText = `Configurar: ${roleName}`;
+    function renderUniformItems(items) {
       const list = document.getElementById('roleUniformList');
       list.innerHTML = '';
+      
+      if (items.length === 0) {
+        list.innerHTML = '<div style="text-align: center; padding: 1.5rem; background: #F8FAFC; border-radius: 12px; color: #94A3B8; font-size: 0.875rem;">No hay prendas definidas aún.</div>';
+        return;
+      }
 
-      const uniforms = roleUniforms[roleName] || [];
-      uniforms.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = "role-uniform-item";
-        div.style = "display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: var(--color-smoke); border-radius: 12px; border: 1px solid var(--color-smoke-mid);";
-        div.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 1rem;">
-            <div style="width: 44px; height: 44px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--color-cyan); box-shadow: var(--shadow-sm);">
-              <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" /></svg>
-            </div>
-            <div>
-              <div style="font-weight: 600; font-size: 0.9375rem; color: var(--color-navy); margin-bottom: 0.125rem;">${item.name}</div>
-              <div style="font-size: 0.75rem; color: var(--color-text-secondary);">Prenda base para plantilla</div>
-            </div>
+      items.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'uniform-item-row';
+        row.style = 'display: flex; gap: 0.75rem; align-items: center;';
+        row.innerHTML = `
+          <input type="text" value="${item.name}" placeholder="Nombre de la prenda" style="flex: 2; padding: 0.6rem; border-radius: 8px; border: 1px solid #E2E8F0; font-size: 0.875rem;">
+          <div style="display: flex; align-items: center; background: #F1F5F9; border-radius: 8px; padding: 2px; height: 38px;">
+            <button onclick="changeQty(this, -1)" style="border: none; background: none; width: 28px; height: 100%; cursor: pointer; color: #64748B; display: flex; align-items: center; justify-content: center;">-</button>
+            <input type="number" value="${item.qty}" min="1" style="width: 32px; text-align: center; border: none; background: none; font-weight: 700; color: var(--color-navy); font-size: 0.875rem;">
+            <button onclick="changeQty(this, 1)" style="border: none; background: none; width: 28px; height: 100%; cursor: pointer; color: #64748B; display: flex; align-items: center; justify-content: center;">+</button>
           </div>
-          
-          <div style="display: flex; align-items: center; gap: 1rem;">
-            <div style="display: flex; align-items: center; gap: 0.75rem; background: white; padding: 0.35rem 0.75rem; border-radius: 8px; border: 1px solid var(--color-smoke-mid);">
-              <button onclick="changeQty(this, -1)" style="border: none; background: none; cursor: pointer; color: var(--color-text-secondary); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">-</button>
-              <span class="qty-val" style="min-width: 24px; text-align: center; font-weight: 700; color: var(--color-navy); font-size: 0.875rem;">${item.qty}</span>
-              <button onclick="changeQty(this, 1)" style="border: none; background: none; cursor: pointer; color: var(--color-cyan); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">+</button>
-            </div>
-            <button class="btn-close" style="font-size: 0.9rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.4" onclick="this.closest('.role-uniform-item').remove()">✕</button>
-          </div>
+          <button onclick="removeUniformRow(this)" style="border: none; background: #FEE2E2; color: #EF4444; width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</button>
         `;
-        list.appendChild(div);
+        list.appendChild(row);
       });
-
-      document.getElementById('roleConfigModal').classList.add('active');
     }
 
     function changeQty(btn, delta) {
-      const span = btn.parentElement.querySelector('.qty-val');
-      let current = parseInt(span.innerText);
-      current = Math.max(1, current + delta);
-      span.innerText = current;
+      const input = btn.parentElement.querySelector('input');
+      let val = parseInt(input.value) + delta;
+      if (val < 1) val = 1;
+      input.value = val;
+    }
+
+    function removeUniformRow(btn) {
+      btn.parentElement.remove();
+    }
+
+    function addUniformItem() {
+      const list = document.getElementById('roleUniformList');
+      if (list.textContent.includes('No hay prendas')) list.innerHTML = '';
+      
+      const row = document.createElement('div');
+      row.className = 'uniform-item-row';
+      row.style = 'display: flex; gap: 0.75rem; align-items: center;';
+      row.innerHTML = `
+        <input type="text" placeholder="Nombre de la prenda" style="flex: 2; padding: 0.6rem; border-radius: 8px; border: 1px solid #E2E8F0; font-size: 0.875rem;">
+        <div style="display: flex; align-items: center; background: #F1F5F9; border-radius: 8px; padding: 2px; height: 38px;">
+          <button onclick="changeQty(this, -1)" style="border: none; background: none; width: 28px; height: 100%; cursor: pointer; color: #64748B; display: flex; align-items: center; justify-content: center;">-</button>
+          <input type="number" value="1" min="1" style="width: 32px; text-align: center; border: none; background: none; font-weight: 700; color: var(--color-navy); font-size: 0.875rem;">
+          <button onclick="changeQty(this, 1)" style="border: none; background: none; width: 28px; height: 100%; cursor: pointer; color: #64748B; display: flex; align-items: center; justify-content: center;">+</button>
+        </div>
+        <button onclick="removeUniformRow(this)" style="border: none; background: #FEE2E2; color: #EF4444; width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</button>
+      `;
+      list.appendChild(row);
+    }
+
+    function setPeriod(months, btn) {
+      currentRenewalFrequency = months;
+      document.getElementById('manual-period').value = months;
+      updateFrequencyUI(months);
+    }
+
+    function handleManualPeriod(input) {
+      const val = parseInt(input.value);
+      if (val > 0) {
+        currentRenewalFrequency = val;
+        updateFrequencyUI(val);
+      }
+    }
+
+    function updateFrequencyUI(months) {
+      currentRenewalFrequency = months;
+      const chips = document.querySelectorAll('.period-chip');
+      const manualContainer = document.getElementById('manual-period-container');
+      
+      let isPreset = false;
+      chips.forEach(chip => {
+        const chipVal = parseInt(chip.textContent);
+        if (chipVal === months) {
+          chip.style.borderColor = 'var(--color-cyan)';
+          chip.style.background = 'rgba(6, 182, 212, 0.1)';
+          chip.style.color = 'var(--color-cyan)';
+          chip.style.fontWeight = '700';
+          isPreset = true;
+        } else {
+          chip.style.borderColor = '#e2e8f0';
+          chip.style.background = 'white';
+          chip.style.color = '#64748B';
+          chip.style.fontWeight = '500';
+        }
+      });
+
+      if (!isPreset && months > 0) {
+        manualContainer.style.borderColor = 'var(--color-cyan)';
+        manualContainer.style.background = 'rgba(6, 182, 212, 0.05)';
+      } else {
+        manualContainer.style.borderColor = '#e2e8f0';
+        manualContainer.style.background = 'white';
+      }
+    }
+
+    async function saveRoleConfig() {
+      const saveBtn = document.querySelector('[onclick="saveRoleConfig()"]');
+      const originalText = saveBtn.textContent;
+      saveBtn.textContent = 'Guardando...';
+      saveBtn.disabled = true;
+
+      try {
+        const rows = document.querySelectorAll('.uniform-item-row');
+        const items = Array.from(rows).map(row => {
+          return {
+            name: row.querySelector('input[type="text"]').value,
+            qty: parseInt(row.querySelector('input[type="number"]').value)
+          };
+        }).filter(item => item.name.trim() !== '');
+
+        const { error } = await _supabase
+          .from('role_definition')
+          .upsert({
+            company_id: currentUser.id,
+            role_name: currentConfigRole,
+            items: items,
+            renewal_frequency: currentRenewalFrequency
+          }, { onConflict: 'company_id,role_name' });
+
+        if (error) throw error;
+
+        // Actualizar visualmente la tarjeta del rol
+        const cardId = `role-card-${currentConfigRole.replace(/\s+/g, '-').replace(/\//g, '-')}`;
+        const card = document.getElementById(cardId);
+        if (card) {
+          card.querySelector('.stat-plantilla').textContent = `${items.length} ${items.length === 1 ? 'prenda' : 'prendas'}`;
+          card.querySelector('.stat-frecuencia').textContent = `Cada ${currentRenewalFrequency} meses`;
+        }
+
+        showToast('Éxito', 'Configuración guardada correctamente');
+        closeRoleConfig();
+      } catch (err) {
+        console.error('Error saving config:', err);
+        showToast('Error', 'No se pudo guardar la configuración');
+      } finally {
+        saveBtn.textContent = originalText;
+        saveBtn.disabled = false;
+      }
     }
 
     function closeRoleConfig() {
       document.getElementById('roleConfigModal').classList.remove('active');
     }
 
-    function addUniformItem() {
-      const list = document.getElementById('roleUniformList');
-      const div = document.createElement('div');
-      div.className = "role-uniform-item";
-      div.style = "display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: var(--color-smoke); border-radius: 12px; border: 1px solid var(--color-smoke-mid);";
-      div.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
-          <div style="width: 44px; height: 44px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--color-cyan); box-shadow: var(--shadow-sm);">
-            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-          </div>
-          <input type="text" placeholder="Nombre de la prenda..." style="flex: 1; border: none; background: transparent; font-size: 0.9375rem; font-weight: 600; color: var(--color-navy); outline: none;">
-        </div>
-        
-        <div style="display: flex; align-items: center; gap: 1rem;">
-          <div style="display: flex; align-items: center; gap: 0.75rem; background: white; padding: 0.35rem 0.75rem; border-radius: 8px; border: 1px solid var(--color-smoke-mid);">
-            <button onclick="changeQty(this, -1)" style="border: none; background: none; cursor: pointer; color: var(--color-text-secondary); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">-</button>
-            <span class="qty-val" style="min-width: 24px; text-align: center; font-weight: 700; color: var(--color-navy); font-size: 0.875rem;">1</span>
-            <button onclick="changeQty(this, 1)" style="border: none; background: none; cursor: pointer; color: var(--color-cyan); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">+</button>
-          </div>
-          <button class="btn-close" style="font-size: 0.9rem; opacity: 0.4; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.4" onclick="this.closest('.role-uniform-item').remove()">✕</button>
-        </div>
-      `;
-      list.appendChild(div);
-      div.querySelector('input').focus();
-    }
-
-    function saveRoleConfig() {
-      showToast("Configuración Guardada", "La plantilla de uniformes para este rol ha sido actualizada.");
-      closeRoleConfig();
-    }
-
-    function openNewRoleModal() {
-      document.getElementById('newRoleModal').classList.add('active');
-    }
-
-    function closeNewRoleModal() {
-      document.getElementById('newRoleModal').classList.remove('active');
-    }
-
-    function createNewRole() {
-      const name = document.getElementById('newRoleName').value;
-      if (!name) {
-        alert("Por favor ingresa el nombre del rol");
-        return;
-      }
-      showToast("Rol Creado", `El rol "${name}" ha sido habilitado exitosamente.`);
-      closeNewRoleModal();
-    }
-
-    function setPeriod(months, btn) {
-      document.querySelectorAll('.period-chip').forEach(b => {
-        b.style.background = 'white';
-        b.style.borderColor = '#e2e8f0';
-        b.style.color = 'var(--color-text-secondary)';
-        b.style.fontWeight = '400';
-      });
-
-      btn.style.background = 'var(--color-cyan-dim)';
-      btn.style.borderColor = 'var(--color-cyan)';
-      btn.style.color = 'var(--color-cyan)';
-      btn.style.fontWeight = '600';
-    }
-
-    function updateRoleCount() {
-      const cards = document.querySelectorAll('.role-card');
-      cards.forEach(card => {
-        const checkbox = card.querySelector('input[type="checkbox"]');
-        if (!checkbox) return; // Saltar tarjeta de "Crear Nuevo Rol"
-
-        const statusSpan = card.querySelector('.role-status-label');
-        if (!statusSpan) return;
-
-        if (checkbox.checked) {
-          statusSpan.textContent = 'Habilitado';
-          statusSpan.className = 'status-active role-status-label';
-          card.style.borderColor = 'var(--color-cyan)';
-        } else {
-          statusSpan.textContent = 'Inhabilitado';
-          statusSpan.className = 'status-inactive role-status-label';
-          card.style.borderColor = 'var(--color-border)';
-        }
-      });
-    }
-
+    function openNewRoleModal() { document.getElementById('newRoleModal').classList.add('active'); }
+    function closeNewRoleModal() { document.getElementById('newRoleModal').classList.remove('active'); }
+    
     function saveRoles() {
-      const enabledRoles = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
-        .map(input => input.closest('.role-card').querySelector('.role-title').textContent);
-
-      showToast('Configuración Guardada', 'Roles actualizados: ' + (enabledRoles.join(', ') || 'Ninguno'));
+      showToast('Éxito', 'Configuración de roles guardada correctamente.');
     }
   </script>
-  <script src="assets/js/utils.js"></script>
 </body>
-
 </html>
