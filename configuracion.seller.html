@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuración Seller | dotacian</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --sidebar-width: 280px;
+    }
+
+    .app-layout {
+      display: flex;
+      min-height: 100vh;
+      background: #F8FAFC;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--color-navy);
+      color: white;
+      padding: 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      z-index: 100;
+    }
+
+    .sidebar .logo a {
+      color: white;
+      font-size: 1.5rem;
+      font-family: var(--font-family-secondary);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .sidebar .logo span {
+      color: var(--color-cyan);
+    }
+
+    .sidebar-nav {
+      margin-top: 3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.875rem 1rem;
+      border-radius: 0.75rem;
+      color: #94A3B8;
+      text-decoration: none;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: white;
+    }
+
+    /* Size Options as Chips */
+    .size-checklist {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .size-option {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.1rem;
+      background: white;
+      border: 1px solid #E2E8F0;
+      border-radius: 0.75rem;
+      transition: all 0.2s;
+      user-select: none;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+    }
+
+    .size-option:hover {
+      border-color: var(--color-cyan);
+      background: #F0FDFA;
+    }
+
+    .size-option input {
+      display: none;
+    }
+
+    .size-option:has(input:checked) {
+      background: rgba(6, 182, 212, 0.1);
+      border-color: var(--color-cyan);
+      color: var(--color-navy);
+      font-weight: 600;
+    }
+
+    .size-option:has(input:disabled) {
+      cursor: not-allowed;
+      opacity: 0.7;
+      background: #F8FAFC;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      padding: 2.5rem;
+    }
+
+    .app-header {
+      margin-bottom: 3rem;
+    }
+
+    .header-left h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      color: var(--color-navy);
+      margin-bottom: 0.5rem;
+      font-family: 'Outfit', sans-serif;
+      letter-spacing: -0.02em;
+    }
+
+    .header-subtitle {
+      color: #64748B;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+
+    /* Settings Card */
+    .settings-card {
+      background: white;
+      border-radius: 1.5rem;
+      border: 1px solid #E2E8F0;
+      padding: 2.5rem;
+      max-width: 800px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .settings-section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-navy);
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    input:disabled, select:disabled {
+      background-color: #F8FAFC;
+      border-color: #E2E8F0;
+      color: #64748B;
+      cursor: not-allowed;
+      opacity: 1;
+    }
+
+    .btn-action {
+      margin-top: 2rem;
+      width: 100%;
+      padding: 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .btn-edit {
+      background: white;
+      border: 2px solid var(--color-cyan);
+      color: var(--color-cyan);
+    }
+
+    .btn-edit:hover {
+      background: rgba(6, 182, 212, 0.05);
+    }
+
+    @media (max-width: 768px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="seller-sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <a href="portal.seller.html">dotacian.<span>seller</span></a>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="portal.seller.html" class="nav-item">
+          <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>
+          <span class="nav-label">Órdenes Activas</span>
+        </a>
+        <a href="catalogo.seller.html" class="nav-item">
+          <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M3 9h18"/></svg></span>
+          <span class="nav-label">Catálogo Seller</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
+          <span class="nav-label">Logística</span>
+        </a>
+        <div class="sidebar-spacer" style="flex: 1;"></div>
+        <a href="configuracion.seller.html" class="nav-item active">
+          <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1-1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span>
+          <span class="nav-label">Configuración</span>
+        </a>
+        <a href="login.seller.html" class="nav-item">
+          <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>
+          <span class="nav-label">Cerrar Sesión</span>
+        </a>
+        <div id="version-tag"></div>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="app-header">
+        <div class="header-left">
+          <h1 id="page-title">Configuración de Fábrica</h1>
+          <p class="header-subtitle">Gestiona la identidad y capacidades de tu taller.</p>
+        </div>
+      </header>
+
+      <div class="settings-card">
+        <h2 class="settings-section-title">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          Información General
+        </h2>
+
+        <form id="seller-settings-form">
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label>Nombre Comercial de la Fábrica</label>
+              <input type="text" id="s-name" placeholder="Ej. Uniformes Industriales Lina" required disabled>
+            </div>
+            <div class="form-group full-width">
+              <label>País</label>
+              <input type="text" id="s-location" placeholder="Ej. MX" required disabled>
+            </div>
+            <div class="form-group full-width">
+              <label>Industrias que Atiende</label>
+              <div id="industries-checkbox-grid" class="size-checklist" style="margin-top: 0.75rem;">
+                <label class="size-option"><input type="checkbox" value="limpieza" disabled><span class="size-label">🧹 Limpieza</span></label>
+                <label class="size-option"><input type="checkbox" value="restaurantes" disabled><span class="size-label">🍽️ Restaurantes</span></label>
+                <label class="size-option"><input type="checkbox" value="industrial" disabled><span class="size-label">⚙️ Industrial</span></label>
+                <label class="size-option"><input type="checkbox" value="corporativo" disabled><span class="size-label">💼 Corporativo</span></label>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Pedido Mínimo (Unidades)</label>
+              <input type="number" id="s-min-qty" placeholder="12" required disabled>
+            </div>
+            <div class="form-group">
+              <label>Capacidad Máxima Mensual</label>
+              <input type="number" id="s-max-qty" placeholder="1000" required disabled>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-edit btn-action" id="btn-toggle-edit" onclick="toggleEdit()">Editar Información</button>
+          <button type="button" class="btn btn-primary btn-action" id="btn-save-settings" style="display: none;" onclick="updateSettings()">Guardar Cambios</button>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/utils.js"></script>
+  <script>
+    const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let session = null;
+    let isEditing = false;
+
+    async function initSettings() {
+      console.log('Iniciando configuración...');
+      const { data: { user } } = await _supabase.auth.getUser();
+      
+      if (!user) {
+        console.error('No hay usuario autenticado');
+        window.location.href = 'login.seller.html';
+        return;
+      }
+      
+      session = { user };
+      console.log('Usuario detectado:', user.id);
+      
+      // Cargar país para la bandera de forma segura
+      const { data: profile } = await _supabase.from('seller_profile').select('*').eq('id', user.id).maybeSingle();
+      if (profile && profile.country) {
+        if (typeof updateVersionIndicator === 'function') {
+          updateVersionIndicator(profile.country);
+        }
+      }
+
+      loadCompanyData();
+    }
+
+    async function loadCompanyData() {
+      try {
+        console.log('Consultando seller_company...');
+        const { data: company, error } = await _supabase
+          .from('seller_company')
+          .select('*')
+          .eq('id', session.user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error('Error en consulta:', error);
+          return;
+        }
+
+        if (company) {
+          console.log('Datos encontrados:', company);
+          const sellerName = company.seller_name || '';
+          document.getElementById('s-name').value = sellerName;
+          document.getElementById('s-location').value = company.location || '';
+          document.getElementById('s-min-qty').value = company.min_order_qty || '';
+          document.getElementById('s-max-qty').value = company.max_order_qty || '';
+          // Poblar Industrias (Checkboxes)
+          if (company.industries && Array.isArray(company.industries)) {
+            document.querySelectorAll('#industries-checkbox-grid input').forEach(cb => {
+              cb.checked = company.industries.includes(cb.value);
+            });
+          }
+          
+          if (sellerName) {
+            document.getElementById('page-title').textContent = `Configuración: ${sellerName}`;
+          }
+        } else {
+          console.log('No hay datos previos para este usuario.');
+        }
+      } catch (err) {
+        console.error('Error crítico en loadCompanyData:', err);
+      }
+    }
+
+    function toggleEdit() {
+      isEditing = !isEditing;
+      console.log('Modo edición:', isEditing);
+      
+      // Seleccionar todos los inputs y checkboxes EXCEPTO el de país
+      const inputs = document.querySelectorAll('#seller-settings-form input:not(#s-location)');
+      const btnEdit = document.getElementById('btn-toggle-edit');
+      const btnSave = document.getElementById('btn-save-settings');
+
+      inputs.forEach(input => {
+        input.disabled = !isEditing;
+      });
+      
+      if (isEditing) {
+        btnEdit.style.display = 'none';
+        btnSave.style.display = 'block';
+      } else {
+        btnEdit.style.display = 'block';
+        btnSave.style.display = 'none';
+      }
+    }
+
+    async function updateSettings() {
+      const btn = document.getElementById('btn-save-settings');
+      btn.disabled = true;
+      btn.textContent = 'Guardando...';
+
+      const selectedIndustries = Array.from(document.querySelectorAll('#industries-checkbox-grid input:checked')).map(cb => cb.value);
+
+      const updateData = {
+        id: session.user.id,
+        seller_name: document.getElementById('s-name').value.trim(),
+        location: document.getElementById('s-location').value.trim(),
+        industries: selectedIndustries,
+        min_order_qty: parseInt(document.getElementById('s-min-qty').value) || 0,
+        max_order_qty: parseInt(document.getElementById('s-max-qty').value) || 0
+      };
+
+      console.log('Enviando datos a Supabase:', updateData);
+
+      const { error } = await _supabase.from('seller_company').upsert(updateData);
+
+      if (!error) {
+        console.log('Guardado exitoso');
+        if (typeof showToast === 'function') showToast('Éxito', 'Información de fábrica actualizada.', 'success');
+        
+        // Actualizar título inmediatamente
+        if (updateData.seller_name) {
+          document.getElementById('page-title').textContent = `Configuración: ${updateData.seller_name}`;
+        }
+        
+        toggleEdit();
+      } else {
+        console.error('Error al guardar:', error);
+        if (typeof showToast === 'function') showToast('Error', 'No se pudo actualizar la información.', 'error');
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Guardar Cambios';
+    }
+
+    initSettings();
+  </script>
+</body>
+</html>
