@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuración | Dotacian</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/utils.js"></script>
+  <style>
+    .config-card {
+      background: white;
+      border-radius: 20px;
+      border: 1px solid #E2E8F0;
+      padding: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      max-width: 850px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .config-header-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 1.5rem;
+    }
+
+    .config-section {
+      margin-bottom: 2.5rem;
+    }
+
+    .config-section h3 {
+      font-size: 1.1rem;
+      color: var(--color-navy);
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #F1F5F9;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #64748B;
+    }
+
+    .form-group input,
+    .form-group select {
+      padding: 0.75rem 1rem;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 12px;
+      font-size: 0.9375rem;
+      outline: none;
+      transition: all 0.2s;
+      background-color: white;
+    }
+
+    .form-group input:disabled,
+    .form-group select:disabled {
+      background-color: #F8FAFC;
+      color: #64748B;
+      cursor: not-allowed;
+      border-color: #F1F5F9;
+    }
+
+    .form-group input:focus {
+      border-color: var(--color-cyan);
+      box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.1);
+    }
+
+    .btn-action {
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: all 0.2s;
+    }
+
+    .btn-edit {
+      background: var(--color-cyan-dim);
+      color: var(--color-cyan);
+      border: 1px solid var(--color-cyan);
+    }
+
+    .btn-save {
+      background: var(--color-brand-primary);
+      color: white;
+      display: none;
+    }
+
+    .btn-action:hover {
+      transform: translateY(-2px);
+      filter: brightness(0.95);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <img src="assets/logos/logo_dotacian.png" alt="dotacian logo" style="width: 130px; height: auto;">
+      </div>
+      <nav class="sidebar-nav">
+        <a href="app.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="roles.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+          <span class="nav-label">Roles</span>
+        </a>
+        <div class="nav-group">
+          <a href="#" class="nav-item">
+            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg></span>
+            <span class="nav-label">Uniformes</span>
+            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
+          </a>
+          <div class="nav-sub-items">
+            <a href="uniformes.html" class="nav-sub-item">Marketplace</a>
+            <a href="mi_dotacion.html" class="nav-sub-item">Mi dotación</a>
+          </div>
+        </div>
+        <a href="empleados.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          <span class="nav-label">Empleados</span>
+        </a>
+        <div class="nav-group">
+          <a href="produccion.html" class="nav-item">
+            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></span>
+            <span class="nav-label">Producción</span>
+            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
+          </a>
+          <div class="nav-sub-items">
+            <a href="cotizaciones.html" class="nav-sub-item">Cotizaciones</a>
+            <a href="muestras.html" class="nav-sub-item">Solicitud de Muestras</a>
+            <a href="ordenes.html" class="nav-sub-item">Órdenes de Compra</a>
+            <a href="seguimiento.html" class="nav-sub-item">Seguimiento</a>
+          </div>
+        </div>
+        <a href="bodega.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg></span>
+          <span class="nav-label">Bodega</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></span>
+          <span class="nav-label">Alertas</span>
+        </a>
+        <div class="sidebar-spacer"></div>
+        <a href="configuracion.html" class="nav-item active nav-item-secondary">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span>
+          <span class="nav-label">Configuración</span>
+        </a>
+        <a href="index.html" class="nav-item nav-item-secondary">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg></span>
+          <span class="nav-label">Cerrar Sesión</span>
+        </a>
+        <div id="version-tag"></div>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="app-header">
+        <div class="header-left">
+          <h1 id="config-title">Configuración de Empresa</h1>
+          <p id="config-subtitle">Gestiona la información base de tu organización</p>
+        </div>
+      </header>
+
+      <div class="app-container">
+        <div class="config-card">
+          <div class="config-header-actions">
+            <button class="btn-action btn-edit" id="btn-edit" onclick="toggleEdit()">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Editar Información
+            </button>
+          </div>
+
+          <form id="config-form" onsubmit="handleSave(event)">
+            <!-- Empresa Section -->
+            <div class="config-section">
+              <h3><span>🏢</span> Datos de la Empresa</h3>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Nombre Comercial</label>
+                  <input type="text" id="company_name" disabled required>
+                </div>
+                <div class="form-group">
+                  <label id="tax_label">ID Fiscal (NIT/RFC)</label>
+                  <input type="text" id="tax_id" disabled>
+                </div>
+                <div class="form-group">
+                  <label>Sector / Industria</label>
+                  <select id="industry" disabled>
+                    <option value="restaurantes">🍽️ Restaurantes</option>
+                    <option value="limpieza">🧹 Limpieza</option>
+                    <option value="industrial">⚙️ Industrial</option>
+                    <option value="corporate">💼 Corporativo</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>País de Operación</label>
+                  <input type="text" id="country" disabled>
+                </div>
+                <div class="form-group">
+                  <label>Número de Empleados</label>
+                  <input type="number" id="employee_count" disabled>
+                </div>
+                <div class="form-group">
+                  <label>Presupuesto Mensual</label>
+                  <input type="number" id="monthly_budget" disabled>
+                </div>
+              </div>
+            </div>
+
+            <!-- Logistica Section -->
+            <div class="config-section">
+              <h3><span>📍</span> Logística y Entrega</h3>
+              <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label>Dirección Principal de Entrega</label>
+                <input type="text" id="delivery_address" disabled>
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Frecuencia de Renovación (meses)</label>
+                  <input type="number" id="renewal_frequency" disabled>
+                </div>
+                <div class="form-group">
+                  <label>Teléfono / WhatsApp</label>
+                  <input type="tel" id="contact_phone" disabled>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end;">
+              <button type="submit" class="btn-action btn-save" id="btn-save">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Guardar Cambios
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let session = null;
+    let isEditing = false;
+    let currentProfile = null;
+
+    async function init() {
+      const { data } = await _supabase.auth.getSession();
+      if (!data.session) {
+        window.location.href = 'login.html';
+        return;
+      }
+      session = data.session;
+      await loadProfile();
+    }
+
+    async function loadProfile() {
+      const { data: profile, error } = await _supabase
+        .from('company_profile')
+        .select('*')
+        .eq('id', session.user.id)
+        .maybeSingle();
+
+      if (profile) {
+        currentProfile = profile;
+        document.getElementById('company_name').value = profile.company_name || '';
+        document.getElementById('tax_id').value = profile.tax_id || '';
+        document.getElementById('industry').value = profile.industry || 'restaurantes';
+        document.getElementById('country').value = profile.country || '';
+        document.getElementById('employee_count').value = profile.employee_count || 0;
+        document.getElementById('monthly_budget').value = profile.monthly_budget || 0;
+        document.getElementById('delivery_address').value = profile.delivery_address || '';
+        document.getElementById('renewal_frequency').value = profile.renewal_frequency || 6;
+        document.getElementById('contact_phone').value = profile.contact_phone || '';
+
+        const country = (profile.country || '').trim().toUpperCase();
+        const taxLabel = document.getElementById('tax_label');
+        const taxInput = document.getElementById('tax_id');
+
+        if (country === 'MX' || country === 'MEXICO' || country === 'MÉXICO') {
+          taxLabel.textContent = 'RFC de la Empresa';
+          taxInput.placeholder = 'Ej: ABC123456789';
+        } else if (country === 'CO' || country === 'COLOMBIA') {
+          taxLabel.textContent = 'NIT de la Empresa';
+          taxInput.placeholder = 'Ej: 900.123.456-1';
+        }
+
+        if (profile.country) {
+          updateVersionIndicator(profile.country);
+        }
+      }
+    }
+
+    function toggleEdit() {
+      isEditing = !isEditing;
+      const inputs = document.querySelectorAll('#config-form input, #config-form select');
+      const editBtn = document.getElementById('btn-edit');
+      const saveBtn = document.getElementById('btn-save');
+
+      inputs.forEach(input => {
+        if (input.id !== 'country') {
+          input.disabled = !isEditing;
+        }
+      });
+
+      if (isEditing) {
+        editBtn.innerHTML = '<span>✕</span> Cancelar';
+        editBtn.style.color = '#EF4444';
+        editBtn.style.borderColor = '#EF4444';
+        editBtn.style.background = '#FEF2F2';
+        saveBtn.style.display = 'flex';
+      } else {
+        editBtn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar Información';
+        editBtn.style.color = 'var(--color-cyan)';
+        editBtn.style.borderColor = 'var(--color-cyan)';
+        editBtn.style.background = 'var(--color-cyan-dim)';
+        saveBtn.style.display = 'none';
+        loadProfile(); 
+      }
+    }
+
+    async function handleSave(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-save');
+      btn.disabled = true;
+      btn.innerHTML = 'Guardando...';
+
+      const updates = {
+        id: session.user.id,
+        company_name: document.getElementById('company_name').value,
+        industry: document.getElementById('industry').value,
+        employee_count: parseInt(document.getElementById('employee_count').value) || 0,
+        monthly_budget: parseInt(document.getElementById('monthly_budget').value) || 0,
+        renewal_frequency: parseInt(document.getElementById('renewal_frequency').value) || 6,
+        tax_id: document.getElementById('tax_id').value,
+        delivery_address: document.getElementById('delivery_address').value,
+        contact_phone: document.getElementById('contact_phone').value,
+        country: document.getElementById('country').value,
+        selected_roles: currentProfile ? currentProfile.selected_roles : []
+      };
+
+      const { error } = await _supabase.from('company_profile').upsert(updates);
+
+      if (!error) {
+        showToast('Éxito', 'Configuración guardada correctamente.', 'success');
+        toggleEdit();
+      } else {
+        showToast('Error', 'No se pudo guardar: ' + error.message, 'error');
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Guardar Cambios';
+    }
+
+    init();
+  </script>
+</body>
+
+</html>
