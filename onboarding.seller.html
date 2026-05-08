@@ -72,8 +72,10 @@
       line-height: 1.1;
       margin-bottom: 1.5rem;
       background: linear-gradient(to bottom right, #FFFFFF 30%, #94A3B8 100%);
+      background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      color: transparent;
     }
 
     .info-side p {
@@ -226,11 +228,22 @@
     <div class="form-side">
       <div class="ob-container">
         <div class="logo" style="margin-bottom: 3rem;">
-          <a href="index.html" style="font-size: 1.5rem;">dotacian.<span>seller</span></a>
+          <a href="index.html">
+            <img src="assets/logos/logo_dotacian_seller.png" alt="dotacian seller logo" style="height: 85px; width: auto; margin-bottom: 2rem;">
+          </a>
         </div>
 
         <div class="progress-bar">
           <div id="ob-progress-fill" class="progress-fill"></div>
+        </div>
+
+        <div id="onboarding-error-alert" style="display: none; background: #FEF2F2; border: 1.5px solid #FCA5A5; color: #991B1B; padding: 1rem; border-radius: 0.75rem; margin-bottom: 1.5rem; font-size: 0.875rem; font-weight: 500; align-items: center; gap: 0.75rem;">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span id="error-message-text"></span>
         </div>
 
         <!-- Step 1: Account -->
@@ -255,7 +268,15 @@
             </div>
             <div class="form-group">
               <label>Contraseña</label>
-              <input type="password" id="seller-pass" placeholder="••••••••" required>
+              <div style="position: relative;">
+                <input type="password" id="seller-pass" placeholder="••••••••" required style="padding-right: 3rem;">
+                <button type="button" onclick="togglePasswordVisibility('seller-pass', this)" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #94A3B8; display: flex; align-items: center; justify-content: center; padding: 0;">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
             </div>
             <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; margin-top: 1.5rem;">Siguiente Paso →</button>
           </form>
@@ -333,6 +354,18 @@
     let currentStep = 1;
     const sellerData = { industries: [] };
 
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const icon = btn.querySelector('svg');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+      } else {
+        input.type = 'password';
+        icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+      }
+    }
+
     function updateIndustry(cb, val) {
       const parent = cb.closest('.checkbox-item');
       if (cb.checked) {
@@ -346,6 +379,11 @@
 
     function nextStep(e, step) {
       if (e) e.preventDefault();
+      
+      // Reset alert
+      const errorAlert = document.getElementById('onboarding-error-alert');
+      if (errorAlert) errorAlert.style.display = 'none';
+
       document.getElementById(`step-${currentStep}`).classList.remove('active');
       currentStep = step;
       document.getElementById(`step-${currentStep}`).classList.add('active');
@@ -395,7 +433,7 @@
 
         await _supabase.from('seller_company').upsert({
           id: userId,
-          company_name: document.getElementById('factory-name').value,
+          seller_name: document.getElementById('factory-name').value,
           location: document.getElementById('factory-location').value,
           min_order_qty: parseInt(document.getElementById('factory-min-qty').value),
           max_order_qty: parseInt(document.getElementById('factory-max-qty').value),
@@ -407,7 +445,17 @@
 
       } catch (err) {
         console.error(err);
-        showToast('Error', 'No se pudo completar el registro.', 'error');
+        const errorAlert = document.getElementById('onboarding-error-alert');
+        const errorText = document.getElementById('error-message-text');
+        
+        if (errorAlert && errorText) {
+          errorText.textContent = err.message || 'No se pudo completar el registro.';
+          errorAlert.style.display = 'flex';
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          showToast('Error', 'No se pudo completar el registro.', 'error');
+        }
+        
         btn.disabled = false;
         btn.textContent = 'Finalizar Registro ✅';
       }
