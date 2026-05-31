@@ -2,6 +2,7 @@
 <html lang="es">
 
 <head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>dotacian app | Órdenes de Compra</title>
@@ -114,18 +115,113 @@
       font-weight: 700;
       color: var(--color-cyan);
     }
+
+    .tab-btn {
+      padding: 0.75rem 1.5rem;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: var(--color-navy);
+    }
+
+    .tab-btn.active {
+      color: var(--color-cyan);
+      border-bottom-color: var(--color-cyan);
+    }
+
+    .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 0.5rem;
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 1001;
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.5);
+      z-index: 900;
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .app-layout.sidebar-open .sidebar-overlay {
+      display: block;
+      opacity: 1;
+    }
+
+    @media (max-width: 992px) {
+      .main-content {
+        margin-left: 0;
+      }
+      .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 0.5rem;
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 1001;
+    }
+      .sidebar {
+        z-index: 1000;
+      }
+      .welcome-banner {
+        padding: 5rem 1.5rem 2rem 1.5rem;
+      }
+      .header-right {
+        position: static !important;
+        flex-direction: column;
+        align-items: flex-start !important;
+        margin-top: 1rem;
+        gap: 1rem !important;
+      }
+      .oc-grid {
+        grid-template-columns: 1fr;
+      }
+      .source-selection {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <div class="app-layout">
+  <div class="app-layout" id="app-layout-wrapper">
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <!-- Sidebar -->
     <aside class="sidebar">
-      <div class="sidebar-brand">
-        <img src="assets/logos/logo_dotacian.png" alt="dotacian logo" style="width: 130px; height: auto;">
+      <div class="sidebar-header">
+        <a href="app.html" style="display: block; width: 100%; text-align: center;">
+          <img src="assets/logos/logo_dotacian.png" alt="dotacian logo"
+            style="width: 180px; max-width: 100%; height: auto; display: inline-block;">
+        </a>
       </div>
-      <nav class="sidebar-nav">
+
+                                    <nav class="sidebar-nav">
         <a href="app.html" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
               viewBox="0 0 24 24">
@@ -143,31 +239,13 @@
             </svg></span>
           <span class="nav-label">Roles</span>
         </a>
-        <div class="nav-group">
-          <a href="#" class="nav-item">
-            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
-            </svg></span>
-            <span class="nav-label">Uniformes</span>
-            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
-          </a>
-          <div class="nav-sub-items">
-            <a href="uniformes.html" class="nav-sub-item">Marketplace</a>
-            <a href="mi_dotacion.html" class="nav-sub-item">Mi dotación</a>
-          </div>
-        </div>
-        <a href="sucursales.html" class="nav-item">
+        <a href="marketplace.html" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
               viewBox="0 0 24 24">
-              <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
-              <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
-              <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
-              <path d="M10 6h4" />
-              <path d="M10 10h4" />
-              <path d="M10 14h4" />
-              <path d="M10 18h4" />
+              <path
+                d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
             </svg></span>
-          <span class="nav-label">Sucursales</span>
+          <span class="nav-label">Marketplace</span>
         </a>
         <a href="empleados.html" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
@@ -179,8 +257,8 @@
             </svg></span>
           <span class="nav-label">Empleados</span>
         </a>
-        <div class="nav-group active">
-          <a href="produccion.html" class="nav-item active">
+        <div class="nav-group">
+          <a href="cotizaciones.html" class="nav-item active">
             <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
                 viewBox="0 0 24 24">
                 <path d="m7.5 4.27 9 5.15" />
@@ -190,258 +268,891 @@
                 <path d="M12 22V12" />
               </svg></span>
             <span class="nav-label">Producción</span>
-            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
+            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor"
+                stroke-width="2" viewBox="0 0 24 24">
+                <path d="m6 9 6 6 6-6" />
+              </svg></span>
           </a>
           <div class="nav-sub-items">
             <a href="cotizaciones.html" class="nav-sub-item">Cotizaciones</a>
-            <a href="muestras.html" class="nav-sub-item">Solicitud de Muestras</a>
             <a href="ordenes.html" class="nav-sub-item active">Órdenes de Compra</a>
-            <a href="seguimiento.html" class="nav-sub-item">Seguimiento</a>
           </div>
         </div>
         <a href="bodega.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg></span>
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <polyline points="21 8 21 21 3 21 3 8"></polyline>
+              <rect x="1" y="3" width="22" height="5"></rect>
+              <line x1="10" y1="12" x2="14" y2="12"></line>
+            </svg></span>
           <span class="nav-label">Bodega</span>
         </a>
-        <a href="#" class="nav-item">
+        <a href="facturas.html" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+              stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
             </svg></span>
-          <span class="nav-label">Alertas</span>
+          <span class="nav-label">Facturas</span>
         </a>
-        <div class="sidebar-spacer"></div>
-        <a href="index.html" class="nav-item nav-item-secondary">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" x2="9" y1="12" y2="12" />
-            </svg></span>
-          <span class="nav-label">Cerrar Sesión</span>
-        </a>
-      <div id="version-tag"></div></nav>
+        <div id="version-tag"></div>
+      </nav>
     </aside>
 
     <!-- Main Content -->
     <main class="main-content">
-      <header class="app-header">
-        <div class="header-left">
-          <h1>Gestión de Órdenes de Compra</h1>
-          <p class="header-subtitle">Formaliza pedidos desde cotizaciones previas o documentos externos</p>
+      <header class="welcome-banner">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <button class="mobile-menu-toggle" onclick="toggleSidebar()" style="color: white; border: none; background: transparent; cursor: pointer;">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="welcome-content">
+            <h1>Gestión de Órdenes de Compra</h1>
+            <p class="welcome-subtitle" style="opacity: 0.9;">Formaliza pedidos desde cotizaciones previas o documentos
+              externos</p>
+          </div>
         </div>
       </header>
 
-      <div class="app-container">
-        <div class="oc-grid">
-          
-          <!-- Column 1: Source Selection -->
-          <div class="source-panel">
-            <div class="source-selection">
-              <div class="source-card active" id="source-quote" onclick="setSource('quote')">
-                <div style="color: var(--color-cyan);"><svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-                <div>
-                  <h3 style="font-size: 1rem; margin-bottom: 0.25rem;">Desde Cotización</h3>
-                  <p style="font-size: 0.75rem; color: var(--color-text-muted);">Carga un presupuesto interno existente</p>
-                </div>
-              </div>
-              <div class="source-card" id="source-file" onclick="setSource('file')">
-                <div style="color: var(--color-navy);"><svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg></div>
-                <div>
-                  <h3 style="font-size: 1rem; margin-bottom: 0.25rem;">Subir Archivo</h3>
-                  <p style="font-size: 0.75rem; color: var(--color-text-muted);">Adjunta OC externa del cliente (PDF/IMG)</p>
-                </div>
-              </div>
-            </div>
+      <div class="dashboard-content-wrapper">
+        <div class="app-container">
 
-            <!-- Dynamic Content: Quote Search -->
-            <div id="quote-search-area" class="app-card">
-              <div style="margin-bottom: 1.5rem;">
-                <input type="text" placeholder="Buscar cotización por ID o Cliente..." style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px;">
-              </div>
-              <div class="quote-list">
-                <div class="quote-search-item" onclick="selectQuote('#COT-8820', 'Restaurante Reforma', '$12,450.00')">
-                  <div>
-                    <div style="font-weight: 700; color: var(--color-navy);">#COT-8820</div>
-                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Restaurante Reforma • 12 Abr 2026</div>
-                  </div>
-                  <div style="font-weight: 600; color: var(--color-cyan);">$12,450.00</div>
-                </div>
-                <div class="quote-search-item" onclick="selectQuote('#COT-8791', 'Hotel Marina', '$8,900.00')">
-                  <div>
-                    <div style="font-weight: 700; color: var(--color-navy);">#COT-8791</div>
-                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Hotel Marina • 10 Abr 2026</div>
-                  </div>
-                  <div style="font-weight: 600; color: var(--color-cyan);">$8,900.00</div>
-                </div>
-                <div class="quote-search-item" onclick="selectQuote('#COT-8755', 'Corporativo Polanco', '$24,100.00')">
-                  <div>
-                    <div style="font-weight: 700; color: var(--color-navy);">#COT-8755</div>
-                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Corporativo Polanco • 05 Abr 2026</div>
-                  </div>
-                  <div style="font-weight: 600; color: var(--color-cyan);">$24,100.00</div>
-                </div>
-              </div>
-            </div>
+          <!-- Tabs Navigation -->
+          <div class="tabs-container"
+            style="margin-bottom: 2rem; display: flex; gap: 0.5rem; border-bottom: 1px solid var(--color-border);">
+            <button id="tab-create" class="tab-btn active" onclick="switchTab('create')">
+              Crear Orden de Compra
+            </button>
+            <button id="tab-active" class="tab-btn" onclick="switchTab('active')">
+              Órdenes de Compra Activas
+            </button>
+          </div>
 
-            <!-- Dynamic Content: File Upload -->
-            <div id="file-upload-area" class="app-card" style="display: none;">
-              <div class="file-upload-zone">
-                <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin-bottom: 1rem;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
-                <h3>Arrastra la Orden de Compra aquí</h3>
-                <p style="font-size: 0.875rem;">O haz clic para buscar en tus archivos (PDF, JPG, PNG)</p>
-                <input type="file" style="display: none;">
-                <button class="btn btn-outline" style="margin-top: 1.5rem;" onclick="simulateFileUpload()">Seleccionar Archivo</button>
+          <!-- Tab Content 1: Create Order -->
+          <div id="section-create" style="display: block;">
+            <div class="oc-grid">
+
+              <!-- Column 1: Source Selection -->
+              <div class="source-panel">
+                <div class="source-selection">
+                  <div class="source-card active" id="source-quote" onclick="setSource('quote')">
+                    <div style="color: var(--color-cyan);"><svg width="32" height="32" fill="none" stroke="currentColor"
+                        stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                      </svg></div>
+                    <div>
+                      <h3 style="font-size: 1rem; margin-bottom: 0.25rem;">Desde Cotización</h3>
+                      <p style="font-size: 0.75rem; color: var(--color-text-muted);">Carga un presupuesto interno
+                        existente
+                      </p>
+                    </div>
+                  </div>
+                  <div class="source-card" id="source-file" onclick="setSource('file')">
+                    <div style="color: var(--color-navy);"><svg width="32" height="32" fill="none" stroke="currentColor"
+                        stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" x2="12" y1="3" y2="15" />
+                      </svg></div>
+                    <div>
+                      <h3 style="font-size: 1rem; margin-bottom: 0.25rem;">Subir Archivo</h3>
+                      <p style="font-size: 0.75rem; color: var(--color-text-muted);">Adjunta OC externa del cliente
+                        (PDF/IMG)</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Dynamic Content: Quote Search -->
+                <div id="quote-search-area" class="app-card">
+                  <div style="margin-bottom: 1.5rem;">
+                    <input type="text" placeholder="Buscar cotización por ID o Cliente..."
+                      style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px;">
+                  </div>
+                  <div class="quote-list">
+                    <!-- Carga dinámica -->
+                    <div style="text-align: center; padding: 2rem; color: var(--color-text-muted);">
+                      Cargando solicitudes de cotización...
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Dynamic Content: File Upload -->
+                <div id="file-upload-area" class="app-card" style="display: none;">
+                  <div class="file-upload-zone" id="dropzone" style="cursor: pointer;"
+                    onclick="document.getElementById('fileInput').click()">
+                    <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
+                      style="margin: 0 auto 1rem;">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" x2="12" y1="3" y2="15" />
+                    </svg>
+                    <h3>Arrastra la Orden de Compra aquí</h3>
+                    <p style="font-size: 0.875rem;">O haz clic para buscar en tus archivos (PDF, JPG, PNG)</p>
+                    <input type="file" id="fileInput" accept=".pdf,.png,.jpg,.jpeg" style="display: none;"
+                      onchange="handleFileSelect(event)">
+                    <button class="btn btn-outline" style="margin-top: 1.5rem;" type="button">Seleccionar
+                      Archivo</button>
+                  </div>
+
+                  <!-- Formulario para detalles de OC Externa (se muestra una vez seleccionado el archivo) -->
+                  <div id="external-file-details"
+                    style="display: none; margin-top: 2rem; border-top: 1px solid var(--color-border); padding-top: 1.5rem;">
+                    <h4 style="font-size: 0.9rem; color: var(--color-navy); margin-bottom: 1rem; font-weight: 700;">
+                      Detalles
+                      del Documento</h4>
+                    <div
+                      style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 0.75rem 1rem; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+                      <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 1.25rem;">📄</span>
+                        <span id="selected-file-name"
+                          style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy);">archivo.pdf</span>
+                      </div>
+                      <button type="button" onclick="clearSelectedFile()"
+                        style="background: none; border: none; color: #EF4444; font-weight: 700; cursor: pointer; font-size: 0.8rem;">Eliminar</button>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1rem;">
+                      <div>
+                        <label
+                          style="font-size: 0.75rem; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 0.25rem; display: block;">Monto
+                          Total (con IVA)</label>
+                        <input type="number" id="externalTotal" placeholder="0.00" min="1" step="0.01"
+                          style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-weight: 600; color: var(--color-navy);"
+                          oninput="updateExternalSummary()">
+                      </div>
+                      <div>
+                        <label
+                          style="font-size: 0.75rem; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 0.25rem; display: block;">Términos
+                          de Pago</label>
+                        <select id="externalPaymentTerms"
+                          style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-weight: 600; color: var(--color-navy); background: white;"
+                          onchange="updateExternalSummary()">
+                          <option value="Contado">Contado</option>
+                          <option value="Crédito 30 días">Crédito 30 días</option>
+                          <option value="Crédito 60 días">Crédito 60 días</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label
+                          style="font-size: 0.75rem; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 0.25rem; display: block;">Proveedor
+                          / Fábrica</label>
+                        <select id="externalSeller"
+                          style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-weight: 600; color: var(--color-navy); background: white;"
+                          onchange="updateExternalSummary()">
+                          <option value="">Selecciona un proveedor...</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              <!-- Column 2: Order Summary -->
+              <div class="summary-panel">
+                <div class="order-summary-box">
+                  <h2 style="font-size: 1.25rem; margin-bottom: 1.5rem;">Resumen de Confirmación</h2>
+
+                  <div id="summary-empty" style="text-align: center; color: var(--color-text-muted); padding: 2rem 0;">
+                    <p>Selecciona una cotización o sube un archivo para continuar</p>
+                  </div>
+
+                  <div id="summary-content" style="display: none;">
+                    <div
+                      style="background: var(--color-smoke); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                      <div
+                        style="font-size: 0.75rem; text-transform: uppercase; color: var(--color-text-muted); font-weight: 700;">
+                        Origen del Pedido</div>
+                      <div id="summary-source-type"
+                        style="font-weight: 700; color: var(--color-navy); margin-top: 0.25rem;">-</div>
+                      <div id="summary-client" style="font-size: 0.875rem; color: var(--color-text-secondary);">-</div>
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem;">
+                      <h4
+                        style="font-size: 0.8125rem; color: var(--color-text-secondary); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                        Desglose de Productos</h4>
+                      <table class="detail-table">
+                        <thead>
+                          <tr>
+                            <th>Producto</th>
+                            <th>Cant.</th>
+                            <th>Talla</th>
+                            <th>Color</th>
+                            <th>Unit.</th>
+                            <th>Total</th>
+                          </tr>
+                        </thead>
+                        <tbody id="summary-items-body">
+                          <!-- Llenado dinámicamente -->
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem; padding-top: 1rem; border-top: 2px dashed var(--color-border);">
+                      <div
+                        style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                        <span>Subtotal (antes de IVA):</span>
+                        <span id="summary-subtotal" style="font-weight: 600;">$0.00</span>
+                      </div>
+                      <div
+                        style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                        <span id="summary-tax-label">IVA (16%):</span>
+                        <span id="summary-tax" style="font-weight: 600;">$0.00</span>
+                      </div>
+                      <div
+                        style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 1rem; margin-top: 0.5rem; border-top: 1px solid var(--color-border); padding-top: 0.5rem;">
+                        <span style="font-weight: 700;">Total de la Orden:</span>
+                        <span id="summary-amount" style="font-weight: 800; color: var(--color-cyan);">$0.00</span>
+                      </div>
+                    </div>
+
+                    <!-- Advance Payment Section -->
+                    <div id="advance-payment-section"
+                      style="display: none; margin-bottom: 1.5rem; padding: 1.25rem; background: #FFF7ED; border: 1px solid #FFEDD5; border-radius: 16px; text-align: left;">
+                      <h4
+                        style="font-size: 0.85rem; color: #C2410C; font-weight: 800; text-transform: uppercase; margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 0.25rem; font-family: 'Outfit', sans-serif;">
+                        <span>⚠️ Anticipo Requerido (<span id="advance-percent-label">50</span>%)</span>
+                      </h4>
+                      <p style="font-size: 0.8rem; color: #9A3412; margin: 0 0 0.75rem 0; line-height: 1.4;">
+                        Esta cotización requiere un pago inicial de <strong id="advance-amount-label">$0.00</strong>
+                        para proceder. Por favor, sube el comprobante de pago de anticipo para completar tu pedido.
+                      </p>
+
+                      <div class="proof-upload-zone" id="proofDropzone"
+                        style="cursor: pointer; border: 2px dashed #FDBA74; border-radius: 12px; padding: 1rem; text-align: center; background: white; transition: all 0.2s;"
+                        onclick="document.getElementById('proofInput').click()"
+                        onmouseover="this.style.borderColor='#F97316'; this.style.background='#FFFDFA';"
+                        onmouseout="this.style.borderColor='#FDBA74'; this.style.background='white';">
+                        <svg width="28" height="28" fill="none" stroke="#C2410C" stroke-width="2" viewBox="0 0 24 24"
+                          style="margin: 0 auto 0.5rem;">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+                        </svg>
+                        <span id="proof-upload-text"
+                          style="font-size: 0.75rem; font-weight: 700; color: #C2410C; display: block;">Seleccionar
+                          comprobante de pago</span>
+                        <span id="proof-file-name"
+                          style="font-size: 0.75rem; color: #10B981; font-weight: 700; display: none;"></span>
+                        <input type="file" id="proofInput" accept=".pdf,.png,.jpg,.jpeg" style="display: none;"
+                          onchange="handleProofSelect(event)">
+                      </div>
+                    </div>
+
+                    <div style="border-top: 1px solid var(--color-border); padding-top: 1.5rem; margin-top: 1.5rem;">
+                      <label
+                        style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-bottom: 1.5rem;">
+                        <input type="checkbox" id="checkCoincide" checked>
+                        <span style="font-size: 0.8125rem;">He validado que los montos coinciden con la OC</span>
+                      </label>
+
+                      <button class="btn btn-primary" style="width: 100%;" onclick="confirmOrder()">Confirmar
+                        Pedido</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 
-          <!-- Column 2: Order Summary -->
-          <div class="summary-panel">
-            <div class="order-summary-box">
-              <h2 style="font-size: 1.25rem; margin-bottom: 1.5rem;">Resumen de Confirmación</h2>
-              
-              <div id="summary-empty" style="text-align: center; color: var(--color-text-muted); padding: 2rem 0;">
-                <p>Selecciona una cotización o sube un archivo para continuar</p>
+          <!-- Tab Content 2: Active Orders -->
+          <div id="section-active" style="display: none;">
+            <!-- Active Purchase Orders Section -->
+            <div class="app-card" style="padding: 2rem;">
+              <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid var(--color-border); padding-bottom: 1rem;">
+                <div>
+                  <h2
+                    style="font-size: 1.25rem; color: var(--color-navy); font-family: 'Outfit', sans-serif; font-weight: 700; margin: 0;">
+                    Órdenes de Compra Activas</h2>
+                  <p style="font-size: 0.8125rem; color: var(--color-text-muted); margin: 0.25rem 0 0 0;">Seguimiento en
+                    tiempo real y estados de producción</p>
+                </div>
+                <button class="btn btn-outline"
+                  style="padding: 0.5rem 1rem; font-size: 0.8125rem; display: flex; align-items: center; gap: 0.5rem; background: white; border-color: var(--color-border); color: var(--color-navy);"
+                  onclick="loadActivePurchaseOrders()">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" viewBox="0 0 24 24" style="margin-right: 0.25rem;">
+                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+                    <path d="M21 3v5h-5" />
+                  </svg>
+                  Actualizar
+                </button>
               </div>
 
-              <div id="summary-content" style="display: none;">
-                <div style="background: var(--color-smoke); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
-                  <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--color-text-muted); font-weight: 700;">Origen del Pedido</div>
-                  <div id="summary-source-type" style="font-weight: 700; color: var(--color-navy); margin-top: 0.25rem;">#COT-8820</div>
-                  <div id="summary-client" style="font-size: 0.875rem; color: var(--color-text-secondary);">Restaurante Reforma</div>
-                </div>
+              <div id="active-pos-loading" style="text-align: center; padding: 3rem; color: var(--color-text-muted);">
+                Cargando órdenes de compra activas...
+              </div>
 
-                <div style="margin-bottom: 1.5rem;">
-                  <h4 style="font-size: 0.8125rem; color: var(--color-text-secondary); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em;">Desglose de Productos</h4>
-                  <table class="detail-table">
-                    <thead>
-                      <tr>
-                        <th>Producto</th>
-                        <th>Cant.</th>
-                        <th>Talla</th>
-                        <th>Color</th>
-                        <th>Unit.</th>
-                        <th>Total</th>
-                      </tr>
-                    </thead>
-                    <tbody id="summary-items-body">
-                      <!-- Filled by selectQuote -->
-                    </tbody>
-                  </table>
-                </div>
-
-                <div style="margin-bottom: 1.5rem; padding-top: 1rem; border-top: 2px dashed var(--color-border);">
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
-                    <span>Subtotal (antes de IVA):</span>
-                    <span id="summary-subtotal" style="font-weight: 600;">$10,732.76</span>
-                  </div>
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
-                    <span>IVA (16%):</span>
-                    <span id="summary-tax" style="font-weight: 600;">$1,717.24</span>
-                  </div>
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 1rem; margin-top: 0.5rem; border-top: 1px solid var(--color-border); padding-top: 0.5rem;">
-                    <span style="font-weight: 700;">Total de la Orden:</span>
-                    <span id="summary-amount" style="font-weight: 800; color: var(--color-cyan);">$12,450.00</span>
-                  </div>
-                </div>
-
-                <div style="border-top: 1px solid var(--color-border); padding-top: 1.5rem; margin-top: 1.5rem;">
-
-                  
-                  <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-bottom: 1.5rem;">
-                    <input type="checkbox" checked>
-                    <span style="font-size: 0.8125rem;">He validado que los montos coinciden con la OC</span>
-                  </label>
-
-                  <button class="btn btn-primary" style="width: 100%;" onclick="confirmOrder()">Confirmar Pedido</button>
-                </div>
+              <div id="active-pos-container"
+                style="display: none; display: flex; flex-direction: column; gap: 1.25rem;">
+                <!-- Carga dinámica de POs -->
               </div>
             </div>
           </div>
-
-        </div>
-      </div>
     </main>
   </div>
 
   <script>
-    function setSource(type) {
-      document.querySelectorAll('.source-card').forEach(c => c.classList.remove('active'));
-      document.getElementById('source-' + type).classList.add('active');
-      
-      if (type === 'quote') {
-        document.getElementById('quote-search-area').style.display = 'block';
-        document.getElementById('file-upload-area').style.display = 'none';
+    function formatCurrency(val) {
+      const userCountry = localStorage.getItem('dotacian_user_country') || 'CO';
+      const isColombia = userCountry === 'CO' || userCountry === 'Colombia';
+      const currency = isColombia ? 'COP' : 'MXN';
+      const formatted = new Intl.NumberFormat(isColombia ? 'es-CO' : 'es-MX', {
+        style: 'currency',
+        currency: currency,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(val);
+      return `${formatted} ${currency}`;
+    }
+
+    function switchTab(tabId) {
+      document.getElementById('tab-create').classList.remove('active');
+      document.getElementById('tab-active').classList.remove('active');
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+
+      if (tabId === 'create') {
+        document.getElementById('section-create').style.display = 'block';
+        document.getElementById('section-active').style.display = 'none';
+        window.location.hash = 'create';
       } else {
-        document.getElementById('quote-search-area').style.display = 'none';
-        document.getElementById('file-upload-area').style.display = 'block';
+        document.getElementById('section-create').style.display = 'none';
+        document.getElementById('section-active').style.display = 'block';
+        window.location.hash = 'active';
+        loadActivePurchaseOrders();
       }
     }
 
-    function selectQuote(id, client, amount) {
+    let finalProofFiles = {};
+
+    function handleFinalProofSelect(event, poId) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      finalProofFiles[poId] = file;
+      const label = document.getElementById(`finalProof-upload-text-${poId}`);
+      if (label) {
+        label.textContent = `📄 ${file.name}`;
+        label.style.color = '#10B981';
+      }
+      showToast('Comprobante Seleccionado', 'Se ha adjuntado el comprobante de pago restante.');
+    }
+
+    async function uploadFinalPaymentProof(poId) {
+      const file = finalProofFiles[poId];
+      if (!file) {
+        showToast('Falta Archivo', 'Por favor selecciona el comprobante de pago restante primero.', 'error');
+        return;
+      }
+
+      const checkbox = document.getElementById(`check100Percent-${poId}`);
+      if (!checkbox || !checkbox.checked) {
+        showToast('Confirmación Requerida', 'Por favor confirma que se abonó el 100% del valor del pedido.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById(`btnSubmitFinal-${poId}`);
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Subiendo...';
+      }
+
+      try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `final_proof_${poId}_${Date.now()}.${fileExt}`;
+        const filePath = `payment_proofs/${fileName}`;
+
+        let publicUrl = '';
+        const { data: uploadData, error: uploadErr } = await _supabase.storage
+          .from('payment_supports')
+          .upload(filePath, file, { cacheControl: '3600', upsert: true });
+
+        if (uploadErr) {
+          console.warn('Storage upload error (using fallback url):', uploadErr);
+          publicUrl = 'mock://payment_supports/payment_proofs/' + fileName;
+        } else {
+          const { data: urlData } = _supabase.storage.from('payment_supports').getPublicUrl(filePath);
+          publicUrl = urlData.publicUrl;
+        }
+
+        const { data: po, error: poFetchErr } = await _supabase
+          .from('company_purchase_orders')
+          .select('*')
+          .eq('id', poId)
+          .single();
+
+        if (poFetchErr) throw poFetchErr;
+
+        if (po.quote_ids && po.quote_ids[0]) {
+          const quoteId = po.quote_ids[0];
+
+          const { data: quote } = await _supabase
+            .from('company_quotes_requests')
+            .select('sizes')
+            .eq('id', quoteId)
+            .single();
+
+          if (quote) {
+            const sizesCopy = JSON.parse(JSON.stringify(quote.sizes || {}));
+            sizesCopy.final_payment_proof_url = publicUrl;
+
+            const { error: quoteUpdateErr } = await _supabase
+              .from('company_quotes_requests')
+              .update({ sizes: sizesCopy })
+              .eq('id', quoteId);
+
+            if (quoteUpdateErr) console.warn('Quote update error:', quoteUpdateErr);
+          }
+        }
+
+        const itemsCopy = JSON.parse(JSON.stringify(po.items || []));
+        if (itemsCopy[0]) {
+          itemsCopy[0].final_payment_proof_url = publicUrl;
+        }
+
+        const { error: poUpdateErr } = await _supabase
+          .from('company_purchase_orders')
+          .update({ items: itemsCopy })
+          .eq('id', poId);
+
+        if (poUpdateErr) console.warn('PO update error:', poUpdateErr);
+
+        showToast('Pago Registrado', 'Se ha registrado el pago del 100% y se adjuntó el comprobante restante.');
+
+        setTimeout(() => {
+          loadActivePurchaseOrders();
+        }, 1500);
+
+      } catch (err) {
+        console.error('Error uploading final proof:', err);
+        showToast('Error', 'No se pudo registrar el pago final: ' + err.message, 'error');
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Registrar Pago';
+        }
+      }
+    }
+
+    let currentProofFile = null;
+    let allQuotes = [];
+    let selectedQuote = null;
+    let selectedSource = 'quote'; // 'quote' or 'file'
+    let currentUploadedFile = null;
+    let sellerCompanies = [];
+    let currentCompanyId = null;
+
+    async function initOrdenes() {
+      try {
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (!session) {
+          window.location.href = 'login.html';
+          return;
+        }
+        currentCompanyId = session.user.id;
+
+        // 1. Cargar perfiles de empresa en cabecera
+        if (typeof populateHeaderProfile === 'function') {
+          populateHeaderProfile(_supabase);
+        }
+
+        // 2. Fetch Sellers (Fábricas) - Cargar al inicio para tener mapeo en memoria
+        let sellerCompaniesMap = {};
+        try {
+          const { data: catSellers } = await _supabase
+            .from('seller_catalog')
+            .select('seller_id, seller_name');
+          if (catSellers) {
+            catSellers.forEach(c => {
+              if (c.seller_id && c.seller_name) {
+                sellerCompaniesMap[c.seller_id] = c.seller_name;
+              }
+            });
+          }
+        } catch (e) {
+          console.warn('Error loading sellers from catalog:', e);
+        }
+
+        const { data: sellers, error: sellersErr } = await _supabase
+          .from('seller_company')
+          .select('id, seller_name');
+
+        if (sellersErr) console.warn('Error loading sellers:', sellersErr);
+        if (sellers) {
+          sellers.forEach(s => {
+            if (s.id && s.seller_name) {
+              sellerCompaniesMap[s.id] = s.seller_name;
+            }
+          });
+        }
+
+        // Convert the map back to array
+        sellerCompanies = Object.entries(sellerCompaniesMap).map(([id, name]) => ({
+          id,
+          seller_name: name
+        }));
+
+        // Poblar selector de vendedores
+        const sellerSelect = document.getElementById('externalSeller');
+        if (sellerSelect) {
+          sellerSelect.innerHTML = '<option value="">Selecciona un proveedor...</option>';
+          sellerCompanies.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.id;
+            opt.textContent = s.seller_name;
+            sellerSelect.appendChild(opt);
+          });
+        }
+
+        // 3. Fetch fallback seller profiles
+        let profileMap = {};
+        try {
+          const { data: profilesData } = await _supabase
+            .from('seller_profile')
+            .select('id, first_name, last_name');
+          if (profilesData) {
+            profilesData.forEach(p => {
+              profileMap[p.id] = `${p.first_name || ''} ${p.last_name || ''}`.trim();
+            });
+          }
+        } catch (e) {
+          console.warn('Could not load fallback seller profiles:', e);
+        }
+
+        // 4. Fetch Cotizaciones con estado 'cotizada'
+        const { data: quotes, error: quotesErr } = await _supabase
+          .from('company_quotes_requests')
+          .select('*')
+          .eq('company_id', currentCompanyId)
+          .eq('status', 'cotizada')
+          .order('created_at', { ascending: false });
+
+        if (quotesErr) throw quotesErr;
+        allQuotes = quotes || [];
+        console.log('DEBUG_QUOTES:', JSON.stringify(allQuotes.map(q => ({ id: q.id, quote_number: q.quote_number, seller_id: q.seller_id, status: q.status })), null, 2));
+
+        // Resolve seller name using preloaded databases and custom fallbacks
+        allQuotes.forEach(q => {
+          let name = 'Proveedor';
+          if (q.seller_id) {
+            const company = sellerCompanies.find(c => c.id === q.seller_id);
+            if (company && company.seller_name) {
+              name = company.seller_name;
+            } else if (profileMap[q.seller_id]) {
+              name = profileMap[q.seller_id];
+            } else {
+              name = `Proveedor (${q.seller_id.slice(-6).toUpperCase()})`;
+            }
+          }
+          q.seller_name = name;
+        });
+
+        renderQuotesList(allQuotes);
+        loadActivePurchaseOrders();
+      } catch (err) {
+        console.error('Error in initOrdenes:', err);
+        showToast('Error', 'No se pudieron cargar los datos de Supabase', 'error');
+      }
+    }
+
+    function renderQuotesList(quotes) {
+      const container = document.querySelector('.quote-list');
+      if (!container) return;
+
+      if (quotes.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 2rem; color: var(--color-text-muted);">
+            No tienes cotizaciones enviadas por el proveedor listas para ordenar.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = quotes.map(q => {
+        const consecutivo = q.quote_number || `COT-${q.id.slice(-6).toUpperCase()}`;
+        const date = new Date(q.created_at).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
+        const sellerName = q.seller_name || 'Proveedor';
+        const totalAmountStr = `$${(q.total_price || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
+
+        return `
+          <div class="quote-search-item" onclick="selectQuoteReal('${q.id}')" id="quote-item-${q.id}">
+            <div>
+              <div style="font-weight: 700; color: var(--color-navy); font-size: 0.95rem;">${consecutivo}</div>
+              <div style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.2rem;">${sellerName} • ${date}</div>
+            </div>
+            <div style="font-weight: 700; color: var(--color-cyan); font-size: 1rem;">${totalAmountStr}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function setSource(type) {
+      selectedSource = type;
+      document.querySelectorAll('.source-card').forEach(c => c.classList.remove('active'));
+      document.getElementById('source-' + type).classList.add('active');
+
+      // Limpiar resumen e inicializar
+      document.getElementById('summary-empty').style.display = 'block';
+      document.getElementById('summary-content').style.display = 'none';
+
+      if (type === 'quote') {
+        document.getElementById('quote-search-area').style.display = 'block';
+        document.getElementById('file-upload-area').style.display = 'none';
+        if (selectedQuote) {
+          selectQuoteReal(selectedQuote.id);
+        }
+      } else {
+        document.getElementById('quote-search-area').style.display = 'none';
+        document.getElementById('file-upload-area').style.display = 'block';
+        if (currentUploadedFile) {
+          document.getElementById('summary-empty').style.display = 'none';
+          document.getElementById('summary-content').style.display = 'block';
+          updateExternalSummary();
+        }
+      }
+    }
+
+    function selectQuoteReal(quoteId) {
+      const q = allQuotes.find(item => item.id === quoteId);
+      if (!q) return;
+
+      selectedQuote = q;
+
+      // Aplicar estilo de selección activa
+      document.querySelectorAll('.quote-search-item').forEach(el => {
+        el.style.borderColor = 'var(--color-border)';
+        el.style.background = 'white';
+      });
+      const activeEl = document.getElementById(`quote-item-${quoteId}`);
+      if (activeEl) {
+        activeEl.style.borderColor = 'var(--color-cyan)';
+        activeEl.style.background = 'rgba(6, 182, 212, 0.02)';
+      }
+
       document.getElementById('summary-empty').style.display = 'none';
       document.getElementById('summary-content').style.display = 'block';
-      document.getElementById('summary-source-type').textContent = id;
-      document.getElementById('summary-client').textContent = client;
 
-      // Map specific quotes to specific item sets to ensure totals match the list
-      const quoteData = {
-        '#COT-8820': [
-          { name: 'Filipina Chef Classic', qty: 10, talla: 'M', color: 'Blanco', unit: 500 },
-          { name: 'Pantalón Cocina Pro', qty: 10, talla: '32', color: 'Negro', unit: 400 },
-          { name: 'Mandil Barista Plus', qty: 5, talla: 'U', color: 'Café', unit: 346.551 }
-        ],
-        '#COT-8791': [
-          { name: 'Camisa Oxford', qty: 10, talla: 'L', color: 'Azul', unit: 450 },
-          { name: 'Pantalón Chino', qty: 8, talla: '34', color: 'Beige', unit: 396.55 }
-        ],
-        '#COT-8755': [
-          { name: 'Chaqueta Industrial', qty: 20, talla: 'XL', color: 'Azul Navy', unit: 800 },
-          { name: 'Overol de Seguridad', qty: 10, talla: 'L', color: 'Naranja', unit: 474.13 }
-        ]
-      };
+      const consecutivo = q.quote_number || `COT-${q.id.slice(-6).toUpperCase()}`;
+      document.getElementById('summary-source-type').textContent = `COTIZACIÓN: ${consecutivo}`;
+
+      document.getElementById('summary-client').textContent = '';
 
       const itemsBody = document.getElementById('summary-items-body');
       itemsBody.innerHTML = '';
 
-      const items = quoteData[id] || quoteData['#COT-8820'];
-
+      let itemsHtml = '';
       let subtotal = 0;
-      items.forEach(item => {
-        const totalItem = item.qty * item.unit;
-        subtotal += totalItem;
-        itemsBody.innerHTML += `
+
+      if (q.sizes && q.sizes.items) {
+        const itemsList = Array.isArray(q.sizes.items)
+          ? q.sizes.items
+          : Object.entries(q.sizes.items).map(([name, item]) => ({ name, ...item }));
+
+        itemsList.forEach(item => {
+          const qty = item.quantity || item.qty || 1;
+          const price = item.unit_price || 0;
+          const totalItem = qty * price;
+          subtotal += totalItem;
+
+          let sizesStr = 'Única';
+          if (item.sizes) {
+            if (typeof item.sizes === 'string') {
+              sizesStr = item.sizes;
+            } else if (typeof item.sizes === 'object') {
+              sizesStr = Object.entries(item.sizes).map(([sz, count]) => `${sz} (${count})`).join(', ');
+            }
+          } else if (item.size) {
+            sizesStr = item.size;
+          }
+
+          const colorStr = item.color || 'Único';
+
+          itemsHtml += `
+            <tr>
+              <td><div style="font-weight: 700; color: var(--color-navy);">${item.name || 'Prenda'}</div></td>
+              <td style="text-align: center; font-weight: 700;">${qty}</td>
+              <td style="text-align: center;"><span style="background: #F1F5F9; color: var(--color-navy); padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 0.75rem;">${sizesStr}</span></td>
+              <td style="text-align: center; color: #64748B;">${colorStr}</td>
+              <td style="text-align: right; color: #64748B;">${formatCurrency(price)}</td>
+              <td class="row-total" style="text-align: right; font-weight: 800; color: var(--color-cyan);">${formatCurrency(totalItem)}</td>
+            </tr>
+          `;
+        });
+      } else {
+        // Cotización simple
+        const qty = q.quantity || 1;
+        const price = q.unit_price || 0;
+        subtotal = qty * price;
+
+        const sizesStr = (typeof q.sizes === 'string') ? q.sizes : (q.sizes ? Object.keys(q.sizes).join(', ') : 'Única');
+        const colorStr = q.color || 'Único';
+
+        itemsHtml += `
           <tr>
-            <td>${item.name}</td>
-            <td>${item.qty}</td>
-            <td>${item.talla}</td>
-            <td>${item.color}</td>
-            <td>$${item.unit.toFixed(2)}</td>
-            <td class="row-total">$${totalItem.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</td>
+            <td><div style="font-weight: 700; color: var(--color-navy);">${q.product_name || 'Producto'}</div></td>
+            <td style="text-align: center; font-weight: 700;">${qty}</td>
+            <td style="text-align: center;"><span style="background: #F1F5F9; color: var(--color-navy); padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 0.75rem;">${sizesStr}</span></td>
+            <td style="text-align: center; color: #64748B;">${colorStr}</td>
+            <td style="text-align: right; color: #64748B;">${formatCurrency(price)}</td>
+            <td class="row-total" style="text-align: right; font-weight: 800; color: var(--color-cyan);">${formatCurrency(subtotal)}</td>
           </tr>
         `;
-      });
+      }
 
-      const tax = subtotal * 0.16;
+      itemsBody.innerHTML = itemsHtml;
+
+      const userCountry = localStorage.getItem('dotacian_user_country') || 'CO';
+      const isColombia = userCountry === 'CO' || userCountry === 'Colombia';
+      const ivaRate = isColombia ? 0.19 : 0.16;
+      const tax = subtotal * ivaRate;
       const total = subtotal + tax;
 
-      document.getElementById('summary-subtotal').textContent = `$${subtotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
-      document.getElementById('summary-tax').textContent = `$${tax.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
-      document.getElementById('summary-amount').textContent = `$${total.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
+      document.getElementById('summary-subtotal').textContent = formatCurrency(subtotal);
+      document.getElementById('summary-tax-label').textContent = `IVA (${isColombia ? '19%' : '16%'}):`;
+      document.getElementById('summary-tax').textContent = formatCurrency(tax);
+      document.getElementById('summary-amount').textContent = formatCurrency(total);
+
+      // Manejo de anticipo
+      const advSection = document.getElementById('advance-payment-section');
+      currentProofFile = null;
+      document.getElementById('proof-upload-text').style.display = 'block';
+      document.getElementById('proof-file-name').style.display = 'none';
+      document.getElementById('proof-file-name').textContent = '';
+
+      if (q.sizes && q.sizes.advance_payment_percent > 0) {
+        const advPercent = q.sizes.advance_payment_percent;
+        const advAmount = total * (advPercent / 100);
+        document.getElementById('advance-percent-label').textContent = advPercent;
+        document.getElementById('advance-amount-label').textContent = formatCurrency(advAmount);
+        advSection.style.display = 'block';
+      } else {
+        advSection.style.display = 'none';
+      }
     }
 
-    function simulateFileUpload() {
-      showToast("Cargando Archivo", "Simulando carga de archivo OC_Cliente_Reforma.pdf...");
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      currentUploadedFile = file;
+      document.getElementById('selected-file-name').textContent = file.name;
+      document.getElementById('external-file-details').style.display = 'block';
+
+      // Ocultar vacío y mostrar resumen
       document.getElementById('summary-empty').style.display = 'none';
       document.getElementById('summary-content').style.display = 'block';
-      document.getElementById('summary-source-type').textContent = "ARCHIVO: OC_Reforma.pdf";
-      document.getElementById('summary-client').textContent = "Restaurante Reforma (Externo)";
-      document.getElementById('summary-amount').textContent = "$15,200.00";
+
+      updateExternalSummary();
+    }
+
+    function handleProofSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      currentProofFile = file;
+      document.getElementById('proof-upload-text').style.display = 'none';
+      const nameEl = document.getElementById('proof-file-name');
+      nameEl.textContent = `📄 ${file.name}`;
+      nameEl.style.display = 'block';
+
+      showToast('Comprobante Cargado', 'Se ha adjuntado el comprobante de pago de anticipo.');
+    }
+
+    function clearSelectedFile() {
+      currentUploadedFile = null;
+      document.getElementById('fileInput').value = '';
+      document.getElementById('external-file-details').style.display = 'none';
+
+      // Limpiar inputs
+      document.getElementById('externalTotal').value = '';
+      document.getElementById('externalPaymentTerms').value = 'Contado';
+      document.getElementById('externalSeller').value = '';
+
+      // Resetear panel resumen
+      document.getElementById('summary-empty').style.display = 'block';
+      document.getElementById('summary-content').style.display = 'none';
+    }
+
+    function updateExternalSummary() {
+      if (selectedSource !== 'file') return;
+
+      const fileName = currentUploadedFile ? currentUploadedFile.name : 'Archivo';
+      document.getElementById('summary-source-type').textContent = `DOCUMENTO: ${fileName}`;
+
+      document.getElementById('summary-client').textContent = '';
+
+      const totalVal = parseFloat(document.getElementById('externalTotal').value) || 0;
+
+      const userCountry = localStorage.getItem('dotacian_user_country') || 'CO';
+      const isColombia = userCountry === 'CO' || userCountry === 'Colombia';
+      const ivaRate = isColombia ? 0.19 : 0.16;
+
+      // Calcular Subtotal e IVA hacia atrás
+      const subtotal = totalVal / (1 + ivaRate);
+      const tax = totalVal - subtotal;
+
+      const itemsBody = document.getElementById('summary-items-body');
+      itemsBody.innerHTML = `
+        <tr>
+          <td><div style="font-weight: 700; color: var(--color-navy);">Orden de Compra Externa</div></td>
+          <td style="text-align: center; font-weight: 700;">1</td>
+          <td style="text-align: center; color: #64748B;">N/A</td>
+          <td style="text-align: center; color: #64748B;">N/A</td>
+          <td style="text-align: right; color: #64748B;">${formatCurrency(subtotal)}</td>
+          <td class="row-total" style="text-align: right; font-weight: 800; color: var(--color-cyan);">${formatCurrency(totalVal)}</td>
+        </tr>
+      `;
+
+      document.getElementById('summary-subtotal').textContent = formatCurrency(subtotal);
+      document.getElementById('summary-tax-label').textContent = `IVA (${isColombia ? '19%' : '16%'}):`;
+      document.getElementById('summary-tax').textContent = formatCurrency(tax);
+      document.getElementById('summary-amount').textContent = formatCurrency(totalVal);
+
+      // Desactivar sección de anticipo para carga manual
+      document.getElementById('advance-payment-section').style.display = 'none';
+      currentProofFile = null;
     }
 
     function confirmOrder() {
+      if (selectedSource === 'file') {
+        const totalVal = parseFloat(document.getElementById('externalTotal').value) || 0;
+        if (!currentUploadedFile) {
+          showToast('Error', 'Por favor selecciona un archivo primero.', 'error');
+          return;
+        }
+        if (totalVal <= 0) {
+          showToast('Error', 'Por favor ingresa un monto total válido para la Orden de Compra.', 'error');
+          return;
+        }
+        const sellerId = document.getElementById('externalSeller').value;
+        if (!sellerId) {
+          showToast('Error', 'Por favor selecciona un proveedor / fábrica.', 'error');
+          return;
+        }
+      } else {
+        if (!selectedQuote) {
+          showToast('Error', 'Por favor selecciona una cotización primero.', 'error');
+          return;
+        }
+        if (selectedQuote.sizes && selectedQuote.sizes.advance_payment_percent > 0) {
+          if (!currentProofFile) {
+            showToast('Falta Comprobante', 'Por favor sube el comprobante del pago de anticipo requerido.', 'error');
+            return;
+          }
+        }
+      }
+
+      if (!document.getElementById('checkCoincide').checked) {
+        showToast('Error', 'Por favor confirma que los montos coinciden marcando la casilla.', 'error');
+        return;
+      }
+
       document.getElementById('confirmModal').style.display = 'flex';
     }
 
@@ -449,28 +1160,705 @@
       document.getElementById('confirmModal').style.display = 'none';
     }
 
-    function processOrder() {
-      closeConfirmModal();
-      showToast("Pedido Confirmado", "¡Pedido confirmado! Se ha notificado al taller central.");
-      setTimeout(() => {
-        window.location.href = "produccion.html";
-      }, 2000);
+    async function processOrder() {
+      const confirmBtn = document.querySelector('#confirmModal button.btn-primary');
+      const cancelBtn = document.querySelector('#confirmModal button.btn-outline');
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Procesando...';
+      cancelBtn.disabled = true;
+
+      try {
+        if (selectedSource === 'quote') {
+          if (!selectedQuote) {
+            showToast('Error', 'Por favor selecciona una cotización primero.', 'error');
+            closeConfirmModal();
+            return;
+          }
+
+          // Build PO number
+          let countPOs = 0;
+          try {
+            const { count, error: countErr } = await _supabase
+              .from('company_purchase_orders')
+              .select('id', { count: 'exact', head: true });
+            if (!countErr && count !== null) {
+              countPOs = count;
+            }
+          } catch (e) {
+            console.warn("Error getting count of POs", e);
+          }
+          const poNumber = 'PO-' + String(countPOs + 1).padStart(7, '0');
+
+          // Normalize items for the PO
+          const orderItems = [];
+          let subtotal = 0;
+          if (selectedQuote.sizes && selectedQuote.sizes.items) {
+            const itemsList = Array.isArray(selectedQuote.sizes.items)
+              ? selectedQuote.sizes.items
+              : Object.entries(selectedQuote.sizes.items).map(([name, item]) => ({ name, ...item }));
+
+            itemsList.forEach(item => {
+              const qty = item.quantity || item.qty || 1;
+              const price = item.unit_price || 0;
+              subtotal += qty * price;
+
+              orderItems.push({
+                product_name: item.name || 'Prenda',
+                quantity: qty,
+                sizes: item.sizes || (item.size ? { [item.size]: qty } : { 'Única': qty }),
+                unit_price: price,
+                seller_id: selectedQuote.seller_id
+              });
+            });
+          } else {
+            const qty = selectedQuote.quantity || 1;
+            const price = selectedQuote.unit_price || 0;
+            subtotal = qty * price;
+
+            orderItems.push({
+              product_name: selectedQuote.product_name || 'Producto General',
+              quantity: qty,
+              sizes: (typeof selectedQuote.sizes === 'string') ? { [selectedQuote.sizes]: qty } : (selectedQuote.sizes || { 'Única': qty }),
+              unit_price: price,
+              seller_id: selectedQuote.seller_id
+            });
+          }
+
+          const userCountry = localStorage.getItem('dotacian_user_country') || 'CO';
+          const isColombia = userCountry === 'CO' || userCountry === 'Colombia';
+          const ivaRate = isColombia ? 0.19 : 0.16;
+          const calculatedTotalAmount = subtotal * (1 + ivaRate);
+
+          // Subir comprobante de pago de anticipo si existe
+          let paymentProofUrl = '';
+          if (currentProofFile) {
+            const fileExt = currentProofFile.name.split('.').pop();
+            const fileName = `proof_${Date.now()}.${fileExt}`;
+            const filePath = `payment_proofs/${fileName}`;
+
+            const { data: uploadData, error: uploadErr } = await _supabase.storage
+              .from('payment_supports')
+              .upload(filePath, currentProofFile, { cacheControl: '3600', upsert: true });
+
+            if (uploadErr) {
+              console.warn('Storage upload error (using fallback url):', uploadErr);
+              paymentProofUrl = 'mock://payment_supports/payment_proofs/' + fileName;
+            } else {
+              const { data: urlData } = _supabase.storage.from('payment_supports').getPublicUrl(filePath);
+              paymentProofUrl = urlData.publicUrl;
+            }
+          }
+
+          // Insert into company_purchase_orders
+          const { data: poData, error: poErr } = await _supabase
+            .from('company_purchase_orders')
+            .insert({
+              company_id: currentCompanyId,
+              seller_id: selectedQuote.seller_id,
+              po_number: poNumber,
+              order_number: poNumber,
+              total_amount: calculatedTotalAmount,
+              payment_terms: 'Contado',
+              status: 'confirmation',
+              items: orderItems,
+              quote_ids: [selectedQuote.id]
+            })
+            .select();
+
+          if (poErr) throw poErr;
+
+          // Update quote status to 'aprobada' y guardar la url del comprobante de pago
+          const sizesCopy = JSON.parse(JSON.stringify(selectedQuote.sizes || {}));
+          if (paymentProofUrl) {
+            sizesCopy.payment_proof_url = paymentProofUrl;
+          }
+
+          const { error: quoteUpdateErr } = await _supabase
+            .from('company_quotes_requests')
+            .update({
+              status: 'aprobada',
+              sizes: sizesCopy
+            })
+            .eq('id', selectedQuote.id);
+
+          if (quoteUpdateErr) console.warn('Non-critical quote status update error:', quoteUpdateErr);
+
+        } else {
+          // File upload source
+          if (!currentUploadedFile) {
+            showToast('Error', 'Por favor selecciona un archivo de Orden de Compra.', 'error');
+            closeConfirmModal();
+            return;
+          }
+
+          const totalVal = parseFloat(document.getElementById('externalTotal').value) || 0;
+          if (totalVal <= 0) {
+            showToast('Error', 'Por favor ingresa un monto total válido para la Orden de Compra.', 'error');
+            closeConfirmModal();
+            return;
+          }
+
+          const sellerId = document.getElementById('externalSeller').value;
+          if (!sellerId) {
+            showToast('Error', 'Por favor selecciona un proveedor / fábrica.', 'error');
+            closeConfirmModal();
+            return;
+          }
+
+          const paymentTerms = document.getElementById('externalPaymentTerms').value;
+
+          // Upload file to signatures bucket
+          const fileExt = currentUploadedFile.name.split('.').pop();
+          const fileName = `po_${Date.now()}.${fileExt}`;
+          const filePath = `purchase_orders/${fileName}`;
+
+          let publicUrl = '';
+          const { data: uploadData, error: uploadErr } = await _supabase.storage
+            .from('signatures')
+            .upload(filePath, currentUploadedFile, { cacheControl: '3600', upsert: true });
+
+          if (uploadErr) {
+            console.warn('Storage upload error (using fallback url):', uploadErr);
+            publicUrl = 'mock://signatures/purchase_orders/' + fileName;
+          } else {
+            const { data: urlData } = _supabase.storage.from('signatures').getPublicUrl(filePath);
+            publicUrl = urlData.publicUrl;
+          }
+
+          // Build PO number
+          let countPOs = 0;
+          try {
+            const { count, error: countErr } = await _supabase
+              .from('company_purchase_orders')
+              .select('id', { count: 'exact', head: true });
+            if (!countErr && count !== null) {
+              countPOs = count;
+            }
+          } catch (e) {
+            console.warn("Error getting count of POs", e);
+          }
+          const poNumber = 'PO-' + String(countPOs + 1).padStart(7, '0');
+
+          // Insert into company_purchase_orders
+          const { error: poErr } = await _supabase
+            .from('company_purchase_orders')
+            .insert({
+              company_id: currentCompanyId,
+              seller_id: sellerId,
+              po_number: poNumber,
+              order_number: poNumber,
+              total_amount: totalVal,
+              payment_terms: paymentTerms,
+              status: 'confirmation',
+              items: [{
+                product_name: 'Orden de Compra Externa (' + currentUploadedFile.name + ')',
+                quantity: 1,
+                size: 'N/A',
+                unit_price: totalVal,
+                seller_id: sellerId
+              }],
+              file_url: publicUrl
+            });
+
+          if (poErr) throw poErr;
+        }
+
+        closeConfirmModal();
+        showToast("Pedido Confirmado", "¡Pedido confirmado! Se ha notificado al taller central.");
+
+        setTimeout(() => {
+          window.location.href = "ordenes.html#active";
+        }, 2000);
+
+      } catch (err) {
+        console.error('Error processing order:', err);
+        showToast('Error', 'Hubo un error al confirmar tu pedido: ' + err.message, 'error');
+      } finally {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Sí, confirmar';
+        cancelBtn.disabled = false;
+      }
     }
+
+    async function loadActivePurchaseOrders() {
+      const container = document.getElementById('active-pos-container');
+      const loadingEl = document.getElementById('active-pos-loading');
+      if (!container || !currentCompanyId) return;
+
+      try {
+        container.style.display = 'none';
+        loadingEl.style.display = 'block';
+
+        // 1. Fetch POs
+        const { data: pos, error: posErr } = await _supabase
+          .from('company_purchase_orders')
+          .select('*')
+          .eq('company_id', currentCompanyId)
+          .order('created_at', { ascending: false });
+
+        if (posErr) throw posErr;
+
+        if (!pos || pos.length === 0) {
+          loadingEl.innerHTML = `
+            <div style="text-align: center; padding: 2rem; color: var(--color-text-muted);">
+              Aún no tienes órdenes de compra generadas.
+            </div>
+          `;
+          return;
+        }
+
+        // 2. Fetch tracking for these POs
+        const poIds = pos.map(p => p.id);
+        let trackingMap = {};
+        if (poIds.length > 0) {
+          const { data: tracking } = await _supabase
+            .from('production_tracking')
+            .select('*')
+            .in('po_id', poIds);
+          if (tracking) {
+            trackingMap = tracking.reduce((acc, t) => ({ ...acc, [t.po_id]: t }), {});
+          }
+        }
+
+        // 3. Map seller/factory names
+        let compMap = {};
+        if (sellerCompanies && sellerCompanies.length > 0) {
+          sellerCompanies.forEach(s => {
+            compMap[s.id] = s.seller_name;
+          });
+        } else {
+          const { data: sellersData } = await _supabase.from('seller_company').select('id, seller_name');
+          if (sellersData) {
+            sellersData.forEach(s => {
+              compMap[s.id] = s.seller_name || 'Proveedor';
+            });
+          }
+        }
+
+        // 3.5 Fetch related quotes to get advance payment config & proof of payment
+        const quoteIds = pos.reduce((acc, po) => {
+          if (po.quote_ids && Array.isArray(po.quote_ids)) {
+            po.quote_ids.forEach(id => {
+              if (id) acc.add(id);
+            });
+          }
+          return acc;
+        }, new Set());
+
+        let quotesMap = {};
+        if (quoteIds.size > 0) {
+          const { data: quotesData } = await _supabase
+            .from('company_quotes_requests')
+            .select('*')
+            .in('id', Array.from(quoteIds));
+          if (quotesData) {
+            quotesMap = quotesData.reduce((acc, q) => ({ ...acc, [q.id]: q }), {});
+          }
+        }
+
+        // 4. Render POs
+        loadingEl.style.display = 'none';
+        container.style.display = 'flex';
+        container.innerHTML = '';
+
+        pos.forEach(po => {
+          const consecutivo = po.po_number || po.order_number || `PO-${po.id.slice(-6).toUpperCase()}`;
+          const date = new Date(po.created_at).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
+          const factory = compMap[po.seller_id] || 'Proveedor';
+          const totalStr = `$${(po.total_amount || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
+          const currentStatus = trackingMap[po.id]?.status || po.status || 'confirmation';
+
+          // Get advance payment info from related quote
+          const quoteId = po.quote_ids && po.quote_ids[0];
+          const quote = quoteId ? quotesMap[quoteId] : null;
+
+          let advancePercent = 0;
+          let paymentProofUrl = '';
+          let finalPaymentProofUrl = '';
+
+          if (quote && quote.sizes) {
+            if (quote.sizes.advance_payment_percent > 0) {
+              advancePercent = quote.sizes.advance_payment_percent;
+            }
+            if (quote.sizes.payment_proof_url) {
+              paymentProofUrl = quote.sizes.payment_proof_url;
+            }
+            if (quote.sizes.final_payment_proof_url) {
+              finalPaymentProofUrl = quote.sizes.final_payment_proof_url;
+            }
+          }
+
+          // Fallback final proof extraction from PO items for external PO files
+          if (!finalPaymentProofUrl && po.items && po.items[0] && po.items[0].final_payment_proof_url) {
+            finalPaymentProofUrl = po.items[0].final_payment_proof_url;
+          }
+
+          let valorPagado = 0;
+          if (finalPaymentProofUrl) {
+            valorPagado = po.total_amount;
+          } else if (paymentProofUrl) {
+            if (advancePercent > 0) {
+              valorPagado = po.total_amount * (advancePercent / 100);
+            } else {
+              valorPagado = po.total_amount;
+            }
+          } else {
+            valorPagado = 0;
+          }
+
+          let valorPorPagar = po.total_amount - valorPagado;
+
+          // Badge configuration
+          const badgeColors = {
+            confirmation: { bg: '#E0F2FE', text: '#0369A1', label: 'Confirmación' },
+            cutting: { bg: '#EEF2FF', text: '#4338CA', label: 'Corte' },
+            production: { bg: '#F5F3FF', text: '#6D28D9', label: 'Producción' },
+            quality: { bg: '#FDF2F8', text: '#BE185D', label: 'Calidad' },
+            delivery: { bg: '#FFF7ED', text: '#C2410C', label: 'Despacho' },
+            completed: { bg: '#ECFDF5', text: '#047857', label: 'Entregado' }
+          };
+          const badge = badgeColors[currentStatus] || { bg: '#F1F5F9', text: '#475569', label: currentStatus };
+
+          // Build item rows
+          const itemsHtml = (po.items || []).map(it => {
+            const qty = it.quantity || it.qty || 1;
+            const price = it.unit_price || 0;
+            const totalItem = qty * price;
+
+            let sizesStr = 'N/A';
+            if (it.sizes) {
+              if (typeof it.sizes === 'string') {
+                sizesStr = it.sizes;
+              } else if (typeof it.sizes === 'object') {
+                sizesStr = Object.entries(it.sizes).map(([sz, count]) => `${sz} (${count})`).join(', ');
+              }
+            } else if (it.size) {
+              sizesStr = it.size;
+            }
+
+            return `
+              <tr style="border-bottom: 1px solid #F1F5F9;">
+                <td style="padding: 0.75rem 0.5rem; text-align: left; font-weight: 600; color: var(--color-navy);">${it.product_name || it.name || 'Prenda'}</td>
+                <td style="padding: 0.75rem 0.5rem; text-align: center; font-weight: 700; color: var(--color-navy);">${qty}</td>
+                <td style="padding: 0.75rem 0.5rem; text-align: center;"><span style="background: #F1F5F9; color: var(--color-navy); padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 0.75rem;">${sizesStr}</span></td>
+                <td style="padding: 0.75rem 0.5rem; text-align: right; color: #64748B;">$${price.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</td>
+                <td style="padding: 0.75rem 0.5rem; text-align: right; font-weight: 800; color: var(--color-cyan);">$${totalItem.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</td>
+              </tr>
+            `;
+          }).join('');
+
+          // Timeline steps
+          const TRACKING_STEPS = [
+            { id: 'confirmation', label: 'CONFIRMACIÓN', desc: 'Recibida en taller' },
+            { id: 'cutting', label: 'CORTE', desc: 'Cola de producción' },
+            { id: 'production', label: 'PRODUCCIÓN', desc: 'Confección y costura' },
+            { id: 'quality', label: 'CALIDAD', desc: 'Control de calidad' },
+            { id: 'delivery', label: 'DESPACHO', desc: 'En tránsito a destino' },
+            { id: 'completed', label: 'ENTREGADO', desc: 'Servicio completado' }
+          ];
+
+          const currentStepIndex = TRACKING_STEPS.findIndex(s => s.id === currentStatus);
+          const progressPercent = currentStepIndex >= 0 ? (currentStepIndex / (TRACKING_STEPS.length - 1)) * 100 : 0;
+
+          const stepsHtml = TRACKING_STEPS.map((step, idx) => {
+            const isPastOrCurrent = idx <= currentStepIndex;
+            const isCurrent = idx === currentStepIndex;
+
+            const circleBg = isPastOrCurrent ? 'var(--color-cyan)' : '#FFFFFF';
+            const circleBorder = isPastOrCurrent ? '2px solid var(--color-cyan)' : '2px solid #CBD5E1';
+            const circleColor = isPastOrCurrent ? '#FFFFFF' : '#64748B';
+            const labelWeight = isCurrent ? '700' : '500';
+            const labelColor = isCurrent ? 'var(--color-navy)' : (isPastOrCurrent ? '#64748B' : '#94A3B8');
+            const glowShadow = isCurrent ? '0 0 16px rgba(6, 182, 212, 0.4)' : 'none';
+
+            return `
+              <div style="display: flex; flex-direction: column; align-items: center; text-align: center; min-width: 90px; z-index: 10; position: relative;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: ${circleBg}; border: ${circleBorder}; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: ${circleColor}; box-shadow: ${glowShadow}; transition: all 0.3s;">
+                  ${isPastOrCurrent && idx < currentStepIndex ? '✓' : idx + 1}
+                </div>
+                <span style="font-size: 0.8125rem; font-weight: ${labelWeight}; color: ${labelColor}; margin-top: 0.5rem; white-space: nowrap;">${step.label}</span>
+                <span style="font-size: 0.65rem; color: #94A3B8; margin-top: 0.1rem; line-height: 1.2; max-width: 85px;">${step.desc}</span>
+              </div>
+            `;
+          }).join('');
+
+          let paymentRowHtml = '';
+          if (currentStatus === 'completed') {
+            if (finalPaymentProofUrl) {
+              paymentRowHtml = `
+                <!-- Payment Info Row for Fully Paid Delivered PO -->
+                <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 0.25rem; padding: 0.75rem 1rem; background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 8px; width: 100%; box-sizing: border-box;">
+                  <div style="flex: 1; min-width: 120px;">
+                    <span style="font-size: 0.7rem; font-weight: 700; color: #047857; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Valor Pagado</span>
+                    <span style="font-size: 0.95rem; font-weight: 700; color: #059669;">${formatCurrency(valorPagado)}</span>
+                  </div>
+                  <div style="flex: 1; min-width: 120px;">
+                    <span style="font-size: 0.7rem; font-weight: 700; color: #047857; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Valor por Pagar</span>
+                    <span style="font-size: 0.95rem; font-weight: 700; color: #059669;">${formatCurrency(0)} (Pago Completo)</span>
+                  </div>
+                  <div style="flex: 1.5; min-width: 180px; display: flex; flex-direction: column; gap: 0.25rem; justify-content: center;">
+                    ${paymentProofUrl ? `
+                      <div style="display: inline-flex; align-items: center; gap: 0.25rem;">
+                        <span style="font-size: 0.75rem; color: #047857; font-weight: 700;">Anticipo:</span>
+                        <a href="${paymentProofUrl}" target="_blank" style="font-size: 0.75rem; font-weight: 700; color: #059669; text-decoration: underline; display: inline-flex; align-items: center; gap: 0.15rem;">
+                          Ver Comprobante
+                        </a>
+                      </div>
+                    ` : ''}
+                    <div style="display: inline-flex; align-items: center; gap: 0.25rem;">
+                      <span style="font-size: 0.75rem; color: #047857; font-weight: 700;">Pago Final:</span>
+                      <a href="${finalPaymentProofUrl}" target="_blank" style="font-size: 0.75rem; font-weight: 700; color: #059669; text-decoration: underline; display: inline-flex; align-items: center; gap: 0.15rem;">
+                        Ver Comprobante
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              `;
+            } else {
+              paymentRowHtml = `
+                <!-- Payment Info Row with Final Payment Uploader -->
+                <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.25rem; padding: 1rem; background: #FFF7ED; border: 1px solid #FFEDD5; border-radius: 8px; width: 100%; box-sizing: border-box;">
+                  <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 120px;">
+                      <span style="font-size: 0.7rem; font-weight: 700; color: #C2410C; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Valor Pagado</span>
+                      <span style="font-size: 0.95rem; font-weight: 700; color: #10B981;">${formatCurrency(valorPagado)}</span>
+                    </div>
+                    <div style="flex: 1; min-width: 120px;">
+                      <span style="font-size: 0.7rem; font-weight: 700; color: #C2410C; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Valor por Pagar</span>
+                      <span style="font-size: 0.95rem; font-weight: 700; color: #EF4444;">${formatCurrency(valorPorPagar)}</span>
+                    </div>
+                    <div style="flex: 1.5; min-width: 180px; display: flex; align-items: center;">
+                      ${paymentProofUrl ? `
+                        <div style="display: inline-flex; align-items: center; gap: 0.35rem; background: #ECFDF5; border: 1px solid #A7F3D0; padding: 0.25rem 0.6rem; border-radius: 6px;">
+                          <span style="font-size: 0.9rem;">📄</span>
+                          <a href="${paymentProofUrl}" target="_blank" style="font-size: 0.75rem; font-weight: 700; color: #059669; text-decoration: none; display: flex; align-items: center; gap: 0.15rem;">
+                            Comprobante Anticipo
+                          </a>
+                        </div>
+                      ` : `
+                        <span style="font-size: 0.75rem; color: #94A3B8; font-style: italic;">Sin anticipo registrado</span>
+                      `}
+                    </div>
+                  </div>
+
+                  <!-- Action Area for delivered PO to confirm 100% payment and upload final support -->
+                  <div style="border-top: 1px dashed #FDBA74; padding-top: 0.75rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                      <div style="flex: 1; min-width: 200px;">
+                        <div class="proof-upload-zone" style="cursor: pointer; border: 2px dashed #FDBA74; border-radius: 8px; padding: 0.5rem; text-align: center; background: white; transition: all 0.2s;"
+                             onclick="document.getElementById('finalProofInput-${po.id}').click()"
+                             onmouseover="this.style.borderColor='#F97316'; this.style.background='#FFFDFA';"
+                             onmouseout="this.style.borderColor='#FDBA74'; this.style.background='white';"
+                             id="finalProofDropzone-${po.id}">
+                          <span id="finalProof-upload-text-${po.id}" style="font-size: 0.75rem; font-weight: 700; color: #C2410C; display: block;">
+                            📎 Adjuntar Comprobante de Pago Restante
+                          </span>
+                          <input type="file" id="finalProofInput-${po.id}" accept=".pdf,.png,.jpg,.jpeg" style="display: none;" 
+                                 onchange="handleFinalProofSelect(event, '${po.id}')">
+                        </div>
+                      </div>
+                      
+                      <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <label style="display: flex; align-items: center; gap: 0.35rem; cursor: pointer; font-size: 0.75rem; color: #9A3412; font-weight: 700;">
+                          <input type="checkbox" id="check100Percent-${po.id}">
+                          Confirmo que aboné el 100%
+                        </label>
+                        <button class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; font-weight: 700; background: #F97316; border: none;" 
+                                onclick="uploadFinalPaymentProof('${po.id}')" id="btnSubmitFinal-${po.id}">
+                          Registrar Pago
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }
+          } else {
+            paymentRowHtml = `
+              <!-- Payment Info Row -->
+              <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 0.25rem; padding: 0.75rem 1rem; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px;">
+                <div style="flex: 1; min-width: 120px;">
+                  <span style="font-size: 0.7rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Valor Pagado</span>
+                  <span style="font-size: 0.95rem; font-weight: 700; color: #10B981;">${formatCurrency(valorPagado)}</span>
+                </div>
+                <div style="flex: 1; min-width: 120px;">
+                  <span style="font-size: 0.7rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Valor por Pagar</span>
+                  <span style="font-size: 0.95rem; font-weight: 700; color: ${valorPorPagar > 0 ? '#F97316' : '#64748B'};">${formatCurrency(valorPorPagar)}</span>
+                </div>
+                <div style="flex: 1.5; min-width: 180px; display: flex; align-items: center;">
+                  ${paymentProofUrl ? `
+                    <div style="display: inline-flex; align-items: center; gap: 0.35rem; background: #ECFDF5; border: 1px solid #A7F3D0; padding: 0.25rem 0.6rem; border-radius: 6px;">
+                      <span style="font-size: 0.9rem;">📄</span>
+                      <a href="${paymentProofUrl}" target="_blank" style="font-size: 0.75rem; font-weight: 700; color: #059669; text-decoration: none; display: flex; align-items: center; gap: 0.15rem;">
+                        Ver Comprobante <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-left: 1px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6m4-3h6v6m-11 5L21 3"/></svg>
+                      </a>
+                    </div>
+                  ` : `
+                    <span style="font-size: 0.75rem; color: #94A3B8; font-style: italic;">Sin comprobante de pago</span>
+                  `}
+                </div>
+              </div>
+            `;
+          }
+
+          const cardHtml = `
+            <div class="app-card" style="border: 1px solid var(--color-border); border-radius: 12px; padding: 1.5rem; margin-bottom: 0; display: flex; flex-direction: column; gap: 1rem; background: white; transition: all 0.2s; text-align: left;">
+              <!-- Header Summary -->
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; width: 100%;">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                    <span style="font-size: 1.15rem; font-weight: 800; color: var(--color-navy); font-family: 'Outfit', sans-serif;">${consecutivo}</span>
+                    <span class="status-badge" style="background: ${badge.bg}; color: ${badge.text}; font-weight: 700; font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 6px;">${badge.label.toUpperCase()}</span>
+                  </div>
+                  <div style="font-size: 0.8125rem; color: var(--color-text-muted); margin-top: 0.25rem;">
+                    Fecha: <strong>${date}</strong> • Proveedor: <strong>${factory}</strong>
+                  </div>
+                </div>
+                <div style="text-align: right; margin-left: auto;">
+                  <div style="font-size: 1.25rem; font-weight: 800; color: var(--color-cyan); font-family: 'Outfit', sans-serif;">${totalStr}</div>
+                  <button class="btn btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.75rem; border-color: var(--color-border); background: white; color: var(--color-navy); margin-top: 0.5rem;" onclick="togglePoDetails('${po.id}')" id="btn-toggle-${po.id}">
+                    Ver Detalles
+                  </button>
+                </div>
+              </div>
+
+              ${paymentRowHtml}
+
+              <!-- Expanded Details (collapsible) -->
+              <div id="details-${po.id}" style="display: none; border-top: 1px solid var(--color-border); padding-top: 1.5rem; margin-top: 0.5rem; animation: scaleIn 0.2s ease-out forwards; width: 100%;">
+                
+                <!-- Premium Progress Tracker -->
+                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; width: 100%; box-sizing: border-box;">
+                  <h4 style="font-size: 0.875rem; font-family: 'Outfit', sans-serif; color: var(--color-navy); font-weight: 700; margin-bottom: 1.5rem; text-align: left;">Línea de Confección y Seguimiento</h4>
+                  
+                  <div style="overflow-x: auto; padding-bottom: 0.75rem; width: 100%;">
+                    <div style="display: flex; justify-content: space-between; position: relative; min-width: 580px; margin: 1rem 0; padding: 0 1rem; box-sizing: border-box;">
+                      <!-- Line connecting steps -->
+                      <div style="position: absolute; top: 15px; left: 40px; right: 40px; height: 4px; background: #E2E8F0; z-index: 1;"></div>
+                      <!-- Active progress bar -->
+                      <div style="position: absolute; top: 15px; left: 40px; width: calc((100% - 80px) * ${progressPercent / 100}); height: 4px; background: var(--color-cyan); z-index: 2; transition: width 0.4s ease;"></div>
+                      
+                      ${stepsHtml}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Products breakdown table -->
+                <h4 style="font-size: 0.875rem; font-family: 'Outfit', sans-serif; color: var(--color-navy); font-weight: 700; margin-bottom: 0.75rem; text-align: left;">Desglose de Productos</h4>
+                <div style="overflow-x: auto; border: 1px solid var(--color-border); border-radius: 8px; width: 100%;">
+                  <table style="width: 100%; border-collapse: collapse; font-size: 0.8125rem;">
+                    <thead>
+                      <tr style="background: #F8FAFC; border-bottom: 1px solid var(--color-border);">
+                        <th style="padding: 0.75rem; text-align: left; color: #64748B; font-weight: 700;">Producto / Prenda</th>
+                        <th style="padding: 0.75rem; text-align: center; color: #64748B; font-weight: 700;">Cant.</th>
+                        <th style="padding: 0.75rem; text-align: center; color: #64748B; font-weight: 700;">Tallas / Detalle</th>
+                        <th style="padding: 0.75rem; text-align: right; color: #64748B; font-weight: 700;">Precio Unit.</th>
+                        <th style="padding: 0.75rem; text-align: right; color: #64748B; font-weight: 700;">Monto Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${itemsHtml}
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Terms and file download -->
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; font-size: 0.8125rem; color: var(--color-text-muted); width: 100%;">
+                  <div>
+                    Términos de Pago: <strong style="color: var(--color-navy);">${po.payment_terms || 'Contado'}</strong>
+                  </div>
+                  ${po.file_url ? `
+                    <div>
+                      <a href="${po.file_url}" target="_blank" style="color: var(--color-cyan); font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.25rem;">
+                        <span>📄</span> Descargar Documento Adjunto
+                      </a>
+                    </div>
+                  ` : ''}
+                </div>
+
+              </div>
+            </div>
+          `;
+          const div = document.createElement('div');
+          div.innerHTML = cardHtml;
+          container.appendChild(div.firstElementChild);
+        });
+
+      } catch (err) {
+        console.error('Error fetching active POs:', err);
+        loadingEl.innerHTML = `
+          <div style="text-align: center; padding: 2rem; color: #EF4444; font-weight: 600;">
+            Ocurrió un error al cargar las órdenes de compra.
+          </div>
+        `;
+      }
+    }
+
+    function togglePoDetails(poId) {
+      const detailsEl = document.getElementById(`details-${poId}`);
+      const btn = document.getElementById(`btn-toggle-${poId}`);
+      if (!detailsEl || !btn) return;
+
+      if (detailsEl.style.display === 'none') {
+        detailsEl.style.display = 'block';
+        btn.textContent = 'Ocultar Detalles';
+        btn.style.background = 'var(--color-smoke)';
+      } else {
+        detailsEl.style.display = 'none';
+        btn.textContent = 'Ver Detalles';
+        btn.style.background = 'white';
+      }
+    }
+
+    // Inicializar buscador en tiempo real en la carga del documento
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.querySelector('#quote-search-area input[type="text"]');
+      if (searchInput) {
+        searchInput.id = 'quoteSearchInput';
+        searchInput.addEventListener('input', (e) => {
+          const query = e.target.value.toLowerCase().trim();
+          const filtered = allQuotes.filter(q => {
+            const consecutivo = (q.quote_number || '').toLowerCase();
+            const id = q.id.toLowerCase();
+            const sellerName = (q.seller_name || '').toLowerCase();
+            return consecutivo.includes(query) || id.includes(query) || sellerName.includes(query);
+          });
+          renderQuotesList(filtered);
+        });
+      }
+
+      initOrdenes();
+
+      // Check URL hash for direct tab navigation
+      const hash = window.location.hash;
+      if (hash === '#active') {
+        switchTab('active');
+      } else {
+        switchTab('create');
+      }
+    });
   </script>
 
   <!-- Modal de Confirmación -->
-  <div id="confirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center;">
-    <div style="background: white; border-radius: 16px; width: 90%; max-width: 400px; padding: 2rem; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: scaleIn 0.3s ease-out forwards; position: relative;">
-      
-      <div style="width: 48px; height: 48px; background: rgba(6, 182, 212, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; color: var(--color-cyan);">
+  <div id="confirmModal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center;">
+    <div
+      style="background: white; border-radius: 16px; width: 90%; max-width: 400px; padding: 2rem; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: scaleIn 0.3s ease-out forwards; position: relative;">
+
+      <div
+        style="width: 48px; height: 48px; background: rgba(6, 182, 212, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; color: var(--color-cyan);">
         <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
           <polyline points="22 4 12 14.01 9 11.01" />
         </svg>
       </div>
 
-      <h3 style="font-size: 1.25rem; font-family: 'Outfit', sans-serif; color: var(--color-navy); margin-bottom: 0.75rem;">¿Confirmar y enviar a taller?</h3>
-      <p style="font-size: 0.9375rem; color: var(--color-text-secondary); line-height: 1.5; margin-bottom: 2rem;">Al confirmar, se generará la orden de producción inmediata y se notificará al taller central. Esta acción no se puede deshacer.</p>
+      <h3
+        style="font-size: 1.25rem; font-family: 'Outfit', sans-serif; color: var(--color-navy); margin-bottom: 0.75rem;">
+        ¿Confirmar y enviar a taller?</h3>
+      <p style="font-size: 0.9375rem; color: var(--color-text-secondary); line-height: 1.5; margin-bottom: 2rem;">Al
+        confirmar, se generará la orden de producción inmediata y se notificará al taller central. Esta acción no se
+        puede deshacer.</p>
 
       <div style="display: flex; gap: 1rem; justify-content: flex-end;">
         <button class="btn btn-outline" onclick="closeConfirmModal()" style="flex: 1;">Cancelar</button>
@@ -481,11 +1869,34 @@
 
   <style>
     @keyframes scaleIn {
-      from { transform: scale(0.95); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+      from {
+        transform: scale(0.95);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
   </style>
-<script src="assets/js/utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    if (typeof window._supabase === 'undefined') {
+      window.SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+      window.SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+      window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+    }
+  </script>
+  <script src="assets/js/utils.js"></script>
+  <script>
+    function toggleSidebar() {
+      const layout = document.getElementById('app-layout-wrapper');
+      if (layout) {
+        layout.classList.toggle('sidebar-open');
+      }
+    }
+  </script>
 </body>
 
 </html>
