@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dotacian | Configurar Uniforme</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      padding: 3rem 4rem;
+      width: calc(100% - var(--sidebar-width));
+      min-height: 100vh;
+    }
+
+    .config-layout {
+      display: grid;
+      grid-template-columns: 1.5fr 400px;
+      gap: 4rem;
+      padding: 1rem 0;
+      align-items: start;
+    }
+
+    .product-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+      padding: 1.5rem 0;
+      border-top: 1px solid #F1F5F9;
+      border-bottom: 1px solid #F1F5F9;
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .meta-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      font-weight: 700;
+    }
+
+    .meta-value {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-navy);
+    }
+
+    .product-description {
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    .volume-discounts-card {
+      background: #F8FAFC;
+      border-radius: 16px;
+      padding: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .discount-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      font-size: 0.85rem;
+      border-bottom: 1px dashed #E2E8F0;
+    }
+
+    .discount-row:last-child {
+      border-bottom: none;
+    }
+
+    .discount-qty {
+      font-weight: 600;
+      color: var(--color-navy);
+    }
+
+    .discount-val {
+      color: #10B981;
+      font-weight: 700;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.8rem;
+      background: #F0FDF4;
+      color: #166534;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .gallery-container {
+      background: white;
+      border-radius: 40px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      position: sticky;
+      top: 2rem;
+      border: none;
+      box-shadow: none;
+    }
+
+    .main-image-viewer {
+      aspect-ratio: 4/5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #F8FAFC;
+      border-radius: 24px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid #F1F5F9;
+    }
+
+    .main-image-viewer img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 0.5rem;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .main-image-viewer:hover img {
+      transform: scale(1.02);
+    }
+
+    /* Logo Overlay Styles */
+    .logo-overlay-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #logo-preview-overlay {
+      position: absolute;
+      cursor: move;
+      pointer-events: auto;
+      user-select: none;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+      transition: none;
+      border: 1px dashed transparent;
+      padding: 4px;
+    }
+
+    #logo-preview-overlay:hover {
+      border-color: var(--color-cyan);
+    }
+
+    .resize-handle {
+      position: absolute;
+      bottom: -5px;
+      right: -5px;
+      width: 12px;
+      height: 12px;
+      background: var(--color-cyan);
+      border: 2px solid white;
+      border-radius: 50%;
+      cursor: nwse-resize;
+      display: none;
+    }
+
+    #logo-preview-overlay:hover .resize-handle {
+      display: block;
+    }
+
+    /* Technique Selection UI */
+    .technique-option input[type="radio"]:checked+.tech-card {
+      background: var(--color-cyan);
+      color: white;
+      border-color: var(--color-cyan);
+    }
+
+    .config-card {
+      background: white;
+      border: 1px solid #E2E8F0;
+      border-radius: 20px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .control-group {
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .control-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .control-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #64748B;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--color-cyan);
+      height: 6px;
+      border-radius: 3px;
+      background: #F1F5F9;
+      appearance: none;
+      cursor: pointer;
+    }
+
+    .thumbnails {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+    }
+
+    .thumb {
+      width: 80px;
+      height: 80px;
+      border-radius: 12px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: white;
+    }
+
+    .thumb.active {
+      border-color: var(--color-cyan);
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 0.5rem;
+    }
+
+    .options-grid {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+
+    .option-chip {
+      padding: 0.5rem 1rem;
+      background: #F1F5F9;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .config-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #94A3B8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1.25rem;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 14px;
+      color: var(--color-navy);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-bottom: 2rem;
+    }
+
+    .btn-back:hover {
+      background: white;
+      border-color: var(--color-cyan);
+      color: var(--color-cyan);
+      transform: translateX(-5px);
+      box-shadow: 0 10px 15px -3px rgba(6, 182, 212, 0.1);
+    }
+
+    .role-grid-assignment {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .role-card-item {
+      background: white;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      position: relative;
+    }
+
+    .role-card-item:hover {
+      border-color: var(--color-cyan);
+      background: #F8FAFC;
+    }
+
+    .role-card-item.selected {
+      border-color: var(--color-cyan);
+      background: #ECFEFF;
+      color: var(--color-cyan);
+    }
+
+    .custom-checkbox {
+      width: 14px;
+      height: 14px;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .role-card-item.selected .custom-checkbox {
+      background: var(--color-cyan);
+      border-color: var(--color-cyan);
+    }
+
+    .role-card-item.selected .custom-checkbox::after {
+      content: '';
+      width: 4px;
+      height: 8px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+      margin-bottom: 2px;
+    }
+
+    .role-card-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--color-navy);
+      line-height: 1;
+    }
+
+    .btn-primary {
+      background: var(--color-cyan);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #E2E8F0;
+      border-radius: 16px;
+      color: var(--color-navy);
+      text-decoration: none;
+      padding: 1.25rem;
+      font-weight: 700;
+    }
+
+    .action-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .toast-container {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      z-index: 9999;
+    }
+
+    @media (max-width: 1024px) {
+      .config-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .gallery-container {
+        position: static;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="app.html" style="display: block; width: 100%; text-align: center;">
+          <img src="assets/logos/logo_dotacian.png" alt="dotacian logo"
+            style="width: 180px; max-width: 100%; height: auto; display: inline-block;">
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="app.html" class="nav-item active">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <rect width="7" height="9" x="3" y="3" rx="1" />
+              <rect width="7" height="5" x="14" y="3" rx="1" />
+              <rect width="7" height="9" x="14" y="12" rx="1" />
+              <rect width="7" height="5" x="3" y="16" rx="1" />
+            </svg></span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="roles.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg></span>
+          <span class="nav-label">Roles</span>
+        </a>
+        <a href="marketplace.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path
+                d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
+            </svg></span>
+          <span class="nav-label">Marketplace</span>
+        </a>
+        <a href="empleados.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg></span>
+          <span class="nav-label">Empleados</span>
+        </a>
+        <div class="nav-group">
+          <a href="cotizaciones.html" class="nav-item">
+            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path d="m7.5 4.27 9 5.15" />
+                <path
+                  d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                <path d="m3.3 7 8.7 5 8.7-5" />
+                <path d="M12 22V12" />
+              </svg></span>
+            <span class="nav-label">Producción</span>
+            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor"
+                stroke-width="2" viewBox="0 0 24 24">
+                <path d="m6 9 6 6 6-6" />
+              </svg></span>
+          </a>
+          <div class="nav-sub-items">
+            <a href="cotizaciones.html" class="nav-sub-item">Cotizaciones</a>
+            <a href="ordenes.html" class="nav-sub-item">Órdenes de Compra</a>
+          </div>
+        </div>
+        <a href="bodega.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <polyline points="21 8 21 21 3 21 3 8"></polyline>
+              <rect x="1" y="3" width="22" height="5"></rect>
+              <line x1="10" y1="12" x2="14" y2="12"></line>
+            </svg></span>
+          <span class="nav-label">Bodega</span>
+        </a>
+        <div id="version-tag"></div>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div id="loading-state"
+        style="display: flex; align-items: center; justify-content: center; height: 60vh; font-weight: 600; color: #64748B;">
+        Cargando detalles del producto...
+      </div>
+
+      <div id="config-content" style="display: none;">
+        <nav>
+          <a href="marketplace.html" class="btn-back">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path d="M19 12H5m7-7-7 7 7 7" />
+            </svg>
+            Volver al Marketplace
+          </a>
+        </nav>
+
+        <div class="config-layout">
+          <div class="gallery-container">
+            <div class="main-image-viewer" id="garment-container">
+              <img id="main-product-image" src="" alt="Producto" style="pointer-events: none;">
+              <div class="logo-overlay-container">
+                <div id="logo-preview-overlay" style="display: none;">
+                  <img id="logo-img-preview" src="" alt=""
+                    style="width: 100%; height: 100%; pointer-events: none; display: block;">
+                  <div class="resize-handle" id="resize-handle"></div>
+                </div>
+              </div>
+            </div>
+            <div class="thumbnails" id="thumbnails">
+            </div>
+          </div>
+
+          <div class="product-info">
+            <div id="product-status" class="status-pill">
+              <span class="pulse-dot" style="width: 8px; height: 8px; background: #10B981; border-radius: 50%;"></span>
+              Disponible para envío inmediato
+            </div>
+
+            <div style="margin-bottom: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+              <h1 id="product-name" class="product-title"
+                style="font-size: 2.25rem; margin: 0; color: var(--color-navy); line-height: 1.1; text-wrap: balance;">
+                Cargando...</h1>
+              <div style="display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap;">
+                <span style="font-size: 1rem; color: #94A3B8; font-weight: 700; text-transform: uppercase;">Desde</span>
+                <span id="product-price" class="product-price"
+                  style="font-size: 1.75rem; color: var(--color-cyan); font-weight: 800;">$0</span>
+              </div>
+            </div>
+
+            <div id="product-industry"
+              style="font-size: 0.85rem; font-weight: 600; color: var(--color-cyan); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.05em;">
+              Industria</div>
+
+            <p id="product-description" class="product-description">
+              Cargando descripción...
+            </p>
+
+            <div class="config-card" style="margin-top: 1rem;">
+              <h3 class="section-title" style="margin-bottom: 1rem;">Personalización de Logo</h3>
+              <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <button class="btn-outline" onclick="document.getElementById('logo-upload').click()"
+                  style="padding: 0.75rem; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; border-style: dashed;">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M4 16v1a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-1m-4-8-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                  Subir Logotipo
+                </button>
+                <input type="file" id="logo-upload" style="display: none;" accept="image/*"
+                  onchange="handleLogoUpload(event)">
+
+                <div id="logo-controls" style="display: none;">
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem;">
+                    <div class="control-item">
+                      <span class="control-label">Ancho (cm)</span>
+                      <input type="number" id="logo-width-cm" placeholder="0.0" step="0.1"
+                        style="padding: 0.5rem; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.85rem; font-weight: 700; color: var(--color-navy);">
+                    </div>
+                    <div class="control-item">
+                      <span class="control-label">Alto (cm)</span>
+                      <input type="number" id="logo-height-cm" placeholder="0.0" step="0.1"
+                        style="padding: 0.5rem; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.85rem; font-weight: 700; color: var(--color-navy);">
+                    </div>
+                  </div>
+
+                  <div class="control-item" style="margin-top: 1rem;">
+                    <span class="control-label">Técnica de Personalización</span>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.4rem;">
+                      <label class="technique-option" style="cursor: pointer;">
+                        <input type="radio" name="logo-technique" value="estampado" checked style="display: none;">
+                        <div class="tech-card"
+                          style="padding: 0.6rem; border: 1px solid #E2E8F0; border-radius: 10px; text-align: center; font-size: 0.8rem; font-weight: 700; transition: all 0.2s;">
+                          Estampado</div>
+                      </label>
+                      <label class="technique-option" style="cursor: pointer;">
+                        <input type="radio" name="logo-technique" value="bordado" style="display: none;">
+                        <div class="tech-card"
+                          style="padding: 0.6rem; border: 1px solid #E2E8F0; border-radius: 10px; text-align: center; font-size: 0.8rem; font-weight: 700; transition: all 0.2s;">
+                          Bordado</div>
+                      </label>
+                    </div>
+                  </div>
+
+                  <p style="font-size: 0.7rem; color: #94A3B8; margin-top: 0.75rem;">Arrastra el logo sobre la prenda
+                    para ubicarlo y usa la esquina para ajustar el tamaño visual.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="product-meta-grid">
+              <div class="meta-item">
+                <span class="meta-label">SKU</span>
+                <span id="product-sku" class="meta-value">-</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Género</span>
+                <span id="product-gender" class="meta-value">-</span>
+              </div>
+            </div>
+
+            <div class="config-section">
+              <h3 class="section-title">Color</h3>
+              <div id="color-options" class="options-grid"></div>
+            </div>
+
+            <div class="config-section">
+              <h3 class="section-title">Tallas Disponibles</h3>
+              <div id="size-options" class="options-grid"></div>
+            </div>
+
+            <div class="config-section">
+              <h3 class="section-title">Descuentos por Volumen</h3>
+              <div id="volume-discounts" class="volume-discounts-card">
+                <div class="discount-row">
+                  <span class="discount-qty">Consultar</span>
+                  <span class="discount-val">Precio Base</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="assignment-section" style="padding-top: 2rem; border-top: 1px solid #F1F5F9;">
+              <h3 class="section-title" style="margin-bottom: 0.5rem;">Asignar a Rol de mi Empresa</h3>
+              <p style="font-size: 0.8rem; color: #94A3B8; margin-bottom: 1rem;">Selecciona los equipos que utilizarán
+                este modelo técnico.</p>
+              <div id="role-grid-assignment" class="role-grid-assignment">
+              </div>
+            </div>
+
+            <div class="action-group">
+              <button id="btn-save" class="btn-primary" onclick="saveToRole()"
+                style="width: 100%; padding: 1.25rem; font-size: 1.1rem;">Asignar a rol</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let productData = null;
+    let selectedRoles = [];
+    let selectedLogoFile = null;
+    let userCountry = 'MX'; // Default
+
+    function showToast(title, message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.style.cssText = "background: white; border-left: 4px solid " + (type === 'error' ? '#EF4444' : 'var(--color-cyan)') + "; padding: 1rem 1.5rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 1rem; min-width: 320px; transition: transform 0.4s;";
+
+      const iconBg = type === 'success' ? '#ECFEFF' : '#FEE2E2';
+      const iconColor = type === 'success' ? 'var(--color-cyan)' : '#EF4444';
+
+      toast.innerHTML = `
+        <div style="background: ${iconBg}; color: ${iconColor}; padding: 0.5rem; border-radius: 8px;">
+          ${type === 'success'
+          ? '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'
+          : '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'}
+        </div>
+        <div>
+          <div style="font-weight: 800; color: var(--color-navy); font-size: 0.9rem;">${title}</div>
+          <div style="font-size: 0.8rem; color: #64748B;">${message}</div>
+        </div>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => { toast.remove(); }, 3500);
+    }
+
+    async function init() {
+      const productId = localStorage.getItem('selected_product_id');
+      if (!productId) { window.location.href = 'marketplace.html'; return; }
+      const { data: { session } } = await _supabase.auth.getSession();
+      if (!session) { window.location.href = 'login.html'; return; }
+
+      // Get Country
+      const { data: profile } = await _supabase.from('user_profile').select('country').eq('id', session.user.id).maybeSingle();
+      const { data: compProfile } = await _supabase.from('company_profile').select('country').eq('id', session.user.id).maybeSingle();
+      userCountry = (compProfile && compProfile.country) || (profile && profile.country) || 'MX';
+
+      if (typeof updateVersionIndicator === 'function') {
+        updateVersionIndicator(userCountry);
+      }
+
+      await loadProduct(productId);
+      await loadRoles(session.user.id);
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('config-content').style.display = 'block';
+    }
+
+    async function loadProduct(id) {
+      const { data, error } = await _supabase.from('seller_catalog').select('*').eq('id', id).single();
+      if (error) return;
+      productData = data;
+      renderProduct();
+    }
+
+    async function loadRoles(userId) {
+      const grid = document.getElementById('role-grid-assignment');
+
+      // Load ACTIVE roles from company_roles (saved when toggle is ON in roles.html)
+      const { data: activeRoles, error } = await _supabase
+        .from('company_roles')
+        .select('role_name')
+        .eq('company_id', userId);
+
+      if (error || !activeRoles || activeRoles.length === 0) {
+        grid.innerHTML = '<div style="font-size: 0.85rem; color: #EF4444; width: 100%;">Aún no tienes roles habilitados. Configúralos primero en la sección de Roles.</div>';
+        return;
+      }
+
+      grid.innerHTML = activeRoles.map(r => `
+        <div class="role-card-item" onclick="toggleRoleSelection('${r.role_name}', this)">
+          <div class="custom-checkbox"></div>
+          <span class="role-card-label">${r.role_name}</span>
+        </div>
+      `).join('');
+    }
+
+    function toggleRoleSelection(role, element) {
+      const idx = selectedRoles.indexOf(role);
+      if (idx > -1) {
+        selectedRoles.splice(idx, 1);
+        element.classList.remove('selected');
+      } else {
+        selectedRoles.push(role);
+        element.classList.add('selected');
+      }
+      const btn = document.getElementById('btn-save');
+      btn.textContent = selectedRoles.length > 0 ? `Asignar a ${selectedRoles.length} ${selectedRoles.length === 1 ? 'rol' : 'roles'}` : 'Asignar a rol';
+    }
+
+    function renderProduct() {
+      if (!productData) return;
+
+      const curConfig = getCurrencyConfig(userCountry);
+
+      document.getElementById('product-name').textContent = productData.name;
+      document.getElementById('product-price').textContent = `${formatCurrency(productData.base_price || 0, userCountry)} ${curConfig.code}`;
+      document.getElementById('product-description').textContent = productData.description || 'No hay descripción disponible para este producto.';
+      document.getElementById('product-sku').textContent = productData.sku || 'N/A';
+      document.getElementById('product-gender').textContent = productData.gender || 'Unisex';
+      document.getElementById('product-industry').textContent = productData.industry || productData.subcategory || 'General';
+
+      // Status indicator
+      const statusPill = document.getElementById('product-status');
+      if (productData.stock_status === 'out_of_stock') {
+        statusPill.innerHTML = '<span style="width: 8px; height: 8px; background: #EF4444; border-radius: 50%;"></span> Agotado Temporalmente';
+        statusPill.style.background = '#FEF2F2';
+        statusPill.style.color = '#991B1B';
+      }
+
+      const mainImg = document.getElementById('main-product-image');
+      mainImg.src = productData.images?.[0] || productData.image_url;
+
+      const thumbsContainer = document.getElementById('thumbnails');
+      const allImages = productData.images || [productData.image_url];
+      thumbsContainer.innerHTML = allImages.map((img, idx) => `
+        <div class="thumb ${idx === 0 ? 'active' : ''}" onclick="setMainImage(this, '${img}')">
+          <img src="${img}" alt="thumbnail">
+        </div>
+      `).join('');
+
+      // Colors
+      const colorContainer = document.getElementById('color-options');
+      const colorStr = productData.color || productData.colors?.join(', ') || 'Estándar';
+      const colors = colorStr.split(',').map(c => c.trim()).filter(c => c);
+      colorContainer.innerHTML = colors.map(c => `<div class="option-chip" style="cursor: default;">${c}</div>`).join('');
+
+      // Sizes
+      const sizeContainer = document.getElementById('size-options');
+      const sizeStr = productData.size || (Array.isArray(productData.sizes) ? productData.sizes.join(', ') : 'Talla Única');
+      const sizes = sizeStr.split(',').map(s => s.trim()).filter(s => s);
+      sizeContainer.innerHTML = sizes.map(s => `<div class="option-chip">${s}</div>`).join('');
+
+      // Volume Discounts
+      const discountContainer = document.getElementById('volume-discounts');
+      const discounts = productData.wholesale_prices || productData.volume_discounts || [];
+
+      // curConfig already defined at the top of renderProduct
+      if (discounts.length > 0) {
+        discountContainer.innerHTML = discounts.sort((a, b) => (a.min_qty || a.min) - (b.min_qty || b.min)).map(d => {
+          const qty = d.min_qty || d.min;
+          const val = d.price ? `${formatCurrency(d.price, userCountry)} ${curConfig.code}` : `-${d.discount_percent}% OFF`;
+          return `
+            <div class="discount-row">
+              <span class="discount-qty">${qty}+ unidades</span>
+              <span class="discount-val">${val}</span>
+            </div>
+          `;
+        }).join('');
+      } else {
+        discountContainer.innerHTML = `
+          <div class="discount-row">
+            <span class="discount-qty">1+ unidades</span>
+            <span class="discount-val">Precio Base</span>
+          </div>
+        `;
+      }
+    }
+
+    let selectedColor = null;
+    function selectColor(color, el) {
+      document.querySelectorAll('#color-options .option-chip').forEach(c => {
+        c.style.background = '#F1F5F9';
+        c.style.color = 'var(--color-navy)';
+        c.style.borderColor = 'transparent';
+      });
+      el.style.background = 'var(--color-cyan)';
+      el.style.color = 'white';
+      selectedColor = color;
+    }
+
+    function setMainImage(el, url) {
+      document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('main-product-image').src = url;
+    }
+
+    function handleLogoUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        selectedLogoFile = file;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const overlay = document.getElementById('logo-preview-overlay');
+          const img = document.getElementById('logo-img-preview');
+          img.src = e.target.result;
+          overlay.style.display = 'block';
+          document.getElementById('logo-controls').style.display = 'block';
+
+          // Initial center position
+          overlay.style.width = '100px';
+          overlay.style.top = '30%';
+          overlay.style.left = '50%';
+          overlay.style.transform = 'translate(-50%, -50%)';
+
+          initLogoInteraction();
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function initLogoInteraction() {
+      const overlay = document.getElementById('logo-preview-overlay');
+      const container = document.getElementById('garment-container');
+      const handle = document.getElementById('resize-handle');
+
+      let isDragging = false;
+      let isResizing = false;
+      let startX, startY, startWidth, startHeight, startTop, startLeft;
+
+      overlay.onmousedown = (e) => {
+        if (e.target === handle) {
+          isResizing = true;
+          startWidth = overlay.offsetWidth;
+          startHeight = overlay.offsetHeight;
+        } else {
+          isDragging = true;
+        }
+        startX = e.clientX;
+        startY = e.clientY;
+        startTop = overlay.offsetTop;
+        startLeft = overlay.offsetLeft;
+        e.preventDefault();
+      };
+
+      document.onmousemove = (e) => {
+        if (isDragging) {
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+
+          let newLeft = ((startLeft + dx) / container.offsetWidth) * 100;
+          let newTop = ((startTop + dy) / container.offsetHeight) * 100;
+
+          overlay.style.left = newLeft + '%';
+          overlay.style.top = newTop + '%';
+        } else if (isResizing) {
+          const dx = e.clientX - startX;
+          overlay.style.width = (startWidth + dx) + 'px';
+        }
+      };
+
+      document.onmouseup = () => {
+        isDragging = false;
+        isResizing = false;
+      };
+    }
+
+    async function saveToRole() {
+      if (selectedRoles.length === 0) {
+        showToast('Atención', 'Por favor selecciona al menos un equipo operativo para asignar esta prenda.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('btn-save');
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Asignando...';
+
+      try {
+        const { data: { user } } = await _supabase.auth.getUser();
+
+        let logoUrl = null;
+        let logoConfig = null;
+
+        // Si hay un logo seleccionado, procesarlo
+        if (selectedLogoFile) {
+          const fileExt = selectedLogoFile.name.split('.').pop();
+          const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+          const { data: uploadData, error: uploadError } = await _supabase.storage
+            .from('logos')
+            .upload(fileName, selectedLogoFile);
+
+          if (uploadError) throw uploadError;
+
+          const { data: { publicUrl } } = _supabase.storage
+            .from('logos')
+            .getPublicUrl(fileName);
+
+          const overlay = document.getElementById('logo-preview-overlay');
+          const techniqueEl = document.querySelector('input[name="logo-technique"]:checked');
+          const technique = techniqueEl ? techniqueEl.value : 'Estampado'; // Default fallback
+
+          logoUrl = publicUrl;
+          logoConfig = {
+            url: logoUrl,
+            technique: technique,
+            width_cm: document.getElementById('logo-width-cm').value || 10,
+            height_cm: document.getElementById('logo-height-cm').value || 10,
+            preview_size_px: overlay.offsetWidth,
+            preview_top_pct: overlay.style.top,
+            preview_left_pct: overlay.style.left,
+            container_width_px: document.getElementById('garment-container').offsetWidth
+          };
+        }
+
+        // Crear el item de uniforme una sola vez
+        const newItem = {
+          product_id: productData.id,
+          seller_id: productData.seller_id,
+          name: productData.name,
+          category: productData.subcategory || productData.industry,
+          image: productData.images?.[0] || productData.image_url,
+          seller_name: productData.seller_name,
+          base_price: productData.base_price,
+          available_sizes: productData.size || (Array.isArray(productData.sizes) ? productData.sizes.join(', ') : 'Talla Única'),
+          color: selectedColor || 'Predeterminado',
+          logo_config: logoConfig,
+          qty: 1
+        };
+
+        // Procesar todos los roles seleccionados
+        for (const roleName of selectedRoles) {
+          // Normalización para búsqueda robusta
+          const { data: roleDefs } = await _supabase
+            .from('role_definition')
+            .select('*')
+            .eq('company_id', user.id)
+            .ilike('role_name', roleName.trim());
+
+          const roleDef = roleDefs && roleDefs.length > 0 ? roleDefs[0] : null;
+
+          let items = roleDef ? (roleDef.items || []) : [];
+
+          // Evitar duplicados si el producto ya está asignado a ese rol
+          const exists = items.some(i => i.product_id === newItem.product_id);
+          if (!exists) {
+            items.push(newItem);
+
+            if (roleDef) {
+              await _supabase.from('role_definition').update({ items: items }).eq('id', roleDef.id);
+            } else {
+              await _supabase.from('role_definition').insert({
+                company_id: user.id,
+                role_name: roleName.trim(),
+                items: items,
+                renewal_frequency: 6
+              });
+            }
+          }
+        }
+
+        // Show success modal instead of toast
+        const modal = document.getElementById('success-modal');
+        const rolesText = selectedRoles.length === 1 ? 'al rol seleccionado' : `a los ${selectedRoles.length} roles seleccionados`;
+        document.getElementById('success-modal-text').textContent = `La prenda ha sido asignada correctamente ${rolesText} y se ha guardado en tu plantilla.`;
+        modal.style.display = 'flex';
+
+      } catch (err) {
+        console.error('Error saving:', err);
+        showToast('Error', 'No se pudo completar la asignación: ' + (err.message || 'Error técnico'), 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    }
+
+    init();
+  </script>
+  <script src="assets/js/utils.js"></script>
+
+  <!-- Success Modal -->
+  <div id="success-modal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 10000; align-items: center; justify-content: center; opacity: 0; animation: fadeIn 0.3s forwards;">
+    <div
+      style="background: white; border-radius: 24px; padding: 3rem 2rem; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); transform: scale(0.9); animation: modalPop 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.1s;">
+      <div
+        style="width: 80px; height: 80px; border-radius: 50%; background: #ECFEFF; color: var(--color-cyan); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem auto;">
+        <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      </div>
+      <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--color-navy); margin-bottom: 0.75rem;">¡Asignación
+        Exitosa!</h2>
+      <p id="success-modal-text" style="color: #64748B; font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.5;">La
+        prenda ha sido asignada correctamente y se ha guardado en tu plantilla.</p>
+      <button class="btn-primary" style="width: 100%; padding: 1.25rem; font-size: 1rem;"
+        onclick="window.location.href='roles.html'">Volver a Roles</button>
+    </div>
+  </div>
+  <style>
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes modalPop {
+      to {
+        transform: scale(1);
+      }
+    }
+  </style>
+</body>
+
+</html>
