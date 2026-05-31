@@ -3821,4 +3821,20 @@ ul {
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+  /* Landing page mobile menu (index.html) */
+  .mobile-drawer {
+    max-width: 100% !important; /* Make it full screen to avoid the weird gap */
+    padding: 1.5rem !important;
+  }
+  
+  .drawer-nav a {
+    font-size: 1.35rem !important;
+    padding: 0.25rem 0;
+  }
+  
+  .drawer-close {
+    font-size: 2.5rem !important;
+    margin-top: -0.5rem; /* Align better with the logo */
+  }
 }
