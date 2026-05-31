@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+
 :root {
   /* === DOTACIAN DESIGN TOKENS === */
 
@@ -41,6 +43,7 @@
   /* Layout */
   --font-family-primary: 'Inter', sans-serif;
   --font-family-heading: 'Outfit', sans-serif;
+  --font-family-highlight: 'Outfit', sans-serif;
   --sidebar-width: 260px;
   --header-height: 80px;
 
@@ -85,6 +88,43 @@ h6 {
   font-family: var(--font-family-heading);
   font-weight: 700;
   line-height: 1.2;
+}
+
+/* Highlighted Text Elements */
+.btn,
+.btn-filter,
+.btn-primary,
+.btn-accent,
+.btn-outline,
+.btn-ghost,
+.logo,
+.nav-links a,
+.header-actions a,
+.nav-item,
+.nav-sub-item,
+.nav-label,
+.sidebar-brand,
+.badge,
+.tag,
+.chip,
+.kpi-label,
+.kpi-value,
+.stat-label,
+.stat-value,
+.price,
+.amount,
+.label,
+.popover-label,
+.category,
+.uniform-category,
+.uniform-name,
+.uniform-price,
+.tab-confirm-btn,
+.action-btn,
+th,
+.section-title,
+.card-title {
+  font-family: var(--font-family-highlight);
 }
 
 a {
@@ -299,7 +339,7 @@ ul {
 
 /* Hero Section */
 .hero {
-  padding: 8rem 0 6rem;
+  padding: 12rem 0 6rem;
   background-color: var(--color-surface-light);
   overflow: hidden;
   position: relative;
@@ -654,7 +694,10 @@ ul {
 
 .mock-kpi-sub {
   font-size: 0.5rem;
-  font-weight: 600;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
 }
 
 .mock-kpi-sub.pos {
@@ -662,7 +705,11 @@ ul {
 }
 
 .mock-kpi-sub.alert {
-  color: var(--color-coral);
+  background: #FEE2E2;
+  color: #991B1B;
+  padding: 0.1rem 0.35rem;
+  border-radius: 999px;
+  font-size: 0.475rem;
 }
 
 /* Table */
@@ -697,12 +744,15 @@ ul {
 }
 
 .mock-badge {
-  font-size: 0.45rem;
+  font-size: 0.5rem;
   font-weight: 700;
-  padding: 0.15rem 0.5rem;
+  padding: 0.2rem 0.55rem;
   border-radius: 999px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
 }
 
 .mock-ok {
@@ -713,6 +763,11 @@ ul {
 .mock-warn {
   background: #FEF3C7;
   color: #92400E;
+}
+
+.mock-alert {
+  background: #FEE2E2;
+  color: #991B1B;
 }
 
 
@@ -2136,9 +2191,10 @@ ul {
 
 /* App & Dashboard Layout */
 .app-layout {
-  display: flex;
   min-height: 100vh;
   background-color: var(--color-surface-light);
+  width: 100%;
+  position: relative;
 }
 
 .sidebar {
@@ -2160,7 +2216,7 @@ ul {
   display: flex;
   align-items: center;
   padding: 0 2rem;
-  font-family: var(--font-family-secondary);
+  font-family: var(--font-family-heading);
   font-size: 1.75rem;
   font-weight: 700;
   color: var(--color-cyan);
@@ -2216,32 +2272,103 @@ ul {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 1rem;
-  color: rgba(255, 255, 255, 0.7);
+  padding: 0.875rem 1.25rem;
+  color: rgba(255, 255, 255, 0.6);
   text-decoration: none;
-  border-radius: var(--radius-md);
-  margin-bottom: 0.5rem;
-  transition: all 0.3s ease;
+  border-radius: 12px;
+  margin-bottom: 0.4rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-weight: 500;
+  position: relative;
+  overflow: hidden;
 }
 
 .nav-item:hover {
-  background-color: rgba(255, 255, 255, 0.07);
-  color: var(--color-text-inverse);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #FFFFFF;
+  transform: translateX(4px);
 }
 
 .nav-item.active {
-  background-color: var(--color-cyan-dim);
+  background-color: #1E293B;
   color: var(--color-cyan);
-  border-left: 3px solid var(--color-cyan);
-  font-weight: 600;
+  font-weight: 700;
+  box-shadow: inset 6px 0 0 0 var(--color-cyan);
+}
+
+/* Welcome Banner (Dashboard, Roles, Empleados, Produccion, Bodega, Marketplace) */
+.welcome-banner {
+  background: linear-gradient(135deg, var(--color-navy) 0%, #0c4a6e 100%);
+  padding: 7rem 3rem 4rem 3rem;
+  color: white;
+  position: relative;
+  overflow: visible;
+  margin-bottom: 0;
+  box-shadow: inset 0 -20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.welcome-banner::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.welcome-banner::before {
+  content: '';
+  position: absolute;
+  bottom: -20%;
+  left: 10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.welcome-title,
+.welcome-banner h1 {
+  font-size: 2.5rem;
+  font-family: var(--font-family-heading);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 2;
+  color: white;
+}
+
+.welcome-subtitle {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
+  position: relative;
+  z-index: 2;
+}
+
+/* Dashboard Layout Wrapper */
+.dashboard-content-wrapper {
+  padding: 2.5rem 3rem 3rem 3rem;
+  position: relative;
+  z-index: 5;
+}
+
+@media (max-width: 768px) {
+  .dashboard-content-wrapper {
+    padding: 1.5rem 1.5rem 2rem 1.5rem;
+  }
 }
 
 .main-content {
-  flex: 1;
   margin-left: var(--sidebar-width);
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 .app-header {
@@ -2314,23 +2441,46 @@ ul {
 
 .data-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   margin-top: 1.5rem;
 }
 
 .data-table th {
   text-align: left;
-  padding: 1rem;
+  padding: 1.25rem 1rem;
   border-bottom: 2px solid var(--color-border);
   color: var(--color-text-secondary);
-  font-weight: 600;
-  font-size: 0.875rem;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: var(--font-family-heading);
+}
+
+.data-table tbody tr {
+  transition: all 0.2s ease;
+  background-color: white;
+}
+
+.data-table tbody tr:hover {
+  background-color: #F8FAFC;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  transform: translateY(-1px);
+  z-index: 10;
+  position: relative;
 }
 
 .data-table td {
-  padding: 1rem;
+  padding: 1.25rem 1rem;
   border-bottom: 1px solid var(--color-border);
   font-size: 0.9375rem;
+  vertical-align: middle;
+  transition: border-color 0.2s ease;
+}
+
+.data-table tbody tr:hover td {
+  border-color: transparent;
 }
 
 .status-badge {
@@ -2354,6 +2504,11 @@ ul {
 .status-critical {
   background-color: #FEE2E2;
   color: #991B1B;
+}
+
+.status-none {
+  background-color: #F1F5F9;
+  color: #475569;
 }
 
 /* Responsive dashboard adjustments */
@@ -2592,6 +2747,8 @@ ul {
 .admin-dark .data-table th {
   color: var(--color-text-muted);
   border-bottom-color: var(--color-border-dark);
+  font-family: var(--font-family-heading);
+  font-weight: 700;
 }
 
 .admin-dark .data-table td {
@@ -3156,37 +3313,54 @@ ul {
 .nav-sub-items {
   display: none;
   flex-direction: column;
-  padding-left: 3rem;
+  padding-left: 2.5rem;
+  margin-left: 1.5rem;
   gap: 0.25rem;
-  margin-top: 0.25rem;
-  margin-bottom: 0.5rem;
+  margin-top: 0.2rem;
+  margin-bottom: 0.75rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.nav-group.active .nav-sub-items,
-.nav-group:hover .nav-sub-items {
+.nav-group.active-group .nav-sub-items {
   display: flex;
 }
 
 .nav-sub-item {
   font-size: 0.8125rem;
-  color: var(--color-text-muted);
-  padding: 0.5rem 0.75rem;
-  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.45);
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
   text-decoration: none;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
+  font-weight: 500;
+  position: relative;
 }
 
 .nav-sub-item:hover {
   color: var(--color-cyan);
-  background: rgba(6, 182, 212, 0.05);
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateX(3px);
 }
 
 .nav-sub-item.active {
   color: var(--color-cyan);
-  font-weight: 600;
+  font-weight: 700;
+  background: rgba(6, 182, 212, 0.04);
+}
+
+.nav-sub-item.active::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 60%;
+  background-color: var(--color-cyan);
+  box-shadow: 0 0 5px var(--color-cyan);
 }
 
 
@@ -3386,6 +3560,15 @@ ul {
   transform: translateX(0);
 }
 
+.toast.toast-error .toast-content {
+  border-left-color: #EF4444;
+}
+
+.toast.toast-error .toast-icon {
+  background: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
+}
+
 .toast-content {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
@@ -3418,7 +3601,7 @@ ul {
 }
 
 .toast-title {
-  font-family: var(--font-heading);
+  font-family: var(--font-family-heading);
   font-weight: 700;
   color: var(--color-brand-primary);
   font-size: 1rem;
@@ -3498,4 +3681,54 @@ ul {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* User Profile Popover */
+.user-popover {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: white;
+  border: 1px solid #E2E8F0;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  width: 240px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  display: none;
+  z-index: 1000;
+  animation: slideDownIn 0.2s ease-out;
+}
+
+.user-popover.active {
+  display: block;
+}
+
+@keyframes slideDownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.popover-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #94A3B8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+  text-align: left;
+}
+
+.popover-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-navy);
+  margin-bottom: 1rem;
+  text-align: left;
 }
