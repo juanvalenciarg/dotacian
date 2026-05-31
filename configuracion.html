@@ -2,6 +2,7 @@
 <html lang="es">
 
 <head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Configuración | Dotacian</title>
@@ -137,72 +138,164 @@
   <div class="app-layout">
     <!-- Sidebar -->
     <aside class="sidebar">
-      <div class="sidebar-brand">
-        <img src="assets/logos/logo_dotacian.png" alt="dotacian logo" style="width: 130px; height: auto;">
+      <div class="sidebar-header">
+        <a href="app.html" style="display: block; width: 100%; text-align: center;">
+          <img src="assets/logos/logo_dotacian.png" alt="dotacian logo"
+            style="width: 180px; max-width: 100%; height: auto; display: inline-block;">
+        </a>
       </div>
-      <nav class="sidebar-nav">
+
+                                    <nav class="sidebar-nav">
         <a href="app.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <rect width="7" height="9" x="3" y="3" rx="1" />
+              <rect width="7" height="5" x="14" y="3" rx="1" />
+              <rect width="7" height="9" x="14" y="12" rx="1" />
+              <rect width="7" height="5" x="3" y="16" rx="1" />
+            </svg></span>
           <span class="nav-label">Dashboard</span>
         </a>
         <a href="roles.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg></span>
           <span class="nav-label">Roles</span>
         </a>
-        <div class="nav-group">
-          <a href="#" class="nav-item">
-            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg></span>
-            <span class="nav-label">Uniformes</span>
-            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
-          </a>
-          <div class="nav-sub-items">
-            <a href="uniformes.html" class="nav-sub-item">Marketplace</a>
-            <a href="mi_dotacion.html" class="nav-sub-item">Mi dotación</a>
-          </div>
-        </div>
+        <a href="marketplace.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path
+                d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
+            </svg></span>
+          <span class="nav-label">Marketplace</span>
+        </a>
         <a href="empleados.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg></span>
           <span class="nav-label">Empleados</span>
         </a>
         <div class="nav-group">
-          <a href="produccion.html" class="nav-item">
-            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></span>
+          <a href="cotizaciones.html" class="nav-item">
+            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path d="m7.5 4.27 9 5.15" />
+                <path
+                  d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                <path d="m3.3 7 8.7 5 8.7-5" />
+                <path d="M12 22V12" />
+              </svg></span>
             <span class="nav-label">Producción</span>
-            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
+            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor"
+                stroke-width="2" viewBox="0 0 24 24">
+                <path d="m6 9 6 6 6-6" />
+              </svg></span>
           </a>
           <div class="nav-sub-items">
             <a href="cotizaciones.html" class="nav-sub-item">Cotizaciones</a>
-            <a href="muestras.html" class="nav-sub-item">Solicitud de Muestras</a>
             <a href="ordenes.html" class="nav-sub-item">Órdenes de Compra</a>
-            <a href="seguimiento.html" class="nav-sub-item">Seguimiento</a>
           </div>
         </div>
         <a href="bodega.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg></span>
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <polyline points="21 8 21 21 3 21 3 8"></polyline>
+              <rect x="1" y="3" width="22" height="5"></rect>
+              <line x1="10" y1="12" x2="14" y2="12"></line>
+            </svg></span>
           <span class="nav-label">Bodega</span>
         </a>
-        <a href="#" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></span>
-          <span class="nav-label">Alertas</span>
-        </a>
-        <div class="sidebar-spacer"></div>
-        <a href="configuracion.html" class="nav-item active nav-item-secondary">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span>
-          <span class="nav-label">Configuración</span>
-        </a>
-        <a href="index.html" class="nav-item nav-item-secondary">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg></span>
-          <span class="nav-label">Cerrar Sesión</span>
+        <a href="facturas.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg></span>
+          <span class="nav-label">Facturas</span>
         </a>
         <div id="version-tag"></div>
       </nav>
     </aside>
 
     <main class="main-content">
-      <header class="app-header">
+      <header class="app-header"
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; padding: 1.5rem 3rem; background: transparent; border: none;">
         <div class="header-left">
-          <h1 id="config-title">Configuración de Empresa</h1>
-          <p id="config-subtitle">Gestiona la información base de tu organización</p>
+          <h1
+            style="font-size: 2.25rem; color: var(--color-navy); font-weight: 800; margin: 0; letter-spacing: -0.02em; font-family: var(--font-family-heading);">
+            Configuración</h1>
+          <p style="color: var(--color-text-secondary); font-size: 1rem; margin-top: 0.25rem;">Ajustes del Sistema y
+            Políticas</p>
+        </div>
+        <div class="header-right"
+          style="display: flex; align-items: center; gap: 1.5rem; position: relative; padding-right: 1rem;">
+          <div id="header-company-badge" onclick="toggleUserPopover(event)"
+            style="background: white; padding: 0.5rem 1rem; border-radius: 1.25rem; border: 1px solid var(--color-border); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 0.75rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative;">
+            <div id="badge-industry-icon"
+              style="width: 36px; height: 36px; background: var(--color-smoke-mid); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--color-cyan); font-size: 1.2rem;">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M3 21h18M3 7v1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7M4 7l1-4h14l1 4" />
+              </svg>
+            </div>
+            <div style="display: flex; flex-direction: column;">
+              <span id="company-name-display"
+                style="font-weight: 700; color: var(--color-navy); font-size: 0.95rem; line-height: 1.2;">Cargando...</span>
+              <span id="dash-industry-val"
+                style="font-size: 0.65rem; color: var(--color-text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Sector</span>
+            </div>
+            <div style="margin-left: 0.5rem; color: var(--color-text-muted);">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </div>
+
+            <!-- Popover -->
+            <div id="user-popover" class="user-popover">
+              <div class="popover-label">Usuario</div>
+              <div id="pop-user-name" class="popover-value">Cargando...</div>
+              <div class="popover-label">Correo Electrónico</div>
+              <div id="pop-user-email" class="popover-value" style="margin-bottom: 0;">Cargando...</div>
+              <hr style="margin: 1rem 0; border: none; border-top: 1px solid var(--color-smoke-mid);">
+              <a href="#"
+                style="color: var(--color-navy); font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; margin-bottom: 0.5rem; transition: color 0.2s;"
+                onmouseover="this.style.color='var(--color-cyan)'" onmouseout="this.style.color='var(--color-navy)'">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                  <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                </svg>
+                Alertas
+              </a>
+              <a href="configuracion.html"
+                style="color: var(--color-navy); font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; margin-bottom: 0.5rem; transition: color 0.2s;"
+                onmouseover="this.style.color='var(--color-cyan)'" onmouseout="this.style.color='var(--color-navy)'">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path
+                    d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1-1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                Configuración
+              </a>
+              <a href="login.html"
+                style="color: #EF4444; font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; transition: color 0.2s;"
+                onmouseover="this.style.color='#DC2626'" onmouseout="this.style.color='#EF4444'">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Cerrar Sesión
+              </a>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -210,7 +303,10 @@
         <div class="config-card">
           <div class="config-header-actions">
             <button class="btn-action btn-edit" id="btn-edit" onclick="toggleEdit()">
-              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
               Editar Información
             </button>
           </div>
@@ -218,23 +314,41 @@
           <form id="config-form" onsubmit="handleSave(event)">
             <!-- Empresa Section -->
             <div class="config-section">
-              <h3><span>🏢</span> Datos de la Empresa</h3>
+              <h3>Datos de la Empresa</h3>
               <div class="form-grid">
                 <div class="form-group">
                   <label>Nombre Comercial</label>
                   <input type="text" id="company_name" disabled required>
                 </div>
                 <div class="form-group">
+                  <label>Razón Social</label>
+                  <input type="text" id="legal_name" disabled placeholder="Nombre legal de la empresa">
+                </div>
+                <div class="form-group">
                   <label id="tax_label">ID Fiscal (NIT/RFC)</label>
-                  <input type="text" id="tax_id" disabled>
+                  <div style="display: flex; gap: 0.5rem; align-items: center; width: 100%;">
+                    <input type="text" id="tax_id" disabled style="flex: 1;">
+                    <div id="dv_wrapper" style="display: none; align-items: center; gap: 0.5rem;">
+                      <span style="font-weight: bold; color: #64748B;">-</span>
+                      <input type="text" id="tax_dv" disabled
+                        style="width: 64px; text-align: center; padding-left: 0.25rem; padding-right: 0.25rem; border-radius: 8px;"
+                        placeholder="DV" maxlength="1">
+                    </div>
+                  </div>
                 </div>
                 <div class="form-group">
                   <label>Sector / Industria</label>
                   <select id="industry" disabled>
-                    <option value="restaurantes">🍽️ Restaurantes</option>
-                    <option value="limpieza">🧹 Limpieza</option>
-                    <option value="industrial">⚙️ Industrial</option>
-                    <option value="corporate">💼 Corporativo</option>
+                    <option value="restaurantes">Restaurantes</option>
+                    <option value="limpieza">Limpieza</option>
+                    <option value="industrial">Industrial</option>
+                    <option value="corporate">Corporativo</option>
+                    <option value="seguridad">Seguridad</option>
+                    <option value="hoteleria">Hotelería</option>
+                    <option value="retail">Retail</option>
+                    <option value="salud">Salud</option>
+                    <option value="construccion">Construcción</option>
+                    <option value="logistica">Logística</option>
                   </select>
                 </div>
                 <div class="form-group">
@@ -246,9 +360,9 @@
                   <input type="number" id="employee_count" disabled>
                 </div>
                 <div class="form-group">
-                  <label>Presupuesto Mensual por Empleado</label>
+                  <label>Presupuesto anual estimado por empleado</label>
                   <div class="input-group">
-                    <span class="input-prefix">$</span>
+                    <span class="input-prefix" id="budget_prefix">$</span>
                     <input type="number" id="monthly_budget" disabled>
                   </div>
                 </div>
@@ -257,26 +371,242 @@
 
             <!-- Logistica Section -->
             <div class="config-section">
-              <h3><span>📍</span> Logística y Entrega</h3>
-              <div class="form-group" style="margin-bottom: 1.5rem;">
-                <label>Dirección Principal de Entrega</label>
-                <input type="text" id="delivery_address" disabled>
-              </div>
+              <h3>Logística y Entrega</h3>
               <div class="form-grid">
+                <!-- Direccion -->
                 <div class="form-group">
-                  <label>Frecuencia de Renovación (meses)</label>
-                  <input type="number" id="renewal_frequency" disabled>
+                  <label>Dirección Principal de Entrega</label>
+                  <input type="text" id="delivery_address" disabled>
                 </div>
                 <div class="form-group">
-                  <label>Teléfono / WhatsApp</label>
-                  <input type="tel" id="contact_phone" disabled>
+                  <label>Departamento / Estado</label>
+                  <select id="delivery_state" disabled>
+                    <option value="">Selecciona una opción...</option>
+                  </select>
+                </div>
+
+                <!-- Hidden legacy input to maintain code stability -->
+                <input type="hidden" id="contact_phone">
+
+                <!-- Contacto 1 -->
+                <div class="form-group" style="grid-column: span 2; margin-top: 1rem;">
+                  <h4 style="color: var(--color-navy); margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 700;">
+                    Contacto Principal de Entrega</h4>
+                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                    <div>
+                      <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Nombre Completo</label>
+                      <input type="text" id="delivery_contact_1_name" disabled placeholder="Nombre del contacto"
+                        style="width: 100%; margin-top: 0.25rem;">
+                    </div>
+                    <div>
+                      <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Teléfono / WhatsApp</label>
+                      <input type="tel" id="delivery_contact_1_phone" disabled placeholder="Ej: +57 300 123 4567"
+                        style="width: 100%; margin-top: 0.25rem;">
+                    </div>
+                    <div>
+                      <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Correo Electrónico</label>
+                      <input type="email" id="delivery_contact_1_email" disabled placeholder="contacto@empresa.com"
+                        style="width: 100%; margin-top: 0.25rem;">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Contacto 2 -->
+                <div class="form-group" style="grid-column: span 2; margin-top: 0.5rem;">
+                  <h4 style="color: var(--color-navy); margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 700;">
+                    Contacto Secundario de Entrega</h4>
+                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                    <div>
+                      <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Nombre Completo</label>
+                      <input type="text" id="delivery_contact_2_name" disabled placeholder="Nombre del contacto"
+                        style="width: 100%; margin-top: 0.25rem;">
+                    </div>
+                    <div>
+                      <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Teléfono / WhatsApp</label>
+                      <input type="tel" id="delivery_contact_2_phone" disabled placeholder="Ej: +57 300 123 4567"
+                        style="width: 100%; margin-top: 0.25rem;">
+                    </div>
+                    <div>
+                      <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Correo Electrónico</label>
+                      <input type="email" id="delivery_contact_2_email" disabled placeholder="contacto2@empresa.com"
+                        style="width: 100%; margin-top: 0.25rem;">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Horarios de Entrega -->
+                <div class="form-group" style="grid-column: span 2; margin-top: 1rem;">
+                  <h4 style="color: var(--color-navy); margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 700;">
+                    Horarios de Entrega Autorizados</h4>
+                  <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 0.75rem; background: var(--color-smoke-light); padding: 1.25rem; border-radius: 16px; border: 1px solid var(--color-border);">
+
+                    <!-- Lunes -->
+                    <div class="hours-row"
+                      style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
+                      <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="hour_active_Lunes" class="hour-toggle"
+                          style="width: 18px; height: 18px; cursor: pointer;" disabled
+                          onchange="toggleDayHours('Lunes')">
+                        <span
+                          style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Lunes</span>
+                      </div>
+                      <div id="time_inputs_Lunes"
+                        style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
+                        <input type="time" id="hour_start_Lunes" class="hour-start"
+                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                          disabled value="08:00">
+                        <span style="color: #64748B; font-size: 0.8125rem;">a</span>
+                        <input type="time" id="hour_end_Lunes" class="hour-end"
+                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                          disabled value="17:00">
+                      </div>
+                    </div>
+
+                    <!-- Martes -->
+                    <div class="hours-row"
+                      style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
+                      <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="hour_active_Martes" class="hour-toggle"
+                          style="width: 18px; height: 18px; cursor: pointer;" disabled
+                          onchange="toggleDayHours('Martes')">
+                        <span
+                          style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Martes</span>
+                      </div>
+                      <div id="time_inputs_Martes"
+                        style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
+                        <input type="time" id="hour_start_Martes" class="hour-start"
+                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                          disabled value="08:00">
+                        <span style="color: #64748B; font-size: 0.8125rem;">a</span>
+                        <input type="time" id="hour_end_Martes" class="hour-end"
+                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                          disabled value="17:00">
+                      </div>
+                    </div>
+
+                    <!-- Miércoles -->
+                    <div class="hours-row"
+                      style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
+                      <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="hour_active_Miercoles" class="hour-toggle"
+                          style="width: 18px; height: 18px; cursor: pointer;" disabled
+                          onchange="toggleDayHours('Miercoles')">
+                        <span
+                          style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Miércoles</span>
+                      </div>
+                      <div id="time_inputs_Miercoles"
+                        style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
+                        <input type="time" id="hour_start_Miercoles" class="hour-start"
+                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                          disabled value="08:00">
+                        <span style="color: #64748B; font-size: 0.8125rem;">a</span>
+                        <input type="time" id="hour_end_Miercoles" class="hour-end"
+                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                          disabled value="17:00">
+                      </div>
+                    </div>
+
+                    <!-- Jueves -->
+                    <div class="hours-row"
+                      style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
+                      <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="hour_active_Jueves" class="hour-toggle"
+                          style="width: 18px; height: 18px; cursor: pointer;" disabled
+                          onchange="toggleDayHours('Jueves')">
+                        <span
+                          style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Jueves</span>
+                      </div>
+                      <div id="time_inputs_Jueves"
+                        style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
+                        <input type="time" id="hour_start_Jueves" class="hour-start"
+                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                          disabled value="08:00">
+                        <span style="color: #64748B; font-size: 0.8125rem;">a</span>
+                        <input type="time" id="hour_end_Jueves" class="hour-end"
+                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                          disabled value="17:00">
+                      </div>
+                    </div>
+
+                    <!-- Viernes -->
+                    <div class="hours-row"
+                      style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
+                      <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="hour_active_Viernes" class="hour-toggle"
+                          style="width: 18px; height: 18px; cursor: pointer;" disabled
+                          onchange="toggleDayHours('Viernes')">
+                        <span
+                          style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Viernes</span>
+                      </div>
+                      <div id="time_inputs_Viernes"
+                        style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
+                        <input type="time" id="hour_start_Viernes" class="hour-start"
+                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                          disabled value="08:00">
+                        <span style="color: #64748B; font-size: 0.8125rem;">a</span>
+                        <input type="time" id="hour_end_Viernes" class="hour-end"
+                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                          disabled value="17:00">
+                      </div>
+                    </div>
+
+                    <!-- Sábado -->
+                    <div class="hours-row"
+                      style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
+                      <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="hour_active_Sabado" class="hour-toggle"
+                          style="width: 18px; height: 18px; cursor: pointer;" disabled
+                          onchange="toggleDayHours('Sabado')">
+                        <span
+                          style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Sábado</span>
+                      </div>
+                      <div id="time_inputs_Sabado"
+                        style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
+                        <input type="time" id="hour_start_Sabado" class="hour-start"
+                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                          disabled value="08:00">
+                        <span style="color: #64748B; font-size: 0.8125rem;">a</span>
+                        <input type="time" id="hour_end_Sabado" class="hour-end"
+                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                          disabled value="14:00">
+                      </div>
+                    </div>
+
+                    <!-- Domingo -->
+                    <div class="hours-row"
+                      style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
+                      <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="hour_active_Domingo" class="hour-toggle"
+                          style="width: 18px; height: 18px; cursor: pointer;" disabled
+                          onchange="toggleDayHours('Domingo')">
+                        <span
+                          style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Domingo</span>
+                      </div>
+                      <div id="time_inputs_Domingo"
+                        style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
+                        <input type="time" id="hour_start_Domingo" class="hour-start"
+                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                          disabled value="08:00">
+                        <span style="color: #64748B; font-size: 0.8125rem;">a</span>
+                        <input type="time" id="hour_end_Domingo" class="hour-end"
+                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                          disabled value="12:00">
+                      </div>
+                    </div>
+
+                  </div>
                 </div>
               </div>
             </div>
 
             <div style="display: flex; justify-content: flex-end;">
               <button type="submit" class="btn-action btn-save" id="btn-save">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                  <polyline points="17 21 17 13 7 13 7 21" />
+                  <polyline points="7 3 7 8 15 8" />
+                </svg>
                 Guardar Cambios
               </button>
             </div>
@@ -295,7 +625,100 @@
     let isEditing = false;
     let currentProfile = null;
 
+    function formatColombiaNit(value) {
+      const numbers = value.replace(/\D/g, '');
+      const truncated = numbers.substring(0, 9);
+      let formatted = '';
+      if (truncated.length > 0) {
+        formatted += truncated.substring(0, 3);
+      }
+      if (truncated.length > 3) {
+        formatted += '.' + truncated.substring(3, 6);
+      }
+      if (truncated.length > 6) {
+        formatted += '.' + truncated.substring(6, 9);
+      }
+      return formatted;
+    }
+
+    const colombiaDepartments = [
+      "Bogotá D.C.", "Antioquia", "Valle del Cauca", "Atlántico", "Santander",
+      "Cundinamarca", "Bolívar", "Tolima", "Nariño", "Córdoba", "Huila",
+      "Norte de Santander", "Meta", "Magdalena", "Cesar", "Caldas", "Risaralda",
+      "Sucre", "Quindío", "Chocó", "Cauca", "Casanare", "Caquetá", "Arauca",
+      "Putumayo", "Guajira", "Amazonas", "Guainía", "Guaviare", "San Andrés",
+      "Vaupés", "Vichada"
+    ];
+
+    const mexicoStates = [
+      "Ciudad de México", "Aguascalientes", "Baja California", "Baja California Sur",
+      "Campeche", "Chiapas", "Chihuahua", "Coahuila", "Colima", "Durango",
+      "Guanajuato", "Guerrero", "Hidalgo", "Jalisco", "México", "Michoacán",
+      "Morelos", "Nayarit", "Nuevo León", "Oaxaca", "Puebla", "Querétaro",
+      "Quintana Roo", "San Luis Potosí", "Sinaloa", "Sonora", "Tabasco",
+      "Tamaulipas", "Tlaxcala", "Veracruz", "Yucatán", "Zacatecas"
+    ];
+
+    function updateStateDropdown(countryCode) {
+      const stateSelect = document.getElementById('delivery_state');
+      if (!stateSelect) return;
+
+      const prevVal = stateSelect.value;
+      stateSelect.innerHTML = '<option value="">Selecciona una opción...</option>';
+
+      const clean = (countryCode || '').trim().toUpperCase();
+      let list = [];
+      if (clean === 'CO' || clean === 'COLOMBIA') {
+        list = colombiaDepartments;
+      } else if (clean === 'MX' || clean === 'MEXICO' || clean === 'MÉXICO') {
+        list = mexicoStates;
+      }
+
+      list.forEach(state => {
+        const opt = document.createElement('option');
+        opt.value = state;
+        opt.textContent = state;
+        stateSelect.appendChild(opt);
+      });
+
+      if (prevVal && list.includes(prevVal)) {
+        stateSelect.value = prevVal;
+      }
+    }
+
+    function toggleDayHours(day) {
+      const cb = document.getElementById(`hour_active_${day}`);
+      const container = document.getElementById(`time_inputs_${day}`);
+      if (cb && container) {
+        if (cb.checked) {
+          container.style.opacity = '1';
+          container.style.pointerEvents = 'auto';
+        } else {
+          container.style.opacity = '0.5';
+          container.style.pointerEvents = 'none';
+        }
+      }
+    }
+
     async function init() {
+      const taxInput = document.getElementById('tax_id');
+      const dvInput = document.getElementById('tax_dv');
+
+      if (taxInput) {
+        taxInput.addEventListener('input', function (e) {
+          const countryVal = document.getElementById('country').value.trim().toUpperCase();
+          if (countryVal === 'CO' || countryVal === 'COLOMBIA') {
+            e.target.value = formatColombiaNit(e.target.value);
+          }
+        });
+      }
+
+      if (dvInput) {
+        dvInput.addEventListener('input', function (e) {
+          e.target.value = e.target.value.replace(/\D/g, '');
+        });
+      }
+
       const { data } = await _supabase.auth.getSession();
       if (!data.session) {
         window.location.href = 'login.html';
@@ -306,52 +729,141 @@
     }
 
     async function loadProfile() {
-      const { data: profile, error } = await _supabase
+      // 1. Consultar el perfil de la empresa
+      const { data: profile } = await _supabase
         .from('company_profile')
         .select('*')
         .eq('id', session.user.id)
         .maybeSingle();
 
-      if (profile) {
-        currentProfile = profile;
-        document.getElementById('company_name').value = profile.company_name || '';
-        document.getElementById('tax_id').value = profile.tax_id || '';
-        document.getElementById('industry').value = profile.industry || 'restaurantes';
-        document.getElementById('country').value = profile.country || '';
-        document.getElementById('employee_count').value = profile.employee_count || 0;
-        document.getElementById('monthly_budget').value = profile.monthly_budget || 0;
-        document.getElementById('delivery_address').value = profile.delivery_address || '';
-        document.getElementById('renewal_frequency').value = profile.renewal_frequency || 6;
-        document.getElementById('contact_phone').value = profile.contact_phone || '';
+      // 2. Consultar el perfil del usuario para obtener el país original de registro
+      const { data: userProfile } = await _supabase
+        .from('user_profile')
+        .select('country')
+        .eq('id', session.user.id)
+        .maybeSingle();
 
-        const country = (profile.country || '').trim().toUpperCase();
-        const taxLabel = document.getElementById('tax_label');
-        const taxInput = document.getElementById('tax_id');
+      if (profile || userProfile) {
+        currentProfile = profile || {};
 
-        if (country === 'MX' || country === 'MEXICO' || country === 'MÉXICO') {
-          taxLabel.textContent = 'RFC de la Empresa';
-          taxInput.placeholder = 'Ej: ABC123456789';
-        } else if (country === 'CO' || country === 'COLOMBIA') {
-          taxLabel.textContent = 'NIT de la Empresa';
-          taxInput.placeholder = 'Ej: 900.123.456-1';
+        // Prioridad: País en la empresa > País en el registro del usuario
+        const finalCountry = profile?.country || userProfile?.country || '';
+
+        document.getElementById('company_name').value = profile?.company_name || '';
+        document.getElementById('legal_name').value = profile?.legal_name || '';
+        document.getElementById('tax_id').value = profile?.tax_id || '';
+        document.getElementById('industry').value = profile?.industry || 'restaurantes';
+        document.getElementById('country').value = finalCountry;
+        document.getElementById('employee_count').value = profile?.employee_count || 0;
+        document.getElementById('monthly_budget').value = profile?.monthly_budget || 0;
+        document.getElementById('delivery_address').value = profile?.delivery_address || '';
+        document.getElementById('contact_phone').value = profile?.contact_phone || '';
+
+        // Dynamic State Dropdown populate & load
+        updateStateDropdown(finalCountry);
+        const stateSelect = document.getElementById('delivery_state');
+        if (stateSelect) {
+          stateSelect.value = profile?.delivery_state || '';
         }
 
-        if (profile.country) {
-          updateVersionIndicator(profile.country);
+        // Contact 1 loading
+        document.getElementById('delivery_contact_1_name').value = profile?.delivery_contact_1_name || '';
+        document.getElementById('delivery_contact_1_phone').value = profile?.delivery_contact_1_phone || '';
+        document.getElementById('delivery_contact_1_email').value = profile?.delivery_contact_1_email || '';
+
+        // Contact 2 loading
+        document.getElementById('delivery_contact_2_name').value = profile?.delivery_contact_2_name || '';
+        document.getElementById('delivery_contact_2_phone').value = profile?.delivery_contact_2_phone || '';
+        document.getElementById('delivery_contact_2_email').value = profile?.delivery_contact_2_email || '';
+
+        // Delivery hours loading
+        const days = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
+        let hoursObj = {};
+        try {
+          if (profile?.delivery_hours) {
+            hoursObj = typeof profile.delivery_hours === 'string'
+              ? JSON.parse(profile.delivery_hours)
+              : profile.delivery_hours;
+          }
+        } catch (e) {
+          console.error("Error parsing delivery hours: ", e);
+        }
+
+        days.forEach(day => {
+          const activeCb = document.getElementById(`hour_active_${day}`);
+          const startInput = document.getElementById(`hour_start_${day}`);
+          const opponentEnd = document.getElementById(`hour_end_${day}`);
+          if (activeCb && startInput && opponentEnd) {
+            const dayData = hoursObj[day] || { enabled: false, start: '08:00', end: '17:00' };
+            activeCb.checked = dayData.enabled;
+            startInput.value = dayData.start || '08:00';
+            opponentEnd.value = dayData.end || '17:00';
+            toggleDayHours(day);
+          }
+        });
+
+        const countryClean = finalCountry.trim().toUpperCase();
+        const taxLabel = document.getElementById('tax_label');
+        const taxInput = document.getElementById('tax_id');
+        const dvWrapper = document.getElementById('dv_wrapper');
+        const dvInput = document.getElementById('tax_dv');
+
+        let rawTaxId = profile?.tax_id || '';
+        let nitVal = rawTaxId;
+        let dvVal = profile?.dv || '';
+
+        const budgetPrefix = document.getElementById('budget_prefix');
+        const budgetInput = document.getElementById('monthly_budget');
+
+        if (countryClean === 'MX' || countryClean === 'MEXICO' || countryClean === 'MÉXICO') {
+          taxLabel.textContent = 'RFC de la Empresa';
+          taxInput.placeholder = 'Ej: ABC123456789';
+          if (dvWrapper) dvWrapper.style.display = 'none';
+          if (dvInput) dvInput.value = '';
+          if (budgetPrefix) budgetPrefix.textContent = 'MXN $';
+          if (budgetInput) budgetInput.style.setProperty('padding-left', '4.5rem', 'important');
+        } else if (countryClean === 'CO' || countryClean === 'COLOMBIA') {
+          taxLabel.textContent = 'NIT de la Empresa';
+          taxInput.placeholder = 'Ej: 900.123.456';
+          if (dvWrapper) dvWrapper.style.display = 'flex';
+
+          if (!dvVal && rawTaxId.includes('-')) {
+            const parts = rawTaxId.split('-');
+            nitVal = parts[0];
+            dvVal = parts[1] || '';
+          }
+          if (budgetPrefix) budgetPrefix.textContent = 'COP $';
+          if (budgetInput) budgetInput.style.setProperty('padding-left', '4.5rem', 'important');
+        } else {
+          taxLabel.textContent = 'ID Fiscal (NIT/RFC)';
+          taxInput.placeholder = '';
+          if (dvWrapper) dvWrapper.style.display = 'none';
+          if (dvInput) dvInput.value = '';
+          if (budgetPrefix) budgetPrefix.textContent = '$';
+          if (budgetInput) budgetInput.style.setProperty('padding-left', '2rem', 'important');
+        }
+
+        taxInput.value = nitVal;
+        if (dvInput) dvInput.value = dvVal;
+
+        if (finalCountry) {
+          updateVersionIndicator(finalCountry);
         }
       }
     }
 
+    const editBtn = document.getElementById('btn-edit');
+    const saveBtn = document.getElementById('btn-save');
+
     function toggleEdit() {
       isEditing = !isEditing;
       const inputs = document.querySelectorAll('#config-form input, #config-form select');
-      const editBtn = document.getElementById('btn-edit');
-      const saveBtn = document.getElementById('btn-save');
-
       inputs.forEach(input => {
-        if (input.id !== 'country') {
-          input.disabled = !isEditing;
+        if (input.id === 'country') {
+          input.disabled = true;
+          return;
         }
+        input.disabled = !isEditing;
       });
 
       if (isEditing) {
@@ -366,7 +878,7 @@
         editBtn.style.borderColor = 'var(--color-cyan)';
         editBtn.style.background = 'var(--color-cyan-dim)';
         saveBtn.style.display = 'none';
-        loadProfile(); 
+        loadProfile();
       }
     }
 
@@ -376,13 +888,63 @@
       btn.disabled = true;
       btn.innerHTML = 'Guardando...';
 
+      const countryVal = document.getElementById('country').value.trim().toUpperCase();
+      const taxVal = document.getElementById('tax_id').value;
+      const dvVal = (countryVal === 'CO' || countryVal === 'COLOMBIA') ? document.getElementById('tax_dv').value : '';
+
+      const days = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
+      const hoursObj = {};
+      days.forEach(day => {
+        const activeCb = document.getElementById(`hour_active_${day}`);
+        const startInput = document.getElementById(`hour_start_${day}`);
+        const opponentEnd = document.getElementById(`hour_end_${day}`);
+        if (activeCb && startInput && opponentEnd) {
+          hoursObj[day] = {
+            enabled: activeCb.checked,
+            start: startInput.value,
+            end: opponentEnd.value
+          };
+        }
+      });
+
       const updates = {
         id: session.user.id,
         company_name: document.getElementById('company_name').value,
+        legal_name: document.getElementById('legal_name').value,
         industry: document.getElementById('industry').value,
         employee_count: parseInt(document.getElementById('employee_count').value) || 0,
         monthly_budget: parseInt(document.getElementById('monthly_budget').value) || 0,
-        renewal_frequency: parseInt(document.getElementById('renewal_frequency').value) || 6,
-        tax_id: document.getElementById('tax_id').value,
+        tax_id: taxVal,
+        dv: dvVal,
         delivery_address: document.getElementById('delivery_address').value,
+        delivery_state: document.getElementById('delivery_state').value,
+        delivery_contact_1_name: document.getElementById('delivery_contact_1_name').value,
+        delivery_contact_1_phone: document.getElementById('delivery_contact_1_phone').value,
+        delivery_contact_1_email: document.getElementById('delivery_contact_1_email').value,
+        delivery_contact_2_name: document.getElementById('delivery_contact_2_name').value,
+        delivery_contact_2_phone: document.getElementById('delivery_contact_2_phone').value,
+        delivery_contact_2_email: document.getElementById('delivery_contact_2_email').value,
+        delivery_hours: hoursObj,
         contact_phone: document.getElementById('contact_phone').value,
+        country: document.getElementById('country').value,
+        selected_roles: currentProfile ? currentProfile.selected_roles : []
+      };
+
+      const { error } = await _supabase.from('company_profile').upsert(updates);
+
+      if (!error) {
+        showToast('Éxito', 'Configuración guardada correctamente.', 'success');
+        toggleEdit();
+      } else {
+        showToast('Error', 'No se pudo guardar: ' + error.message, 'error');
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Guardar Cambios';
+    }
+
+    init();
+  </script>
+</body>
+
+</html>
