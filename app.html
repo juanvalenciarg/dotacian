@@ -2,6 +2,7 @@
 <html lang="es">
 
 <head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal Cliente | dotacian</title>
@@ -51,10 +52,13 @@
       display: none;
       background: none;
       border: none;
-      color: var(--color-navy);
+      color: white;
       cursor: pointer;
       padding: 0.5rem;
-      margin-right: 1rem;
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 1001;
     }
 
     .sidebar-overlay {
@@ -85,8 +89,17 @@
         padding: 1rem 1.5rem;
       }
       .mobile-menu-toggle {
-        display: block;
-      }
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 0.5rem;
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 1001;
+    }
       .sidebar {
         z-index: 1000;
       }
