@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Facturas | Portal Cliente</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root { --sidebar-width: 280px; }
+    .app-layout { display: flex; min-height: 100vh; background: #F8FAFC; }
+    .main-content { flex: 1; margin-left: var(--sidebar-width); padding: 0; background: #F8FAFC; position: relative; }
+    
+    .app-header { padding: 1.5rem 3rem; display: flex; justify-content: space-between; align-items: center; position: absolute; top: 0; left: var(--sidebar-width); right: 0; z-index: 9999; background: transparent; border: none; }
+    
+    .content-wrapper { padding: 0 3rem 4rem; position: relative; z-index: 10; max-width: 1200px; margin: 0 auto; }
+
+    .app-card { background-color: white; padding: 1.5rem; border-radius: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); border: 1px solid #E2E8F0; }
+    
+    .btn-action { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-family: var(--font-family-primary); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none; margin-right: 0.5rem; }
+    .btn-pdf { background: white; color: var(--color-navy); border: 1px solid #E2E8F0; }
+    .btn-pdf:hover { background: #F8FAFC; border-color: #CBD5E1; color: #EF4444; }
+    .btn-xml { background: #F0FDFA; color: #0D9488; border: 1px solid #CCFBF1; }
+    .btn-xml:hover { background: #CCFBF1; }
+    
+    .status-badge { padding: 0.25rem 0.75rem; border-radius: 99px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+    .status-badge.stamped { background: #DCFCE7; color: #16A34A; }
+
+    .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 0.5rem;
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 1001;
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.5);
+      z-index: 900;
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .app-layout.sidebar-open .sidebar-overlay {
+      display: block;
+      opacity: 1;
+    }
+
+    @media (max-width: 992px) {
+      .main-content {
+        margin-left: 0;
+      }
+      .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 0.5rem;
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 1001;
+    }
+      .sidebar {
+        z-index: 1000;
+      }
+      .app-header {
+        position: static;
+      }
+      .header-right {
+        margin-top: 1rem;
+      }
+      .content-wrapper {
+        padding: 0 1.5rem 4rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-layout" id="app-layout-wrapper">
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <aside class="sidebar">
+      <div class="sidebar-header" style="padding: 1.5rem 1rem 0 1rem; display: flex; justify-content: center;">
+        <a href="app.html" style="display: block; width: 100%; text-align: center;">
+          <img src="assets/logos/logo_dotacian.png" alt="dotacian logo" style="width: 180px; max-width: 100%; height: auto; display: inline-block;">
+        </a>
+      </div>
+      <!-- El sidebar será inyectado por update_client_nav.py -->
+            <nav class="sidebar-nav">
+        <a href="app.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <rect width="7" height="9" x="3" y="3" rx="1" />
+              <rect width="7" height="5" x="14" y="3" rx="1" />
+              <rect width="7" height="9" x="14" y="12" rx="1" />
+              <rect width="7" height="5" x="3" y="16" rx="1" />
+            </svg></span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="roles.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg></span>
+          <span class="nav-label">Roles</span>
+        </a>
+        <a href="marketplace.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path
+                d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
+            </svg></span>
+          <span class="nav-label">Marketplace</span>
+        </a>
+        <a href="empleados.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg></span>
+          <span class="nav-label">Empleados</span>
+        </a>
+        <div class="nav-group">
+          <a href="cotizaciones.html" class="nav-item">
+            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path d="m7.5 4.27 9 5.15" />
+                <path
+                  d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                <path d="m3.3 7 8.7 5 8.7-5" />
+                <path d="M12 22V12" />
+              </svg></span>
+            <span class="nav-label">Producción</span>
+            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor"
+                stroke-width="2" viewBox="0 0 24 24">
+                <path d="m6 9 6 6 6-6" />
+              </svg></span>
+          </a>
+          <div class="nav-sub-items">
+            <a href="cotizaciones.html" class="nav-sub-item">Cotizaciones</a>
+            <a href="ordenes.html" class="nav-sub-item">Órdenes de Compra</a>
+          </div>
+        </div>
+        <a href="bodega.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <polyline points="21 8 21 21 3 21 3 8"></polyline>
+              <rect x="1" y="3" width="22" height="5"></rect>
+              <line x1="10" y1="12" x2="14" y2="12"></line>
+            </svg></span>
+          <span class="nav-label">Bodega</span>
+        </a>
+        <a href="facturas.html" class="nav-item active">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg></span>
+          <span class="nav-label">Facturas</span>
+        </a>
+        <div id="version-tag"></div>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="app-header">
+        <div class="header-left"></div>
+        <div class="header-right" style="display: flex; align-items: center; gap: 1.5rem; padding-right: 1rem;">
+          <div style="background: white; padding: 0.5rem 1rem; border-radius: 1.25rem; border: 1px solid #E2E8F0; display: flex; align-items: center; gap: 0.75rem;">
+            <div style="display: flex; flex-direction: column; text-align: right;">
+              <span id="company-name-display" style="font-weight: 700; color: var(--color-navy); font-size: 0.95rem;">Cargando...</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="welcome-banner">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <button class="mobile-menu-toggle" onclick="toggleSidebar()" style="color: white; border: none; background: transparent; cursor: pointer;">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="welcome-content">
+            <h1 class="welcome-title">Tus Facturas</h1>
+            <p class="welcome-subtitle">Descarga las facturas electrónicas emitidas por dotacian.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-wrapper">
+        <div class="app-card" style="margin-top: -1.5rem; position: relative; z-index: 10;">
+          <h2 style="font-family: var(--font-family-heading); font-size: 1.25rem; margin-bottom: 1rem; color: var(--color-navy);">Historial de Facturas</h2>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Número</th>
+                <th>PO Asociada</th>
+                <th>Fecha Emisión</th>
+                <th>Estado</th>
+                <th style="text-align:right;">Monto Total</th>
+                <th style="text-align:center;">Descargar</th>
+              </tr>
+            </thead>
+            <tbody id="invoices-list">
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 4rem;">
+                  <div class="spinner-sm" style="width: 32px; height: 32px; border: 3px solid #E2E8F0; border-top-color: var(--color-cyan); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/utils.js?v=3"></script>
+  <script>
+    const _supabase = supabase.createClient(
+      'https://awuhvewotmwelurmjvmu.supabase.co',
+      'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq'
+    );
+
+    async function init() {
+      const { data: { session } } = await _supabase.auth.getSession();
+      if (!session) return window.location.href = 'login.html';
+
+      const companyId = session.user.id;
+
+      const compRes = await _supabase.from('company_profile').select('company_name').eq('id', companyId).single();
+      if(compRes.data) document.getElementById('company-name-display').textContent = compRes.data.company_name;
+
+      await loadInvoices(companyId);
+    }
+
+    async function loadInvoices(companyId) {
+      const container = document.getElementById('invoices-list');
+      try {
+        const { data, error } = await _supabase
+          .from('company_invoices')
+          .select('*, po:po_id(po_number, order_number)')
+          .eq('company_id', companyId)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          container.innerHTML = `
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 4rem 2rem;">
+                <svg width="48" height="48" fill="none" stroke="#CBD5E1" stroke-width="1.5" viewBox="0 0 24 24" style="margin-bottom:1rem;">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                  <polyline points="10 9 9 9 8 9"/>
+                </svg>
+                <h3 style="font-family: var(--font-family-heading); font-size: 1.15rem; color: var(--color-navy); margin-bottom: 0.5rem;">No tienes facturas emitidas</h3>
+                <p style="color: #64748B; font-size: 0.9rem;">Las facturas aparecerán aquí una vez que dotacian las procese.</p>
+              </td>
+            </tr>`;
+          return;
+        }
+
+        container.innerHTML = data.map(inv => {
+          const poRef = inv.po?.po_number || inv.po?.order_number || 'S/N';
+          const dateStr = new Date(inv.created_at).toLocaleDateString('es-ES', { day:'2-digit', month:'short', year:'numeric' });
+          const totalStr = `$${parseFloat(inv.total_amount).toLocaleString('es-MX', {minimumFractionDigits:2})}`;
+          
+          return `
+            <tr>
+              <td><strong style="color: var(--color-navy);">${inv.invoice_number}</strong></td>
+              <td>${poRef}</td>
+              <td>${dateStr}</td>
+              <td><span class="status-badge stamped">Emitida</span></td>
+              <td style="text-align:right; font-weight:700;">${totalStr}</td>
+              <td style="text-align:center;">
+                ${inv.pdf_url ? `<a href="${inv.pdf_url}" target="_blank" class="btn-action btn-pdf">PDF</a>` : ''}
+                ${inv.xml_url ? `<a href="${inv.xml_url}" target="_blank" class="btn-action btn-xml">XML</a>` : ''}
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = `
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 4rem 2rem;">
+                <svg width="48" height="48" fill="none" stroke="#CBD5E1" stroke-width="1.5" viewBox="0 0 24 24" style="margin-bottom:1rem;">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                  <polyline points="10 9 9 9 8 9"/>
+                </svg>
+                <h3 style="font-family: var(--font-family-heading); font-size: 1.15rem; color: var(--color-navy); margin-bottom: 0.5rem;">No tienes facturas emitidas</h3>
+                <p style="color: #64748B; font-size: 0.9rem;">Las facturas aparecerán aquí una vez que estén disponibles.</p>
+              </td>
+            </tr>`;
+      }
+    }
+
+    init();
+
+    function toggleSidebar() {
+      const layout = document.getElementById('app-layout-wrapper');
+      if (layout) {
+        layout.classList.toggle('sidebar-open');
+      }
+    }
+  </script>
+</body>
+</html>
