@@ -512,7 +512,7 @@
         // 1. Buscamos todas las órdenes recientes para este vendedor
         const { data: allOrders, error: ordersErr } = await _supabase
           .from('company_purchase_orders')
-          .select('*, company_profile(company_name)')
+          .select('*, company_profile(company_name, nit_rfc)')
           .eq('seller_id', sellerId)
           .order('created_at', { ascending: false });
 
@@ -523,6 +523,7 @@
         // 2. Buscamos el tracking de estas órdenes
         const poIds = (orders || []).map(o => o.id);
         let trackingMap = {};
+        let invoiceMap = {};
         if (poIds.length > 0) {
           const { data: tracking } = await _supabase
             .from('production_tracking')
@@ -530,6 +531,13 @@
             .in('po_id', poIds);
 
           trackingMap = (tracking || []).reduce((acc, t) => ({ ...acc, [t.po_id]: t }), {});
+
+          const { data: invoices } = await _supabase
+            .from('company_invoices')
+            .select('po_id, pdf_url, xml_url, invoice_number')
+            .in('po_id', poIds);
+          
+          invoiceMap = (invoices || []).reduce((acc, i) => ({ ...acc, [i.po_id]: i }), {});
         }
 
         // 3. También buscamos cotizaciones aprobadas o en producción
@@ -548,11 +556,13 @@
             id: o.id,
             po_number: o.po_number || o.order_number || 'S/N',
             company_profile: o.company_profile,
+            company_id: o.company_id,
             items: o.items || [],
             total_amount: o.total_amount || 0,
             created_at: o.created_at,
             status: trackingMap[o.id]?.status || 'confirmation',
-            progress_percent: trackingMap[o.id]?.progress_percent || 0
+            progress_percent: trackingMap[o.id]?.progress_percent || 0,
+            invoice: invoiceMap[o.id] || null
           })),
           ...(filteredQuotes).map(q => ({
             id: q.id,
@@ -720,7 +730,17 @@
                        <button class="btn-step" onclick="advanceStep('${o.id}', '${o.status}', ${o.isQuote ? "'quote'" : "'po'"})">
                          Pasar a ${PRODUCTION_STEPS[currentStepIndex + 1].label}
                        </button>
-                     ` : '<span style="color: #10B981; font-weight: 800; font-size: 0.8rem;">✓ COMPLETADA</span>'}
+                     ` : (o.invoice ? 
+                         `<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem;">
+                            <span style="color: #10B981; font-weight: 800; font-size: 0.75rem;">✓ COMPLETADA</span>
+                            <a href="${o.invoice.pdf_url}" target="_blank" style="color: var(--color-cyan); font-weight: 700; font-size: 0.75rem; text-decoration: none;">📄 Ver Factura</a>
+                          </div>` 
+                         : 
+                         `<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem;">
+                            <span style="color: #10B981; font-weight: 800; font-size: 0.75rem;">✓ COMPLETADA</span>
+                            <button onclick='openInvoiceModal(${JSON.stringify(o).replace(/'/g, "&apos;")})' style="background: #10B981; color: white; padding: 0.3rem 0.6rem; font-size: 0.7rem; font-weight: 700; border-radius: 6px; border: none; cursor: pointer;">Subir Factura</button>
+                          </div>`
+                     )}
                    </div>
                 </div>
               </div>
@@ -921,6 +941,143 @@
       </div>
     </div>
   </div>
+  <!-- Modal Emitir Factura Seller -->
+  <div class="modal-backdrop" id="modalFacturaSeller" style="display: none; position: fixed; inset: 0; background: rgba(2, 6, 23, 0.8); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 10000;">
+    <div class="modal-box" style="background: white; border: 1px solid #E2E8F0; border-radius: 1rem; width: 500px; max-width: 90%; padding: 2rem;">
+      <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div class="modal-title" style="font-family: var(--font-family-heading); font-size: 1.25rem; font-weight: 800; color: #0F172A;">Subir Factura Oficial</div>
+        <button onclick="closeInvoiceModal()" style="background: none; border: none; font-size: 1.25rem; color: #94A3B8; cursor: pointer;">✕</button>
+      </div>
+
+      <div style="background: #F8FAFC; border-left: 3px solid var(--color-cyan); padding: 1rem; margin-bottom: 1.5rem; border-radius: 0 0.5rem 0.5rem 0;">
+        <span style="font-size:0.8rem; color:#64748B; display:block;">Cliente:</span>
+        <strong id="m-inv-client" style="color:#0F172A;"></strong><br>
+        <span style="font-size:0.8rem; color:#64748B; display:block; margin-top:0.5rem;">NIT/RFC:</span>
+        <strong id="m-inv-tax" style="color:#0F172A;"></strong><br>
+        <span style="font-size:0.8rem; color:#64748B; display:block; margin-top:0.5rem;">Orden / Monto:</span>
+        <strong id="m-inv-order" style="color:#0F172A;"></strong> | <strong id="m-inv-amount" style="color:var(--color-cyan);"></strong>
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; font-size: 0.8rem; color: #64748B; font-weight: 600; margin-bottom: 0.4rem;">Folio / Número de Factura *</label>
+        <input type="text" id="f-inv-num" style="width: 100%; padding: 0.75rem; border: 1px solid #CBD5E1; border-radius: 0.5rem; font-family: inherit;" placeholder="Ej: F-1002">
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; font-size: 0.8rem; color: #64748B; font-weight: 600; margin-bottom: 0.4rem;">Archivo PDF (Obligatorio) *</label>
+        <div style="border: 2px dashed #CBD5E1; border-radius: 0.5rem; padding: 1.5rem; text-align: center; position: relative; cursor: pointer;" onmouseover="this.style.borderColor='var(--color-cyan)'" onmouseout="this.style.borderColor='#CBD5E1'">
+          <input type="file" id="f-inv-pdf" accept="application/pdf" onchange="handleInvoiceFile('pdf', event)" style="position: absolute; inset: 0; opacity: 0; cursor: pointer;">
+          <span id="name-inv-pdf" style="color: #64748B; font-size: 0.9rem; font-weight: 500;">Haz clic o arrastra tu PDF aquí</span>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; font-size: 0.8rem; color: #64748B; font-weight: 600; margin-bottom: 0.4rem;">Archivo XML (Opcional para CFDI/DIAN)</label>
+        <div style="border: 2px dashed #CBD5E1; border-radius: 0.5rem; padding: 1.5rem; text-align: center; position: relative; cursor: pointer;" onmouseover="this.style.borderColor='var(--color-cyan)'" onmouseout="this.style.borderColor='#CBD5E1'">
+          <input type="file" id="f-inv-xml" accept="application/xml,text/xml" onchange="handleInvoiceFile('xml', event)" style="position: absolute; inset: 0; opacity: 0; cursor: pointer;">
+          <span id="name-inv-xml" style="color: #64748B; font-size: 0.9rem; font-weight: 500;">Haz clic o arrastra tu XML aquí</span>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+        <button onclick="closeInvoiceModal()" style="background: white; color: #64748B; border: 1px solid #CBD5E1; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">Cancelar</button>
+        <button id="btn-save-inv" onclick="saveInvoiceSeller()" style="background: var(--color-cyan); color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">Subir Factura</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let invoiceActivePo = null;
+    let invoiceFiles = { pdf: null, xml: null };
+
+    window.openInvoiceModal = function(po) {
+      invoiceActivePo = po;
+      document.getElementById('m-inv-client').textContent = po.company_profile?.company_name || 'Desconocido';
+      document.getElementById('m-inv-tax').textContent = po.company_profile?.nit_rfc || 'No registrado';
+      document.getElementById('m-inv-order').textContent = po.po_number || 'S/N';
+      document.getElementById('m-inv-amount').textContent = formatPrice(po.total_amount);
+
+      document.getElementById('f-inv-num').value = '';
+      invoiceFiles = { pdf: null, xml: null };
+      document.getElementById('f-inv-pdf').value = '';
+      document.getElementById('f-inv-xml').value = '';
+      document.getElementById('name-inv-pdf').textContent = 'Haz clic o arrastra tu PDF aquí';
+      document.getElementById('name-inv-xml').textContent = 'Haz clic o arrastra tu XML aquí';
+
+      document.getElementById('modalFacturaSeller').style.display = 'flex';
+    };
+
+    window.closeInvoiceModal = function() {
+      document.getElementById('modalFacturaSeller').style.display = 'none';
+      invoiceActivePo = null;
+    };
+
+    window.handleInvoiceFile = function(type, event) {
+      const f = event.target.files[0];
+      if (!f) return;
+      invoiceFiles[type] = f;
+      document.getElementById(`name-inv-${type}`).textContent = f.name;
+    };
+
+    window.saveInvoiceSeller = async function() {
+      if (!invoiceActivePo) return;
+      const invNum = document.getElementById('f-inv-num').value.trim();
+      if (!invNum) return alert('Por favor, ingresa el Folio o Número de Factura.');
+      if (!invoiceFiles.pdf) return alert('El archivo PDF es obligatorio.');
+
+      const btn = document.getElementById('btn-save-inv');
+      btn.disabled = true; 
+      btn.textContent = 'Subiendo...';
+
+      try {
+        const amt = invoiceActivePo.total_amount;
+        const taxId = invoiceActivePo.company_profile?.nit_rfc || '';
+        const companyName = invoiceActivePo.company_profile?.company_name || '';
+        const country = 'CO'; // Defaulting for simple flow, can be mapped from profile if needed.
+
+        // Upload PDF
+        const pdfPath = `seller/${invoiceActivePo.id}_${invNum}.pdf`;
+        await _supabase.storage.from('invoices').upload(pdfPath, invoiceFiles.pdf, { upsert: true });
+        const pdfUrl = _supabase.storage.from('invoices').getPublicUrl(pdfPath).data.publicUrl;
+
+        // Upload XML (Optional)
+        let xmlUrl = null;
+        if (invoiceFiles.xml) {
+          const xmlPath = `seller/${invoiceActivePo.id}_${invNum}.xml`;
+          await _supabase.storage.from('invoices').upload(xmlPath, invoiceFiles.xml, { upsert: true });
+          xmlUrl = _supabase.storage.from('invoices').getPublicUrl(xmlPath).data.publicUrl;
+        }
+
+        const { error } = await _supabase.from('company_invoices').insert({
+          po_id: invoiceActivePo.id,
+          company_id: invoiceActivePo.company_id,
+          invoice_number: invNum,
+          country: country,
+          tax_id: taxId,
+          legal_name: companyName,
+          subtotal: amt / 1.19, // simplified for CO standard 19%
+          tax_amount: amt - (amt / 1.19),
+          total_amount: amt,
+          pdf_url: pdfUrl,
+          xml_url: xmlUrl,
+          mx_metadata: {},
+          co_metadata: { source: 'seller_portal' }
+        });
+
+        if (error) throw error;
+
+        showToast("Éxito", "La factura ha sido subida y está disponible para el cliente.");
+        closeInvoiceModal();
+        loadActiveOrders(); // refresh view
+      } catch (err) {
+        console.error(err);
+        alert('Hubo un error al subir la factura: ' + err.message);
+      } finally {
+        btn.disabled = false; 
+        btn.textContent = 'Subir Factura';
+      }
+    };
+  </script>
 </body>
 
 </html>
