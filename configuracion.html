@@ -146,12 +146,22 @@
       filter: brightness(0.95);
     }
 
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
     @media (max-width: 768px) {
-      .form-grid {
+      .form-grid,
+      .contact-grid {
         grid-template-columns: 1fr;
       }
       .config-card {
-        padding: 1.25rem;
+        padding: 1rem;
+      }
+      .app-container {
+        padding: 0.5rem !important;
       }
       .config-section h3 {
         font-size: 1.05rem;
@@ -263,6 +273,7 @@
         <div id="version-tag"></div>
       </nav>
     </aside>
+    <div class="overlay" onclick="toggleSidebar()"></div>
 
     <main class="main-content">
       <header class="app-header">
@@ -441,7 +452,7 @@
                 <div class="form-group" style="grid-column: span 2; margin-top: 1rem;">
                   <h4 style="color: var(--color-navy); margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 700;">
                     Contacto Principal de Entrega</h4>
-                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                  <div class="contact-grid">
                     <div>
                       <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Nombre Completo</label>
                       <input type="text" id="delivery_contact_1_name" disabled placeholder="Nombre del contacto"
@@ -464,7 +475,7 @@
                 <div class="form-group" style="grid-column: span 2; margin-top: 0.5rem;">
                   <h4 style="color: var(--color-navy); margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 700;">
                     Contacto Secundario de Entrega</h4>
-                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                  <div class="contact-grid">
                     <div>
                       <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Nombre Completo</label>
                       <input type="text" id="delivery_contact_2_name" disabled placeholder="Nombre del contacto"
@@ -674,6 +685,23 @@
     let session = null;
     let isEditing = false;
     let currentProfile = null;
+
+    function toggleSidebar() {
+      const sidebar = document.querySelector('.sidebar');
+      const overlay = document.querySelector('.overlay');
+      if (sidebar) sidebar.classList.toggle('active');
+      if (overlay) overlay.classList.toggle('active');
+    }
+
+    function toggleUserPopover(event) {
+      if (event) {
+        event.stopPropagation();
+      }
+      const popover = document.getElementById('user-popover');
+      if (popover) {
+        popover.classList.toggle('active');
+      }
+    }
 
     function formatColombiaNit(value) {
       const numbers = value.replace(/\D/g, '');
@@ -969,32 +997,4 @@
         delivery_address: document.getElementById('delivery_address').value,
         delivery_state: document.getElementById('delivery_state').value,
         delivery_contact_1_name: document.getElementById('delivery_contact_1_name').value,
-        delivery_contact_1_phone: document.getElementById('delivery_contact_1_phone').value,
-        delivery_contact_1_email: document.getElementById('delivery_contact_1_email').value,
-        delivery_contact_2_name: document.getElementById('delivery_contact_2_name').value,
-        delivery_contact_2_phone: document.getElementById('delivery_contact_2_phone').value,
-        delivery_contact_2_email: document.getElementById('delivery_contact_2_email').value,
-        delivery_hours: hoursObj,
-        contact_phone: document.getElementById('contact_phone').value,
-        country: document.getElementById('country').value,
-        selected_roles: currentProfile ? currentProfile.selected_roles : []
-      };
-
-      const { error } = await _supabase.from('company_profile').upsert(updates);
-
-      if (!error) {
-        showToast('Éxito', 'Configuración guardada correctamente.', 'success');
-        toggleEdit();
-      } else {
-        showToast('Error', 'No se pudo guardar: ' + error.message, 'error');
-      }
-
-      btn.disabled = false;
-      btn.innerHTML = '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Guardar Cambios';
-    }
-
-    init();
-  </script>
-</body>
-
-</html>
+       
