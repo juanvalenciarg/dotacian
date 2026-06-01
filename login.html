@@ -318,7 +318,7 @@
           <p>Ingresa a tu portal corporativo.</p>
         </div>
 
-        <form class="auth-form" id="client-login-form">
+        <form class="auth-form" id="client-login-form" onsubmit="event.preventDefault();">
           <div id="login-error-alert" class="error-alert">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="10"></circle>
@@ -375,7 +375,15 @@
     // Supabase Configuration
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    let _supabase = null;
+    try {
+      if (typeof supabase !== 'undefined') {
+        _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+    } catch(err) {
+      console.error("Supabase load error:", err);
+    }
 
     function togglePasswordVisibility(inputId, btn) {
       const input = document.getElementById(inputId);
@@ -404,6 +412,14 @@
         const errorAlert = document.getElementById('login-error-alert');
         const errorText = document.getElementById('error-message-text');
         errorAlert.style.display = 'none';
+
+        if (!_supabase) {
+          errorText.textContent = 'Error de conexión. Asegúrate de estar conectado a internet y de no tener bloqueadores de red activos.';
+          errorAlert.style.display = 'flex';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Iniciar Sesión';
+          return;
+        }
 
         try {
           const { data, error } = await _supabase.auth.signInWithPassword({
@@ -450,3 +466,20 @@
           setTimeout(() => {
             window.location.href = 'app.html';
           }, 1000);
+
+        } catch (err) {
+          if (typeof showToast === 'function') {
+            showToast('Error', 'Hubo un fallo en la conexión.', 'error');
+          } else {
+            errorText.textContent = 'Hubo un fallo en la conexión.';
+            errorAlert.style.display = 'flex';
+          }
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Iniciar Sesión';
+        }
+      });
+    }
+  </script>
+</body>
+
+</html>
