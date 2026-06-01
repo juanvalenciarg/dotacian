@@ -614,11 +614,12 @@
           } else if (o.items) {
              const itms = Array.isArray(o.items) ? o.items : [];
              itms.forEach(it => {
-               if (!it.name) return;
-               const normName = normalizeText(it.name);
-               const keyName = it.name + (it.size ? `_${it.size}` : '');
+               const itemName = it.product_name || it.name;
+               if (!itemName) return;
+               const normName = normalizeText(itemName);
+               const keyName = itemName + (it.size ? `_${it.size}` : '');
                itemsObj[keyName] = {
-                 displayName: it.name,
+                 displayName: itemName,
                  quantity: it.qty || it.quantity || 1,
                  sku: it.sku || sellerProductSkus[normName] || '-',
                  sizes: it.sizes || (it.size ? { [it.size]: it.qty || it.quantity || 1 } : { 'Única': it.qty || it.quantity || 1 }),
