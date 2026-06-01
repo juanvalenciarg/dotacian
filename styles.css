@@ -2398,6 +2398,10 @@ ul {
   z-index: 90;
 }
 
+.mobile-menu-toggle {
+  display: none;
+}
+
 .app-container {
   padding: 2rem;
   width: 100%;
