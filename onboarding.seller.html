@@ -2,359 +2,923 @@
 <html lang="es">
 
 <head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Seller Onboarding | dotacian</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <!-- SDKs & Utils -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/utils.js?v=4"></script>
+
   <style>
-    body {
-      background-color: var(--color-white);
+    /* =============================================
+       PREMIUM SELLER CONVERSATIONAL ONBOARDING
+    ============================================= */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
       margin: 0;
-      overflow: hidden;
+      padding: 0;
     }
 
-    .split-screen {
-      display: flex;
-      min-height: 100vh;
-      width: 100%;
+    html,
+    body {
+      height: 100%;
+      font-family: 'Inter', sans-serif;
+      background-color: #080A10;
+      color: #F8FAFC;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
-    /* Left Side: Branding & Info */
-    .info-side {
-      flex: 1.1;
-      background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-deep) 100%);
-      padding: 4rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-      color: white;
-    }
-
-    .info-side::before {
-      content: '';
+    /* Ambient Glow Backgrounds */
+    .ambient-glow-1 {
       position: absolute;
       top: -10%;
+      left: -10%;
+      width: 50vw;
+      height: 50vw;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .ambient-glow-2 {
+      position: absolute;
+      bottom: -10%;
       right: -10%;
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, var(--color-cyan-glow) 0%, transparent 70%);
-      opacity: 0.4;
+      width: 50vw;
+      height: 50vw;
+      background: radial-gradient(circle, rgba(8, 145, 178, 0.15) 0%, transparent 70%);
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 1;
     }
 
-    .info-content {
+    .onboarding-shell {
       position: relative;
-      z-index: 10;
-      max-width: 520px;
-    }
-
-    .info-tag {
-      display: inline-block;
-      padding: 0.5rem 1rem;
-      background: rgba(6, 182, 212, 0.1);
-      border: 1px solid rgba(6, 182, 212, 0.3);
-      color: var(--color-cyan);
-      border-radius: 100px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 2rem;
-    }
-
-    .info-side h1 {
-      font-size: 3.5rem;
-      line-height: 1.1;
-      margin-bottom: 1.5rem;
-      background: linear-gradient(to bottom right, #FFFFFF 30%, #94A3B8 100%);
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      color: transparent;
-    }
-
-    .info-side p {
-      font-size: 1.25rem;
-      line-height: 1.6;
-      color: #94A3B8;
-      margin-bottom: 3rem;
-    }
-
-    .feature-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-
-    .feature-item {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      font-weight: 500;
-      color: #E2E8F0;
-    }
-
-    .feature-icon {
-      width: 32px;
-      height: 32px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--color-cyan);
-    }
-
-    /* Right Side: Form */
-    .form-side {
-      flex: 1;
-      background: white;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 4rem;
-      overflow-y: auto;
+      z-index: 2;
+      padding: 2rem 1.5rem;
     }
 
-    .ob-container {
-      width: 100%;
-      max-width: 440px;
+    /* Header Logo */
+    .ob-header {
+      position: absolute;
+      top: 0.5rem;
+      left: 3rem;
+      z-index: 1000;
     }
 
-    .ob-step {
-      display: none;
-      animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .ob-step.active {
+    .ob-logo img {
+      height: 125px;
+      width: auto;
       display: block;
     }
 
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(20px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    .checkbox-group {
+    /* Conversational Container */
+    .chat-container {
+      width: 100%;
+      max-width: 600px;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
-      margin-top: 0.5rem;
+      gap: 2rem;
+      margin-top: 4rem;
     }
 
-    .checkbox-item {
+    /* AI Avatar / Orb Section */
+    .ai-orb-section {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 0.75rem;
-      padding: 1rem;
-      border: 1.5px solid #E2E8F0;
-      border-radius: 0.75rem;
-      cursor: pointer;
-      transition: all 0.2s;
+      gap: 1rem;
+      text-align: center;
     }
 
-    .checkbox-item:hover {
-      border-color: var(--color-cyan);
-      background: #F8FAFC;
+    .ai-orb-container {
+      position: relative;
+      width: 84px;
+      height: 84px;
     }
 
-    .checkbox-item.selected {
-      border-color: var(--color-cyan);
-      background: #F0FDFA;
+    .ai-orb-ring {
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 2px dashed rgba(6, 182, 212, 0.3);
+      animation: spin 16s linear infinite;
     }
 
-    .checkbox-item input {
-      width: 1.25rem;
-      height: 1.25rem;
-      accent-color: var(--color-cyan);
-      cursor: pointer;
-    }
-
-    .progress-bar {
-      height: 6px;
-      background: #F1F5F9;
-      border-radius: 100px;
-      margin-bottom: 2.5rem;
+    .ai-orb {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #22D3EE 0%, #0891B2 50%, #0369A1 100%);
+      box-shadow: 0 0 25px rgba(6, 182, 212, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.3);
+      animation: floatOrb 4s ease-in-out infinite;
+      position: relative;
       overflow: hidden;
     }
 
-    .progress-fill {
-      height: 100%;
-      background: var(--color-cyan);
-      width: 50%;
-      transition: width 0.4s ease;
+    .ai-orb::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
+      border-radius: 50%;
     }
 
-    @media (max-width: 1024px) {
-      .info-side { display: none; }
-      .form-side { flex: 1; padding: 2rem; }
+    /* Orb Status Animations */
+    @keyframes floatOrb {
+
+      0%,
+      100% {
+        transform: translateY(0px) scale(1);
+      }
+
+      50% {
+        transform: translateY(-8px) scale(1.03);
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .ai-orb.thinking {
+      animation: orbPulse 1.2s ease-in-out infinite alternate;
+      background: radial-gradient(circle at 30% 30%, #38BDF8 0%, #0284C7 50%, #075985 100%);
+      box-shadow: 0 0 35px rgba(56, 189, 248, 0.7);
+    }
+
+    @keyframes orbPulse {
+      from {
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+      }
+
+      to {
+        transform: scale(1.08);
+        box-shadow: 0 0 40px rgba(56, 189, 248, 0.9);
+      }
+    }
+
+    /* Agent Identity Name */
+    .agent-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #06B6D4;
+      text-transform: lowercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Message Bubbles */
+    .message-bubble {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 1.5rem;
+      padding: 2.25rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      position: relative;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .ai-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.35rem;
+      line-height: 1.45;
+      font-weight: 600;
+      color: #F1F5F9;
+      margin-bottom: 0.5rem;
+    }
+
+    .ai-subtext {
+      font-size: 0.95rem;
+      color: #94A3B8;
+      line-height: 1.5;
+    }
+
+    /* Typewriter animation support class */
+    .typing::after {
+      content: '|';
+      animation: blinkCursor 0.8s infinite;
+      color: #06B6D4;
+      margin-left: 2px;
+    }
+
+    @keyframes blinkCursor {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0;
+      }
+    }
+
+    /* Input Field Panel */
+    .interactive-panel {
+      margin-top: 1.5rem;
+      animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      display: none;
+    }
+
+    .interactive-panel.active {
+      display: block;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Modern Inputs */
+    .input-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .input-wrapper label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .modern-input {
+      width: 100%;
+      padding: 1.1rem 1.4rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1rem;
+      font-size: 1.05rem;
+      font-family: inherit;
+      color: white;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .modern-input:focus {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: #06B6D4;
+      box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.15);
+    }
+
+    /* Side-by-Side Grid */
+    .input-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    /* High-Fidelity Country Selector Cards */
+    .country-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .country-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1.25rem;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .country-card:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(6, 182, 212, 0.4);
+      transform: translateY(-4px);
+    }
+
+    .country-card.selected {
+      background: rgba(6, 182, 212, 0.06);
+      border-color: #06B6D4;
+      box-shadow: 0 10px 30px rgba(6, 182, 212, 0.15);
+    }
+
+    .country-flag {
+      font-size: 2.75rem;
+      margin-bottom: 0.75rem;
+      display: block;
+      transition: transform 0.3s;
+    }
+
+    .country-card:hover .country-flag {
+      transform: scale(1.15) rotate(4deg);
+    }
+
+    .country-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #E2E8F0;
+    }
+
+    .country-card.selected .country-name {
+      color: #22D3EE;
+    }
+
+    /* Industry Selector Grid (Seller Specific) */
+    .industry-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .industry-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .industry-card:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(6, 182, 212, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .industry-card.selected {
+      background: rgba(6, 182, 212, 0.06);
+      border-color: #06B6D4;
+      box-shadow: 0 8px 24px rgba(6, 182, 212, 0.1);
+    }
+
+    .industry-icon {
+      font-size: 2rem;
+      width: 52px;
+      height: 52px;
+      border-radius: 0.75rem;
+      background: rgba(255, 255, 255, 0.03);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.3s;
+    }
+
+    .industry-card:hover .industry-icon {
+      transform: scale(1.1);
+      background: rgba(6, 182, 212, 0.1);
+    }
+
+    .industry-card.selected .industry-icon {
+      background: rgba(6, 182, 212, 0.15);
+      color: #22D3EE;
+    }
+
+    .industry-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .industry-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #E2E8F0;
+    }
+
+    .industry-card.selected .industry-title {
+      color: #22D3EE;
+    }
+
+    .industry-subtitle {
+      font-size: 0.75rem;
+      color: #64748B;
+    }
+
+    /* Action Buttons */
+    .btn-glow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      width: 100%;
+      padding: 1.25rem;
+      background: #06B6D4;
+      color: #080A10;
+      border: none;
+      border-radius: 1.1rem;
+      font-family: inherit;
+      font-size: 1.05rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 8px 24px rgba(6, 182, 212, 0.3);
+    }
+
+    .btn-glow:hover {
+      background: #22D3EE;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(6, 182, 212, 0.5);
+    }
+
+    .btn-glow:disabled {
+      background: #1E293B;
+      color: #64748B;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .btn-glow svg {
+      transition: transform 0.3s;
+    }
+
+    .btn-glow:hover svg {
+      transform: translateX(4px);
+    }
+
+    /* Password Vis toggle */
+    .eye-toggle {
+      position: absolute;
+      right: 1.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #64748B;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: color 0.2s;
+    }
+
+    .eye-toggle:hover {
+      color: #94A3B8;
+    }
+
+    /* Footer & Redirection */
+    .ob-footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.875rem;
+      color: #64748B;
+    }
+
+    .ob-footer a {
+      color: #06B6D4;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .ob-footer a:hover {
+      color: #22D3EE;
+    }
+
+    /* Loading / Thinking */
+    .loading-status-text {
+      font-size: 0.95rem;
+      color: #64748B;
+      font-style: italic;
+      margin-top: 0.5rem;
+      animation: pulseText 1.5s infinite alternate;
+    }
+
+    @keyframes pulseText {
+      from {
+        opacity: 0.5;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .toast-container {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      z-index: 9999;
+    }
+
+    @media (max-width: 768px) {
+      .ob-header {
+        position: static;
+        margin-bottom: 2rem;
+      }
+
+      .chat-container {
+        margin-top: 0;
+      }
+
+      .input-grid-2,
+      .industry-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 
 <body>
-  <div class="split-screen">
-    <!-- Branding Side -->
-    <div class="info-side">
-      <div class="info-content">
-        <span class="info-tag">Portal para Fabricantes</span>
-        <h1>Impulsa tu negocio de dotación y uniformes.</h1>
-        <p>Accede a cientos de clientes corporativos que buscan calidad y eficiencia en sus uniformes.</p>
-        
-        <div class="feature-list">
-          <div class="feature-item">
-            <div class="feature-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg></div>
-            <span>Venta directa a grandes corporativos</span>
-          </div>
-          <div class="feature-item">
-            <div class="feature-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-            <span>Gestión de producción automatizada</span>
-          </div>
-          <div class="feature-item">
-            <div class="feature-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 22s8-4.5 8-11.8A8 8 0 0 0 12 2a8 8 0 0 0-8 8.2c0 7.3 8 11.8 8 11.8z"/></svg></div>
-            <span>Pagos garantizados y logística centralizada</span>
-          </div>
-        </div>
+  <!-- Ambient glow backdrop -->
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+
+  <div class="onboarding-shell">
+    <!-- Header Logo -->
+    <header class="ob-header">
+      <div class="ob-logo">
+        <a href="index.html">
+          <img src="assets/logos/logo_dotacian.seller_original.png" alt="dotacian seller">
+        </a>
       </div>
-    </div>
+    </header>
 
-    <!-- Form Side -->
-    <div class="form-side">
-      <div class="ob-container">
-        <div class="logo" style="margin-bottom: 3rem;">
-          <a href="index.html">
-            <img src="assets/logos/logo_dotacian_seller.png" alt="dotacian seller logo" style="height: 85px; width: auto; margin-bottom: 2rem;">
-          </a>
+    <div class="chat-container">
+      <!-- AI Orb -->
+      <div class="ai-orb-section">
+        <div class="ai-orb-container">
+          <div class="ai-orb-ring"></div>
+          <div id="agent-orb" class="ai-orb"></div>
+        </div>
+        <div class="agent-name">dot</div>
+      </div>
+
+      <!-- Dialogue Bubble -->
+      <div class="message-bubble">
+        <div id="ai-chat-bubble" class="ai-text typing">Cargando asistente...</div>
+        <div id="ai-chat-subbubble" class="ai-subtext"></div>
+
+        <!-- STEP 0: Welcome -->
+        <div id="panel-0" class="interactive-panel active">
+          <button class="btn-glow" onclick="nextStep(1)">
+            Comenzar Registro de Taller
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path d="M5 12h14m-7-7 7 7-7 7" />
+            </svg>
+          </button>
+
+          <div class="ob-footer">
+            ¿Ya tienes cuenta de fabricante? <a href="login.seller.html">Inicia sesión</a>
+          </div>
         </div>
 
-        <div class="progress-bar">
-          <div id="ob-progress-fill" class="progress-fill"></div>
+        <!-- STEP 1: Personal Name -->
+        <div id="panel-1" class="interactive-panel">
+          <div class="input-grid-2">
+            <div class="input-wrapper">
+              <label for="seller-first-name">Tu Nombre</label>
+              <input type="text" id="seller-first-name" class="modern-input" placeholder="Ej. Juan" autocomplete="off"
+                oninput="validateStep1()">
+            </div>
+            <div class="input-wrapper">
+              <label for="seller-last-name">Tu Apellido</label>
+              <input type="text" id="seller-last-name" class="modern-input" placeholder="Ej. Pérez" autocomplete="off"
+                oninput="validateStep1()">
+            </div>
+          </div>
+
+          <button id="btn-next-1" class="btn-glow" onclick="nextStep(2)" disabled>
+            Continuar
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path d="M5 12h14m-7-7 7 7-7 7" />
+            </svg>
+          </button>
         </div>
 
-        <div id="onboarding-error-alert" style="display: none; background: #FEF2F2; border: 1.5px solid #FCA5A5; color: #991B1B; padding: 1rem; border-radius: 0.75rem; margin-bottom: 1.5rem; font-size: 0.875rem; font-weight: 500; align-items: center; gap: 0.75rem;">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="8" x2="12" y2="12"></line>
-            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-          </svg>
-          <span id="error-message-text"></span>
+        <!-- STEP 2: Email & Password -->
+        <div id="panel-2" class="interactive-panel">
+          <div class="input-wrapper">
+            <label for="seller-email">Correo Corporativo</label>
+            <input type="email" id="seller-email" class="modern-input" placeholder="comercial@tufactoria.com"
+              autocomplete="off" oninput="validateStep2()">
+          </div>
+          <div class="input-wrapper">
+            <label for="seller-pass">Contraseña de Acceso</label>
+            <div style="position: relative;">
+              <input type="password" id="seller-pass" class="modern-input" placeholder="Min. 6 caracteres"
+                oninput="validateStep2()">
+              <button type="button" class="eye-toggle" onclick="togglePassword('seller-pass', this)">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <button id="btn-next-2" class="btn-glow" onclick="nextStep(3)" disabled>
+            Continuar
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path d="M5 12h14m-7-7 7 7-7 7" />
+            </svg>
+          </button>
         </div>
 
-        <!-- Step 1: Account -->
-        <div id="step-1" class="ob-step active">
-          <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; font-family: var(--font-family-secondary);">Información Personal</h2>
-          <p style="color: var(--color-text-secondary); margin-bottom: 2rem;">Crea tu perfil de administrador de taller.</p>
-          
-          <form onsubmit="nextStep(event, 2)">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-              <div class="form-group">
-                <label>Nombre</label>
-                <input type="text" id="seller-first-name" placeholder="Juan" required>
-              </div>
-              <div class="form-group">
-                <label>Apellido</label>
-                <input type="text" id="seller-last-name" placeholder="Pérez" required>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Correo Corporativo</label>
-              <input type="email" id="seller-email" placeholder="comercial@tufactoria.com" required>
-            </div>
-            <div class="form-group">
-              <label>Contraseña</label>
-              <div style="position: relative;">
-                <input type="password" id="seller-pass" placeholder="••••••••" required style="padding-right: 3rem;">
-                <button type="button" onclick="togglePasswordVisibility('seller-pass', this)" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #94A3B8; display: flex; align-items: center; justify-content: center; padding: 0;">
-                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                  </svg>
-                </button>
-              </div>
-            </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; margin-top: 1.5rem;">Siguiente Paso →</button>
-          </form>
+        <!-- STEP 3: Factory Name (Razón Social) -->
+        <div id="panel-3" class="interactive-panel">
+          <div class="input-wrapper">
+            <label for="factory-name">Razón Social de la Fábrica</label>
+            <input type="text" id="factory-name" class="modern-input" placeholder="Ej. Textiles del Centro S.A.S"
+              autocomplete="off" oninput="validateStep3()">
+          </div>
+
+          <button id="btn-next-3" class="btn-glow" onclick="nextStep(4)" disabled>
+            Continuar
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path d="M5 12h14m-7-7 7 7-7 7" />
+            </svg>
+          </button>
         </div>
 
-        <!-- Step 2: Factory & Industries -->
-        <div id="step-2" class="ob-step">
-          <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; font-family: var(--font-family-secondary);">Datos de Fábrica</h2>
-          <p style="color: var(--color-text-secondary); margin-bottom: 1.5rem;">Completa el perfil de tu empresa.</p>
-          
-          <form onsubmit="finishOnboarding(event)">
-            <div class="form-group">
-              <label>Nombre de la Fábrica</label>
-              <input type="text" id="factory-name" placeholder="Textiles del Centro S.A." required>
+        <!-- STEP 4: Factory Location -->
+        <div id="panel-4" class="interactive-panel">
+          <div class="country-grid">
+            <div class="country-card" id="loc-mx" onclick="selectLocation('MX', 'loc-mx')">
+              <span class="country-flag">🇲🇽</span>
+              <span class="country-name">México</span>
             </div>
-            
-            <div class="form-group">
-              <label>Sede Principal</label>
-              <select id="factory-location" class="wiz-input" style="width: 100%; border: 1.5px solid #E2E8F0; padding: 0.75rem; border-radius: 0.75rem;">
-                <option value="CO">Colombia 🇨🇴</option>
-                <option value="MX">México 🇲🇽</option>
-              </select>
+            <div class="country-card" id="loc-co" onclick="selectLocation('CO', 'loc-co')">
+              <span class="country-flag">🇨🇴</span>
+              <span class="country-name">Colombia</span>
             </div>
+          </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-              <div class="form-group">
-                <label>Mín. por Pedido</label>
-                <input type="number" id="factory-min-qty" placeholder="10" required>
-              </div>
-              <div class="form-group">
-                <label>Máx. por Pedido</label>
-                <input type="number" id="factory-max-qty" placeholder="5000" required>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>Industrias que atiendes</label>
-              <div class="checkbox-group">
-                <label class="checkbox-item" id="item-limpieza">
-                  <input type="checkbox" onchange="updateIndustry(this, 'limpieza')">
-                  <span>Limpieza 🧹</span>
-                </label>
-                <label class="checkbox-item" id="item-restaurantes">
-                  <input type="checkbox" onchange="updateIndustry(this, 'restaurantes')">
-                  <span>Restaurantes 🍽️</span>
-                </label>
-                <label class="checkbox-item" id="item-industrial">
-                  <input type="checkbox" onchange="updateIndustry(this, 'industrial')">
-                  <span>Industrial ⚙️</span>
-                </label>
-              </div>
-            </div>
-
-            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-              <button type="button" class="btn btn-outline" style="flex: 1;" onclick="prevStep(1)">Atrás</button>
-              <button type="submit" class="btn btn-primary" style="flex: 2;">Finalizar Registro ✅</button>
-            </div>
-          </form>
+          <button id="btn-next-4" class="btn-glow" onclick="nextStep(5)" disabled>
+            Continuar
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path d="M5 12h14m-7-7 7 7-7 7" />
+            </svg>
+          </button>
         </div>
 
-        <div class="auth-footer" style="margin-top: 2rem; border-top: 1px solid #F1F5F9; padding-top: 2rem; text-align: center;">
-          ¿Ya eres parte de la red? <a href="login.seller.html" style="color: var(--color-cyan); font-weight: 600;">Inicia Sesión</a>
+        <!-- STEP 5: Industries Selector -->
+        <div id="panel-5" class="interactive-panel">
+          <div class="industry-grid">
+            <div class="industry-card" id="ind-limpieza" onclick="toggleIndustry('limpieza', 'ind-limpieza')">
+              <div class="industry-icon">🧹</div>
+              <div class="industry-meta">
+                <span class="industry-title">Limpieza</span>
+                <span class="industry-subtitle">Uniformes de aseo general</span>
+              </div>
+            </div>
+            <div class="industry-card" id="ind-restaurantes"
+              onclick="toggleIndustry('restaurantes', 'ind-restaurantes')">
+              <div class="industry-icon">🍽️</div>
+              <div class="industry-meta">
+                <span class="industry-title">Restaurantes</span>
+                <span class="industry-subtitle">Cocina y atención directa</span>
+              </div>
+            </div>
+            <div class="industry-card" id="ind-industrial" onclick="toggleIndustry('industrial', 'ind-industrial')">
+              <div class="industry-icon">⚙️</div>
+              <div class="industry-meta">
+                <span class="industry-title">Industrial</span>
+                <span class="industry-subtitle">Operarios y bodega</span>
+              </div>
+            </div>
+            <div class="industry-card" id="ind-corporate" onclick="toggleIndustry('corporate', 'ind-corporate')">
+              <div class="industry-icon">👔</div>
+              <div class="industry-meta">
+                <span class="industry-title">Corporativo</span>
+                <span class="industry-subtitle">Oficina y administración</span>
+              </div>
+            </div>
+            <div class="industry-card" id="ind-seguridad" onclick="toggleIndustry('seguridad', 'ind-seguridad')">
+              <div class="industry-icon">🛡️</div>
+              <div class="industry-meta">
+                <span class="industry-title">Seguridad</span>
+                <span class="industry-subtitle">Guardias y vigilancia</span>
+              </div>
+            </div>
+            <div class="industry-card" id="ind-hoteleria" onclick="toggleIndustry('hoteleria', 'ind-hoteleria')">
+              <div class="industry-icon">🏨</div>
+              <div class="industry-meta">
+                <span class="industry-title">Hotelería</span>
+                <span class="industry-subtitle">Recepción y botones</span>
+              </div>
+            </div>
+            <div class="industry-card" id="ind-retail" onclick="toggleIndustry('retail', 'ind-retail')">
+              <div class="industry-icon">🏪</div>
+              <div class="industry-meta">
+                <span class="industry-title">Retail</span>
+                <span class="industry-subtitle">Tiendas y mostrador</span>
+              </div>
+            </div>
+            <div class="industry-card" id="ind-salud" onclick="toggleIndustry('salud', 'ind-salud')">
+              <div class="industry-icon">⚕️</div>
+              <div class="industry-meta">
+                <span class="industry-title">Salud</span>
+                <span class="industry-subtitle">Médicos y enfermería</span>
+              </div>
+            </div>
+            <div class="industry-card" id="ind-construccion"
+              onclick="toggleIndustry('construccion', 'ind-construccion')">
+              <div class="industry-icon">🏗️</div>
+              <div class="industry-meta">
+                <span class="industry-title">Construcción</span>
+                <span class="industry-subtitle">Obras y proyectos</span>
+              </div>
+            </div>
+            <div class="industry-card" id="ind-logistica" onclick="toggleIndustry('logistica', 'ind-logistica')">
+              <div class="industry-icon">📦</div>
+              <div class="industry-meta">
+                <span class="industry-title">Logística</span>
+                <span class="industry-subtitle">Transporte y almacén</span>
+              </div>
+            </div>
+          </div>
+
+          <button id="btn-next-5" class="btn-glow" onclick="submitSellerOnboarding()">
+            Finalizar Registro de Taller
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path d="M5 12h14m-7-7 7 7-7 7" />
+            </svg>
+          </button>
         </div>
+
+        <!-- STEP 6: Loading AI -->
+        <div id="panel-6" class="interactive-panel" style="text-align: center;">
+          <div id="loadingStatusText" class="loading-status-text">Inicializando perfil de fábrica...</div>
+        </div>
+
       </div>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/utils.js"></script>
+  <div class="toast-container" id="toast-container"></div>
+
   <script>
+    const stepsConfig = {
+      0: {
+        text: "¡Hola! Soy dot, tu asistente de fábricas.",
+        subtext: "Te guiaré paso a paso para dar de alta tu taller textil y conectarte con grandes corporativos. ¿Comenzamos?"
+      },
+      1: {
+        text: "Excelente. Primero, ¿cuál es tu nombre y apellido?",
+        subtext: "Ingresa tu nombre y apellido para poder identificarte más fácil."
+      },
+      2: {
+        text: "Mucho gusto, {name}. ¿Qué credenciales de acceso utilizaremos?",
+        subtext: "Define tu dirección de correo corporativa y una clave de acceso (mínimo 6 caracteres)."
+      },
+      3: {
+        text: "Perfecto. Hablemos de tu empresa textil. ¿Cuál es su Razón Social?",
+        subtext: "Ingresa la denominación legal completa de tu fábrica para contratos oficiales."
+      },
+      4: {
+        text: "Entendido. ¿En qué país opera principalmente tu fábrica?",
+        subtext: "Esto definirá la facturación y la asignación de pedidos del sector respectivo."
+      },
+      5: {
+        text: "Por último, ¿para qué industrias confeccionan uniformes?",
+        subtext: "Selecciona una o varias industrias táctiles. Esto activará tu visibilidad en el marketplace de dotación."
+      },
+      6: {
+        text: "Creando tu cuenta textil...",
+        subtext: "Vinculando bases de datos y habilitando tu catálogo seller de dotacian..."
+      }
+    };
+
+    let currentStep = 0;
+    let selectedLocationVal = null;
+    const sellerData = { industries: [] };
+    let userId = null;
+    let typingTimer = null;
+
+    // Supabase
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let currentStep = 1;
-    const sellerData = { industries: [] };
+    window.onload = () => {
+      triggerChatStep(0);
+    };
 
-    function togglePasswordVisibility(inputId, btn) {
+    // Chat transition with typewriter animation
+    function triggerChatStep(step) {
+      currentStep = step;
+      const textContainer = document.getElementById('ai-chat-bubble');
+      const subtextContainer = document.getElementById('ai-chat-subbubble');
+
+      document.querySelectorAll('.interactive-panel').forEach(p => p.classList.remove('active'));
+
+      let rawText = stepsConfig[step].text;
+      if (step === 2) {
+        const fName = document.getElementById('seller-first-name').value.trim();
+        rawText = rawText.replace('{name}', fName);
+      }
+
+      subtextContainer.style.opacity = 0;
+      subtextContainer.textContent = stepsConfig[step].subtext;
+
+      textContainer.textContent = "";
+      textContainer.classList.add('typing');
+
+      let charIdx = 0;
+      if (typingTimer) clearInterval(typingTimer);
+
+      typingTimer = setInterval(() => {
+        textContainer.textContent += rawText.charAt(charIdx);
+        charIdx++;
+        if (charIdx >= rawText.length) {
+          clearInterval(typingTimer);
+          textContainer.classList.remove('typing');
+
+          subtextContainer.style.transition = "opacity 0.4s ease";
+          subtextContainer.style.opacity = 1;
+
+          const targetPanel = document.getElementById(`panel-${step}`);
+          if (targetPanel) targetPanel.classList.add('active');
+        }
+      }, 15);
+    }
+
+    function nextStep(step) {
+      triggerChatStep(step);
+    }
+
+    // Interactive Validations
+    function validateStep1() {
+      const fName = document.getElementById('seller-first-name').value.trim();
+      const lName = document.getElementById('seller-last-name').value.trim();
+      document.getElementById('btn-next-1').disabled = !(fName.length > 0 && lName.length > 0);
+    }
+
+    function validateStep2() {
+      const email = document.getElementById('seller-email').value.trim();
+      const pass = document.getElementById('seller-pass').value;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      document.getElementById('btn-next-2').disabled = !(emailRegex.test(email) && pass.length >= 6);
+    }
+
+    function validateStep3() {
+      const name = document.getElementById('factory-name').value.trim();
+      document.getElementById('btn-next-3').disabled = !(name.length > 0);
+    }
+
+    function selectLocation(loc, cardId) {
+      selectedLocationVal = loc;
+      document.querySelectorAll('.country-card').forEach(c => c.classList.remove('selected'));
+      document.getElementById(cardId).classList.add('selected');
+      document.getElementById('btn-next-4').disabled = false;
+    }
+
+    function toggleIndustry(ind, cardId) {
+      const card = document.getElementById(cardId);
+      const idx = sellerData.industries.indexOf(ind);
+
+      if (idx > -1) {
+        sellerData.industries.splice(idx, 1);
+        card.classList.remove('selected');
+      } else {
+        sellerData.industries.push(ind);
+        card.classList.add('selected');
+      }
+    }
+
+    function togglePassword(inputId, btn) {
       const input = document.getElementById(inputId);
       const icon = btn.querySelector('svg');
       if (input.type === 'password') {
@@ -366,100 +930,114 @@
       }
     }
 
-    function updateIndustry(cb, val) {
-      const parent = cb.closest('.checkbox-item');
-      if (cb.checked) {
-        parent.classList.add('selected');
-        if (!sellerData.industries.includes(val)) sellerData.industries.push(val);
-      } else {
-        parent.classList.remove('selected');
-        sellerData.industries = sellerData.industries.filter(i => i !== val);
-      }
-    }
-
-    function nextStep(e, step) {
-      if (e) e.preventDefault();
-      
-      // Reset alert
-      const errorAlert = document.getElementById('onboarding-error-alert');
-      if (errorAlert) errorAlert.style.display = 'none';
-
-      document.getElementById(`step-${currentStep}`).classList.remove('active');
-      currentStep = step;
-      document.getElementById(`step-${currentStep}`).classList.add('active');
-      document.getElementById('ob-progress-fill').style.width = (step * 50) + '%';
-    }
-
-    function prevStep(step) {
-      document.getElementById(`step-${currentStep}`).classList.remove('active');
-      currentStep = step;
-      document.getElementById(`step-${currentStep}`).classList.add('active');
-      document.getElementById('ob-progress-fill').style.width = (step * 50) + '%';
-    }
-
-    async function finishOnboarding(e) {
-      if (e) e.preventDefault();
-      
-      const email = document.getElementById('seller-email').value;
+    // Supabase submission
+    async function submitSellerOnboarding() {
+      const email = document.getElementById('seller-email').value.trim();
       const pass = document.getElementById('seller-pass').value;
-      
-      const btn = document.querySelector('#step-2 .btn-primary');
-      btn.disabled = true;
-      btn.textContent = 'Procesando...';
+      const fName = document.getElementById('seller-first-name').value.trim();
+      const lName = document.getElementById('seller-last-name').value.trim();
+      const factoryName = document.getElementById('factory-name').value.trim();
+
+      triggerChatStep(6);
+
+      const orb = document.getElementById('agent-orb');
+      orb.classList.add('thinking');
+
+      const statusEl = document.getElementById('loadingStatusText');
+      const messages = [
+        'Enviando credenciales seguras de fabricante...',
+        'Inicializando tu perfil de vendedor...',
+        'Registrando tu fábrica en dotacian...',
+        'Activando industrias comerciales...'
+      ];
+
+      let msgIdx = 0;
+      const statusTimer = setInterval(() => {
+        msgIdx++;
+        if (msgIdx < messages.length) {
+          statusEl.textContent = messages[msgIdx];
+        }
+      }, 700);
 
       try {
         const { data: authData, error: authError } = await _supabase.auth.signUp({
           email: email,
           password: pass,
           options: {
-            data: { 
+            data: {
               user_type: 'seller',
-              first_name: document.getElementById('seller-first-name').value,
-              last_name: document.getElementById('seller-last-name').value
+              first_name: fName,
+              last_name: lName
             }
           }
         });
 
         if (authError) throw authError;
+        userId = authData.user.id;
 
-        const userId = authData.user.id;
-
-        await _supabase.from('seller_profile').upsert({
+        // Upsert to seller_profile
+        const { error: profileError } = await _supabase.from('seller_profile').upsert({
           id: userId,
-          first_name: document.getElementById('seller-first-name').value,
-          last_name: document.getElementById('seller-last-name').value,
+          first_name: fName,
+          last_name: lName,
           email: email
         });
+        if (profileError) throw profileError;
 
-        await _supabase.from('seller_company').upsert({
+        // Upsert to seller_company
+        const { error: companyError } = await _supabase.from('seller_company').upsert({
           id: userId,
-          seller_name: document.getElementById('factory-name').value,
-          location: document.getElementById('factory-location').value,
-          min_order_qty: parseInt(document.getElementById('factory-min-qty').value),
-          max_order_qty: parseInt(document.getElementById('factory-max-qty').value),
+          seller_name: factoryName,
+          location: selectedLocationVal,
           industries: sellerData.industries
         });
+        if (companyError) throw companyError;
 
-        showToast('¡Bienvenido!', 'Registro exitoso.', 'success');
-        setTimeout(() => { window.location.href = 'portal.seller.html'; }, 1500);
+        clearInterval(statusTimer);
+        statusEl.textContent = "¡Todo listo! Ingresando a tu panel seller...";
+        showToast('¡Éxito!', 'Registro de fabricante completado.', 'success');
+
+        orb.classList.remove('thinking');
+        orb.style.boxShadow = "0 0 40px #10B981";
+        orb.style.background = "radial-gradient(circle at 30% 30%, #34D399 0%, #059669 50%, #064E3B 100%)";
+
+        setTimeout(() => {
+          window.location.href = 'portal.seller.html';
+        }, 1200);
 
       } catch (err) {
-        console.error(err);
-        const errorAlert = document.getElementById('onboarding-error-alert');
-        const errorText = document.getElementById('error-message-text');
-        
-        if (errorAlert && errorText) {
-          errorText.textContent = err.message || 'No se pudo completar el registro.';
-          errorAlert.style.display = 'flex';
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        } else {
-          showToast('Error', 'No se pudo completar el registro.', 'error');
-        }
-        
-        btn.disabled = false;
-        btn.textContent = 'Finalizar Registro ✅';
+        clearInterval(statusTimer);
+        orb.classList.remove('thinking');
+        orb.style.boxShadow = "0 0 40px #EF4444";
+        orb.style.background = "radial-gradient(circle at 30% 30%, #F87171 0%, #DC2626 50%, #7F1D1D 100%)";
+
+        statusEl.innerHTML = `<span style="color: #EF4444;">Error en el registro: ${err.message || 'Inténtalo de nuevo.'}</span>`;
+        showToast('Error', err.message || 'Fallo en el registro', 'error');
+
+        setTimeout(() => {
+          triggerChatStep(5);
+          orb.style.boxShadow = "";
+          orb.style.background = "";
+        }, 3000);
       }
+    }
+
+    function showToast(title, message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.style.cssText = "background: #1E293B; border-left: 4px solid " + (type === 'error' ? '#EF4444' : '#06B6D4') + "; padding: 1rem 1.5rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 1rem; min-width: 320px; color: white;";
+
+      toast.innerHTML = `
+        <div>
+          <div style="font-weight: 800; font-size: 0.9rem;">${title}</div>
+          <div style="font-size: 0.8rem; color: #94A3B8;">${message}</div>
+        </div>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => { toast.remove(); }, 3500);
     }
   </script>
 </body>
+
 </html>
