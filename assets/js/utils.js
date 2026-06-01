@@ -270,7 +270,8 @@ function resetInactivityTimer() {
 async function logoutUser() {
   if (typeof _supabase !== 'undefined') {
     await _supabase.auth.signOut();
-    window.location.href = 'login.html';
+    const isSeller = window.location.pathname.endsWith('.seller.html');
+    window.location.href = isSeller ? 'login.seller.html' : 'login.html';
   }
 }
 
