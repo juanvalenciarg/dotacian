@@ -1,276 +1,4 @@
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Configuración | Dotacian</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/utils.js?v=4"></script>
-  <style>
-    .app-header {
-      padding: 1.5rem 3rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: absolute;
-      top: 0;
-      left: var(--sidebar-width);
-      right: 0;
-      z-index: 10;
-      background: transparent;
-      border: none;
-    }
-
-    .config-card {
-      background: white;
-      border-radius: 20px;
-      border: 1px solid #E2E8F0;
-      padding: 2rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      max-width: 850px;
-      margin: 0 auto;
-      position: relative;
-    }
-
-    .config-header-actions {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 1.5rem;
-    }
-
-    .config-section {
-      margin-bottom: 2.5rem;
-    }
-
-    .config-section h3 {
-      font-size: 1.1rem;
-      color: var(--color-navy);
-      margin-bottom: 1.5rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 2px solid #F1F5F9;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .form-group label {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: #64748B;
-    }
-
-    .form-group input,
-    .form-group select {
-      padding: 0.75rem 1rem;
-      border: 1.5px solid #E2E8F0;
-      border-radius: 12px;
-      font-size: 0.9375rem;
-      outline: none;
-      transition: all 0.2s;
-      background-color: white;
-    }
-
-    .form-group input:disabled,
-    .form-group select:disabled {
-      background-color: #F8FAFC;
-      color: #64748B;
-      cursor: not-allowed;
-      border-color: #F1F5F9;
-    }
-
-    .form-group input:focus {
-      border-color: var(--color-cyan);
-      box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.1);
-    }
-
-    .input-group {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .input-group .input-prefix {
-      position: absolute;
-      left: 1rem;
-      color: #64748B;
-      font-weight: 600;
-      pointer-events: none;
-    }
-
-    .input-group input {
-      padding-left: 2rem !important;
-      width: 100%;
-    }
-
-    .btn-action {
-      padding: 0.75rem 1.5rem;
-      border-radius: 12px;
-      font-weight: 700;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      transition: all 0.2s;
-    }
-
-    .btn-edit {
-      background: var(--color-cyan-dim);
-      color: var(--color-cyan);
-      border: 1px solid var(--color-cyan);
-    }
-
-    .btn-save {
-      background: var(--color-brand-primary);
-      color: white;
-      display: none;
-    }
-
-    .btn-action:hover {
-      transform: translateY(-2px);
-      filter: brightness(0.95);
-    }
-
-    .contact-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1rem;
-    }
-
-    @media (max-width: 768px) {
-      .form-grid,
-      .contact-grid {
-        grid-template-columns: 1fr;
-      }
-      .config-card {
-        padding: 1rem;
-      }
-      .app-container {
-        padding: 0.5rem !important;
-      }
-      .config-section h3 {
-        font-size: 1.05rem;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .hours-row {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 0.75rem !important;
-      }
-      .hours-row > div:last-child {
-        width: 100%;
-        justify-content: space-between;
-      }
-    }
-  </style>
-</head>
-
-<body>
-  <div class="app-layout">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <a href="app.html" style="display: block; width: 100%; text-align: center;">
-          <img src="assets/logos/logo_dotacian.png" alt="dotacian logo"
-            style="width: 180px; max-width: 100%; height: auto; display: inline-block;">
-        </a>
-      </div>
-
-                                    <nav class="sidebar-nav">
-        <a href="app.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <rect width="7" height="9" x="3" y="3" rx="1" />
-              <rect width="7" height="5" x="14" y="3" rx="1" />
-              <rect width="7" height="9" x="14" y="12" rx="1" />
-              <rect width="7" height="5" x="3" y="16" rx="1" />
-            </svg></span>
-          <span class="nav-label">Dashboard</span>
-        </a>
-        <a href="roles.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            </svg></span>
-          <span class="nav-label">Roles</span>
-        </a>
-        <a href="marketplace.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path
-                d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
-            </svg></span>
-          <span class="nav-label">Marketplace</span>
-        </a>
-        <a href="empleados.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg></span>
-          <span class="nav-label">Empleados</span>
-        </a>
-        <div class="nav-group">
-          <a href="cotizaciones.html" class="nav-item">
-            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="m7.5 4.27 9 5.15" />
-                <path
-                  d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-                <path d="m3.3 7 8.7 5 8.7-5" />
-                <path d="M12 22V12" />
-              </svg></span>
-            <span class="nav-label">Producción</span>
-            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor"
-                stroke-width="2" viewBox="0 0 24 24">
-                <path d="m6 9 6 6 6-6" />
-              </svg></span>
-          </a>
-          <div class="nav-sub-items">
-            <a href="cotizaciones.html" class="nav-sub-item">Cotizaciones</a>
-            <a href="ordenes.html" class="nav-sub-item">Órdenes de Compra</a>
-          </div>
-        </div>
-        <a href="bodega.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <polyline points="21 8 21 21 3 21 3 8"></polyline>
-              <rect x="1" y="3" width="22" height="5"></rect>
-              <line x1="10" y1="12" x2="14" y2="12"></line>
-            </svg></span>
-          <span class="nav-label">Bodega</span>
-        </a>
-        <a href="facturas.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/>
-              <line x1="16" y1="17" x2="8" y2="17"/>
-              <polyline points="10 9 9 9 8 9"/>
-            </svg></span>
-          <span class="nav-label">Facturas</span>
-        </a>
-        <div id="version-tag"></div>
+      <div id="version-tag"></div>
       </nav>
     </aside>
     <div class="overlay" onclick="toggleSidebar()"></div>
@@ -278,7 +6,7 @@
     <main class="main-content">
       <header class="app-header">
         <div class="header-left">
-          <button class="mobile-menu-toggle" onclick="toggleSidebar()" style="color: var(--color-navy); border: none; background: transparent; cursor: pointer;">
+          <button class="mobile-menu-toggle" onclick="toggleSidebar()" style="color: white; border: none; background: transparent; cursor: pointer;">
             <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -681,6 +409,7 @@
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    window._supabase = _supabase;
 
     let session = null;
     let isEditing = false;
@@ -997,4 +726,32 @@
         delivery_address: document.getElementById('delivery_address').value,
         delivery_state: document.getElementById('delivery_state').value,
         delivery_contact_1_name: document.getElementById('delivery_contact_1_name').value,
-       
+        delivery_contact_1_phone: document.getElementById('delivery_contact_1_phone').value,
+        delivery_contact_1_email: document.getElementById('delivery_contact_1_email').value,
+        delivery_contact_2_name: document.getElementById('delivery_contact_2_name').value,
+        delivery_contact_2_phone: document.getElementById('delivery_contact_2_phone').value,
+        delivery_contact_2_email: document.getElementById('delivery_contact_2_email').value,
+        delivery_hours: hoursObj,
+        contact_phone: document.getElementById('contact_phone').value,
+        country: document.getElementById('country').value,
+        selected_roles: currentProfile ? currentProfile.selected_roles : []
+      };
+
+      const { error } = await _supabase.from('company_profile').upsert(updates);
+
+      if (!error) {
+        showToast('Éxito', 'Configuración guardada correctamente.', 'success');
+        toggleEdit();
+      } else {
+        showToast('Error', 'No se pudo guardar: ' + error.message, 'error');
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Guardar Cambios';
+    }
+
+    init();
+  </script>
+</body>
+
+</html>
