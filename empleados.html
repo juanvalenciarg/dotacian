@@ -2974,4 +2974,117 @@
             } else if (diffMonths <= 1) {
               statusText = 'PRÓXIMO A RENOVAR';
               statusClass = 'warning';
-       
+            } else {
+              statusText = 'AL DÍA';
+              statusClass = 'success';
+            }
+          }
+
+          return {
+            id: initials,
+            db_id: emp.id,
+            name: `${fn} ${ln}`.trim(),
+            sucursal: 'Matriz',
+            status: statusClass,
+            statusText: statusText,
+            address: 'Matriz',
+            phone: emp.phone || '',
+            assignedRole: emp.role || '',
+            role_status: emp.role_status || 'active',
+            shirt_size: emp.shirt_size || '',
+            pants_size: emp.pants_size || '',
+            shoe_size: emp.shoe_size || '',
+            id_document: emp.id_document || ''
+          };
+        });
+
+        renderEmployees('Restaurante');
+      } catch (err) {
+        console.error("Error fetching employees:", err);
+      }
+    }
+
+    // Initial render
+    window.onload = () => {
+      setTimeout(fetchEmployees, 1000); // Wait for Supabase to init
+      setTimeout(loadActiveRoles, 1000); // Wait for Supabase to init
+      setTimeout(loadRoleGarments, 1000); // Load configured garments from DB
+    };
+
+    window.roleGarments = {};
+    window.roleDefinitions = {};
+    async function loadRoleGarments() {
+      try {
+        const { data: sessionData } = await _supabase.auth.getSession();
+        const companyId = sessionData?.session?.user?.id;
+        if (!companyId) return;
+
+        const { data, error } = await _supabase.from('role_definition')
+          .select('role_name, items, renewal_frequency')
+          .eq('company_id', companyId);
+
+        if (error) throw error;
+
+        data.forEach(row => {
+          const roleLower = row.role_name.toLowerCase().trim();
+          window.roleGarments[roleLower] = row.items || [];
+          window.roleDefinitions[roleLower] = {
+            items: row.items || [],
+            renewal_frequency: row.renewal_frequency || 6
+          };
+        });
+      } catch (err) {
+        console.error("Error fetching role garments:", err);
+      }
+    }
+
+    async function loadActiveRoles() {
+      const select = document.getElementById('empRole');
+      select.innerHTML = '<option value="">Selecciona un rol...</option>';
+      try {
+        const { data: sessionData } = await _supabase.auth.getSession();
+        const companyId = sessionData?.session?.user?.id;
+        if (!companyId) return;
+
+        // Query active roles from company_roles (where roles.html saves them)
+        const { data: activeRolesData, error } = await _supabase
+          .from('company_roles')
+          .select('role_name')
+          .eq('company_id', companyId);
+
+        if (error) throw error;
+
+        const activeRoles = (activeRolesData || []).map(r => r.role_name);
+        window.activeRolesList = activeRoles;
+
+        activeRoles.forEach(roleName => {
+          const opt = document.createElement('option');
+          opt.value = roleName;
+          opt.textContent = roleName;
+          select.appendChild(opt);
+        });
+      } catch (err) {
+        console.error("Error cargando roles activos desde Supabase:", err);
+        window.activeRolesList = [];
+      }
+    }
+
+    function toggleSidebar() {
+      const layout = document.getElementById('app-layout-wrapper');
+      if (layout) {
+        layout.classList.toggle('sidebar-open');
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    if (typeof window._supabase === 'undefined') {
+      window.SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+      window.SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+      window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+    }
+  </script>
+  <script src="assets/js/utils.js?v=4"></script>
+</body>
+
+</html>
