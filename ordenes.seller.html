@@ -80,23 +80,81 @@
     }
 
     .main-content {
-      flex: 1;
       margin-left: var(--sidebar-width);
-      padding: 2.5rem;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background: #F1F5F9;
     }
 
-    .page-header {
-      margin-bottom: 2.5rem;
+    .app-header {
+      padding: 1.5rem 3rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background: transparent;
+      border: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 9999;
     }
 
-    .page-title {
-      font-size: 1.875rem;
-      color: var(--color-navy);
+    .welcome-banner {
+      background: linear-gradient(135deg, var(--color-navy) 0%, #0c4a6e 100%);
+      padding: 7rem 3rem 4rem 3rem;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: -3rem;
+      box-shadow: inset 0 -20px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .welcome-banner::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .welcome-banner::before {
+      content: '';
+      position: absolute;
+      bottom: -20%;
+      left: 10%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .welcome-title {
+      font-size: 2.25rem;
       font-weight: 800;
+      margin-bottom: 0.5rem;
       font-family: var(--font-family-heading);
+      letter-spacing: -0.02em;
+    }
+
+    .welcome-subtitle {
+      font-size: 1.1rem;
+      color: #94A3B8;
+      font-weight: 500;
+    }
+
+    .dashboard-content-wrapper {
+      padding: 0 3rem 3rem 3rem;
+      position: relative;
+      z-index: 2;
     }
 
     /* Order Card Style */
@@ -408,6 +466,15 @@
   <script>
     const _supabase = supabase.createClient('https://awuhvewotmwelurmjvmu.supabase.co', 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq');
 
+    function normalizeText(str) {
+      return (str || '').trim().toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    let sellerProducts = [];
+    let sellerProductImages = {};
+    let sellerProductSkus = {};
+
     const PRODUCTION_STEPS = [
       { id: 'confirmation', label: 'Confirmación', progress: 0, color: '#0EA5E9' },
       { id: 'cutting', label: 'Corte', progress: 20, color: '#6366F1' },
@@ -425,6 +492,21 @@
       const listContainer = document.getElementById('orders-list');
 
       try {
+        // Fetch seller catalog
+        const { data: catalog } = await _supabase
+          .from('seller_catalog')
+          .select('name, image_url, images, sku')
+          .eq('seller_id', sellerId);
+
+        sellerProducts = (catalog || []).map(p => normalizeText(p.name));
+        sellerProductImages = {};
+        sellerProductSkus = {};
+        (catalog || []).forEach(p => {
+          const key = normalizeText(p.name);
+          sellerProductImages[key] = p.images?.[0] || p.image_url || '';
+          sellerProductSkus[key] = p.sku || '-';
+        });
+
         // 1. Buscamos todas las órdenes recientes para este vendedor
         const { data: allOrders, error: ordersErr } = await _supabase
           .from('company_purchase_orders')
@@ -496,6 +578,121 @@
         listContainer.innerHTML = combined.map(o => {
           const currentStepIndex = PRODUCTION_STEPS.findIndex(s => s.id === o.status);
 
+          let itemsObj = {};
+          if (o.isQuote && o.items[0]) {
+            const q = o.items[0];
+            if (q.sizes && q.sizes.items) {
+              if (Array.isArray(q.sizes.items)) {
+                q.sizes.items.forEach(it => {
+                  if (!it.name) return;
+                  const normName = normalizeText(it.name);
+                  itemsObj[it.name] = {
+                    quantity: it.qty || 1,
+                    sku: it.sku || sellerProductSkus[normName] || '-',
+                    sizes: it.sizes || (it.size ? { [it.size]: it.qty || 1 } : { 'Única': it.qty || 1 }),
+                    unit_price: it.unit_price,
+                    logo_config: it.logo_config || null
+                  };
+                });
+              } else {
+                Object.entries(q.sizes.items).forEach(([k, v]) => {
+                  const normName = normalizeText(k);
+                  v.sku = v.sku || sellerProductSkus[normName] || '-';
+                  itemsObj[k] = v;
+                });
+              }
+            } else {
+              const normName = normalizeText(q.product_name || '');
+              itemsObj[q.product_name || 'Producto General'] = {
+                sku: q.sku || sellerProductSkus[normName] || '-',
+                quantity: q.quantity || 1,
+                unit_price: q.unit_price,
+                sizes: (typeof q.sizes === 'string') ? { [q.sizes]: q.quantity } : (q.sizes || { 'Única': q.quantity || 1 }),
+                logo_config: q.logo_config || null
+              };
+            }
+          } else if (o.items) {
+             const itms = Array.isArray(o.items) ? o.items : [];
+             itms.forEach(it => {
+               if (!it.name) return;
+               const normName = normalizeText(it.name);
+               const keyName = it.name + (it.size ? `_${it.size}` : '');
+               itemsObj[keyName] = {
+                 displayName: it.name,
+                 quantity: it.qty || it.quantity || 1,
+                 sku: it.sku || sellerProductSkus[normName] || '-',
+                 sizes: it.sizes || (it.size ? { [it.size]: it.qty || it.quantity || 1 } : { 'Única': it.qty || it.quantity || 1 }),
+                 unit_price: it.unit_price || it.price || 0,
+                 logo_config: it.logo_config || null
+               };
+             });
+          }
+
+          let detailsHtml = `
+            <div id="details-${o.id}" style="display: none; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #F1F5F9;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                <thead>
+                  <tr style="background: #F8FAFC; border-bottom: 1px solid #E2E8F0; text-align: left;">
+                    <th style="padding: 10px; color: #64748B; font-weight: 700;">Prenda</th>
+                    <th style="padding: 10px; color: #64748B; font-weight: 700; text-align: center;">SKU</th>
+                    <th style="padding: 10px; color: #64748B; font-weight: 700; text-align: center;">Tallas</th>
+                    <th style="padding: 10px; color: #64748B; font-weight: 700; text-align: center;">Total Unidades</th>
+                    <th style="padding: 10px; color: #64748B; font-weight: 700; text-align: right;">Precio Unitario</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${Object.entries(itemsObj).map(([key, item]) => {
+                    const name = item.displayName || key;
+                    const sizeBadges = Object.entries(item.sizes || {}).map(([sz, qty]) => `<span style="background: #F1F5F9; color: var(--color-navy); padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 0.75rem; margin-right: 0.4rem; white-space: nowrap;">${sz} (${qty})</span>`).join('');
+                    const baseGarmentImg = item.image || sellerProductImages[normalizeText(name)] || 'assets/placeholder.png';
+
+                    let logoInfoHtml = '';
+                    if (item.logo_config) {
+                      const techLabel = item.logo_config.technique === 'bordado' ? '🧵 Bordado' : '🎨 Estampado';
+                      const dims = `${item.logo_config.width_cm || '?'} x ${item.logo_config.height_cm || '?'} cm`;
+                      const safeLogoUrl = item.logo_config.url || '';
+                      const safeTop = item.logo_config.preview_top_pct || '30%';
+                      const safeLeft = item.logo_config.preview_left_pct || '50%';
+                      const safeSize = item.logo_config.preview_size_px || 100;
+                      const safeContainerWidth = item.logo_config.container_width_px || 500;
+
+                      logoInfoHtml = `
+                        <div style="margin-top: 6px; display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; flex-wrap: wrap;">
+                          <span style="background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.2); color: var(--color-cyan); padding: 2px 6px; border-radius: 6px; font-weight: 700;">${techLabel}</span>
+                          <span style="color: #64748B; font-weight: 600; display: inline-flex; align-items: center; gap: 2px;">📐 ${dims}</span>
+                          ${safeLogoUrl ? `
+                            <a href="${safeLogoUrl}" target="_blank" style="color: var(--color-cyan); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 2px;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                              <span>Ver Logo</span>
+                            </a>
+                            <span style="color: #CBD5E1;">|</span>
+                            <a href="javascript:void(0)" onclick="openVisualReferenceModal('${baseGarmentImg}', '${safeLogoUrl}', '${techLabel}', '${dims}', '${safeTop}', '${safeLeft}', ${safeSize}, ${safeContainerWidth})" style="color: var(--color-cyan); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 2px;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                              <span>Ver Prenda</span>
+                            </a>
+                          ` : ''}
+                        </div>
+                      `;
+                    }
+
+                    return `
+                      <tr style="border-bottom: 1px solid #F1F5F9;">
+                        <td style="padding: 12px; font-weight: 700; color: var(--color-navy); text-align: left;">
+                          <div style="font-weight: 800; color: var(--color-navy);">${name}</div>
+                          ${logoInfoHtml}
+                        </td>
+                        <td style="padding: 12px; text-align: center; color: #64748B; font-family: monospace; font-size: 0.8rem;">${item.sku || '-'}</td>
+                        <td style="padding: 12px; text-align: center; display: flex; flex-wrap: wrap; gap: 4px; justify-content: center;">${sizeBadges}</td>
+                        <td style="padding: 12px; text-align: center; font-weight: 700; color: var(--color-navy);">${item.quantity}</td>
+                        <td style="padding: 12px; text-align: right; font-weight: 700; color: var(--color-navy); font-size: 0.90rem;">
+                          ${formatPrice(item.unit_price || 0)}
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+          `;
+
           return `
             <div class="order-card" id="card-${o.id}">
               <div class="order-card-header">
@@ -509,13 +706,19 @@
                     ${o.items ? o.items.length : 0} productos seleccionados • Total: <strong>${formatPrice(o.total_amount)}</strong>
                   </div>
                 </div>
-                <div style="text-align: right;">
+                <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem;">
                    <div style="font-size: 0.75rem; color: #94A3B8; margin-bottom: 0.5rem;">RECIBIDA: ${new Date(o.created_at).toLocaleDateString()}</div>
-                   ${currentStepIndex < PRODUCTION_STEPS.length - 1 ? `
-                     <button class="btn-step" onclick="advanceStep('${o.id}', '${o.status}', ${o.isQuote ? "'quote'" : "'po'"})">
-                       Pasar a ${PRODUCTION_STEPS[currentStepIndex + 1].label}
+                   <div style="display: flex; gap: 0.5rem;">
+                     <button class="btn" onclick="toggleOrderDetails('${o.id}')" id="toggle-btn-${o.id}" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; font-weight: 700; border-radius: 8px; background: white; border: 1px solid var(--color-cyan); color: var(--color-cyan); display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; transition: all 0.2s; font-family: inherit;">
+                       <span>Ver Detalles</span>
+                       <svg id="chevron-${o.id}" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="transition: transform 0.2s;"><path d="m6 9 6 6 6-6"/></svg>
                      </button>
-                   ` : '<span style="color: #10B981; font-weight: 800; font-size: 0.8rem;">✓ COMPLETADA</span>'}
+                     ${currentStepIndex < PRODUCTION_STEPS.length - 1 ? `
+                       <button class="btn-step" onclick="advanceStep('${o.id}', '${o.status}', ${o.isQuote ? "'quote'" : "'po'"})">
+                         Pasar a ${PRODUCTION_STEPS[currentStepIndex + 1].label}
+                       </button>
+                     ` : '<span style="color: #10B981; font-weight: 800; font-size: 0.8rem;">✓ COMPLETADA</span>'}
+                   </div>
                 </div>
               </div>
 
@@ -533,6 +736,8 @@
                   `;
           }).join('')}
               </div>
+              
+              ${detailsHtml}
             </div>
           `;
         }).join('');
@@ -624,8 +829,95 @@
       return `$${(val || 0).toLocaleString('es-MX')}`;
     }
 
+    window.toggleOrderDetails = function (orderId) {
+      const detailsRow = document.getElementById(`details-${orderId}`);
+      const chevron = document.getElementById(`chevron-${orderId}`);
+      const btn = document.getElementById(`toggle-btn-${orderId}`);
+
+      if (!detailsRow || !chevron || !btn) return;
+
+      if (detailsRow.style.display === 'none') {
+        detailsRow.style.display = 'block';
+        chevron.style.transform = 'rotate(180deg)';
+        btn.style.background = 'var(--color-cyan)';
+        btn.style.color = 'white';
+      } else {
+        detailsRow.style.display = 'none';
+        chevron.style.transform = 'rotate(0deg)';
+        btn.style.background = 'white';
+        btn.style.color = 'var(--color-cyan)';
+      }
+    };
+
+    window.openVisualReferenceModal = function (garmentImg, logoUrl, technique, dims, previewTop, previewLeft, previewSize, containerWidth) {
+      document.getElementById('visualRefGarmentImg').src = garmentImg || 'assets/placeholder.png';
+      document.getElementById('visualRefLogoImg').src = logoUrl || '';
+      document.getElementById('visualRefTechnique').textContent = technique || 'Estándar';
+      document.getElementById('visualRefDims').textContent = dims || 'N/A';
+
+      const overlay = document.getElementById('visualRefLogoOverlay');
+      overlay.style.top = previewTop || '30%';
+      overlay.style.left = previewLeft || '50%';
+
+      let widthStyle = '20%';
+      if (previewSize) {
+        const sizePx = parseInt(previewSize) || 100;
+        const denom = parseInt(containerWidth) || 500;
+        const pct = Math.min(60, Math.max(5, Math.round((sizePx / denom) * 100)));
+        widthStyle = `${pct}%`;
+      }
+      overlay.style.width = widthStyle;
+
+      document.getElementById('visualReferenceModal').style.cssText = 'display: flex; position: fixed; inset: 0; z-index: 10000; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center;';
+    };
+
+    window.closeVisualReferenceModal = function () {
+      document.getElementById('visualReferenceModal').style.display = 'none';
+    };
+
     loadActiveOrders();
   </script>
+
+  <!-- Modal de Referencia Visual (Prenda con Logo) -->
+  <div id="visualReferenceModal"
+    style="display: none; position: fixed; inset: 0; z-index: 10000; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center;">
+    <div
+      style="background: white; border-radius: 24px; padding: 2rem; max-width: 450px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); text-align: center; position: relative; animation: modalIn 0.25s ease-out;">
+      <button onclick="closeVisualReferenceModal()"
+        style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.25rem; color: #94A3B8; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; transition: background 0.2s;"
+        onmouseover="this.style.background='#F1F5F9'; this.style.color='#0F172A';"
+        onmouseout="this.style.background='none'; this.style.color='#94A3B8';">✕</button>
+
+      <h3 id="visualRefTitle"
+        style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 800; color: #0F172A; margin-bottom: 0.25rem; text-align: left;">
+        Referencia Visual</h3>
+      <p id="visualRefSubtitle" style="color: #64748B; font-size: 0.85rem; margin: 0 0 1.5rem 0; text-align: left;">
+        Posición y proporción estimada del logotipo sobre la prenda.</p>
+
+      <!-- Contenedor de la Prenda + Logo -->
+      <div id="visualRefContainer"
+        style="aspect-ratio: 4/5; width: 100%; max-width: 320px; margin: 0 auto; background: #F8FAFC; border-radius: 16px; border: 1px solid #E2E8F0; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center;">
+        <img id="visualRefGarmentImg" src="" style="width: 100%; height: 100%; object-fit: contain; padding: 0.5rem;"
+          alt="Prenda Base">
+        <div id="visualRefLogoOverlay"
+          style="position: absolute; pointer-events: none; display: flex; align-items: center; justify-content: center; transform: translate(-50%, -50%);">
+          <img id="visualRefLogoImg" src="" style="width: 100%; height: 100%; display: block;" alt="Logo Overlay">
+        </div>
+      </div>
+
+      <div id="visualRefMeta"
+        style="margin-top: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; background: #F8FAFC; padding: 1rem; border-radius: 12px; border: 1px solid #E2E8F0; text-align: left; font-size: 0.8rem;">
+        <div>
+          <span style="color: #64748B; font-weight: 600; text-transform: uppercase; font-size: 0.65rem; display: block; letter-spacing: 0.05em;">Técnica</span>
+          <span id="visualRefTechnique" style="font-weight: 700; color: #0F172A;">Bordado</span>
+        </div>
+        <div>
+          <span style="color: #64748B; font-weight: 600; text-transform: uppercase; font-size: 0.65rem; display: block; letter-spacing: 0.05em;">Dimensiones Aprox.</span>
+          <span id="visualRefDims" style="font-weight: 700; color: #0F172A;">10 x 5 cm</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>
