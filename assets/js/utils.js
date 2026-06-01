@@ -31,3 +31,259 @@ function showToast(title, message, type = 'success') {
     }
   }, 4000);
 }
+
+function updateVersionIndicator(country) {
+  const container = document.getElementById('version-tag');
+  if (!container) return;
+  
+  const isColombia = country === 'CO' || country === 'Colombia';
+  const flagUrl = isColombia 
+    ? 'https://flagcdn.com/w40/co.png' 
+    : 'https://flagcdn.com/w40/mx.png';
+  
+  container.innerHTML = `
+    <div class="version-indicator">
+      <div class="flag-circle" title="Versión ${isColombia ? 'Colombia' : 'México'}">
+        <img src="${flagUrl}" alt="Flag">
+      </div>
+    </div>
+  `;
+  
+  // Store for other pages
+  localStorage.setItem('dotacian_user_country', country);
+}
+
+function initVersionIndicator() {
+  const country = localStorage.getItem('dotacian_user_country');
+  if (country) {
+    updateVersionIndicator(country);
+  }
+}
+
+// Auto-init on load if country is known
+function initSidebar() {
+  const groups = document.querySelectorAll('.nav-group');
+  groups.forEach(group => {
+    const mainItem = group.querySelector('.nav-item');
+    if (mainItem) {
+      mainItem.addEventListener('click', (e) => {
+        // Only toggle if it has sub-items
+        const subItems = group.querySelector('.nav-sub-items');
+        if (subItems) {
+          e.preventDefault();
+          e.stopPropagation();
+          group.classList.toggle('active-group');
+          
+          // Rotate arrow icon if exists
+          const arrow = mainItem.querySelector('span:last-child svg');
+          if (arrow) {
+            arrow.style.transform = group.classList.contains('active-group') ? 'rotate(180deg)' : 'rotate(0deg)';
+            arrow.style.transition = 'transform 0.3s ease';
+          }
+        }
+      });
+    }
+  });
+}
+
+// Reorganiza la cabecera en móviles para que luzca como en cotizaciones
+function alignMobileHeader() {
+  const appHeader = document.querySelector('.app-header');
+  const welcomeBanner = document.querySelector('.welcome-banner');
+  if (!appHeader || !welcomeBanner) return;
+
+  const headerRight = document.querySelector('.header-right');
+  const toggleBtn = document.querySelector('.mobile-menu-toggle');
+
+  if (window.innerWidth <= 992) {
+    if (headerRight && headerRight.parentElement === appHeader) {
+      welcomeBanner.appendChild(headerRight);
+      headerRight.style.position = 'relative';
+      headerRight.style.marginTop = '1rem';
+      headerRight.style.right = 'auto';
+      headerRight.style.top = 'auto';
+      headerRight.style.paddingRight = '0';
+      headerRight.style.justifyContent = 'flex-start';
+    }
+    if (toggleBtn && toggleBtn.parentElement !== welcomeBanner) {
+      welcomeBanner.appendChild(toggleBtn);
+      toggleBtn.style.position = 'absolute';
+      toggleBtn.style.top = '1.5rem';
+      toggleBtn.style.right = '1.5rem';
+      toggleBtn.style.display = 'block';
+    }
+    appHeader.style.display = 'none';
+    welcomeBanner.style.paddingTop = '4.5rem';
+  } else {
+    if (headerRight && headerRight.parentElement !== appHeader) {
+      appHeader.appendChild(headerRight);
+      headerRight.style.position = 'relative';
+      headerRight.style.marginTop = '0';
+      headerRight.style.paddingRight = '1rem';
+      headerRight.style.justifyContent = 'flex-end';
+    }
+    if (toggleBtn && appHeader.querySelector('.header-left') && toggleBtn.parentElement !== appHeader.querySelector('.header-left')) {
+      appHeader.querySelector('.header-left').appendChild(toggleBtn);
+      toggleBtn.style.position = 'absolute';
+    }
+    appHeader.style.display = 'flex';
+    welcomeBanner.style.paddingTop = ''; // Revert to stylesheet
+  }
+}
+
+window.addEventListener('resize', alignMobileHeader);
+
+function initUtils() {
+  initVersionIndicator();
+  initSidebar();
+  
+  // Cerrar popover al hacer click fuera
+  document.addEventListener('click', () => {
+    const pop = document.getElementById('user-popover');
+    if (pop) pop.classList.remove('active');
+  });
+
+  // Try to populate header profile
+  setTimeout(() => {
+    let sb = null;
+    if (typeof _supabase !== 'undefined') sb = _supabase;
+    else if (typeof window._supabase !== 'undefined') sb = window._supabase;
+    
+    if (sb) {
+      populateHeaderProfile(sb);
+      setupAutoLogout();
+    }
+  }, 500);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    initUtils();
+    alignMobileHeader();
+  });
+} else {
+  initUtils();
+  alignMobileHeader();
+}
+
+async function populateHeaderProfile(supabaseClient) {
+  try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) return;
+    
+    let { data: profileData } = await supabaseClient.from('user_profile').select('first_name, last_name, country').eq('id', session.user.id).limit(1);
+    let { data: compData } = await supabaseClient.from('company_profile').select('company_name, industry, country').eq('id', session.user.id).limit(1);
+    
+    let profile = profileData && profileData.length > 0 ? profileData[0] : null;
+    let comp = compData && compData.length > 0 ? compData[0] : null;
+
+    // Check if seller if no client profile found
+    if (!profile && !comp) {
+      const { data: sProfileData } = await supabaseClient.from('seller_profile').select('first_name, last_name, country').eq('id', session.user.id).limit(1);
+      const { data: sCompData } = await supabaseClient.from('seller_company').select('seller_name, location').eq('id', session.user.id).limit(1);
+      
+      const sProfile = sProfileData && sProfileData.length > 0 ? sProfileData[0] : null;
+      const sComp = sCompData && sCompData.length > 0 ? sCompData[0] : null;
+
+      if (sProfile) profile = sProfile;
+      if (sComp) comp = { company_name: sComp.seller_name, industry: 'Manufactura', country: sComp.location };
+    }
+
+    const userCountry = (comp && comp.country) || (profile && profile.country) || 'MX';
+    updateVersionIndicator(userCountry);
+
+    const firstName = profile && profile.first_name ? profile.first_name : (session.user.user_metadata?.first_name || 'Usuario');
+    const lastName = profile && profile.last_name ? profile.last_name : (session.user.user_metadata?.last_name || '');
+
+    const companyName = comp && comp.company_name ? comp.company_name : 'Mi Empresa';
+    const industry = comp && comp.industry ? comp.industry : 'Sector';
+
+    if (document.getElementById('pop-user-name')) {
+      document.getElementById('pop-user-name').textContent = `${firstName} ${lastName}`.trim();
+    }
+    if (document.getElementById('pop-user-email')) {
+      document.getElementById('pop-user-email').textContent = session.user.email;
+    }
+    if (document.getElementById('company-name-display')) {
+      document.getElementById('company-name-display').textContent = companyName;
+    }
+    if (document.getElementById('dash-industry-val')) {
+      document.getElementById('dash-industry-val').textContent = industry;
+    }
+
+    // Cambiar icono de industria
+    const iconDisplay = document.getElementById('badge-industry-icon');
+    if (iconDisplay) {
+      const industryLower = industry.toLowerCase();
+      let iconSvg = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M3 7v1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7M4 7l1-4h14l1 4"/></svg>';
+      if (industryLower === 'restaurantes') iconSvg = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v4M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7M12 15v7M15 15v7"/></svg>';
+      else if (industryLower === 'hospitalidad') iconSvg = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 22V4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v18M10 18h4M12 18v4M7 6h.01M7 10h.01M7 14h.01M17 6h.01M17 10h.01M17 14h.01"/></svg>';
+      else if (industryLower === 'industrial') iconSvg = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 20V10l10-4 10 4v10H2Z"/><path d="M17 11v9M7 11v9M12 6v14"/></svg>';
+      else if (industryLower === 'salud') iconSvg = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>';
+      else if (industryLower === 'educacion') iconSvg = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m22 10-10-5L2 10l10 5 10-5Z"/><path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/></svg>';
+      else if (industryLower === 'servicios') iconSvg = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a2 2 0 0 1-2.83-2.83l-3.94 3.6ZM9.14 14.86l2.83 2.83M5 19l2.83-2.83m1.41-5.66 2.12 2.12a2 2 0 0 0 2.83 0l3.54-3.54M3.5 13.5l3.54-3.54a2 2 0 0 1 2.83 0l2.12 2.12"/></svg>';
+      
+      iconDisplay.innerHTML = iconSvg;
+      iconDisplay.style.color = "var(--color-cyan)";
+    }
+
+    window.dispatchEvent(new CustomEvent('userProfileLoaded', { detail: { industry, companyName, userCountry } }));
+  } catch (err) {
+    console.error('Error populating header profile', err);
+  }
+}
+
+function toggleUserPopover(e) {
+  if (e) e.stopPropagation();
+  const pop = document.getElementById('user-popover');
+  if (pop) pop.classList.toggle('active');
+}
+
+function getCurrencyConfig(country) {
+  const isColombia = country === 'CO' || country === 'Colombia';
+  return {
+    code: isColombia ? 'COP' : 'MXN',
+    locale: isColombia ? 'es-CO' : 'es-MX',
+    symbol: '$'
+  };
+}
+
+function formatCurrency(val, country = 'MX') {
+  const config = getCurrencyConfig(country);
+  return new Intl.NumberFormat(config.locale, {
+    style: 'currency',
+    currency: config.code,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(val);
+}
+
+// Auto-logout after inactivity
+const INACTIVITY_TIME = 5 * 60 * 1000; // 5 minutos
+let inactivityTimer;
+
+function resetInactivityTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(logoutUser, INACTIVITY_TIME);
+}
+
+async function logoutUser() {
+  if (typeof _supabase !== 'undefined') {
+    await _supabase.auth.signOut();
+    window.location.href = 'login.html';
+  }
+}
+
+function setupAutoLogout() {
+  const path = window.location.pathname;
+  if (path.includes('login') || path.endsWith('index.html') || path === '/' || path.endsWith('dotacian/')) {
+    return;
+  }
+  
+  const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+  events.forEach(event => {
+    document.addEventListener(event, resetInactivityTimer, { passive: true });
+  });
+  
+  resetInactivityTimer();
+}
