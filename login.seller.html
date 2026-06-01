@@ -2,6 +2,7 @@
 <html lang="es">
 
 <head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Seller Login | dotacian</title>
@@ -10,69 +11,378 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <style>
+    body,
+    html {
+      height: 100%;
+      margin: 0;
+      background-color: var(--color-smoke);
+    }
+
+    .seller-auth-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .seller-auth-brand {
+      flex: 1.2;
+      background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-deep) 100%);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 4rem 6rem;
+      color: white;
+    }
+
+    .seller-auth-brand::before {
+      content: '';
+      position: absolute;
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, var(--color-cyan-dim) 0%, transparent 60%);
+      top: -200px;
+      left: -200px;
+      border-radius: 50%;
+    }
+
+    .seller-auth-brand::after {
+      content: '';
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, transparent 60%);
+      bottom: -100px;
+      right: -100px;
+      border-radius: 50%;
+    }
+
+    .brand-glass-panel {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 3rem;
+      border-radius: var(--radius-xl);
+      position: relative;
+      z-index: 2;
+      max-width: 500px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .brand-content h1 {
+      font-size: 3.5rem;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-content h1 span {
+      color: var(--color-cyan);
+    }
+
+    .brand-content p {
+      font-size: 1.125rem;
+      color: var(--color-text-on-dark);
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+
+    .seller-auth-form-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background: var(--color-background);
+      box-shadow: -20px 0 40px rgba(0, 0, 0, 0.05);
+      position: relative;
+      z-index: 999;
+    }
+
+    .seller-auth-box {
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .seller-logo {
+      margin-bottom: 2.5rem;
+      display: block;
+    }
+
+    .seller-logo img {
+      height: 85px;
+      width: auto;
+    }
+
+    .form-header {
+      margin-bottom: 2.5rem;
+    }
+
+    .form-header h2 {
+      font-size: 2rem;
+      color: var(--color-navy);
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .form-header p {
+      color: var(--color-text-secondary);
+      font-size: 1rem;
+    }
+
+    .modern-input-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .modern-input-group label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-navy);
+      margin-bottom: 0.5rem;
+    }
+
+    .modern-input {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      transition: all 0.2s;
+      background: var(--color-smoke);
+      color: var(--color-navy);
+    }
+
+    .modern-input:focus {
+      outline: none;
+      border-color: var(--color-cyan);
+      box-shadow: 0 0 0 4px var(--color-cyan-dim);
+      background: white;
+    }
+
+    .modern-input::placeholder {
+      color: var(--color-text-muted);
+    }
+
+    .modern-btn {
+      width: 100%;
+      padding: 1rem;
+      background: var(--color-cyan);
+      color: var(--color-navy);
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 1.125rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+      box-shadow: 0 4px 14px 0 rgba(6, 182, 212, 0.39);
+    }
+
+    .modern-btn:hover {
+      background: var(--color-cyan-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.5);
+    }
+
+    .modern-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .footer-links {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+    }
+
+    .footer-links a {
+      color: var(--color-cyan-hover);
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--color-cyan);
+      text-decoration: underline;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 1.25rem;
+      top: 2.35rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: color 0.2s;
+    }
+
+    .toggle-password:hover {
+      color: var(--color-navy);
+    }
+
+    .error-alert {
+      display: none;
+      background: #FEF2F2;
+      border: 1.5px solid #FCA5A5;
+      color: #991B1B;
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 1.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      align-items: center;
+      gap: 0.75rem;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 968px) {
+      .seller-auth-container {
+        flex-direction: column-reverse;
+      }
+
+      .seller-auth-brand {
+        padding: 2rem 1rem;
+        flex: none;
+        min-height: 40vh;
+      }
+
+      .brand-glass-panel {
+        padding: 1.5rem;
+      }
+
+      .brand-content h1 {
+        font-size: 2.25rem;
+        word-wrap: break-word;
+        hyphens: auto;
+      }
+
+      .brand-content p {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .brand-content h1 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
 </head>
 
 <body>
-  <div class="auth-page">
-    <div class="auth-card">
-      <div class="auth-header">
-        <div class="logo">
-          <a href="index.html">
-            <img src="assets/logos/logo_dotacian_seller.png" alt="dotacian seller logo" style="height: 75px; width: auto; margin-bottom: 0.5rem;">
-          </a>
-        </div>
-        <p>Acceso exclusivo para fabricantes y proveedores de uniformes.</p>
-      </div>
+  <div class="seller-auth-container">
 
-      <form class="auth-form">
-        <div id="login-error-alert" style="display: none; background: #FEF2F2; border: 1.5px solid #FCA5A5; color: #991B1B; padding: 1rem; border-radius: 0.75rem; margin-bottom: 1.5rem; font-size: 0.875rem; font-weight: 500; align-items: center; gap: 0.75rem;">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="8" x2="12" y2="12"></line>
-            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-          </svg>
-          <span id="error-message-text"></span>
+    <!-- Left Branding Section -->
+    <div class="seller-auth-brand">
+      <div class="brand-glass-panel">
+        <div class="brand-content">
+          <h1>Potencia tus <span>ventas</span> industriales.</h1>
+          <p>Únete a la red más exclusiva de fabricantes y proveedores de uniformes. Gestiona tus catálogos, pedidos y
+            cotizaciones desde un solo lugar.</p>
         </div>
-        <div class="form-group">
-          <label for="email">Correo Corporativo</label>
-          <input type="email" id="email" placeholder="comercial@fabrica.com" required>
+      </div>
+    </div>
+
+    <!-- Right Form Section -->
+    <div class="seller-auth-form-container">
+      <div class="seller-auth-box">
+
+        <a href="index.html" class="seller-logo">
+          <img src="assets/logos/logo_dotacian_seller_fondo.png" alt="dotacian seller logo">
+        </a>
+
+        <div class="form-header">
+          <h2>Bienvenido de vuelta</h2>
+          <p>Ingresa a tu portal exclusivo de fabricante.</p>
         </div>
-        <div class="form-group">
-          <label for="password">Contraseña</label>
-          <div style="position: relative;">
-            <input type="password" id="password" placeholder="••••••••" required style="padding-right: 3rem;">
-            <button type="button" onclick="togglePasswordVisibility('password', this)" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #94A3B8; display: flex; align-items: center; justify-content: center; padding: 0;">
+
+        <form class="auth-form" id="seller-login-form" onsubmit="event.preventDefault();">
+          <div id="login-error-alert" class="error-alert">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span id="error-message-text">Credenciales inválidas.</span>
+          </div>
+
+          <div class="modern-input-group">
+            <label for="email">Correo Corporativo</label>
+            <input type="email" id="email" class="modern-input" placeholder="comercial@fabrica.com" required>
+          </div>
+
+          <div class="modern-input-group">
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" class="modern-input" placeholder="••••••••" required
+              style="padding-right: 3rem;">
+            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('password', this)">
               <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>
             </button>
           </div>
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: -0.5rem; margin-bottom: 1rem;">
-          <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; color: var(--color-text-secondary); cursor: pointer;">
-            <input type="checkbox" id="remember" style="accent-color: var(--color-brand-accent); width: 1rem; height: 1rem; cursor: pointer;">
-            Recordarme
-          </label>
-          <a href="#" style="font-size: 0.8125rem; color: var(--color-brand-accent);">¿Olvidaste tu contraseña?</a>
-        </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; margin-top: 1rem;">Acceder al Portal Seller</button>
-      </form>
 
-      <div class="auth-footer">
-        ¿Quieres ser proveedor? <a href="onboarding.seller.html">Regístrate aquí</a>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <label
+              style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--color-text-secondary); cursor: pointer; font-weight: 500;">
+              <input type="checkbox" id="remember"
+                style="accent-color: var(--color-brand-accent); width: 1.1rem; height: 1.1rem; cursor: pointer;">
+              Recordarme
+            </label>
+            <a href="#" style="font-size: 0.875rem; color: var(--color-cyan-hover); font-weight: 600;">¿Olvidaste tu
+              contraseña?</a>
+          </div>
+
+          <button type="submit" class="modern-btn">Acceder al Portal Seller</button>
+        </form>
+
+        <div class="footer-links">
+          ¿Aún no eres proveedor? <a href="onboarding.seller.html">Aplica para unirte aquí</a>
+        </div>
       </div>
     </div>
+
   </div>
 
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/utils.js?v=4"></script>
 
   <script>
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    let _supabase = null;
+    try {
+      if (typeof supabase !== 'undefined') {
+        _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+    } catch(err) {
+      console.error("Supabase load error:", err);
+    }
 
     function togglePasswordVisibility(inputId, btn) {
       const input = document.getElementById(inputId);
@@ -86,11 +396,11 @@
       }
     }
 
-    const loginForm = document.querySelector('.auth-form');
+    const loginForm = document.getElementById('seller-login-form');
     if (loginForm) {
       loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
         const submitBtn = loginForm.querySelector('button[type="submit"]');
@@ -101,6 +411,14 @@
         const errorAlert = document.getElementById('login-error-alert');
         const errorText = document.getElementById('error-message-text');
         errorAlert.style.display = 'none';
+
+        if (!_supabase) {
+          errorText.textContent = 'Error de conexión. Asegúrate de estar conectado a internet y de no tener bloqueadores de red activos.';
+          errorAlert.style.display = 'flex';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Acceder al Portal Seller';
+          return;
+        }
 
         try {
           const { data, error } = await _supabase.auth.signInWithPassword({
@@ -116,14 +434,21 @@
             return;
           }
 
-          showToast('¡Bienvenido!', 'Sesión iniciada correctamente', 'success');
-          
+          if (typeof showToast === 'function') {
+            showToast('¡Bienvenido!', 'Sesión iniciada correctamente', 'success');
+          }
+
           setTimeout(() => {
             window.location.href = 'portal.seller.html';
           }, 1000);
 
         } catch (err) {
-          showToast('Error', 'Hubo un fallo en la conexión.', 'error');
+          if (typeof showToast === 'function') {
+            showToast('Error', 'Hubo un fallo en la conexión.', 'error');
+          } else {
+            errorText.textContent = 'Hubo un fallo en la conexión.';
+            errorAlert.style.display = 'flex';
+          }
           submitBtn.disabled = false;
           submitBtn.textContent = 'Acceder al Portal Seller';
         }
@@ -131,4 +456,5 @@
     }
   </script>
 </body>
+
 </html>
