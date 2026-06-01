@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dotacian | Restablecer Contraseña</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      background-color: var(--color-smoke);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 1rem;
+    }
+
+    .auth-container {
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      max-width: 480px;
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .auth-header {
+      padding: 2.5rem 2.5rem 1rem 2.5rem;
+      text-align: center;
+    }
+
+    .auth-logo {
+      width: 180px;
+      height: auto;
+      margin-bottom: 1.5rem;
+    }
+
+    .auth-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--color-navy);
+      margin: 0 0 0.5rem 0;
+    }
+
+    .auth-subtitle {
+      color: var(--color-text-secondary);
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    .auth-body {
+      padding: 1rem 2.5rem 3rem 2.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+      position: relative;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-navy);
+      margin-bottom: 0.5rem;
+    }
+
+    .modern-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.875rem 1rem;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      transition: all 0.2s;
+      background: var(--color-smoke);
+      color: var(--color-navy);
+    }
+
+    .modern-input:focus {
+      outline: none;
+      border-color: var(--color-cyan);
+      box-shadow: 0 0 0 4px var(--color-cyan-dim);
+      background: white;
+    }
+
+    .modern-btn {
+      width: 100%;
+      padding: 1rem;
+      background: var(--color-cyan);
+      color: var(--color-navy);
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 1.125rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+      box-shadow: 0 4px 14px 0 rgba(6, 182, 212, 0.39);
+    }
+
+    .modern-btn:hover {
+      background: var(--color-cyan-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.5);
+    }
+
+    .modern-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .error-alert {
+      display: none;
+      background: #FEF2F2;
+      border: 1.5px solid #FCA5A5;
+      color: #991B1B;
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 1.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      align-items: center;
+      gap: 0.75rem;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .success-alert {
+      display: none;
+      background: #ECFDF5;
+      border: 1.5px solid #6EE7B7;
+      color: #065F46;
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 1.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      align-items: center;
+      gap: 0.75rem;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="auth-container">
+    <div class="auth-header">
+      <img src="assets/logos/logo_dotacian.png" alt="Dotacian Logo" class="auth-logo">
+      <h1 class="auth-title">Nueva Contraseña</h1>
+      <p class="auth-subtitle">Ingresa tu nueva contraseña para acceder.</p>
+    </div>
+
+    <div class="auth-body">
+      <div id="alert-box" class="error-alert">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span id="alert-text"></span>
+      </div>
+      
+      <div id="success-box" class="success-alert">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        <span>Contraseña actualizada correctamente. Redirigiendo...</span>
+      </div>
+
+      <form id="reset-form">
+        <div class="form-group">
+          <label for="password" class="form-label">Nueva Contraseña</label>
+          <input type="password" id="password" class="modern-input" placeholder="Mínimo 6 caracteres" required minlength="6">
+        </div>
+
+        <button type="submit" class="modern-btn">Guardar Contraseña</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Cuando el usuario entra desde el correo, Supabase maneja automáticamente la sesión
+    // validando el token de recuperación que viene en la URL.
+    
+    const form = document.getElementById('reset-form');
+    
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const newPassword = document.getElementById('password').value;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const errorAlert = document.getElementById('alert-box');
+      const errorText = document.getElementById('alert-text');
+      const successAlert = document.getElementById('success-box');
+      
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Guardando...';
+      errorAlert.style.display = 'none';
+
+      try {
+        // Actualizar la contraseña del usuario
+        const { data, error } = await _supabase.auth.updateUser({
+          password: newPassword
+        });
+
+        if (error) {
+          errorText.textContent = 'Hubo un error al actualizar: ' + error.message;
+          errorAlert.style.display = 'flex';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Guardar Contraseña';
+          return;
+        }
+
+        successAlert.style.display = 'flex';
+        
+        // Redirigir al login o al dashboard después de 2 segundos
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 2000);
+        
+      } catch (err) {
+        errorText.textContent = 'Ocurrió un error en la conexión.';
+        errorAlert.style.display = 'flex';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Guardar Contraseña';
+      }
+    });
+  </script>
+</body>
+</html>
