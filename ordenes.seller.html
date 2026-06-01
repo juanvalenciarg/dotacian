@@ -512,7 +512,7 @@
         // 1. Buscamos todas las órdenes recientes para este vendedor
         const { data: allOrders, error: ordersErr } = await _supabase
           .from('company_purchase_orders')
-          .select('*, company_profile(company_name, nit_rfc)')
+          .select('*, company_profile(company_name, tax_id)')
           .eq('seller_id', sellerId)
           .order('created_at', { ascending: false });
 
@@ -993,7 +993,7 @@
     window.openInvoiceModal = function(po) {
       invoiceActivePo = po;
       document.getElementById('m-inv-client').textContent = po.company_profile?.company_name || 'Desconocido';
-      document.getElementById('m-inv-tax').textContent = po.company_profile?.nit_rfc || 'No registrado';
+      document.getElementById('m-inv-tax').textContent = po.company_profile?.tax_id || 'No registrado';
       document.getElementById('m-inv-order').textContent = po.po_number || 'S/N';
       document.getElementById('m-inv-amount').textContent = formatPrice(po.total_amount);
 
@@ -1031,7 +1031,7 @@
 
       try {
         const amt = invoiceActivePo.total_amount;
-        const taxId = invoiceActivePo.company_profile?.nit_rfc || '';
+        const taxId = invoiceActivePo.company_profile?.tax_id || '';
         const companyName = invoiceActivePo.company_profile?.company_name || '';
         const country = 'CO'; // Defaulting for simple flow, can be mapped from profile if needed.
 
