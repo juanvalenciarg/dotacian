@@ -171,20 +171,27 @@
       }
       .app-header {
         left: 0;
-        padding: 1rem 1.5rem;
+        padding: 1.5rem;
+        flex-direction: row !important;
+        justify-content: flex-start !important;
+        background: transparent !important;
+        position: absolute !important;
+      }
+      .header-right {
+        margin-top: 0 !important;
       }
       .mobile-menu-toggle {
-      display: none;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-      padding: 0.5rem;
-      position: absolute;
-      top: 1.5rem;
-      right: 1.5rem;
-      z-index: 1001;
-    }
+        display: block !important;
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        padding: 0.5rem;
+        position: absolute;
+        top: 1.25rem;
+        right: 1.25rem;
+        z-index: 1001;
+      }
       .sidebar {
         z-index: 1000;
       }
@@ -588,7 +595,7 @@
     <aside class="sidebar">
       <div class="sidebar-header">
         <a href="portal.seller.html" style="display: block; width: 100%; text-align: center;">
-          <img src="assets/logos/logo_dotacian.seller_original.png" alt="dotacian seller logo"
+          <img src="assets/logos/logo_dotacian.png" alt="dotacian seller logo"
             style="width: 180px; max-width: 100%; height: auto; display: inline-block;">
         </a>
       </div>
