@@ -3735,6 +3735,7 @@ ul {
 
 /* --- Global Mobile Layout & Form Fixes --- */
 @media (max-width: 992px) {
+
   /* Force hamburger menu to show on all dashboard views */
   .mobile-menu-toggle {
     display: block !important;
@@ -3752,69 +3753,71 @@ ul {
   .header-mobile-toggle {
     display: flex !important;
   }
-  
+
   .app-header {
     padding: 1rem !important;
   }
 }
 
 @media (max-width: 768px) {
+
   /* Reduce padding on the top banners */
   .welcome-banner {
     padding: 4.5rem 1rem 1.5rem 1rem !important;
   }
-  
+
   .content-wrapper {
     padding: 0 1rem 2rem !important;
   }
-  
+
   .header-right {
     gap: 0.5rem !important;
     /* Make sure there is space for the hamburger menu on the right */
-    padding-right: 3rem !important; 
+    padding-right: 3rem !important;
   }
 }
 
 @media (max-width: 480px) {
   /* iPhone 16 and smaller specific fixes */
-  
+
   /* Make forms fully stacked and comfortable to tap */
   .form-grid {
     grid-template-columns: 1fr !important;
     gap: 1rem !important;
   }
-  
-  .form-group input, 
+
+  .form-group input,
   .form-group select,
   .form-group textarea {
     padding: 0.75rem 0.875rem !important;
-    font-size: 1rem !important; /* Prevents iOS auto-zoom */
+    font-size: 1rem !important;
+    /* Prevents iOS auto-zoom */
   }
 
   /* Cards should have less padding */
-  .app-card, 
-  .setup-card-premium, 
+  .app-card,
+  .setup-card-premium,
   .stat-card-premium {
     padding: 1.25rem !important;
     border-radius: 1rem !important;
   }
-  
+
   /* Stats row completely stacked */
   .stats-row {
     grid-template-columns: 1fr !important;
   }
-  
+
   /* Resize headers so they fit */
-  .header-left h1, 
+  .header-left h1,
   .welcome-title {
     font-size: 1.75rem !important;
   }
 
-  .header-subtitle, 
+  .header-subtitle,
   .welcome-subtitle {
     font-size: 0.95rem !important;
   }
-  
+
   #company-name-display {
     max-width: 120px;
     white-space: nowrap;
@@ -3824,17 +3827,19 @@ ul {
 
   /* Landing page mobile menu (index.html) */
   .mobile-drawer {
-    max-width: 100% !important; /* Make it full screen to avoid the weird gap */
+    max-width: 100% !important;
+    /* Make it full screen to avoid the weird gap */
     padding: 1.5rem !important;
   }
-  
+
   .drawer-nav a {
     font-size: 1.35rem !important;
     padding: 0.25rem 0;
   }
-  
+
   .drawer-close {
     font-size: 2.5rem !important;
-    margin-top: -0.5rem; /* Align better with the logo */
+    margin-top: -0.5rem;
+    /* Align better with the logo */
   }
 }
