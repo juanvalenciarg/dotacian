@@ -5,7 +5,7 @@
   <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dotacian | Gestión de empleados</title>
+  <title>Dotacian | Gestión de Empleados</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
@@ -121,24 +121,28 @@
       .main-content {
         margin-left: 0;
       }
+
       .mobile-menu-toggle {
-      display: none;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-      padding: 0.5rem;
-      position: absolute;
-      top: 1.5rem;
-      right: 1.5rem;
-      z-index: 1001;
-    }
+        display: none;
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        padding: 0.5rem;
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        z-index: 1001;
+      }
+
       .sidebar {
         z-index: 1000;
       }
+
       .welcome-banner {
         padding: 5rem 1.5rem 2rem 1.5rem;
       }
+
       .header-right {
         position: static !important;
         flex-direction: column;
@@ -171,7 +175,7 @@
         </a>
       </div>
 
-                                    <nav class="sidebar-nav">
+      <nav class="sidebar-nav">
         <a href="app.html" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
               viewBox="0 0 24 24">
@@ -240,11 +244,11 @@
         <a href="facturas.html" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/>
-              <line x1="16" y1="17" x2="8" y2="17"/>
-              <polyline points="10 9 9 9 8 9"/>
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
             </svg></span>
           <span class="nav-label">Facturas</span>
         </a>
@@ -256,8 +260,10 @@
     <main class="main-content">
       <header class="welcome-banner">
         <div style="display: flex; align-items: center; gap: 1rem;">
-          <button class="mobile-menu-toggle" onclick="toggleSidebar()" style="color: white; border: none; background: transparent; cursor: pointer;">
-            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <button class="mobile-menu-toggle" onclick="toggleSidebar()"
+            style="color: white; border: none; background: transparent; cursor: pointer;">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" viewBox="0 0 24 24">
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="6" x2="21" y2="6"></line>
               <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -427,22 +433,24 @@
           </div>
 
           <!-- Employee Table -->
-          <div class="app-card">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th style="width: 40px;"><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
-                  <th style="cursor: pointer;" onclick="sortTable(1)">Nombre Completo ↕</th>
-                  <th style="cursor: pointer;" onclick="sortTable(2)">Rol / Puesto ↕</th>
-                  <th style="cursor: pointer;" onclick="sortTable(3)">Alerta Renovación ↕</th>
-                  <th style="cursor: pointer;" onclick="sortTable(4)">Estado ↕</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody id="employees-tbody">
-                <!-- Data will be populated by JS -->
-              </tbody>
-            </table>
+          <div class="app-card" style="padding: 0; overflow: hidden;">
+            <div style="overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch; padding: 1rem;">
+              <table class="data-table" style="min-width: 700px;">
+                <thead>
+                  <tr>
+                    <th style="width: 40px;"><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
+                    <th style="cursor: pointer;" onclick="sortTable(1)">Nombre Completo ↕</th>
+                    <th style="cursor: pointer;" onclick="sortTable(2)">Rol / Puesto ↕</th>
+                    <th style="cursor: pointer;" onclick="sortTable(3)">Alerta Renovación ↕</th>
+                    <th style="cursor: pointer;" onclick="sortTable(4)">Estado ↕</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="employees-tbody">
+                  <!-- Data will be populated by JS -->
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -2963,7 +2971,7 @@
       window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
     }
   </script>
-  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/utils.js?v=4"></script>
 </body>
 
 </html>
