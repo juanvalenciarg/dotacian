@@ -2307,6 +2307,20 @@ ul {
   box-shadow: inset 0 -20px 40px rgba(0, 0, 0, 0.1);
 }
 
+@media (max-width: 992px) {
+  .welcome-banner {
+    padding: 6.5rem 1.5rem 2.5rem 1.5rem;
+  }
+  .header-right {
+    position: static !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    margin-top: 1.25rem !important;
+    gap: 1rem !important;
+    padding-right: 0 !important;
+  }
+}
+
 .welcome-banner::after {
   content: '';
   position: absolute;
