@@ -331,11 +331,9 @@
     </aside>
 
     <main class="main-content">
-      <header class="page-header">
-        <div>
-          <h1 class="page-title">Órdenes Activas</h1>
-          <p style="color: #64748B;">Gestiona el progreso de fabricación de tus pedidos</p>
-
+      <header class="app-header">
+        <div class="header-left"></div>
+        <div class="header-right" id="header-right-placeholder">
           <div id="header-company-badge" onclick="toggleUserPopover(event)"
             style="background: white; padding: 0.5rem 1rem; border-radius: 1.25rem; border: 1px solid var(--color-border); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 0.75rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative;">
             <div id="badge-industry-icon"
@@ -388,11 +386,18 @@
         </div>
       </header>
 
-      <div id="orders-list">
-        <!-- Spinner initially -->
-        <div style="text-align: center; padding: 5rem;">
-          <div class="spinner"></div>
-          <p style="margin-top: 1rem; color: #94A3B8;">Cargando órdenes de producción...</p>
+      <div class="welcome-banner">
+        <h1 class="welcome-title">Órdenes Activas</h1>
+        <p class="welcome-subtitle">Gestiona el progreso de fabricación de tus pedidos</p>
+      </div>
+
+      <div class="dashboard-content-wrapper">
+        <div id="orders-list">
+          <!-- Spinner initially -->
+          <div style="text-align: center; padding: 5rem;">
+            <div class="spinner"></div>
+            <p style="margin-top: 1rem; color: #94A3B8;">Cargando órdenes de producción...</p>
+          </div>
         </div>
       </div>
     </main>
