@@ -2,6 +2,7 @@
 <html lang="es">
 
 <head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>mi dotacian | Mi Dotación</title>
@@ -11,6 +12,7 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     /* === MI PORTAL — PERSONAL DASHBOARD === */
     * {
@@ -735,9 +737,9 @@
     <!-- Hero Greeting -->
     <div class="mi-hero">
       <div class="mi-hero-content">
-        <p class="mi-greeting">Bienvenida de vuelta 👋</p>
-        <h1 class="mi-name">María López</h1>
-        <p class="mi-role">Chef — Condesa </p>
+        <p class="mi-greeting">Bienvenido 👋</p>
+        <h1 class="mi-name" id="hero-emp-name">Cargando...</h1>
+        <p class="mi-role" id="hero-emp-role">--</p>
       </div>
     </div>
 
@@ -746,7 +748,7 @@
 
       <!-- Dynamic Flow Card -->
       <div class="mi-card">
-        
+
         <!-- TALLA FLOW -->
         <div id="view-talla" style="display: none;">
           <div class="mi-card-header">
@@ -754,24 +756,88 @@
             <span class="mi-card-title">Confirma tus Medidas</span>
           </div>
           <div class="kit-info" style="margin-bottom: 1rem;">
-            <p style="font-size: 0.8125rem; color: var(--color-text-secondary); margin-bottom: 1.25rem; line-height: 1.5;">Hemos sugerido tus tallas usando nuestra IA y tu historial. Revísalas o actualízalas antes de confirmar.</p>
-            
+            <p
+              style="font-size: 0.8125rem; color: var(--color-text-secondary); margin-bottom: 1.25rem; line-height: 1.5;">
+              Hemos sugerido tus tallas usando nuestra IA y tu historial. Revísalas o actualízalas antes de confirmar.
+            </p>
+
             <div class="form-group">
               <label class="form-label">Talla de Camisa/Filipina</label>
               <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 0.5rem;">
-                <input type="text" class="form-control" value="M" style="width: 80px; text-align: center; font-weight: 700; font-size: 1rem;">
-                <div style="flex: 1; display: flex; align-items: center; gap: 0.4rem; padding: 0.6rem; background: #f0fdfa; color: #0f766e; border: 1px solid #ccfbf1; font-size: 0.75rem; border-radius: 0.5rem; font-weight: 600;"><span>✨</span> Sugerido por IA: M</div>
+                <select class="form-control" style="width: 100px; text-align: center; font-weight: 700; font-size: 1rem;">
+                  <option value="">--</option>
+                  <option value="XS">XS</option>
+                  <option value="S">S</option>
+                  <option value="M" selected>M</option>
+                  <option value="L">L</option>
+                  <option value="XL">XL</option>
+                  <option value="2XL">2XL</option>
+                  <option value="Unitalla">Unitalla</option>
+                </select>
+                <div
+                  style="flex: 1; display: flex; align-items: center; gap: 0.4rem; padding: 0.6rem; background: #f0fdfa; color: #0f766e; border: 1px solid #ccfbf1; font-size: 0.75rem; border-radius: 0.5rem; font-weight: 600;">
+                  <span>✨</span> Sugerido por IA: M
+                </div>
               </div>
             </div>
-            
+
             <div class="form-group" style="display: flex; gap: 1rem;">
               <div style="flex: 1;">
                 <label class="form-label">Talla Pantalón</label>
-                <input type="number" class="form-control" value="32" style="text-align: center; font-weight: 700; font-size: 1rem;">
+                <select class="form-control" style="text-align: center; font-weight: 700; font-size: 1rem;">
+                  <option value="">--</option>
+                  <optgroup label="Hombre">
+                    <option value="28">28</option>
+                    <option value="30">30</option>
+                    <option value="32" selected>32</option>
+                    <option value="34">34</option>
+                    <option value="36">36</option>
+                    <option value="38">38</option>
+                    <option value="40">40</option>
+                    <option value="42">42</option>
+                    <option value="44">44</option>
+                  </optgroup>
+                  <optgroup label="Mujer">
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                  </optgroup>
+                  <option value="Unitalla">Unitalla</option>
+                </select>
               </div>
               <div style="flex: 1;">
                 <label class="form-label">Calzado (cm)</label>
-                <input type="number" class="form-control" value="27" style="text-align: center; font-weight: 700; font-size: 1rem;">
+                <select class="form-control" style="text-align: center; font-weight: 700; font-size: 1rem;">
+                  <option value="">--</option>
+                  <option value="26">26</option>
+                  <option value="27" selected>27</option>
+                  <option value="28">28</option>
+                  <option value="29">29</option>
+                  <option value="30">30</option>
+                  <option value="31">31</option>
+                  <option value="32">32</option>
+                  <option value="33">33</option>
+                  <option value="34">34</option>
+                  <option value="35">35</option>
+                  <option value="36">36</option>
+                  <option value="37">37</option>
+                  <option value="38">38</option>
+                  <option value="39">39</option>
+                  <option value="40">40</option>
+                  <option value="41">41</option>
+                  <option value="42">42</option>
+                  <option value="43">43</option>
+                  <option value="44">44</option>
+                  <option value="45">45</option>
+                  <option value="46">46</option>
+                  <option value="Unitalla">Unitalla</option>
+                </select>
               </div>
             </div>
           </div>
@@ -789,13 +855,40 @@
 
           <div class="kit-info">
             <div class="kit-info-title"><span>📋</span> Confirma los artículos recibidos</div>
-            <ul class="kit-list">
-              <li><input type="checkbox" onchange="checkItems()"> 2x Filipinas Blancas (Manga 3/4)</li>
-              <li><input type="checkbox" onchange="checkItems()"> 2x Pantalones de Cocina (Negro)</li>
-              <li><input type="checkbox" onchange="checkItems()"> 1x Mandil de Pecho</li>
-              <li><input type="checkbox" onchange="checkItems()"> 1x Zapatos Antideslizantes (Negro)</li>
-            </ul>
+            <div id="delivery-checklist" style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
+              <div style="text-align: center; padding: 2rem; color: #94a3b8; font-size: 0.9rem;">
+                <div class="spinner"
+                  style="width: 24px; height: 24px; border: 3px solid #f1f5f9; border-top-color: var(--color-cyan); border-radius: 50%; margin: 0 auto 0.75rem; animation: spin 1s linear infinite;">
+                </div>
+                Cargando dotación...
+              </div>
+            </div>
           </div>
+
+          <style>
+            @keyframes spin {
+              to {
+                transform: rotate(360deg);
+              }
+            }
+
+            .delivery-item-row {
+              display: flex;
+              align-items: center;
+              gap: 1rem;
+              padding: 1rem;
+              background: #F8FAFC;
+              border: 1px solid #E2E8F0;
+              border-radius: 12px;
+              transition: all 0.2s;
+            }
+
+            .delivery-item-row:has(input:checked) {
+              background: white;
+              border-color: var(--color-cyan);
+              box-shadow: 0 2px 8px rgba(6, 182, 212, 0.08);
+            }
+          </style>
 
           <div class="signature-area">
             <span class="signature-label">Firma aquí para confirmar recepción</span>
@@ -844,18 +937,109 @@
 
 
       <script>
+        const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentDeliveryId = null;
+
         // Set mode logic on load
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
           const params = new URLSearchParams(window.location.search);
-          const mode = params.get('mode') || 'talla';
-          
+          currentDeliveryId = params.get('delivery_id');
+          const mode = params.get('mode') || (currentDeliveryId ? 'firma' : 'talla');
+
+          if (currentDeliveryId) {
+            await loadDeliveryData(currentDeliveryId);
+          }
+
           if (mode === 'talla') {
             document.getElementById('view-talla').style.display = 'block';
           } else {
             document.getElementById('view-firma').style.display = 'block';
-            resizeCanvas(); // Ensure canvas is sized if firma mode
+            setTimeout(resizeCanvas, 100);
           }
         });
+
+        async function loadDeliveryData(id) {
+          console.log("Iniciando carga de entrega:", id);
+          const checklist = document.getElementById('delivery-checklist');
+          const heroName = document.getElementById('hero-emp-name');
+          const heroRole = document.getElementById('hero-emp-role');
+
+          if (window.location.protocol === 'file:') {
+            console.warn("⚠️ Ejecutando desde archivo local. Esto puede bloquear las peticiones a Supabase.");
+            heroName.textContent = "Error de Protocolo";
+            checklist.innerHTML = '<div style="text-align:center; padding:2rem; color:#ef4444; background:#fef2f2; border-radius:12px; border:1px solid #fee2e2;">' +
+              '<b>Error de Seguridad:</b> No puedes abrir este archivo directamente desde la carpeta.<br><br>' +
+              'Usa un servidor local (Live Server en VS Code) para que la base de datos funcione.</div>';
+            return;
+          }
+
+          try {
+            console.log("Consultando Supabase...");
+            const { data: del, error } = await _supabase
+              .from('uniform_deliveries')
+              .select(`
+                *,
+                company_employees!inner (
+                  first_name,
+                  last_name,
+                  role
+                )
+              `)
+              .eq('id', id)
+              .maybeSingle();
+
+            if (error) {
+              console.error("Error en query Supabase:", error);
+              throw error;
+            }
+
+            console.log("Datos recibidos:", del);
+
+            if (!del) {
+              heroName.textContent = "Entrega no encontrada";
+              checklist.innerHTML = '<div style="text-align:center; padding:2rem; color:#64748B; background:#f8fafc; border-radius:12px; border:1px dashed #e2e8f0;">El link es inválido o la entrega ya no existe.</div>';
+              return;
+            }
+
+            const emp = del.company_employees;
+            if (emp) {
+              heroName.textContent = `${emp.first_name} ${emp.last_name}`;
+              heroRole.textContent = emp.role || 'Empleado';
+            } else {
+              heroName.textContent = "Empleado Desconocido";
+            }
+
+            checklist.innerHTML = '';
+
+            if (del.items && Array.isArray(del.items) && del.items.length > 0) {
+              del.items.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'delivery-item-row';
+                row.innerHTML = `
+                  <input type="checkbox" onchange="checkItems()" checked style="width:20px; height:20px; accent-color:var(--color-cyan); cursor:pointer;"> 
+                  <div style="flex:1;">
+                    <div style="font-size:0.9375rem; font-weight:700; color:var(--color-navy);">${item.name}</div>
+                    <div style="font-size:0.8125rem; color:#64748B;">Cantidad: <b>${item.qty}</b> | Talla: <b>${item.size}</b></div>
+                  </div>
+                `;
+                checklist.appendChild(row);
+              });
+            } else {
+              checklist.innerHTML = '<div style="text-align:center; padding:2rem; color:#64748B; font-size:0.85rem; background:#f8fafc; border-radius:12px; border:1px dashed #e2e8f0;">No hay ítems registrados en esta entrega.</div>';
+            }
+            checkItems();
+          } catch (err) {
+            console.error('Error fatal al cargar entrega:', err);
+            heroName.textContent = "Error de Conexión";
+            checklist.innerHTML = `<div style="text-align:center; padding:2rem; color:#ef4444; font-size:0.85rem; background:#fef2f2; border-radius:12px; border:1px solid #fee2e2;">
+              No se pudo conectar con la base de datos.<br><br>
+              <small>${err.message || 'Error desconocido'}</small>
+            </div>`;
+          }
+        }
 
         // Submit Talla logic
         function submitTalla() {
@@ -863,7 +1047,7 @@
           btn.classList.add('confirmed');
           btn.disabled = true;
           btn.innerHTML = '<span>✅</span> Tallas Guardadas';
-          
+
           document.querySelector('#successModal .mi-modal-icon').textContent = '📏';
           document.querySelector('#successModal .mi-modal-title').textContent = 'Medidas Confirmadas';
           document.querySelector('#successModal .mi-modal-text').textContent = 'Tus tallas se han guardado exitosamente para la producción de tu próxima dotación.';
@@ -950,40 +1134,53 @@
           return !pixelBuffer.some(color => color !== 0);
         }
 
-        function submitConfirmation() {
+        async function submitConfirmation() {
           const isPartial = document.getElementById('partialReceipt').checked;
           const startBtn = document.getElementById('startConfirmBtn');
           const date = new Date().toLocaleDateString();
 
           startBtn.classList.add('confirmed');
           startBtn.disabled = true;
+          startBtn.innerHTML = 'Guardando firma...';
 
-          if (isPartial) {
-            startBtn.style.background = '#f59e0b';
-            startBtn.style.color = '#1e1e1e';
-            startBtn.innerHTML = '<span>⚠️</span> Recepción Parcial Firmada — ' + date;
-          } else {
-            startBtn.innerHTML = '<span>✅</span> Entrega Confirmada — ' + date;
+          try {
+            const signatureData = canvas.toDataURL(); // Base64 signature
+
+            if (currentDeliveryId) {
+              const { error } = await _supabase
+                .from('uniform_deliveries')
+                .update({
+                  status: 'signed',
+                  signature_svg: signatureData,
+                  signed_at: new Date().toISOString()
+                })
+                .eq('id', currentDeliveryId);
+
+              if (error) throw error;
+            }
+
+            if (isPartial) {
+              startBtn.style.background = '#f59e0b';
+              startBtn.style.color = '#1e1e1e';
+              startBtn.innerHTML = '<span>⚠️</span> Recepción Parcial Firmada — ' + date;
+            } else {
+              startBtn.innerHTML = '<span>✅</span> Entrega Confirmada — ' + date;
+            }
+
+            // Lock all interactions
+            document.querySelector('.signature-area').style.opacity = '0.5';
+            document.querySelector('.signature-area').style.pointerEvents = 'none';
+            document.querySelectorAll('.kit-list input').forEach(cb => cb.disabled = true);
+            document.getElementById('partialReceipt').disabled = true;
+
+            setTimeout(() => { showSuccessModal(); }, 300);
+          } catch (err) {
+            console.error('Error saving signature:', err);
+            alert('Error al guardar la firma. Por favor intenta de nuevo.');
+            startBtn.disabled = false;
+            startBtn.classList.remove('confirmed');
+            startBtn.innerHTML = 'Reintentar Confirmación';
           }
-
-          // Lock all interactions
-          document.querySelector('.signature-area').style.opacity = '0.5';
-          document.querySelector('.signature-area').style.pointerEvents = 'none';
-          document.querySelectorAll('.kit-list input').forEach(cb => cb.disabled = true);
-          document.getElementById('partialReceipt').disabled = true;
-
-          // Customize success modal text
-          if (isPartial) {
-            document.querySelector('#successModal .mi-modal-icon').textContent = '⚠️';
-            document.querySelector('#successModal .mi-modal-title').textContent = 'Recepción Parcial Registrada';
-            document.querySelector('#successModal .mi-modal-text').textContent = 'Se han registrado los artículos recibidos y tu firma. El supervisor será notificado de los artículos pendientes.';
-          } else {
-            document.querySelector('#successModal .mi-modal-icon').textContent = '✨';
-            document.querySelector('#successModal .mi-modal-title').textContent = '¡Confirmado!';
-            document.querySelector('#successModal .mi-modal-text').textContent = 'Tu dotación ha sido recibida y firmada correctamente.';
-          }
-
-          setTimeout(() => { showSuccessModal(); }, 300);
         }
 
         function showSuccessModal() {
@@ -1052,7 +1249,7 @@
         <span>
           ¿Tienes algún problema con la plataforma?
           <a href="#" style="color: var(--color-cyan); font-weight: 600; text-decoration: none;">Reportar problema</a>
-          <script src="assets/js/utils.js"></script>
+          <script src="assets/js/utils.js?v=4"></script>
 </body>
 
 </html>
