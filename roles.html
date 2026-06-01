@@ -946,7 +946,8 @@
         grid.appendChild(card);
       });
 
-      // Add "Create New Role" card
+      // Add "Create New Role" card (Temporarily disabled)
+      /*
       const addCard = document.createElement('div');
       addCard.className = 'role-card add-role-card';
       addCard.style = "border: 2px dashed #CBD5E1; border-radius: 1.25rem; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 220px; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: rgba(255, 255, 255, 0.5);";
@@ -963,6 +964,7 @@
         </div>
       `;
       grid.appendChild(addCard);
+      */
 
       updateRoleCount();
     }
@@ -1326,7 +1328,7 @@
       window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
     }
   </script>
-  <script src="assets/js/utils.js?v=3"></script>
+  <script src="assets/js/utils.js?v=4"></script>
 </body>
 
 </html>
