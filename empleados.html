@@ -615,15 +615,73 @@
           <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
             <div style="flex: 1;">
               <label>Talla Camisa</label>
-              <input type="text" id="empShirtSize" placeholder="ej. M" required>
+              <select id="empShirtSize" required style="width: 100%; padding: 0.6rem; border: 1px solid var(--color-border); border-radius: 4px; background: white;">
+                <option value="">Selecciona...</option>
+                <option value="XS">XS</option>
+                <option value="S">S</option>
+                <option value="M">M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+                <option value="2XL">2XL</option>
+                <option value="Unitalla">Unitalla</option>
+              </select>
             </div>
             <div style="flex: 1;">
               <label>Talla Pantalón</label>
-              <input type="text" id="empPantsSize" placeholder="ej. 32" required>
+              <select id="empPantsSize" required style="width: 100%; padding: 0.6rem; border: 1px solid var(--color-border); border-radius: 4px; background: white;">
+                <option value="">Selecciona...</option>
+                <optgroup label="Hombre">
+                  <option value="28">28</option>
+                  <option value="30">30</option>
+                  <option value="32">32</option>
+                  <option value="34">34</option>
+                  <option value="36">36</option>
+                  <option value="38">38</option>
+                  <option value="40">40</option>
+                  <option value="42">42</option>
+                  <option value="44">44</option>
+                </optgroup>
+                <optgroup label="Mujer">
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                </optgroup>
+                <option value="Unitalla">Unitalla</option>
+              </select>
             </div>
             <div style="flex: 1;">
               <label>Talla Zapatos</label>
-              <input type="text" id="empShoeSize" placeholder="ej. 27" required>
+              <select id="empShoeSize" required style="width: 100%; padding: 0.6rem; border: 1px solid var(--color-border); border-radius: 4px; background: white;">
+                <option value="">Selecciona...</option>
+                <option value="26">26</option>
+                <option value="27">27</option>
+                <option value="28">28</option>
+                <option value="29">29</option>
+                <option value="30">30</option>
+                <option value="31">31</option>
+                <option value="32">32</option>
+                <option value="33">33</option>
+                <option value="34">34</option>
+                <option value="35">35</option>
+                <option value="36">36</option>
+                <option value="37">37</option>
+                <option value="38">38</option>
+                <option value="39">39</option>
+                <option value="40">40</option>
+                <option value="41">41</option>
+                <option value="42">42</option>
+                <option value="43">43</option>
+                <option value="44">44</option>
+                <option value="45">45</option>
+                <option value="46">46</option>
+                <option value="Unitalla">Unitalla</option>
+              </select>
             </div>
           </div>
 
@@ -684,27 +742,82 @@
             <label
               style="font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-bottom: 0.25rem;">Talla
               Camisa</label>
-            <input type="text" id="detailShirtSize"
-              style="font-size: 0.875rem; color: var(--color-navy); font-weight: 800; border: 1px solid var(--color-border); border-radius: 6px; padding: 0.35rem 0.5rem; width: 100%; background: white;"
-              value="M">
+            <select id="detailShirtSize"
+              style="font-size: 0.875rem; color: var(--color-navy); font-weight: 800; border: 1px solid var(--color-border); border-radius: 6px; padding: 0.35rem 0.5rem; width: 100%; background: white;">
+                <option value="">Selecciona...</option>
+                <option value="XS">XS</option>
+                <option value="S">S</option>
+                <option value="M">M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+                <option value="2XL">2XL</option>
+                <option value="Unitalla">Unitalla</option>
+            </select>
           </div>
           <div class="app-card"
             style="padding: 1rem; margin: 0; background: #f8fafc; border: 1px solid var(--color-border);">
             <label
               style="font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-bottom: 0.25rem;">Talla
               Pantalón</label>
-            <input type="text" id="detailPantsSize"
-              style="font-size: 0.875rem; color: var(--color-navy); font-weight: 800; border: 1px solid var(--color-border); border-radius: 6px; padding: 0.35rem 0.5rem; width: 100%; background: white;"
-              value="32">
+            <select id="detailPantsSize"
+              style="font-size: 0.875rem; color: var(--color-navy); font-weight: 800; border: 1px solid var(--color-border); border-radius: 6px; padding: 0.35rem 0.5rem; width: 100%; background: white;">
+                <option value="">Selecciona...</option>
+                <optgroup label="Hombre">
+                  <option value="28">28</option>
+                  <option value="30">30</option>
+                  <option value="32">32</option>
+                  <option value="34">34</option>
+                  <option value="36">36</option>
+                  <option value="38">38</option>
+                  <option value="40">40</option>
+                  <option value="42">42</option>
+                  <option value="44">44</option>
+                </optgroup>
+                <optgroup label="Mujer">
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                </optgroup>
+                <option value="Unitalla">Unitalla</option>
+            </select>
           </div>
           <div class="app-card"
             style="padding: 1rem; margin: 0; background: #f8fafc; border: 1px solid var(--color-border);">
             <label
               style="font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-bottom: 0.25rem;">Talla
               Zapatos</label>
-            <input type="text" id="detailShoeSize"
-              style="font-size: 0.875rem; color: var(--color-navy); font-weight: 800; border: 1px solid var(--color-border); border-radius: 6px; padding: 0.35rem 0.5rem; width: 100%; background: white;"
-              value="27">
+            <select id="detailShoeSize"
+              style="font-size: 0.875rem; color: var(--color-navy); font-weight: 800; border: 1px solid var(--color-border); border-radius: 6px; padding: 0.35rem 0.5rem; width: 100%; background: white;">
+                <option value="">Selecciona...</option>
+                <option value="26">26</option>
+                <option value="27">27</option>
+                <option value="28">28</option>
+                <option value="29">29</option>
+                <option value="30">30</option>
+                <option value="31">31</option>
+                <option value="32">32</option>
+                <option value="33">33</option>
+                <option value="34">34</option>
+                <option value="35">35</option>
+                <option value="36">36</option>
+                <option value="37">37</option>
+                <option value="38">38</option>
+                <option value="39">39</option>
+                <option value="40">40</option>
+                <option value="41">41</option>
+                <option value="42">42</option>
+                <option value="43">43</option>
+                <option value="44">44</option>
+                <option value="45">45</option>
+                <option value="46">46</option>
+                <option value="Unitalla">Unitalla</option>
+            </select>
           </div>
           <div
             style="grid-column: span 3; display: flex; justify-content: flex-end; margin-top: 0.25rem; margin-bottom: 0.5rem;">
@@ -2861,117 +2974,4 @@
             } else if (diffMonths <= 1) {
               statusText = 'PRÓXIMO A RENOVAR';
               statusClass = 'warning';
-            } else {
-              statusText = 'AL DÍA';
-              statusClass = 'success';
-            }
-          }
-
-          return {
-            id: initials,
-            db_id: emp.id,
-            name: `${fn} ${ln}`.trim(),
-            sucursal: 'Matriz',
-            status: statusClass,
-            statusText: statusText,
-            address: 'Matriz',
-            phone: emp.phone || '',
-            assignedRole: emp.role || '',
-            role_status: emp.role_status || 'active',
-            shirt_size: emp.shirt_size || '',
-            pants_size: emp.pants_size || '',
-            shoe_size: emp.shoe_size || '',
-            id_document: emp.id_document || ''
-          };
-        });
-
-        renderEmployees('Restaurante');
-      } catch (err) {
-        console.error("Error fetching employees:", err);
-      }
-    }
-
-    // Initial render
-    window.onload = () => {
-      setTimeout(fetchEmployees, 1000); // Wait for Supabase to init
-      setTimeout(loadActiveRoles, 1000); // Wait for Supabase to init
-      setTimeout(loadRoleGarments, 1000); // Load configured garments from DB
-    };
-
-    window.roleGarments = {};
-    window.roleDefinitions = {};
-    async function loadRoleGarments() {
-      try {
-        const { data: sessionData } = await _supabase.auth.getSession();
-        const companyId = sessionData?.session?.user?.id;
-        if (!companyId) return;
-
-        const { data, error } = await _supabase.from('role_definition')
-          .select('role_name, items, renewal_frequency')
-          .eq('company_id', companyId);
-
-        if (error) throw error;
-
-        data.forEach(row => {
-          const roleLower = row.role_name.toLowerCase().trim();
-          window.roleGarments[roleLower] = row.items || [];
-          window.roleDefinitions[roleLower] = {
-            items: row.items || [],
-            renewal_frequency: row.renewal_frequency || 6
-          };
-        });
-      } catch (err) {
-        console.error("Error fetching role garments:", err);
-      }
-    }
-
-    async function loadActiveRoles() {
-      const select = document.getElementById('empRole');
-      select.innerHTML = '<option value="">Selecciona un rol...</option>';
-      try {
-        const { data: sessionData } = await _supabase.auth.getSession();
-        const companyId = sessionData?.session?.user?.id;
-        if (!companyId) return;
-
-        // Query active roles from company_roles (where roles.html saves them)
-        const { data: activeRolesData, error } = await _supabase
-          .from('company_roles')
-          .select('role_name')
-          .eq('company_id', companyId);
-
-        if (error) throw error;
-
-        const activeRoles = (activeRolesData || []).map(r => r.role_name);
-        window.activeRolesList = activeRoles;
-
-        activeRoles.forEach(roleName => {
-          const opt = document.createElement('option');
-          opt.value = roleName;
-          opt.textContent = roleName;
-          select.appendChild(opt);
-        });
-      } catch (err) {
-        console.error("Error cargando roles activos desde Supabase:", err);
-        window.activeRolesList = [];
-      }
-    }
-
-    function toggleSidebar() {
-      const layout = document.getElementById('app-layout-wrapper');
-      if (layout) {
-        layout.classList.toggle('sidebar-open');
-      }
-    }
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    if (typeof window._supabase === 'undefined') {
-      window.SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
-      window.SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-      window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-    }
-  </script>
-  <script src="assets/js/utils.js?v=4"></script>
-</body>
-
-</html>
+       
