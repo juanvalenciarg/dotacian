@@ -169,6 +169,7 @@
       .main-content {
         margin-left: 0;
       }
+
       .app-header {
         left: 0;
         padding: 1.5rem;
@@ -177,9 +178,11 @@
         background: transparent !important;
         position: absolute !important;
       }
+
       .header-right {
         margin-top: 0 !important;
       }
+
       .mobile-menu-toggle {
         display: block !important;
         background: none;
@@ -192,9 +195,11 @@
         right: 1.25rem;
         z-index: 1001;
       }
+
       .sidebar {
         z-index: 1000;
       }
+
       .welcome-banner {
         padding: 6rem 1.5rem 3rem 1.5rem;
       }
@@ -557,6 +562,7 @@
       flex-direction: column;
       gap: 2rem;
     }
+
     @media (max-width: 1200px) {
       .welcome-banner {
         margin-top: 5rem;
@@ -595,12 +601,12 @@
     <aside class="sidebar">
       <div class="sidebar-header">
         <a href="portal.seller.html" style="display: block; width: 100%; text-align: center;">
-          <img src="assets/logos/logo_dotacian.png" alt="dotacian seller logo"
+          <img src="assets/logos/logo_dotacian.seller_original.png" alt="dotacian seller logo"
             style="width: 180px; max-width: 100%; height: auto; display: inline-block;">
         </a>
       </div>
 
-                              <nav class="sidebar-nav">
+      <nav class="sidebar-nav">
         <a href="portal.seller.html" class="nav-item active">
           <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
               viewBox="0 0 24 24">
@@ -648,10 +654,11 @@
           <span class="nav-label">Envíos</span>
         </a>
         <a href="pagos.seller.html" class="nav-item">
-          <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <rect x="2" y="5" width="20" height="14" rx="2"/>
-            <line x1="2" y1="10" x2="22" y2="10"/>
-          </svg></span>
+          <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <rect x="2" y="5" width="20" height="14" rx="2" />
+              <line x1="2" y1="10" x2="22" y2="10" />
+            </svg></span>
           <span class="nav-label">Pagos</span>
         </a>
 
@@ -665,7 +672,8 @@
       <header class="app-header">
         <div class="header-left" style="display: flex; align-items: center;">
           <button class="mobile-menu-toggle" onclick="toggleSidebar()">
-            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" viewBox="0 0 24 24">
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="6" x2="21" y2="6"></line>
               <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -786,90 +794,90 @@
                   <span id="stat-clients" class="stat-value-p">0</span>
                   <span class="stat-trend" style="color: #64748B;">Empresas</span>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div> <!-- Close dashboard-left -->
+
+        <div class="dashboard-bottom">
+          <!-- Setup Progress Card -->
+          <div id="setup-card-container" class="setup-card-premium">
+            <button onclick="dismissSetupCard()"
+              style="position: absolute; top: 1.25rem; right: 1.25rem; background: rgba(255,255,255,0.1); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 1000; transition: all 0.2s;">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div id="setup-card-content" style="position: relative; z-index: 1;">
+              <h3 id="setup-card-title"
+                style="font-size: 1.35rem; font-weight: 800; font-family: var(--font-family-heading); margin-bottom: 0.5rem; letter-spacing: -0.02em;">
+                Configuración Inicial</h3>
+              <p id="setup-card-subtitle" style="font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-bottom: 2rem;">
+                Completa estos pasos
+                para activar tu cuenta.</p>
+
+              <div style="margin-bottom: 2.5rem;">
+                <div
+                  style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                  <span
+                    style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.8);">Progreso
+                    Global</span>
+                  <span id="setup-progress-val"
+                    style="font-size: 1.1rem; font-weight: 800; color: var(--color-cyan);">0%</span>
+                </div>
+                <div class="setup-progress-track">
+                  <div id="setup-progress-bar" class="setup-progress-fill"></div>
+                </div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div id="check-company" class="setup-task-item">
+                  <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div class="check-circle"
+                      style="width: 22px; height: 22px; border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s ease;">
+                    </div>
+                    <span style="font-weight: 500;">Configura tu empresa</span>
+                  </div>
+                  <a href="configuracion.seller.html" class="setup-btn-mini">Ir <svg width="12" height="12" fill="none"
+                      stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg></a>
+                </div>
+                <div id="check-product" class="setup-task-item">
+                  <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div class="check-circle"
+                      style="width: 22px; height: 22px; border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s ease;">
+                    </div>
+                    <span style="font-weight: 500;">Sube un primer producto</span>
+                  </div>
+                  <a href="catalogo.seller.html" class="setup-btn-mini">Ir <svg width="12" height="12" fill="none"
+                      stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg></a>
+                </div>
+                <div id="check-bank" class="setup-task-item">
+                  <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div class="check-circle"
+                      style="width: 22px; height: 22px; border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s ease;">
+                    </div>
+                    <span style="font-weight: 500;">Datos bancarios</span>
+                  </div>
+                  <a href="configuracion.seller.html" class="setup-btn-mini">Ir <svg width="12" height="12" fill="none"
+                      stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg></a>
                 </div>
               </div>
             </div>
-          </div> <!-- Close dashboard-left -->
-
-          <div class="dashboard-bottom">
-            <!-- Setup Progress Card -->
-            <div id="setup-card-container" class="setup-card-premium">
-              <button onclick="dismissSetupCard()"
-                style="position: absolute; top: 1.25rem; right: 1.25rem; background: rgba(255,255,255,0.1); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 1000; transition: all 0.2s;">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                  <path d="M18 6 6 18M6 6l12 12" />
-                </svg>
-              </button>
-
-              <div id="setup-card-content" style="position: relative; z-index: 1;">
-                <h3 id="setup-card-title"
-                  style="font-size: 1.35rem; font-weight: 800; font-family: var(--font-family-heading); margin-bottom: 0.5rem; letter-spacing: -0.02em;">
-                  Configuración Inicial</h3>
-                <p id="setup-card-subtitle"
-                  style="font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Completa estos pasos
-                  para activar tu cuenta.</p>
-
-                <div style="margin-bottom: 2.5rem;">
-                  <div
-                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                    <span
-                      style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.8);">Progreso
-                      Global</span>
-                    <span id="setup-progress-val"
-                      style="font-size: 1.1rem; font-weight: 800; color: var(--color-cyan);">0%</span>
-                  </div>
-                  <div class="setup-progress-track">
-                    <div id="setup-progress-bar" class="setup-progress-fill"></div>
-                  </div>
-                </div>
-
-                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                  <div id="check-company" class="setup-task-item">
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                      <div class="check-circle"
-                        style="width: 22px; height: 22px; border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s ease;">
-                      </div>
-                      <span style="font-weight: 500;">Configura tu empresa</span>
-                    </div>
-                    <a href="configuracion.seller.html" class="setup-btn-mini">Ir <svg width="12" height="12"
-                        fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path d="M5 12h14M12 5l7 7-7 7" />
-                      </svg></a>
-                  </div>
-                  <div id="check-product" class="setup-task-item">
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                      <div class="check-circle"
-                        style="width: 22px; height: 22px; border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s ease;">
-                      </div>
-                      <span style="font-weight: 500;">Sube un primer producto</span>
-                    </div>
-                    <a href="catalogo.seller.html" class="setup-btn-mini">Ir <svg width="12" height="12" fill="none"
-                        stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path d="M5 12h14M12 5l7 7-7 7" />
-                      </svg></a>
-                  </div>
-                  <div id="check-bank" class="setup-task-item">
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                      <div class="check-circle"
-                        style="width: 22px; height: 22px; border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s ease;">
-                      </div>
-                      <span style="font-weight: 500;">Datos bancarios</span>
-                    </div>
-                    <a href="configuracion.seller.html" class="setup-btn-mini">Ir <svg width="12" height="12"
-                        fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path d="M5 12h14M12 5l7 7-7 7" />
-                      </svg></a>
-                  </div>
-                </div>
-              </div>
-              <div
-                style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: var(--color-cyan); border-radius: 50%; opacity: 0.1; filter: blur(50px);">
-              </div>
+            <div
+              style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: var(--color-cyan); border-radius: 50%; opacity: 0.1; filter: blur(50px);">
             </div>
-          </div> <!-- End dashboard-bottom -->
-        </div>
+          </div>
+        </div> <!-- End dashboard-bottom -->
       </div>
-    </main>
+  </div>
+  </main>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
