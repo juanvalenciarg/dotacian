@@ -2312,7 +2312,7 @@ ul {
     padding: 6.5rem 1.5rem 2.5rem 1.5rem;
   }
   .header-right {
-    position: static !important;
+    position: relative !important;
     flex-direction: column !important;
     align-items: flex-start !important;
     margin-top: 1.25rem !important;
@@ -3711,6 +3711,13 @@ ul {
   display: none;
   z-index: 1000;
   animation: slideDownIn 0.2s ease-out;
+}
+
+@media (max-width: 992px) {
+  .user-popover {
+    left: 0;
+    right: auto;
+  }
 }
 
 .user-popover.active {
