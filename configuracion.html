@@ -8,8 +8,22 @@
   <title>Configuración | Dotacian</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/utils.js?v=4"></script>
   <style>
+    .app-header {
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: absolute;
+      top: 0;
+      left: var(--sidebar-width);
+      right: 0;
+      z-index: 10;
+      background: transparent;
+      border: none;
+    }
+
     .config-card {
       background: white;
       border-radius: 20px;
@@ -227,14 +241,15 @@
     </aside>
 
     <main class="main-content">
-      <header class="app-header"
-        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; padding: 1.5rem 3rem; background: transparent; border: none;">
+      <header class="app-header">
         <div class="header-left">
-          <h1
-            style="font-size: 2.25rem; color: var(--color-navy); font-weight: 800; margin: 0; letter-spacing: -0.02em; font-family: var(--font-family-heading);">
-            Configuración</h1>
-          <p style="color: var(--color-text-secondary); font-size: 1rem; margin-top: 0.25rem;">Ajustes del Sistema y
-            Políticas</p>
+          <button class="mobile-menu-toggle" onclick="toggleSidebar()" style="color: var(--color-navy); border: none; background: transparent; cursor: pointer;">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
         </div>
         <div class="header-right"
           style="display: flex; align-items: center; gap: 1.5rem; position: relative; padding-right: 1rem;">
@@ -299,7 +314,17 @@
         </div>
       </header>
 
-      <div class="app-container">
+      <div class="welcome-banner">
+        <div class="welcome-content">
+          <h1 class="welcome-title" style="font-size: 2.5rem; font-weight: 800; margin: 0 0 0.5rem 0; letter-spacing: -0.02em;">
+            Configuración</h1>
+          <p class="welcome-subtitle" style="font-size: 1.1rem; opacity: 0.9; margin: 0; max-width: 600px;">
+            Ajustes del Sistema y Políticas</p>
+        </div>
+      </div>
+
+      <div class="dashboard-content-wrapper">
+        <div class="app-container" style="margin-top: 2rem;">
         <div class="config-card">
           <div class="config-header-actions">
             <button class="btn-action btn-edit" id="btn-edit" onclick="toggleEdit()">
@@ -612,6 +637,7 @@
             </div>
           </form>
         </div>
+      </div>
       </div>
     </main>
   </div>
