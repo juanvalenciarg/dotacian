@@ -262,13 +262,29 @@
       }
 
       .client-auth-brand {
-        padding: 3rem 2rem;
+        padding: 2rem 1rem;
         flex: none;
         min-height: 40vh;
       }
 
       .brand-glass-panel {
-        padding: 2rem;
+        padding: 1.5rem;
+      }
+
+      .brand-content h1 {
+        font-size: 2.25rem;
+        word-wrap: break-word;
+        hyphens: auto;
+      }
+
+      .brand-content p {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .brand-content h1 {
+        font-size: 1.8rem;
       }
     }
   </style>
@@ -433,20 +449,3 @@
           setTimeout(() => {
             window.location.href = 'app.html';
           }, 1000);
-
-        } catch (err) {
-          if (typeof showToast === 'function') {
-            showToast('Error', 'Hubo un fallo en la conexión.', 'error');
-          } else {
-            errorText.textContent = 'Hubo un fallo en la conexión.';
-            errorAlert.style.display = 'flex';
-          }
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Iniciar Sesión';
-        }
-      });
-    }
-  </script>
-</body>
-
-</html>
