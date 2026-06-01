@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Órdenes | dotacian seller</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --sidebar-width: 280px;
+    }
+
+    .app-layout {
+      display: flex;
+      min-height: 100vh;
+      background: #F8FAFC;
+    }
+
+    /* Sidebar consistent with seller portal */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--color-navy);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      z-index: 100;
+    }
+
+    .sidebar-header {
+      background: transparent;
+      padding: 1.5rem 1rem 0 1rem;
+      border-bottom: none;
+      margin-bottom: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .sidebar-nav {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.875rem 1rem;
+      border-radius: 0.75rem;
+      color: #94A3B8;
+      text-decoration: none;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: white;
+    }
+
+    .nav-item.active {
+      background: linear-gradient(90deg, rgba(6, 182, 212, 0.15) 0%, rgba(6, 182, 212, 0) 100%);
+      color: var(--color-cyan);
+      border-left: 3px solid var(--color-cyan);
+      box-shadow: none !important;
+      border-radius: 0 0.75rem 0.75rem 0;
+      padding-left: calc(1rem - 3px);
+      font-weight: 700;
+    }
+
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      padding: 2.5rem;
+    }
+
+    .page-header {
+      margin-bottom: 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .page-title {
+      font-size: 1.875rem;
+      color: var(--color-navy);
+      font-weight: 800;
+      font-family: var(--font-family-heading);
+    }
+
+    /* Order Card Style */
+    .order-card {
+      background: white;
+      border-radius: 1.25rem;
+      border: 1px solid #E2E8F0;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .order-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05);
+    }
+
+    .order-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+    }
+
+    .po-badge {
+      font-size: 1.125rem;
+      font-weight: 800;
+      color: var(--color-navy);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .client-tag {
+      font-size: 0.875rem;
+      color: #64748B;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Steps Tracker */
+    .steps-container {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0.5rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #F1F5F9;
+    }
+
+    .step-item {
+      text-align: center;
+      flex: 1;
+      text-align: center;
+      position: relative;
+      cursor: pointer;
+      opacity: 0.4;
+      transition: all 0.3s;
+    }
+
+    .step-item.active {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+
+    .step-item.completed {
+      opacity: 0.8;
+    }
+
+    .step-label {
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: #94A3B8;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.05em;
+    }
+
+    .step-item.active .step-label {
+      color: var(--color-cyan);
+    }
+
+    .step-item.completed .step-label {
+      color: #10B981;
+    }
+
+    .step-bar {
+      height: 6px;
+      background: #F1F5F9;
+      border-radius: 10px;
+      margin: 0 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .step-item.active .step-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--color-cyan);
+      animation: pulseBar 2s infinite;
+    }
+
+    .step-item.completed .step-bar {
+      background: #10B981;
+    }
+
+    @keyframes pulseBar {
+      0% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
+    .btn-step {
+      background: white;
+      border: 2px solid var(--color-cyan);
+      color: var(--color-cyan);
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-step:hover {
+      background: var(--color-cyan);
+      color: white;
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+    }
+
+    .order-items-summary {
+      font-size: 0.875rem;
+      color: #64748B;
+      margin: 0.5rem 0;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 5rem;
+      background: white;
+      border-radius: 1.5rem;
+      border: 2px dashed #E2E8F0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="portal.seller.html" style="display: block; width: 100%; text-align: center;">
+          <img src="assets/logos/logo_dotacian.png" alt="logo"
+            style="width: 180px; max-width: 100%; height: auto; display: inline-block;">
+        </a>
+      </div>
+                              <nav class="sidebar-nav">
+        <a href="portal.seller.html" class="nav-item">
+          <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg></span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="catalogo.seller.html" class="nav-item">
+          <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <path d="M9 3v18" />
+              <path d="M3 9h18" />
+            </svg></span>
+          <span class="nav-label">Catálogo</span>
+        </a>
+        <a href="cotizaciones.seller.html" class="nav-item">
+          <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg></span>
+          <span class="nav-label">Cotizaciones</span>
+        </a>
+        <a href="ordenes.seller.html" class="nav-item active">
+          <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
+            </svg></span>
+          <span class="nav-label">Órdenes Activas</span>
+        </a>
+        <a href="envios.seller.html" class="nav-item">
+          <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="2" y1="12" x2="22" y2="12" />
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            </svg></span>
+          <span class="nav-label">Envíos</span>
+        </a>
+        <a href="pagos.seller.html" class="nav-item">
+          <span class="nav-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="2" y="5" width="20" height="14" rx="2"/>
+            <line x1="2" y1="10" x2="22" y2="10"/>
+          </svg></span>
+          <span class="nav-label">Pagos</span>
+        </a>
+
+        <div class="sidebar-spacer" style="flex: 1;"></div>
+        <div id="version-tag"></div>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">Órdenes Activas</h1>
+          <p style="color: #64748B;">Gestiona el progreso de fabricación de tus pedidos</p>
+
+          <div id="header-company-badge" onclick="toggleUserPopover(event)"
+            style="background: white; padding: 0.5rem 1rem; border-radius: 1.25rem; border: 1px solid var(--color-border); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 0.75rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative;">
+            <div id="badge-industry-icon"
+              style="width: 36px; height: 36px; background: var(--color-smoke-mid); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--color-cyan); font-size: 1.2rem;">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M3 21h18M3 7v1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7M4 7l1-4h14l1 4" />
+              </svg>
+            </div>
+            <div style="display: flex; flex-direction: column;">
+              <span id="company-name-display"
+                style="font-weight: 700; color: var(--color-navy); font-size: 0.95rem; line-height: 1.2;">Cargando...</span>
+              <span id="dash-industry-val"
+                style="font-size: 0.65rem; color: var(--color-text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Sector</span>
+            </div>
+            <div style="margin-left: 0.5rem; color: var(--color-text-muted);">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </div>
+
+            <!-- Popover -->
+            <div id="user-popover" class="user-popover">
+              <div class="popover-label">Usuario</div>
+              <div id="pop-user-name" class="popover-value">Cargando...</div>
+              <div class="popover-label">Correo Electrónico</div>
+              <div id="pop-user-email" class="popover-value" style="margin-bottom: 0;">Cargando...</div>
+              <hr style="margin: 1rem 0; border: none; border-top: 1px solid var(--color-smoke-mid);">
+              <a href="configuracion.seller.html"
+                style="color: var(--color-navy); font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; margin-bottom: 0.75rem; transition: color 0.2s;"
+                onmouseover="this.style.color='var(--color-cyan)'" onmouseout="this.style.color='var(--color-navy)'">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path
+                    d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1-1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                Configuración
+              </a>
+              <a href="login.seller.html"
+                style="color: #EF4444; font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; transition: color 0.2s;"
+                onmouseover="this.style.color='#DC2626'" onmouseout="this.style.color='#EF4444'">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Cerrar Sesión
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div id="orders-list">
+        <!-- Spinner initially -->
+        <div style="text-align: center; padding: 5rem;">
+          <div class="spinner"></div>
+          <p style="margin-top: 1rem; color: #94A3B8;">Cargando órdenes de producción...</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/utils.js?v=4"></script>
+  <script>
+    const _supabase = supabase.createClient('https://awuhvewotmwelurmjvmu.supabase.co', 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq');
+
+    const PRODUCTION_STEPS = [
+      { id: 'confirmation', label: 'Confirmación', progress: 0, color: '#0EA5E9' },
+      { id: 'cutting', label: 'Corte', progress: 20, color: '#6366F1' },
+      { id: 'production', label: 'Producción', progress: 40, color: '#8B5CF6' },
+      { id: 'quality', label: 'Calidad', progress: 60, color: '#EC4899' },
+      { id: 'delivery', label: 'Despacho', progress: 80, color: '#F97316' },
+      { id: 'completed', label: 'Entregado', progress: 100, color: '#10B981' }
+    ];
+
+    async function loadActiveOrders() {
+      const { data: { session } } = await _supabase.auth.getSession();
+      if (!session) return window.location.href = 'login.seller.html';
+
+      const sellerId = session.user.id;
+      const listContainer = document.getElementById('orders-list');
+
+      try {
+        // 1. Buscamos todas las órdenes recientes para este vendedor
+        const { data: allOrders, error: ordersErr } = await _supabase
+          .from('company_purchase_orders')
+          .select('*, company_profile(company_name)')
+          .eq('seller_id', sellerId)
+          .order('created_at', { ascending: false });
+
+        if (ordersErr) throw ordersErr;
+
+        const orders = allOrders || [];
+
+        // 2. Buscamos el tracking de estas órdenes
+        const poIds = (orders || []).map(o => o.id);
+        let trackingMap = {};
+        if (poIds.length > 0) {
+          const { data: tracking } = await _supabase
+            .from('production_tracking')
+            .select('*')
+            .in('po_id', poIds);
+
+          trackingMap = (tracking || []).reduce((acc, t) => ({ ...acc, [t.po_id]: t }), {});
+        }
+
+        // 3. También buscamos cotizaciones aprobadas o en producción
+        const { data: approvedQuotes, error: quotesErr } = await _supabase
+          .from('company_quotes_requests')
+          .select('*, company_profile(company_name)')
+          .eq('seller_id', sellerId)
+          .in('status', ['aprobada', 'en_produccion']);
+
+        // Identificamos qué cotizaciones ya están vinculadas a una Orden de Compra para no duplicar
+        const linkedQuoteIds = new Set((orders || []).flatMap(o => o.quote_ids || []));
+        const filteredQuotes = (approvedQuotes || []).filter(q => !linkedQuoteIds.has(q.id));
+
+        const combined = [
+          ...(orders || []).map(o => ({
+            id: o.id,
+            po_number: o.po_number || o.order_number || 'S/N',
+            company_profile: o.company_profile,
+            items: o.items || [],
+            total_amount: o.total_amount || 0,
+            created_at: o.created_at,
+            status: trackingMap[o.id]?.status || 'confirmation',
+            progress_percent: trackingMap[o.id]?.progress_percent || 0
+          })),
+          ...(filteredQuotes).map(q => ({
+            id: q.id,
+            isQuote: true,
+            po_number: q.quote_number,
+            company_profile: q.company_profile,
+            items: [q],
+            total_amount: q.total_amount,
+            created_at: q.created_at,
+            status: trackingMap[q.id]?.status || 'confirmation',
+            progress_percent: trackingMap[q.id]?.progress_percent || 0
+          }))
+        ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+        if (combined.length === 0) {
+          listContainer.innerHTML = `
+            <div class="empty-state">
+              <h3 style="color: var(--color-navy); margin-bottom: 0.5rem;">No hay órdenes activas</h3>
+              <p style="color: #64748B;">Las nuevas órdenes de tus clientes aparecerán aquí automáticamente.</p>
+            </div>
+          `;
+          return;
+        }
+
+        listContainer.innerHTML = combined.map(o => {
+          const currentStepIndex = PRODUCTION_STEPS.findIndex(s => s.id === o.status);
+
+          return `
+            <div class="order-card" id="card-${o.id}">
+              <div class="order-card-header">
+                <div>
+                  <div class="po-badge">
+                    ${o.po_number}
+                    ${o.isQuote ? '<span style="font-size: 0.6rem; background: #FEF3C7; color: #92400E; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">COTIZACIÓN APROBADA</span>' : ''}
+                  </div>
+                  <div class="client-tag">${o.company_profile?.company_name || 'Cliente'}</div>
+                  <div class="order-items-summary">
+                    ${o.items ? o.items.length : 0} productos seleccionados • Total: <strong>${formatPrice(o.total_amount)}</strong>
+                  </div>
+                </div>
+                <div style="text-align: right;">
+                   <div style="font-size: 0.75rem; color: #94A3B8; margin-bottom: 0.5rem;">RECIBIDA: ${new Date(o.created_at).toLocaleDateString()}</div>
+                   ${currentStepIndex < PRODUCTION_STEPS.length - 1 ? `
+                     <button class="btn-step" onclick="advanceStep('${o.id}', '${o.status}', ${o.isQuote ? "'quote'" : "'po'"})">
+                       Pasar a ${PRODUCTION_STEPS[currentStepIndex + 1].label}
+                     </button>
+                   ` : '<span style="color: #10B981; font-weight: 800; font-size: 0.8rem;">✓ COMPLETADA</span>'}
+                </div>
+              </div>
+
+              <div class="steps-container">
+                ${PRODUCTION_STEPS.map((step, idx) => {
+            let statusClass = '';
+            if (idx < currentStepIndex) statusClass = 'completed';
+            else if (idx === currentStepIndex) statusClass = 'active';
+
+            return `
+                    <div class="step-item ${statusClass}" onclick="updateToStep('${o.id}', '${step.id}', ${o.isQuote ? "'quote'" : "'po'"})">
+                      <div class="step-label">${step.label}</div>
+                      <div class="step-bar"></div>
+                    </div>
+                  `;
+          }).join('')}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.error('Error:', err);
+        listContainer.innerHTML = '<p style="color: red; text-align: center;">Error al cargar las órdenes.</p>';
+      }
+    }
+
+    async function advanceStep(poId, currentStepId, type = 'po') {
+      const idx = PRODUCTION_STEPS.findIndex(s => s.id === currentStepId);
+      if (idx < PRODUCTION_STEPS.length - 1) {
+        const nextStep = PRODUCTION_STEPS[idx + 1].id;
+        if (nextStep === 'delivery' || nextStep === 'completed') {
+          showToast("Redirigiendo...", "Para gestionar despachos o entregas ve a la sección de Envíos.");
+          setTimeout(() => { window.location.href = 'envios.seller.html'; }, 1500);
+          return;
+        }
+        await updateToStep(poId, PRODUCTION_STEPS[idx + 1].id, type);
+      }
+    }
+
+    async function updateToStep(poId, stepId, type = 'po') {
+      if (stepId === 'delivery' || stepId === 'completed') {
+         showToast("Acción requerida", "Para cambiar a este estado, dirígete a la sección de Envíos.");
+         setTimeout(() => { window.location.href = 'envios.seller.html'; }, 1500);
+         return;
+      }
+      
+      const stepInfo = PRODUCTION_STEPS.find(s => s.id === stepId);
+      if (!stepInfo) return;
+
+      showToast("Actualizando...", "Cambiando fase de producción...");
+
+      try {
+        // 1. Obtener la información base (company_id) de la tabla correspondiente
+        const sourceTable = type === 'quote' ? 'company_quotes_requests' : 'company_purchase_orders';
+        const { data: sourceData, error: fetchErr } = await _supabase
+          .from(sourceTable)
+          .select('company_id')
+          .eq('id', poId)
+          .single();
+
+        if (fetchErr || !sourceData) {
+          console.error('Error fetching source data:', fetchErr);
+          throw new Error("No se pudo encontrar la orden original.");
+        }
+
+        // Obtener el sellerId de la sesión actual
+        const { data: { session } } = await _supabase.auth.getSession();
+        const sellerId = session.user.id;
+
+        // 2. Realizar UPSERT en production_tracking
+        const { error: upsertErr } = await _supabase
+          .from('production_tracking')
+          .upsert({
+            po_id: poId,
+            company_id: sourceData.company_id,
+            seller_id: sellerId,
+            status: stepId,
+            progress_percent: stepInfo.progress
+          }, { onConflict: 'po_id' });
+
+        if (upsertErr) throw upsertErr;
+
+        // 3. Actualizar el estado en la tabla de origen (Quote o PO)
+        const newTableStatus = stepId === 'completed' ? 'completed' : 'en_produccion';
+        const { error: syncErr } = await _supabase
+          .from(sourceTable)
+          .update({ status: newTableStatus })
+          .eq('id', poId);
+
+        if (syncErr) console.warn('Sync error (non-critical):', syncErr);
+
+        // Nota: La lógica de alimentar la bodega (status: completed) y despachar (status: delivery)
+        // se maneja exclusivamente en envios.seller.html ahora.
+
+        showToast("Estado Actualizado", `La orden ahora está en fase de ${stepInfo.label}`);
+        loadActiveOrders();
+      } catch (err) {
+        console.error('Update Error:', err);
+        showToast("Error", "No se pudo actualizar el estado: " + err.message, "error");
+      }
+    }
+
+    function formatPrice(val) {
+      if (window.formatCurrency) return window.formatCurrency(val, 'MX');
+      return `$${(val || 0).toLocaleString('es-MX')}`;
+    }
+
+    loadActiveOrders();
+  </script>
+</body>
+
+</html>
