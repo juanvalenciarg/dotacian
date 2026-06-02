@@ -1277,7 +1277,7 @@
           let signatureHtml = '';
           const b64Sig = signaturesBase64[delivery.id];
           if (b64Sig) {
-            signatureHtml = `<img src="${b64Sig}" style="height: 80px; max-width: 160px; object-fit: contain; display: block; margin: 0 auto;" alt="Firma del Empleado">`;
+            signatureHtml = `<img src="${b64Sig}" style="height: 80px; width: auto; display: block; margin: 0 auto;" alt="Firma del Empleado">`;
           } else {
             signatureHtml = `<span style="font-size: 0.8125rem; color: #64748b; font-style: italic;">Firmado digitalmente</span>`;
           }
@@ -1285,7 +1285,7 @@
           const pageBreakStyle = dIdx > 0 ? 'page-break-before: always; margin-top: 40px;' : '';
 
           htmlContent += `
-            <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px; background: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); ${pageBreakStyle}">
+            <div class="delivery-box" style="page-break-inside: avoid; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px; background: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); ${pageBreakStyle}">
               <!-- Delivery Header -->
               <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px;">
                 <div>
@@ -1351,7 +1351,7 @@
         filename: `Historial_Entregas_${emp.name.replace(/\s+/g, '_')}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true, logging: false, scrollY: 0, windowWidth: 800 },
-        pagebreak: { mode: ['css', 'legacy'] },
+        pagebreak: { mode: ['css', 'legacy'], avoid: ['.delivery-box'] },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
       };
 
