@@ -1277,7 +1277,7 @@
           let signatureHtml = '';
           const b64Sig = signaturesBase64[delivery.id];
           if (b64Sig) {
-            signatureHtml = `<img src="${b64Sig}" style="max-height: 80px; max-width: 160px; height: auto; width: auto;" alt="Firma del Empleado">`;
+            signatureHtml = `<img src="${b64Sig}" style="height: 80px; max-width: 160px; object-fit: contain; display: block; margin: 0 auto;" alt="Firma del Empleado">`;
           } else {
             signatureHtml = `<span style="font-size: 0.8125rem; color: #64748b; font-style: italic;">Firmado digitalmente</span>`;
           }
