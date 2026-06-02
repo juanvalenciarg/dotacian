@@ -5,7 +5,7 @@
   <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catálogo Seller | Dotacian</title>
+  <title>Catálogo Seller | dotacian</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
@@ -1025,7 +1025,8 @@
             </div>
             <div class="form-group">
               <label>Género</label>
-              <select id="p-gender" onchange="if(document.getElementById('p-subcategory').value) renderSizeChips(document.getElementById('p-subcategory').value)">
+              <select id="p-gender"
+                onchange="if(document.getElementById('p-subcategory').value) renderSizeChips(document.getElementById('p-subcategory').value)">
                 <option value="Unisex">Unisex</option>
                 <option value="Hombre">Hombre</option>
                 <option value="Mujer">Mujer</option>
@@ -1358,7 +1359,7 @@
       hoteleria: ['Uniformes de Recepción', 'Uniformes de Recamarera', 'Uniformes de Botones'],
       retail: ['Uniformes de Tienda', 'Chalecos', 'Playeras Polo'],
       salud: ['Filipinas Médicas', 'Batas Médicas', 'Pantalones Médicos'],
-      limpieza: ['Filipinas', 'Pantalones', 'Batas', 'Cofias', 'Mandiles'],
+      limpieza: ['Filipinas', 'Pantalones', 'Conjunto: Filipina + Pantalon', 'Batas', 'Cofias', 'Mandiles'],
       industrial: ['Overoles', 'Pantalones', 'Botas de Seguridad', 'Cascos', 'Camisolas', 'Chalecos Reflejantes', 'Guantes'],
       restaurantes: [
         'Filipinas Chef',
@@ -1407,7 +1408,7 @@
       const gender = document.getElementById('p-gender') ? document.getElementById('p-gender').value : 'Unisex';
 
       if (sub.includes('bota') || sub.includes('zapato')) {
-        sizes = Array.from({length: 21}, (_, i) => (i + 26).toString());
+        sizes = Array.from({ length: 21 }, (_, i) => (i + 26).toString());
       } else if (sub.includes('pantalón') || sub.includes('pantalon')) {
         if (gender === 'Mujer') {
           sizes = ['2', '3', '4', '5', '6', '7', '8', '9', '10'];
