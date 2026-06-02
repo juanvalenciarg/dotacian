@@ -1284,7 +1284,7 @@
           let signatureHtml = '';
           const b64Sig = signaturesBase64[delivery.id];
           if (b64Sig) {
-            signatureHtml = `<img src="${b64Sig}" style="max-height: 80px; max-width: 250px; object-fit: contain;" alt="Firma del Empleado">`;
+            signatureHtml = `<img src="${b64Sig}" style="max-height: 80px; max-width: 160px; height: auto; width: auto;" alt="Firma del Empleado">`;
           } else {
             signatureHtml = `<span style="font-size: 0.8125rem; color: #64748b; font-style: italic;">Firmado digitalmente</span>`;
           }
@@ -1325,8 +1325,8 @@
                   <h6 style="margin: 0 0 4px 0; font-size: 0.8125rem; font-weight: 700; color: #334155;">Declaración de Conformidad</h6>
                   <p style="margin: 0; font-size: 0.7rem; color: #64748b; line-height: 1.4;">El colaborador abajo firmante certifica haber recibido las prendas listadas a su entera satisfacción y de la talla adecuada para su operación.</p>
                 </div>
-                <div style="text-align: center; border-left: 1px solid #e2e8f0; padding-left: 24px; min-width: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                  <div style="height: 80px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">
+                <div style="text-align: center; border-left: 1px solid #e2e8f0; padding-left: 24px; min-width: 180px;">
+                  <div style="height: 80px; margin-bottom: 6px;">
                     ${signatureHtml}
                   </div>
                   <span style="font-size: 0.7rem; text-transform: uppercase; color: #64748b; font-weight: 700; letter-spacing: 0.05em; border-top: 1px solid #cbd5e1; padding-top: 4px; width: 100%; display: block;">Firma del Colaborador</span>
@@ -1348,6 +1348,12 @@
       `;
 
       pdfContainer.innerHTML = htmlContent;
+      
+      // Attach to body so html2canvas can properly read layout and image sizes
+      pdfContainer.style.position = 'absolute';
+      pdfContainer.style.left = '-9999px';
+      pdfContainer.style.top = '0';
+      document.body.appendChild(pdfContainer);
 
       const opt = {
         margin: [0.5, 0.5, 0.5, 0.5],
@@ -1359,9 +1365,13 @@
 
       html2pdf().set(opt).from(pdfContainer).save().then(() => {
         showNotification("Historial descargado exitosamente.");
+        document.body.removeChild(pdfContainer);
       }).catch(err => {
         console.error("Error generating PDF:", err);
         showNotification("Error al generar el PDF.");
+        if(document.body.contains(pdfContainer)) {
+          document.body.removeChild(pdfContainer);
+        }
       });
     }
 
