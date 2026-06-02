@@ -5,7 +5,7 @@
   <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Configurar Uniforme | Dotacian</title>
+  <title>Dotacian | Configurar Uniforme</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@700;800&display=swap"
@@ -419,6 +419,27 @@
 
       .gallery-container {
         position: static;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 5rem 1rem 2rem 1rem;
+      }
+
+      .config-layout {
+        gap: 2rem;
+      }
+
+      .product-meta-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      
+      .main-image-viewer {
+        border-radius: 16px;
       }
     }
   </style>
@@ -1029,7 +1050,7 @@
 
     init();
   </script>
-  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/utils.js?v=4"></script>
 
   <!-- Success Modal -->
   <div id="success-modal"
