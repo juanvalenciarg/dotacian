@@ -941,7 +941,14 @@
       const isDismissed = localStorage.getItem('dotacian_seller_setup_dismissed') === 'true';
 
       // 1. Check Company (33%)
-      const hasCompany = company && company.seller_name && company.location;
+      const hasCompany = company && 
+        company.seller_name && 
+        company.location &&
+        company.legal_name &&
+        company.tax_id &&
+        company.contact1_name &&
+        company.contact1_phone &&
+        company.contact1_email;
 
       // 2. Check Product (33%)
       const { count: productCount } = await _supabase
