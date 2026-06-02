@@ -528,7 +528,7 @@
                 </select>
               </div>
               <div class="form-group">
-                <label>Número de Cuenta</label>
+                <label id="label-bank-number">Número de Cuenta</label>
                 <input type="text" id="s-bank-number" placeholder="000-000000-00" disabled>
               </div>
               <div class="form-group">
@@ -557,6 +557,25 @@
     let session = null;
     let isEditing = false;
 
+    function applyCountryFormatting(countryCode) {
+      const phone1 = document.getElementById('s-contact1-phone');
+      const phone2 = document.getElementById('s-contact2-phone');
+      const bankLabelEl = document.getElementById('label-bank-number');
+      const bankNumberInput = document.getElementById('s-bank-number');
+
+      if (countryCode === 'MX') {
+        if (phone1) phone1.placeholder = 'Ej. +52 55 1234 5678';
+        if (phone2) phone2.placeholder = 'Ej. +52 55 8765 4321';
+        if (bankLabelEl) bankLabelEl.textContent = 'CLABE Interbancaria';
+        if (bankNumberInput) bankNumberInput.placeholder = '18 dígitos';
+      } else if (countryCode === 'CO') {
+        if (phone1) phone1.placeholder = 'Ej. +57 300 123 4567';
+        if (phone2) phone2.placeholder = 'Ej. +57 300 765 4321';
+        if (bankLabelEl) bankLabelEl.textContent = 'Número de Cuenta';
+        if (bankNumberInput) bankNumberInput.placeholder = '000-000000-00';
+      }
+    }
+
     async function initSettings() {
       console.log('Iniciando configuración...');
       const { data: { user } } = await _supabase.auth.getUser();
@@ -579,6 +598,8 @@
           locInput.value = profile.country;
           locInput.disabled = true; // Siempre bloqueado
         }
+
+        applyCountryFormatting(profile.country);
 
         if (typeof updateVersionIndicator === 'function') {
           updateVersionIndicator(profile.country);
@@ -610,6 +631,7 @@
           // El país de la empresa manda si ya existe, si no, se queda el del perfil
           if (company.location) {
             document.getElementById('s-location').value = company.location;
+            applyCountryFormatting(company.location);
           }
 
           document.getElementById('s-min-qty').value = company.min_order_qty || '';
