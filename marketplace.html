@@ -12,7 +12,7 @@
     rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/utils.js?v=4"></script>
   <style>
     :root {
       --sidebar-width: 280px;
@@ -78,29 +78,35 @@
       .main-content {
         margin-left: 0;
       }
+
       .app-header {
         left: 0;
         padding: 1rem 1.5rem;
       }
+
       .mobile-menu-toggle {
-      display: none;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-      padding: 0.5rem;
-      position: absolute;
-      top: 1.5rem;
-      right: 1.5rem;
-      z-index: 1001;
-    }
+        display: none;
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        padding: 0.5rem;
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        z-index: 1001;
+      }
+
       .sidebar {
         z-index: 1000;
       }
+
       .marketplace-container {
         padding: 6rem 1.5rem 2rem 1.5rem;
       }
-    }    /* User Profile Popover */
+    }
+
+    /* User Profile Popover */
     .user-popover {
       position: absolute;
       top: calc(100% + 10px);
@@ -461,7 +467,7 @@
         </a>
       </div>
 
-                                    <nav class="sidebar-nav">
+      <nav class="sidebar-nav">
         <a href="app.html" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
               viewBox="0 0 24 24">
@@ -530,11 +536,11 @@
         <a href="facturas.html" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/>
-              <line x1="16" y1="17" x2="8" y2="17"/>
-              <polyline points="10 9 9 9 8 9"/>
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
             </svg></span>
           <span class="nav-label">Facturas</span>
         </a>
@@ -546,7 +552,8 @@
       <header class="app-header">
         <div class="header-left" style="display: flex; align-items: center;">
           <button class="mobile-menu-toggle" onclick="toggleSidebar()">
-            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" viewBox="0 0 24 24">
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="6" x2="21" y2="6"></line>
               <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -635,7 +642,7 @@
                 oninput="applyFilters()">
             </div>
 
-            <div class="filter-bar" id="industry-filters">
+            <div class="filter-bar" id="industry-filters" style="display: none;">
               <div class="filter-chip active" data-industry="all">Todos</div>
               <div class="filter-chip" data-industry="restaurantes">Restaurantes</div>
               <div class="filter-chip" data-industry="industrial">Industrial</div>
@@ -736,9 +743,14 @@
         else if (ind.includes('industrial')) iconEl.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 12V2M4.93 4.93l1.41 1.41M2 12h2M6.34 17.66l-1.41 1.41M12 22v-2M17.66 17.66l1.41 1.41M22 12h-2M19.07 4.93l-1.41 1.41"/></svg>';
         else if (ind.includes('limpieza')) iconEl.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m3 21 14-14M14.5 3.5l6 6M20 3.5l-6 6"/></svg>';
         else iconEl.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M3 7v1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7M4 7l1-4h14l1 4"/></svg>';
+      
+        // Establecer la industria actual basada en el cliente
+        currentIndustry = ind || 'all';
       }
 
-      initIndustryFilters();
+      // Inicializar subcategorías en base a la industria del cliente
+      updateSubcategoryFilters();
+      
       await loadGlobalMarketplace();
     }
 
@@ -819,14 +831,16 @@
 
         if (error) throw error;
 
-        // 2. Traer nombres reales de los vendedores desde seller_company
+        // 2. Traer nombres reales y sectores de los vendedores
+        let sellerDataMap = {};
         try {
           const { data: sellers } = await _supabase
             .from('seller_company')
-            .select('id, seller_name');
+            .select('id, seller_name, industries');
           if (sellers) {
             sellers.forEach(s => {
               sellerMap[s.id] = s.seller_name;
+              sellerDataMap[s.id] = s;
             });
           }
         } catch (sErr) {
@@ -841,8 +855,27 @@
           userCountry = 'MX';
         }
 
-        // 4. Mostrar TODO por ahora para evitar que el catálogo quede vacío por fallos de mapeo
-        allProducts = products || [];
+        // 4. Filtrar por industria del cliente y lo que el seller tenga configurado
+        let filteredProducts = products || [];
+        if (currentIndustry && currentIndustry !== 'all') {
+          filteredProducts = filteredProducts.filter(p => {
+            const prodInd = (p.industry || '').toLowerCase();
+            const sellerData = sellerDataMap[p.seller_id];
+            
+            // Verifica que la industria del producto coincida
+            const matchesIndustry = prodInd === currentIndustry;
+            
+            // Verifica que el seller tenga definida esta industria
+            let sellerHasIndustry = true; // Fallback por si no tiene configuración
+            if (sellerData && sellerData.industries && Array.isArray(sellerData.industries)) {
+              sellerHasIndustry = sellerData.industries.map(i => i.toLowerCase()).includes(currentIndustry);
+            }
+
+            return matchesIndustry && sellerHasIndustry;
+          });
+        }
+
+        allProducts = filteredProducts;
 
         renderProducts(allProducts);
       } catch (err) {
