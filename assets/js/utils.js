@@ -259,13 +259,55 @@ function formatCurrency(val, country = 'MX') {
 }
 
 // Auto-logout after inactivity
-const INACTIVITY_TIME = 5 * 60 * 1000; // 5 minutos
+const WARNING_TIME = 4 * 60 * 1000; // 4 minutos
+const LOGOUT_TIME = 5 * 60 * 1000;  // 5 minutos
 let inactivityTimer;
+let logoutTimer;
+let isWarningActive = false;
 
 function resetInactivityTimer() {
+  if (isWarningActive) return; // Do not reset if warning is shown
+  
   clearTimeout(inactivityTimer);
-  inactivityTimer = setTimeout(logoutUser, INACTIVITY_TIME);
+  clearTimeout(logoutTimer);
+  
+  inactivityTimer = setTimeout(showInactivityWarning, WARNING_TIME);
 }
+
+function showInactivityWarning() {
+  isWarningActive = true;
+  
+  let modal = document.getElementById('inactivity-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'inactivity-modal';
+    modal.className = 'modal-overlay active';
+    modal.style.zIndex = '9999';
+    modal.innerHTML = `
+      <div class="modal-content" style="max-width: 400px; text-align: center; padding: 2.5rem 2rem;">
+        <div style="width: 56px; height: 56px; background: #FFFBEB; color: #D97706; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        </div>
+        <h2 style="font-family: var(--font-family-heading, 'Outfit'); color: var(--color-navy, #0f172a); font-size: 1.5rem; margin-bottom: 0.5rem; font-weight: 700;">Tu sesión está por expirar</h2>
+        <p style="color: var(--color-text-secondary, #64748b); font-size: 0.875rem; margin-bottom: 2rem; line-height: 1.5;">Llevas un tiempo inactivo. Por tu seguridad, cerraremos tu sesión automáticamente en 1 minuto.</p>
+        <button onclick="keepSessionActive()" class="btn btn-primary" style="width: 100%; padding: 0.875rem; font-size: 0.95rem; background: var(--color-cyan, #06b6d4); color: var(--color-navy, #0f172a); border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(6, 182, 212, 0.2);">Mantener Sesión Activa</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  } else {
+    modal.classList.add('active');
+  }
+
+  logoutTimer = setTimeout(logoutUser, LOGOUT_TIME - WARNING_TIME);
+}
+
+window.keepSessionActive = function() {
+  isWarningActive = false;
+  clearTimeout(logoutTimer);
+  const modal = document.getElementById('inactivity-modal');
+  if (modal) modal.classList.remove('active');
+  resetInactivityTimer();
+};
 
 async function logoutUser() {
   if (typeof _supabase !== 'undefined') {
