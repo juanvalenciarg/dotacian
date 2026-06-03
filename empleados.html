@@ -1340,27 +1340,26 @@
         </div>
       `;
 
-      const tempContainer = document.createElement('div');
-      tempContainer.style.cssText = "width: 700px; box-sizing: border-box; padding: 20px; background: #ffffff; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; color: #1e293b; position: absolute; left: 0; top: 0; z-index: -9999;";
-      tempContainer.innerHTML = htmlContent;
-      document.body.appendChild(tempContainer);
+      const fullHtmlContent = `
+        <div style="background: #ffffff; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; color: #1e293b; padding: 20px;">
+          ${htmlContent}
+        </div>
+      `;
 
       const opt = {
         margin: [0.5, 0.5, 0.5, 0.5],
         filename: `Historial_Entregas_${emp.name.replace(/\s+/g, '_')}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false, scrollY: 0, scrollX: 0, x: 0, y: 0, windowWidth: 800 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
         pagebreak: { mode: ['css', 'legacy'], avoid: ['.delivery-box'] },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
       };
 
-      html2pdf().set(opt).from(tempContainer).save().then(() => {
+      html2pdf().set(opt).from(fullHtmlContent).save().then(() => {
         showNotification("Historial descargado exitosamente.");
-        document.body.removeChild(tempContainer);
       }).catch(err => {
         console.error("Error generating PDF:", err);
         showNotification("Error al generar el PDF.");
-        if(tempContainer.parentNode) document.body.removeChild(tempContainer);
       });
     }
 
