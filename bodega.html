@@ -10,6 +10,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap"
     rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="styles.css">
   <style>
     .bodega-badge {
@@ -838,12 +839,22 @@
 
           <!-- Quick Actions -->
           <div
-            style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center;">
-            <div style="color: var(--color-text-muted); font-size: 0.75rem;">
+            style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div style="color: var(--color-text-muted); font-size: 0.75rem; flex: 1; min-width: 200px;">
               * Los seminuevos provienen de devoluciones automatizadas.
             </div>
-            <button class="btn btn-outline" style="font-size: 0.75rem; padding: 0.5rem 1rem;"
-              onclick="closeInventoryModal()">Cerrar Vista</button>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <button class="btn btn-outline" style="font-size: 0.75rem; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.35rem;" onclick="downloadInventoryExcel()">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="8" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="16" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                Excel
+              </button>
+              <button class="btn btn-outline" style="font-size: 0.75rem; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.35rem;" onclick="downloadInventoryPDF()">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                PDF
+              </button>
+              <button class="btn btn-outline" style="font-size: 0.75rem; padding: 0.5rem 1rem; margin-left: 0.5rem;"
+                onclick="closeInventoryModal()">Cerrar</button>
+            </div>
           </div>
         </div>
       </div>
@@ -1337,6 +1348,104 @@
     function closeInventoryModal() {
       document.getElementById('inventoryModal').classList.remove('active');
       document.getElementById('inventorySearch').value = '';
+    }
+
+    function downloadInventoryExcel() {
+      const q = (document.getElementById('inventorySearch').value || '').toLowerCase().trim();
+      const exportData = [];
+      
+      inventoryData.forEach(item => {
+        if (q && !item.prenda.toLowerCase().includes(q) && !item.talla.toLowerCase().includes(q)) return;
+        
+        if (item.nuevos > 0) {
+          exportData.push({ Producto: item.prenda, Talla: item.talla, Estado: 'Nuevo', Cantidad: item.nuevos });
+        }
+        if (item.seminuevos > 0) {
+          exportData.push({ Producto: item.prenda, Talla: item.talla, Estado: 'Seminuevo', Cantidad: item.seminuevos });
+        }
+      });
+      
+      if (exportData.length === 0) {
+        showNotification("No hay datos para exportar.");
+        return;
+      }
+      
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Inventario");
+      
+      const dateStr = new Date().toLocaleDateString('es-MX').replace(/\//g, '-');
+      XLSX.writeFile(wb, `Stock_Disponible_${dateStr}.xlsx`);
+    }
+
+    function downloadInventoryPDF() {
+      const q = (document.getElementById('inventorySearch').value || '').toLowerCase().trim();
+      
+      let rowsHtml = '';
+      inventoryData.forEach(item => {
+        if (q && !item.prenda.toLowerCase().includes(q) && !item.talla.toLowerCase().includes(q)) return;
+        
+        if (item.nuevos > 0) {
+          rowsHtml += `<tr><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.prenda}</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.talla}</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">Nuevo</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.nuevos}</td></tr>`;
+        }
+        if (item.seminuevos > 0) {
+          rowsHtml += `<tr><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.prenda}</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.talla}</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">Seminuevo</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.seminuevos}</td></tr>`;
+        }
+      });
+      
+      if (!rowsHtml) {
+        showNotification("No hay datos para exportar.");
+        return;
+      }
+
+      const dateStrObj = new Date();
+      const dateStr = dateStrObj.toLocaleDateString('es-MX');
+
+      const printFrame = document.createElement('iframe');
+      printFrame.style.position = 'absolute';
+      printFrame.style.top = '-10000px';
+      printFrame.style.left = '-10000px';
+      document.body.appendChild(printFrame);
+
+      const frameDoc = printFrame.contentWindow ? printFrame.contentWindow.document : printFrame.contentDocument;
+      frameDoc.open();
+      frameDoc.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Stock_Disponible_${dateStr.replace(/\//g, '-')}</title>
+            <style>
+              body { font-family: 'Helvetica Neue', Arial, sans-serif; padding: 20px; color: #1e293b; background: #fff; }
+              table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 20px; }
+              th { padding: 10px 8px; border-bottom: 2px solid #cbd5e1; font-size: 0.875rem; text-transform: uppercase; color: #475569; }
+            </style>
+          </head>
+          <body>
+            <h2 style="margin-bottom: 5px;">Desglose de Inventario</h2>
+            <p style="color: #64748b; margin-top: 0;">Fecha de descarga: ${dateStr}</p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Talla</th>
+                  <th>Estado</th>
+                  <th>Cantidad</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rowsHtml}
+              </tbody>
+            </table>
+          </body>
+        </html>
+      `);
+      frameDoc.close();
+
+      printFrame.onload = function() {
+        printFrame.contentWindow.focus();
+        printFrame.contentWindow.print();
+        setTimeout(() => { document.body.removeChild(printFrame); }, 1000);
+      };
     }
 
     function openMinimosModal() {
