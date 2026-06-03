@@ -1340,27 +1340,47 @@
         </div>
       `;
 
-      const fullHtmlContent = `
-        <div style="width: 700px; margin: 0; background: #ffffff; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; color: #1e293b; padding: 20px;">
-          ${htmlContent}
-        </div>
-      `;
+      const printFrame = document.createElement('iframe');
+      printFrame.style.position = 'absolute';
+      printFrame.style.top = '-10000px';
+      printFrame.style.left = '-10000px';
+      printFrame.style.width = '100%';
+      printFrame.style.height = '100%';
+      document.body.appendChild(printFrame);
 
-      const opt = {
-        margin: [0.5, 0.5, 0.5, 0.5],
-        filename: `Historial_Entregas_${emp.name.replace(/\s+/g, '_')}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, allowTaint: true, logging: false, scrollY: 0, scrollX: 0, windowWidth: 800 },
-        pagebreak: { mode: ['css', 'legacy'], avoid: ['.delivery-box'] },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      const frameDoc = printFrame.contentWindow ? printFrame.contentWindow.document : printFrame.contentDocument;
+      frameDoc.open();
+      frameDoc.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Historial_Entregas_${emp.name.replace(/\s+/g, '_')}</title>
+            <style>
+              @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+              body { font-family: 'Inter', Arial, sans-serif; padding: 20px; color: #1e293b; background: #fff; }
+              @media print {
+                body { padding: 0; }
+                .page-break { page-break-before: always; }
+              }
+            </style>
+          </head>
+          <body>
+            <div style="max-width: 800px; margin: 0 auto;">
+              ${htmlContent}
+            </div>
+          </body>
+        </html>
+      `);
+      frameDoc.close();
+
+      printFrame.onload = function() {
+        printFrame.contentWindow.focus();
+        printFrame.contentWindow.print();
+        setTimeout(() => {
+          document.body.removeChild(printFrame);
+          showNotification("Historial abierto para imprimir o guardar.");
+        }, 1000);
       };
-
-      html2pdf().set(opt).from(fullHtmlContent).save().then(() => {
-        showNotification("Historial descargado exitosamente.");
-      }).catch(err => {
-        console.error("Error generating PDF:", err);
-        showNotification("Error al generar el PDF.");
-      });
     }
 
     function openModal() {
