@@ -5,7 +5,7 @@
   <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal Cliente | Dotacian</title>
+  <title>Portal Cliente | dotacian</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
@@ -84,25 +84,29 @@
       .main-content {
         margin-left: 0;
       }
+
       .app-header {
         left: 0;
         padding: 1rem 1.5rem;
       }
+
       .mobile-menu-toggle {
-      display: none;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-      padding: 0.5rem;
-      position: absolute;
-      top: 1.5rem;
-      right: 1.5rem;
-      z-index: 1001;
-    }
+        display: none;
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        padding: 0.5rem;
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        z-index: 1001;
+      }
+
       .sidebar {
         z-index: 1000;
       }
+
       .welcome-banner {
         padding: 6rem 1.5rem 3rem 1.5rem;
       }
@@ -418,7 +422,7 @@
       position: relative;
       overflow: hidden;
       margin-top: 1.5rem;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
       display: flex;
       flex-direction: column;
       height: 380px;
@@ -582,9 +586,17 @@
     }
 
     @keyframes pulseBadge {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+
+      100% {
+        transform: scale(1);
+      }
     }
 
     .dot-ai-overlay h4 {
@@ -646,7 +658,7 @@
         </a>
       </div>
 
-                                    <nav class="sidebar-nav">
+      <nav class="sidebar-nav">
         <a href="app.html" class="nav-item active">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
               viewBox="0 0 24 24">
@@ -715,11 +727,11 @@
         <a href="facturas.html" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/>
-              <line x1="16" y1="17" x2="8" y2="17"/>
-              <polyline points="10 9 9 9 8 9"/>
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
             </svg></span>
           <span class="nav-label">Facturas</span>
         </a>
@@ -732,7 +744,8 @@
       <header class="app-header">
         <div class="header-left" style="display: flex; align-items: center;">
           <button class="mobile-menu-toggle" onclick="toggleSidebar()">
-            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" viewBox="0 0 24 24">
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="6" x2="21" y2="6"></line>
               <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -879,141 +892,146 @@
           </div> <!-- Close dashboard-left -->
 
           <div class="dashboard-bottom">
-              <!-- Setup Progress Card -->
-              <div id="setup-card-container" class="setup-card-premium">
-                <button onclick="dismissSetupCard()"
-                  style="position: absolute; top: 1.25rem; right: 1.25rem; background: rgba(255,255,255,0.1); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; transition: all 0.2s;">
+            <!-- Setup Progress Card -->
+            <div id="setup-card-container" class="setup-card-premium">
+              <button onclick="dismissSetupCard()"
+                style="position: absolute; top: 1.25rem; right: 1.25rem; background: rgba(255,255,255,0.1); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; transition: all 0.2s;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+              </button>
+
+              <div id="setup-card-content" style="position: relative; z-index: 1;">
+                <h3 id="setup-card-title"
+                  style="font-size: 1.35rem; font-weight: 800; font-family: var(--font-family-heading); margin-bottom: 0.5rem; letter-spacing: -0.02em;">
+                  Configuración Inicial</h3>
+                <p id="setup-card-subtitle"
+                  style="font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Completa estos pasos
+                  para activar tu cuenta.</p>
+
+                <div style="margin-bottom: 2.5rem;">
+                  <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                    <span
+                      style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.8);">Progreso
+                      Global</span>
+                    <span id="setup-progress-val"
+                      style="font-size: 1.1rem; font-weight: 800; color: var(--color-cyan);">0%</span>
+                  </div>
+                  <div class="setup-progress-track">
+                    <div id="setup-progress-bar" class="setup-progress-fill"></div>
+                  </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                  <div id="check-company" class="setup-task-item">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                      <div class="check-circle"
+                        style="width: 22px; height: 22px; border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s ease;">
+                      </div>
+                      <span style="font-weight: 500;">Configura tu empresa</span>
+                    </div>
+                    <a href="configuracion.html" class="setup-btn-mini">Ir <svg width="12" height="12" fill="none"
+                        stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                      </svg></a>
+                  </div>
+                  <div id="check-product" class="setup-task-item">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                      <div class="check-circle"
+                        style="width: 22px; height: 22px; border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s ease;">
+                      </div>
+                      <span style="font-weight: 500;">Configura roles de uniformes</span>
+                    </div>
+                    <a href="roles.html" class="setup-btn-mini">Ir <svg width="12" height="12" fill="none"
+                        stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                      </svg></a>
+                  </div>
+                  <div id="check-bank" class="setup-task-item">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                      <div class="check-circle"
+                        style="width: 22px; height: 22px; border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s ease;">
+                      </div>
+                      <span style="font-weight: 500;">Añade empleados</span>
+                    </div>
+                    <a href="empleados.html" class="setup-btn-mini">Ir <svg width="12" height="12" fill="none"
+                        stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                      </svg></a>
+                  </div>
+                </div>
+              </div>
+              <div
+                style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: var(--color-cyan); border-radius: 50%; opacity: 0.1; filter: blur(50px);">
+              </div>
+            </div>
+
+            <!-- dot AI Assistant Card (Proximamente) -->
+            <div class="dot-ai-card">
+              <!-- Glassmorphism Disabled Overlay -->
+              <div class="dot-ai-overlay">
+                <div class="dot-ai-badge">✨ Próximamente ✨</div>
+                <h4>Conversa con dot</h4>
+                <p>Tu nuevo asistente inteligente para gestionar y optimizar la dotación de tu empresa.</p>
+              </div>
+
+              <!-- Header -->
+              <div class="dot-ai-header">
+                <div class="dot-ai-avatar">d</div>
+                <div>
+                  <h3 class="dot-ai-title">dot AI <span>Agente IA</span></h3>
+                  <div
+                    style="font-size: 0.65rem; color: #10B981; font-weight: 600; display: flex; align-items: center; gap: 3px; margin-top: 1px;">
+                    <span
+                      style="display: inline-block; width: 5px; height: 5px; background: #10B981; border-radius: 50%;"></span>
+                    En línea
+                  </div>
+                </div>
+              </div>
+
+              <!-- Chat History -->
+              <div class="dot-ai-chat-history">
+                <div class="chat-bubble assistant">
+                  ¡Hola! Soy <strong>dot</strong>, tu asistente de inteligencia artificial. Puedo ayudarte a analizar
+                  consumos, gestionar inventarios y resolver cualquier duda sobre la plataforma. ¿En qué puedo ayudarte
+                  hoy?
+                </div>
+                <div class="chat-bubble user">
+                  ¿Cómo puedo generar una cotización inteligente para reposición?
+                </div>
+                <div class="chat-bubble assistant">
+                  Es súper sencillo. Ve a la pestaña de **Cotizaciones**, y bajo el módulo de **Cotización
+                  Inteligente**, podrás ingresar el stock actual y dot sugerirá las cantidades exactas de reposición.
+                </div>
+              </div>
+
+              <!-- Input Row -->
+              <div class="dot-ai-input-row">
+                <input type="text" class="dot-ai-input" placeholder="Pregúntale a dot..." disabled>
+                <button class="dot-ai-send-btn" disabled>
                   <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                    <path d="M18 6 6 18M6 6l12 12" />
+                    <line x1="22" y1="2" x2="11" y2="13" />
+                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
                   </svg>
                 </button>
-
-                <div id="setup-card-content" style="position: relative; z-index: 1;">
-                  <h3 id="setup-card-title"
-                    style="font-size: 1.35rem; font-weight: 800; font-family: var(--font-family-heading); margin-bottom: 0.5rem; letter-spacing: -0.02em;">
-                    Configuración Inicial</h3>
-                  <p id="setup-card-subtitle"
-                    style="font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Completa estos pasos
-                    para activar tu cuenta.</p>
-
-                  <div style="margin-bottom: 2.5rem;">
-                    <div
-                      style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                      <span
-                        style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.8);">Progreso
-                        Global</span>
-                      <span id="setup-progress-val"
-                        style="font-size: 1.1rem; font-weight: 800; color: var(--color-cyan);">0%</span>
-                    </div>
-                    <div class="setup-progress-track">
-                      <div id="setup-progress-bar" class="setup-progress-fill"></div>
-                    </div>
-                  </div>
-
-                  <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                    <div id="check-company" class="setup-task-item">
-                      <div style="display: flex; align-items: center; gap: 1rem;">
-                        <div class="check-circle"
-                          style="width: 22px; height: 22px; border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s ease;">
-                        </div>
-                        <span style="font-weight: 500;">Configura tu empresa</span>
-                      </div>
-                      <a href="configuracion.html" class="setup-btn-mini">Ir <svg width="12" height="12" fill="none"
-                          stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                          <path d="M5 12h14M12 5l7 7-7 7" />
-                        </svg></a>
-                    </div>
-                    <div id="check-product" class="setup-task-item">
-                      <div style="display: flex; align-items: center; gap: 1rem;">
-                        <div class="check-circle"
-                          style="width: 22px; height: 22px; border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s ease;">
-                        </div>
-                        <span style="font-weight: 500;">Configura roles de uniformes</span>
-                      </div>
-                      <a href="roles.html" class="setup-btn-mini">Ir <svg width="12" height="12" fill="none"
-                          stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                          <path d="M5 12h14M12 5l7 7-7 7" />
-                        </svg></a>
-                    </div>
-                    <div id="check-bank" class="setup-task-item">
-                      <div style="display: flex; align-items: center; gap: 1rem;">
-                        <div class="check-circle"
-                          style="width: 22px; height: 22px; border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s ease;">
-                        </div>
-                        <span style="font-weight: 500;">Añade empleados</span>
-                      </div>
-                      <a href="empleados.html" class="setup-btn-mini">Ir <svg width="12" height="12" fill="none"
-                          stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                          <path d="M5 12h14M12 5l7 7-7 7" />
-                        </svg></a>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: var(--color-cyan); border-radius: 50%; opacity: 0.1; filter: blur(50px);">
-                </div>
               </div>
-
-              <!-- dot AI Assistant Card (Proximamente) -->
-              <div class="dot-ai-card">
-                <!-- Glassmorphism Disabled Overlay -->
-                <div class="dot-ai-overlay">
-                  <div class="dot-ai-badge">✨ Próximamente ✨</div>
-                  <h4>Conversa con dot</h4>
-                  <p>Tu nuevo asistente inteligente para gestionar y optimizar la dotación de tu empresa.</p>
-                </div>
-
-                <!-- Header -->
-                <div class="dot-ai-header">
-                  <div class="dot-ai-avatar">d</div>
-                  <div>
-                    <h3 class="dot-ai-title">dot AI <span>Agente IA</span></h3>
-                    <div style="font-size: 0.65rem; color: #10B981; font-weight: 600; display: flex; align-items: center; gap: 3px; margin-top: 1px;">
-                      <span style="display: inline-block; width: 5px; height: 5px; background: #10B981; border-radius: 50%;"></span>
-                      En línea
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Chat History -->
-                <div class="dot-ai-chat-history">
-                  <div class="chat-bubble assistant">
-                    ¡Hola! Soy <strong>dot</strong>, tu asistente de inteligencia artificial. Puedo ayudarte a analizar consumos, gestionar inventarios y resolver cualquier duda sobre la plataforma. ¿En qué puedo ayudarte hoy?
-                  </div>
-                  <div class="chat-bubble user">
-                    ¿Cómo puedo generar una cotización inteligente para reposición?
-                  </div>
-                  <div class="chat-bubble assistant">
-                    Es súper sencillo. Ve a la pestaña de **Cotizaciones**, y bajo el módulo de **Cotización Inteligente**, podrás ingresar el stock actual y dot sugerirá las cantidades exactas de reposición.
-                  </div>
-                </div>
-
-                <!-- Input Row -->
-                <div class="dot-ai-input-row">
-                  <input type="text" class="dot-ai-input" placeholder="Pregúntale a dot..." disabled>
-                  <button class="dot-ai-send-btn" disabled>
-                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                      <line x1="22" y1="2" x2="11" y2="13" />
-                      <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
             </div>
-          </div> <!-- End dashboard-bottom -->
-        </div>
-      </div> <!-- End Dashboard Content Wrapper -->
+
+          </div>
+        </div> <!-- End dashboard-bottom -->
+      </div>
+  </div> <!-- End Dashboard Content Wrapper -->
   </div>
   </main>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/utils.js?v=3"></script>
+  <script src="assets/js/utils.js?v=4"></script>
   <script>
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token' } });
     let userCountry = 'MX'; // Default
 
     async function initPortal() {
