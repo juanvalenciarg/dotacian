@@ -318,7 +318,7 @@
           <p>Ingresa a tu portal corporativo.</p>
         </div>
 
-        <form class="auth-form" id="client-login-form" onsubmit="event.preventDefault();">
+        <form class="auth-form" id="client-login-form" onsubmit="return false;">
           <div id="login-error-alert" class="error-alert">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="10"></circle>
@@ -352,7 +352,8 @@
                 style="accent-color: var(--color-brand-accent); width: 1.1rem; height: 1.1rem; cursor: pointer;">
               Recordarme
             </label>
-            <a href="recuperar.html" style="font-size: 0.875rem; color: var(--color-cyan-hover); font-weight: 600;">¿Olvidaste tu
+            <a href="recuperar.html"
+              style="font-size: 0.875rem; color: var(--color-cyan-hover); font-weight: 600;">¿Olvidaste tu
               contraseña?</a>
           </div>
 
@@ -375,13 +376,13 @@
     // Supabase Configuration
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-    
+
     let _supabase = null;
     try {
       if (typeof supabase !== 'undefined') {
-        _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token' } });
       }
-    } catch(err) {
+    } catch (err) {
       console.error("Supabase load error:", err);
     }
 
@@ -478,6 +479,17 @@
           submitBtn.textContent = 'Iniciar Sesión';
         }
       });
+    }
+
+    // Comprobar si hubo un rebote desde app.html por falta de sesión
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('reason') === 'no_session') {
+      const errorAlert = document.getElementById('login-error-alert');
+      const errorText = document.getElementById('error-message-text');
+      if (errorAlert && errorText) {
+        errorText.textContent = 'Tu sesión no pudo ser validada. Asegúrate de que las cookies/localStorage estén habilitados o intenta de nuevo.';
+        errorAlert.style.display = 'flex';
+      }
     }
   </script>
 </body>
