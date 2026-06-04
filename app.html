@@ -1038,7 +1038,8 @@
       try {
         const { data: { session } } = await _supabase.auth.getSession();
         if (!session) {
-          window.location.href = 'login.html';
+          console.warn('No session found on app.html, redirecting to login');
+          window.location.href = 'login.html?reason=no_session';
           return;
         }
 
