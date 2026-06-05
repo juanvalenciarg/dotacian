@@ -215,6 +215,30 @@
     let currentUserRecord = null;
     let currentUserType = null; // 'client' or 'seller'
 
+    // Validación de sesión administrativa
+    async function checkAdminAuth() {
+      const { data: { session } } = await _supabase.auth.getSession();
+      if (!session) {
+        window.location.href = 'login.admin.html';
+        return;
+      }
+
+      // Validar que exista en admin_profile
+      const { data: adminData, error } = await _supabase
+        .from('admin_profile')
+        .select('id')
+        .eq('id', session.user.id)
+        .maybeSingle();
+
+      if (error || !adminData) {
+        await _supabase.auth.signOut();
+        window.location.href = 'login.admin.html?error=unauthorized';
+      }
+    }
+
+    // Ejecutar validación inmediatamente
+    checkAdminAuth();
+
     async function searchUser() {
       const email = document.getElementById('searchEmail').value.trim();
       if (!email) {
