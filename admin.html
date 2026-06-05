@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>dotacian admin | Control Interno</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <style>
+    .search-container {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+
+    .search-input-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .search-input-group label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-navy);
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #E2E8F0;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--color-brand-primary);
+    }
+
+    .user-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      display: none; /* Oculto por defecto */
+    }
+
+    .user-card.active {
+      display: block;
+    }
+
+    .user-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #E2E8F0;
+    }
+
+    .role-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .role-client { background: #DBEAFE; color: #1E40AF; }
+    .role-seller { background: #D1FAE5; color: #065F46; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+    }
+
+    .form-control {
+      padding: 0.75rem;
+      border: 1px solid #E2E8F0;
+      border-radius: 0.5rem;
+      font-family: inherit;
+    }
+
+    .actions-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #E2E8F0;
+    }
+
+    .toast-container {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 9999;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-layout admin-dark">
+    <!-- Sidebar -->
+    <aside class="sidebar" style="background-color: #020617;">
+      <div class="sidebar-brand"><span>dotacian</span> admin</div>
+      <nav class="sidebar-nav">
+        <a href="admin.html" class="nav-item active"><span>👥</span> Gestión de Usuarios</a>
+        <a href="facturas.admin.html" class="nav-item"><span>💸</span> Facturación</a>
+        <a href="#" class="nav-item"><span>🛠️</span> Logs de Sistema</a>
+        <a href="#" class="nav-item"><span>🛡️</span> Seguridad</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="app-header">
+        <h1>Gestión de Usuarios</h1>
+        <div class="algo-status">
+          <span style="color: var(--color-cyan);">●</span> Panel Administrativo
+        </div>
+      </header>
+
+      <div class="app-container">
+        
+        <!-- Buscador -->
+        <div class="search-container">
+          <div class="search-input-group">
+            <label for="searchEmail">Buscar usuario por correo electrónico</label>
+            <input type="email" id="searchEmail" class="search-input" placeholder="ejemplo@correo.com">
+          </div>
+          <button class="btn btn-primary" onclick="searchUser()" id="btnSearch">Buscar Usuario</button>
+        </div>
+
+        <!-- Tarjeta de Resultados (Oculta) -->
+        <div id="userCard" class="user-card">
+          <div class="user-header">
+            <div>
+              <h2 id="cardTitle" style="margin: 0; font-family: var(--font-family-heading); color: var(--color-navy);">Datos del Usuario</h2>
+              <p id="cardEmail" style="margin: 0; color: var(--color-text-secondary); font-size: 0.875rem;">-</p>
+            </div>
+            <span id="cardRole" class="role-badge role-client">Cliente</span>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Nombre</label>
+              <input type="text" id="editFirstName" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Apellido</label>
+              <input type="text" id="editLastName" class="form-control">
+            </div>
+            <div class="form-group" id="nicknameGroup">
+              <label>Apodo / Nickname</label>
+              <input type="text" id="editNickname" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>País</label>
+              <input type="text" id="editCountry" class="form-control" placeholder="MX o CO">
+            </div>
+          </div>
+
+          <div class="actions-bar">
+            <button class="btn btn-outline" style="border-color: #EF4444; color: #EF4444;" onclick="resetPassword()">
+              Enviar correo de cambio de contraseña
+            </button>
+            <button class="btn btn-primary" onclick="saveUser()">
+              Guardar Cambios
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="assets/js/utils.js?v=4"></script>
+  <script>
+    const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentUserRecord = null;
+    let currentUserType = null; // 'client' or 'seller'
+
+    async function searchUser() {
+      const email = document.getElementById('searchEmail').value.trim();
+      if (!email) {
+        showToast('Atención', 'Por favor ingresa un correo.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('btnSearch');
+      btn.textContent = 'Buscando...';
+      btn.disabled = true;
+      document.getElementById('userCard').classList.remove('active');
+
+      try {
+        // Buscar en user_profile (Clientes)
+        const { data: clientData, error: clientError } = await _supabase
+          .from('user_profile')
+          .select('*')
+          .eq('email', email)
+          .maybeSingle();
+
+        if (clientData) {
+          fillCard(clientData, 'client');
+          return;
+        }
+
+        // Buscar en seller_profile (Fabricantes)
+        const { data: sellerData, error: sellerError } = await _supabase
+          .from('seller_profile')
+          .select('*')
+          .eq('email', email)
+          .maybeSingle();
+
+        if (sellerData) {
+          fillCard(sellerData, 'seller');
+          return;
+        }
+
+        showToast('No encontrado', 'No se encontró ningún usuario o seller con ese correo.', 'error');
+
+      } catch (err) {
+        console.error(err);
+        showToast('Error', 'Hubo un error en la búsqueda.', 'error');
+      } finally {
+        btn.textContent = 'Buscar Usuario';
+        btn.disabled = false;
+      }
+    }
+
+    function fillCard(data, type) {
+      currentUserRecord = data;
+      currentUserType = type;
+
+      document.getElementById('cardEmail').textContent = data.email;
+      
+      const roleBadge = document.getElementById('cardRole');
+      if (type === 'client') {
+        roleBadge.textContent = 'Cliente';
+        roleBadge.className = 'role-badge role-client';
+        document.getElementById('nicknameGroup').style.display = 'flex';
+        document.getElementById('editNickname').value = data.nickname || '';
+      } else {
+        roleBadge.textContent = 'Fabricante';
+        roleBadge.className = 'role-badge role-seller';
+        document.getElementById('nicknameGroup').style.display = 'none';
+      }
+
+      document.getElementById('editFirstName').value = data.first_name || '';
+      document.getElementById('editLastName').value = data.last_name || '';
+      document.getElementById('editCountry').value = data.country || '';
+
+      document.getElementById('userCard').classList.add('active');
+    }
+
+    async function saveUser() {
+      if (!currentUserRecord || !currentUserType) return;
+
+      const fName = document.getElementById('editFirstName').value.trim();
+      const lName = document.getElementById('editLastName').value.trim();
+      const country = document.getElementById('editCountry').value.trim();
+      
+      let updatePayload = {
+        first_name: fName,
+        last_name: lName,
+        country: country
+      };
+
+      let table = '';
+
+      if (currentUserType === 'client') {
+        updatePayload.nickname = document.getElementById('editNickname').value.trim();
+        table = 'user_profile';
+      } else {
+        table = 'seller_profile';
+      }
+
+      try {
+        const { error } = await _supabase
+          .from(table)
+          .update(updatePayload)
+          .eq('id', currentUserRecord.id);
+
+        if (error) throw error;
+        showToast('Éxito', 'Perfil actualizado correctamente.', 'success');
+      } catch (err) {
+        console.error(err);
+        showToast('Error', 'No se pudo actualizar el perfil.', 'error');
+      }
+    }
+
+    async function resetPassword() {
+      if (!currentUserRecord) return;
+      const email = currentUserRecord.email;
+
+      if (!confirm(`¿Estás seguro de enviar un enlace de recuperación a ${email}?`)) return;
+
+      try {
+        const { data, error } = await _supabase.auth.resetPasswordForEmail(email);
+        if (error) throw error;
+
+        showToast('Enviado', `Correo de recuperación enviado a ${email}.`, 'success');
+      } catch (err) {
+        console.error("Error resetting password:", err);
+        showToast('Error', 'No se pudo enviar el correo de recuperación.', 'error');
+      }
+    }
+
+    function showToast(title, message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.style.cssText = "background: white; border-left: 4px solid " + (type === 'error' ? '#EF4444' : '#10B981') + "; padding: 1rem 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 1rem; min-width: 300px;";
+      toast.innerHTML = `
+        <div>
+          <div style="font-weight: 700; font-size: 0.9rem; color: #0F172A;">${title}</div>
+          <div style="font-size: 0.875rem; color: #64748B;">${message}</div>
+        </div>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => { toast.remove(); }, 4000);
+    }
+  </script>
+</body>
+
+</html>
