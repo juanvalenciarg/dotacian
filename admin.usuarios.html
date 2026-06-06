@@ -423,11 +423,11 @@
               </div>
               <div class="form-group">
                 <label>Empresa Asociada</label>
-                <div id="viewCompany" style="font-weight: 600; color: #334155;">--</div>
+                <input type="text" id="editCompany" class="form-control" placeholder="Nombre de la empresa">
               </div>
               <div class="form-group">
                 <label>Sector / Industria</label>
-                <div id="viewIndustry" style="font-weight: 600; color: #334155;">--</div>
+                <input type="text" id="editIndustry" class="form-control" placeholder="Ej. Restaurantes">
               </div>
               <div class="form-group">
                 <label>Cotizaciones</label>
@@ -440,8 +440,11 @@
             </div>
 
             <div class="actions-bar">
+              <button class="btn btn-outline" style="border-color: #991B1B; color: #991B1B; background: #FEF2F2;" onclick="deleteUser()">
+                Eliminar Usuario
+              </button>
               <button class="btn btn-outline" style="border-color: #EF4444; color: #EF4444;" onclick="resetPassword()">
-                Enviar correo de cambio de contraseña
+                Cambiar Contraseña
               </button>
               <button class="btn btn-primary" onclick="saveUser()">
                 Guardar Cambios
@@ -627,11 +630,12 @@
 
       // Empresa
       if (data.role === 'client') {
-        document.getElementById('viewCompany').textContent = data.company?.company_name || 'Sin registro';
-        document.getElementById('viewIndustry').textContent = data.company?.industry || 'Sin sector';
+        document.getElementById('editCompany').value = data.company?.company_name || '';
+        document.getElementById('editIndustry').value = data.company?.industry || '';
       } else {
-        document.getElementById('viewCompany').textContent = data.company?.seller_name || 'Sin registro';
-        document.getElementById('viewIndustry').textContent = 'Fabricante'; // Sellers generally don't have industry in the same way
+        document.getElementById('editCompany').value = data.company?.seller_name || '';
+        document.getElementById('editIndustry').value = 'Fabricante';
+        document.getElementById('editIndustry').disabled = true;
       }
 
       // Transacciones
@@ -666,11 +670,32 @@
         updatePayload.nickname = document.getElementById('editNickname').value.trim();
       }
 
+      const companyName = document.getElementById('editCompany').value.trim();
+      const industryName = document.getElementById('editIndustry').value.trim();
+
       try {
+        // Actualizar Perfil (user_profile o seller_profile)
         const { error } = await _supabase
           .from(table)
           .update(updatePayload)
           .eq('id', currentUserRecord.user_id);
+
+        if (error) throw error;
+
+        // Actualizar Empresa (company_profile) - solo para clientes
+        if (currentUserType === 'client') {
+          const companyPayload = {
+            id: currentUserRecord.user_id,
+            company_name: companyName,
+            industry: industryName
+          };
+          
+          const { error: compError } = await _supabase
+            .from('company_profile')
+            .upsert([companyPayload], { onConflict: 'id' });
+            
+          if (compError) throw compError;
+        }
 
         if (error) throw error;
         showToast('Éxito', 'Perfil actualizado correctamente.', 'success');
@@ -694,6 +719,28 @@
       } catch (err) {
         console.error("Error resetting password:", err);
         showToast('Error', 'No se pudo enviar el correo de recuperación.', 'error');
+      }
+    }
+
+    async function deleteUser() {
+      if (!currentUserRecord || !currentUserRecord.user_id) return;
+      
+      const confirmDelete = confirm("¿Estás completamente seguro de que deseas eliminar este usuario? Esta acción es irreversible y borrará todos sus datos.");
+      if (!confirmDelete) return;
+
+      try {
+        const { error } = await _supabase.rpc('delete_user_admin', {
+          target_user_id: currentUserRecord.user_id
+        });
+
+        if (error) throw error;
+        
+        showToast('Eliminado', 'El usuario ha sido eliminado permanentemente.', 'success');
+        document.getElementById('userCard').classList.remove('active');
+        fetchUsers(); // Recargar la tabla
+      } catch (err) {
+        console.error("Error eliminando usuario:", err);
+        showToast('Error', 'No se pudo eliminar al usuario.', 'error');
       }
     }
 
