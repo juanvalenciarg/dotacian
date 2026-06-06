@@ -422,12 +422,12 @@
                 <h3 style="font-size: 1rem; color: #0F172A; margin: 0;">Empresa y Transacciones</h3>
               </div>
               <div class="form-group">
-                <label>Empresa Asociada</label>
-                <div id="viewCompany" style="font-weight: 600; color: #334155;">--</div>
+                <label>Fábrica Asociada</label>
+                <input type="text" id="editCompany" class="form-control" placeholder="Nombre de la fábrica">
               </div>
               <div class="form-group">
                 <label>Sector / Industria</label>
-                <div id="viewIndustry" style="font-weight: 600; color: #334155;">--</div>
+                <input type="text" id="editIndustry" class="form-control" value="Fabricante" disabled>
               </div>
               <div class="form-group">
                 <label>Cotizaciones</label>
@@ -440,8 +440,11 @@
             </div>
 
             <div class="actions-bar">
+              <button class="btn btn-outline" style="border-color: #991B1B; color: #991B1B; background: #FEF2F2;" onclick="deleteUser()">
+                Eliminar Fabricante
+              </button>
               <button class="btn btn-outline" style="border-color: #EF4444; color: #EF4444;" onclick="resetPassword()">
-                Enviar correo de cambio de contraseña
+                Cambiar Contraseña
               </button>
               <button class="btn btn-primary" onclick="saveUser()">
                 Guardar Cambios
@@ -627,11 +630,9 @@
 
       // Empresa
       if (data.role === 'client') {
-        document.getElementById('viewCompany').textContent = data.company?.company_name || 'Sin registro';
-        document.getElementById('viewIndustry').textContent = data.company?.industry || 'Sin sector';
+        document.getElementById('editCompany').value = data.company?.company_name || '';
       } else {
-        document.getElementById('viewCompany').textContent = data.company?.seller_name || 'Sin registro';
-        document.getElementById('viewIndustry').textContent = 'Fabricante'; // Sellers generally don't have industry in the same way
+        document.getElementById('editCompany').value = data.company?.seller_name || '';
       }
 
       // Transacciones
@@ -666,11 +667,31 @@
         updatePayload.nickname = document.getElementById('editNickname').value.trim();
       }
 
+      const companyName = document.getElementById('editCompany').value.trim();
+
+      // OJO: En los sellers no guardamos el país en seller_profile
+      delete updatePayload.country;
+
       try {
         const { error } = await _supabase
           .from(table)
           .update(updatePayload)
           .eq('id', currentUserRecord.user_id);
+
+        if (error) throw error;
+
+        // Actualizar Empresa (seller_company) y guardar el país allí
+        const companyPayload = {
+          id: currentUserRecord.user_id,
+          seller_name: companyName,
+          location: country
+        };
+        
+        const { error: compError } = await _supabase
+          .from('seller_company')
+          .upsert([companyPayload], { onConflict: 'id' });
+          
+        if (compError) throw compError;
 
         if (error) throw error;
         showToast('Éxito', 'Perfil actualizado correctamente.', 'success');
@@ -694,6 +715,28 @@
       } catch (err) {
         console.error("Error resetting password:", err);
         showToast('Error', 'No se pudo enviar el correo de recuperación.', 'error');
+      }
+    }
+
+    async function deleteUser() {
+      if (!currentUserRecord || !currentUserRecord.user_id) return;
+      
+      const confirmDelete = confirm("¿Estás completamente seguro de que deseas eliminar este fabricante? Esta acción es irreversible y borrará todos sus datos.");
+      if (!confirmDelete) return;
+
+      try {
+        const { error } = await _supabase.rpc('delete_user_admin', {
+          target_user_id: currentUserRecord.user_id
+        });
+
+        if (error) throw error;
+        
+        showToast('Eliminado', 'El fabricante ha sido eliminado permanentemente.', 'success');
+        document.getElementById('userCard').classList.remove('active');
+        fetchUsers(); // Recargar la tabla
+      } catch (err) {
+        console.error("Error eliminando usuario:", err);
+        showToast('Error', 'No se pudo eliminar al fabricante.', 'error');
       }
     }
 
