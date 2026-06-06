@@ -255,10 +255,8 @@
         </a>
       </div>
       <nav class="sidebar-nav">
-        <a href="#" onclick="switchView('dashboard')" id="nav-dashboard" class="nav-item active"><span>📊</span>
-          Dashboard</a>
-        <a href="#" onclick="switchView('users')" id="nav-users" class="nav-item"><span>👥</span> Gestión de
-          Usuarios</a>
+        <a href="admin.html" id="nav-dashboard" class="nav-item active"><span>📊</span> Dashboard</a>
+        <a href="admin.usuarios.html" id="nav-users" class="nav-item"><span>👥</span> Gestión de Usuarios</a>
         <a href="facturas.admin.html" class="nav-item"><span>💸</span> Facturación</a>
         <a href="#" class="nav-item"><span>🛠️</span> Logs de Sistema</a>
         <a href="#" class="nav-item"><span>🛡️</span> Seguridad</a>
@@ -278,12 +276,15 @@
         <!-- Vista del Dashboard -->
         <div id="dashboardView">
           <div class="metrics-grid">
-            <div class="metric-card">
+            <div class="metric-card" style="cursor: pointer;" onclick="window.location.href='admin.usuarios.html'">
               <div class="metric-header">
                 <span>Clientes</span>
                 <div class="metric-icon">🏢</div>
               </div>
               <div class="metric-value" id="count-users">--</div>
+              <div style="font-size: 0.75rem; color: var(--color-primary); margin-top: 0.5rem; display: flex; align-items: center; gap: 0.25rem;">
+                Ir a Gestión de Usuarios <span style="font-size: 0.8rem;">→</span>
+              </div>
             </div>
 
             <div class="metric-card">
@@ -326,97 +327,6 @@
           </div>
         </div>
 
-        <!-- Vista de Gestión de Usuarios (Oculta por defecto) -->
-        <div id="userManagementView" style="display: none;">
-          <!-- Buscador -->
-          <div class="search-container">
-            <div class="search-input-group">
-              <label for="searchEmail">Buscar usuario por correo electrónico</label>
-              <input type="email" id="searchEmail" class="search-input" placeholder="ejemplo@correo.com">
-            </div>
-            <button class="btn btn-primary" onclick="searchUser()" id="btnSearch">Buscar Usuario</button>
-          </div>
-
-          <!-- Tarjeta de Resultados (Oculta) -->
-          <div id="userCard" class="user-card">
-            <div class="user-header">
-              <div>
-                <h2 id="cardTitle"
-                  style="margin: 0; font-family: var(--font-family-heading); color: var(--color-navy);">Datos del
-                  Usuario</h2>
-                <p id="cardEmail" style="margin: 0; color: var(--color-text-secondary); font-size: 0.875rem;">-</p>
-              </div>
-              <span id="cardRole" class="role-badge role-client">Cliente</span>
-            </div>
-
-            <div class="form-grid">
-              <!-- Datos Personales -->
-              <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 0.5rem; border-bottom: 1px solid #E2E8F0; padding-bottom: 0.5rem;">
-                <h3 style="font-size: 1rem; color: #0F172A; margin: 0;">Datos Básicos</h3>
-              </div>
-              <div class="form-group">
-                <label>Nombre</label>
-                <input type="text" id="editFirstName" class="form-control">
-              </div>
-              <div class="form-group">
-                <label>Apellido</label>
-                <input type="text" id="editLastName" class="form-control">
-              </div>
-              <div class="form-group" id="nicknameGroup">
-                <label>Apodo / Nickname</label>
-                <input type="text" id="editNickname" class="form-control">
-              </div>
-              <div class="form-group">
-                <label>País</label>
-                <input type="text" id="editCountry" class="form-control" placeholder="MX o CO">
-              </div>
-
-              <!-- Registro y Actividad -->
-              <div class="form-group" style="grid-column: 1 / -1; margin-top: 1rem; margin-bottom: 0.5rem; border-bottom: 1px solid #E2E8F0; padding-bottom: 0.5rem;">
-                <h3 style="font-size: 1rem; color: #0F172A; margin: 0;">Registro y Tiempos</h3>
-              </div>
-              <div class="form-group">
-                <label>Fecha de Registro</label>
-                <div id="viewCreatedAt" style="font-weight: 600; color: #334155;">--</div>
-              </div>
-              <div class="form-group">
-                <label>Último Ingreso</label>
-                <div id="viewLastLogin" style="font-weight: 600; color: #334155;">--</div>
-              </div>
-
-              <!-- Empresa y Sector -->
-              <div class="form-group" style="grid-column: 1 / -1; margin-top: 1rem; margin-bottom: 0.5rem; border-bottom: 1px solid #E2E8F0; padding-bottom: 0.5rem;">
-                <h3 style="font-size: 1rem; color: #0F172A; margin: 0;">Empresa y Transacciones</h3>
-              </div>
-              <div class="form-group">
-                <label>Empresa Asociada</label>
-                <div id="viewCompany" style="font-weight: 600; color: #334155;">--</div>
-              </div>
-              <div class="form-group">
-                <label>Sector / Industria</label>
-                <div id="viewIndustry" style="font-weight: 600; color: #334155;">--</div>
-              </div>
-              <div class="form-group">
-                <label>Cotizaciones</label>
-                <div id="viewQuotes" style="font-weight: 600; color: #334155;">--</div>
-              </div>
-              <div class="form-group">
-                <label>Órdenes de Compra</label>
-                <div id="viewOrders" style="font-weight: 600; color: #334155;">--</div>
-              </div>
-            </div>
-
-            <div class="actions-bar">
-              <button class="btn btn-outline" style="border-color: #EF4444; color: #EF4444;" onclick="resetPassword()">
-                Enviar correo de cambio de contraseña
-              </button>
-              <button class="btn btn-primary" onclick="saveUser()">
-                Guardar Cambios
-              </button>
-            </div>
-          </div>
-
-        </div>
     </main>
   </div>
 
@@ -427,9 +337,6 @@
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: 'dotacian-client-token' } });
-
-    let currentUserRecord = null;
-    let currentUserType = null; // 'client' or 'seller'
 
     // Validación de sesión administrativa
     async function checkAdminAuth() {
@@ -457,21 +364,6 @@
 
     // Ejecutar validación inmediatamente
     checkAdminAuth();
-
-    // Lógica de Navegación
-    function switchView(viewName) {
-      document.getElementById('dashboardView').style.display = viewName === 'dashboard' ? 'block' : 'none';
-      document.getElementById('userManagementView').style.display = viewName === 'users' ? 'block' : 'none';
-
-      document.getElementById('nav-dashboard').classList.toggle('active', viewName === 'dashboard');
-      document.getElementById('nav-users').classList.toggle('active', viewName === 'users');
-
-      document.getElementById('pageTitle').textContent = viewName === 'dashboard' ? 'Dashboard Principal' : 'Gestión de Usuarios';
-
-      if (viewName === 'dashboard') {
-        loadDashboardMetrics();
-      }
-    }
 
     // Lógica del Dashboard utilizando RPC para saltar el RLS
     async function loadDashboardMetrics() {
@@ -518,146 +410,6 @@
         }
       } catch (err) {
         console.error("Excepción en loadDashboardMetrics:", err);
-      }
-    }
-
-    async function searchUser() {
-      const email = document.getElementById('searchEmail').value.trim();
-      if (!email) {
-        showToast('Atención', 'Por favor ingresa un correo.', 'error');
-        return;
-      }
-
-      const btn = document.getElementById('btnSearch');
-      btn.textContent = 'Buscando...';
-      btn.disabled = true;
-      document.getElementById('userCard').classList.remove('active');
-
-      try {
-        const { data, error } = await _supabase.rpc('get_user_admin_details', { search_email: email });
-
-        if (error) {
-          throw error;
-        }
-
-        if (data && data.found) {
-          fillCard(data);
-        } else {
-          showToast('No encontrado', 'No se encontró ningún usuario con ese correo.', 'error');
-        }
-
-      } catch (err) {
-        console.error("Error buscando usuario:", err);
-        showToast('Error', 'Hubo un error en la búsqueda (Asegúrate de haber creado el RPC en Supabase).', 'error');
-      } finally {
-        btn.textContent = 'Buscar Usuario';
-        btn.disabled = false;
-      }
-    }
-
-    function formatDate(isoString) {
-      if (!isoString) return 'No registrado';
-      return new Date(isoString).toLocaleString('es-MX', {
-        day: '2-digit', month: 'short', year: 'numeric',
-        hour: '2-digit', minute: '2-digit'
-      });
-    }
-
-    function fillCard(data) {
-      currentUserRecord = data;
-      currentUserType = data.role;
-
-      document.getElementById('cardEmail').textContent = data.email;
-
-      const roleBadge = document.getElementById('cardRole');
-      if (data.role === 'client') {
-        roleBadge.textContent = 'Cliente';
-        roleBadge.className = 'role-badge role-client';
-        document.getElementById('nicknameGroup').style.display = 'flex';
-        document.getElementById('editNickname').value = data.profile?.nickname || '';
-      } else {
-        roleBadge.textContent = 'Fabricante';
-        roleBadge.className = 'role-badge role-seller';
-        document.getElementById('nicknameGroup').style.display = 'none';
-      }
-
-      document.getElementById('editFirstName').value = data.profile?.first_name || '';
-      document.getElementById('editLastName').value = data.profile?.last_name || '';
-      document.getElementById('editCountry').value = data.profile?.country || '';
-
-      // Tiempos
-      document.getElementById('viewCreatedAt').textContent = formatDate(data.created_at);
-      document.getElementById('viewLastLogin').textContent = formatDate(data.last_sign_in_at);
-
-      // Empresa
-      if (data.role === 'client') {
-        document.getElementById('viewCompany').textContent = data.company?.company_name || 'Sin registro';
-        document.getElementById('viewIndustry').textContent = data.company?.industry || 'Sin sector';
-      } else {
-        document.getElementById('viewCompany').textContent = data.company?.seller_name || 'Sin registro';
-        document.getElementById('viewIndustry').textContent = 'Fabricante'; // Sellers generally don't have industry in the same way
-      }
-
-      // Transacciones
-      document.getElementById('viewQuotes').textContent = data.quotes_count > 0 ? \`Sí (\${data.quotes_count})\` : 'No';
-      
-      const ordersBadge = document.getElementById('viewOrders');
-      if (data.orders_count > 0) {
-        ordersBadge.innerHTML = \`<span style="color: #10B981;">Sí (\${data.orders_count})</span>\`;
-      } else {
-        ordersBadge.textContent = 'No';
-      }
-
-      document.getElementById('userCard').classList.add('active');
-    }
-
-    async function saveUser() {
-      if (!currentUserRecord || !currentUserType) return;
-
-      const fName = document.getElementById('editFirstName').value.trim();
-      const lName = document.getElementById('editLastName').value.trim();
-      const country = document.getElementById('editCountry').value.trim();
-
-      let updatePayload = {
-        first_name: fName,
-        last_name: lName,
-        country: country
-      };
-
-      let table = currentUserType === 'client' ? 'user_profile' : 'seller_profile';
-
-      if (currentUserType === 'client') {
-        updatePayload.nickname = document.getElementById('editNickname').value.trim();
-      }
-
-      try {
-        const { error } = await _supabase
-          .from(table)
-          .update(updatePayload)
-          .eq('id', currentUserRecord.user_id);
-
-        if (error) throw error;
-        showToast('Éxito', 'Perfil actualizado correctamente.', 'success');
-      } catch (err) {
-        console.error(err);
-        showToast('Error', 'No se pudo actualizar el perfil.', 'error');
-      }
-    }
-
-    async function resetPassword() {
-      if (!currentUserRecord) return;
-      const email = currentUserRecord.email;
-
-      if (!confirm(`¿Estás seguro de enviar un enlace de recuperación a ${email}?`)) return;
-
-      try {
-        const { data, error } = await _supabase.auth.resetPasswordForEmail(email);
-        if (error) throw error;
-
-        showToast('Enviado', `Correo de recuperación enviado a ${email}.`, 'success');
-      } catch (err) {
-        console.error("Error resetting password:", err);
-        showToast('Error', 'No se pudo enviar el correo de recuperación.', 'error');
       }
     }
 
