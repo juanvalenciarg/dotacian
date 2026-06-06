@@ -350,6 +350,10 @@
             </div>
 
             <div class="form-grid">
+              <!-- Datos Personales -->
+              <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 0.5rem; border-bottom: 1px solid #E2E8F0; padding-bottom: 0.5rem;">
+                <h3 style="font-size: 1rem; color: #0F172A; margin: 0;">Datos Básicos</h3>
+              </div>
               <div class="form-group">
                 <label>Nombre</label>
                 <input type="text" id="editFirstName" class="form-control">
@@ -365,6 +369,40 @@
               <div class="form-group">
                 <label>País</label>
                 <input type="text" id="editCountry" class="form-control" placeholder="MX o CO">
+              </div>
+
+              <!-- Registro y Actividad -->
+              <div class="form-group" style="grid-column: 1 / -1; margin-top: 1rem; margin-bottom: 0.5rem; border-bottom: 1px solid #E2E8F0; padding-bottom: 0.5rem;">
+                <h3 style="font-size: 1rem; color: #0F172A; margin: 0;">Registro y Tiempos</h3>
+              </div>
+              <div class="form-group">
+                <label>Fecha de Registro</label>
+                <div id="viewCreatedAt" style="font-weight: 600; color: #334155;">--</div>
+              </div>
+              <div class="form-group">
+                <label>Último Ingreso</label>
+                <div id="viewLastLogin" style="font-weight: 600; color: #334155;">--</div>
+              </div>
+
+              <!-- Empresa y Sector -->
+              <div class="form-group" style="grid-column: 1 / -1; margin-top: 1rem; margin-bottom: 0.5rem; border-bottom: 1px solid #E2E8F0; padding-bottom: 0.5rem;">
+                <h3 style="font-size: 1rem; color: #0F172A; margin: 0;">Empresa y Transacciones</h3>
+              </div>
+              <div class="form-group">
+                <label>Empresa Asociada</label>
+                <div id="viewCompany" style="font-weight: 600; color: #334155;">--</div>
+              </div>
+              <div class="form-group">
+                <label>Sector / Industria</label>
+                <div id="viewIndustry" style="font-weight: 600; color: #334155;">--</div>
+              </div>
+              <div class="form-group">
+                <label>Cotizaciones</label>
+                <div id="viewQuotes" style="font-weight: 600; color: #334155;">--</div>
+              </div>
+              <div class="form-group">
+                <label>Órdenes de Compra</label>
+                <div id="viewOrders" style="font-weight: 600; color: #334155;">--</div>
               </div>
             </div>
 
@@ -496,62 +534,79 @@
       document.getElementById('userCard').classList.remove('active');
 
       try {
-        // Buscar en user_profile (Clientes)
-        const { data: clientData, error: clientError } = await _supabase
-          .from('user_profile')
-          .select('*')
-          .eq('email', email)
-          .maybeSingle();
+        const { data, error } = await _supabase.rpc('get_user_admin_details', { search_email: email });
 
-        if (clientData) {
-          fillCard(clientData, 'client');
-          return;
+        if (error) {
+          throw error;
         }
 
-        // Buscar en seller_profile (Fabricantes)
-        const { data: sellerData, error: sellerError } = await _supabase
-          .from('seller_profile')
-          .select('*')
-          .eq('email', email)
-          .maybeSingle();
-
-        if (sellerData) {
-          fillCard(sellerData, 'seller');
-          return;
+        if (data && data.found) {
+          fillCard(data);
+        } else {
+          showToast('No encontrado', 'No se encontró ningún usuario con ese correo.', 'error');
         }
-
-        showToast('No encontrado', 'No se encontró ningún usuario o seller con ese correo.', 'error');
 
       } catch (err) {
-        console.error(err);
-        showToast('Error', 'Hubo un error en la búsqueda.', 'error');
+        console.error("Error buscando usuario:", err);
+        showToast('Error', 'Hubo un error en la búsqueda (Asegúrate de haber creado el RPC en Supabase).', 'error');
       } finally {
         btn.textContent = 'Buscar Usuario';
         btn.disabled = false;
       }
     }
 
-    function fillCard(data, type) {
+    function formatDate(isoString) {
+      if (!isoString) return 'No registrado';
+      return new Date(isoString).toLocaleString('es-MX', {
+        day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+    }
+
+    function fillCard(data) {
       currentUserRecord = data;
-      currentUserType = type;
+      currentUserType = data.role;
 
       document.getElementById('cardEmail').textContent = data.email;
 
       const roleBadge = document.getElementById('cardRole');
-      if (type === 'client') {
+      if (data.role === 'client') {
         roleBadge.textContent = 'Cliente';
         roleBadge.className = 'role-badge role-client';
         document.getElementById('nicknameGroup').style.display = 'flex';
-        document.getElementById('editNickname').value = data.nickname || '';
+        document.getElementById('editNickname').value = data.profile?.nickname || '';
       } else {
         roleBadge.textContent = 'Fabricante';
         roleBadge.className = 'role-badge role-seller';
         document.getElementById('nicknameGroup').style.display = 'none';
       }
 
-      document.getElementById('editFirstName').value = data.first_name || '';
-      document.getElementById('editLastName').value = data.last_name || '';
-      document.getElementById('editCountry').value = data.country || '';
+      document.getElementById('editFirstName').value = data.profile?.first_name || '';
+      document.getElementById('editLastName').value = data.profile?.last_name || '';
+      document.getElementById('editCountry').value = data.profile?.country || '';
+
+      // Tiempos
+      document.getElementById('viewCreatedAt').textContent = formatDate(data.created_at);
+      document.getElementById('viewLastLogin').textContent = formatDate(data.last_sign_in_at);
+
+      // Empresa
+      if (data.role === 'client') {
+        document.getElementById('viewCompany').textContent = data.company?.company_name || 'Sin registro';
+        document.getElementById('viewIndustry').textContent = data.company?.industry || 'Sin sector';
+      } else {
+        document.getElementById('viewCompany').textContent = data.company?.seller_name || 'Sin registro';
+        document.getElementById('viewIndustry').textContent = 'Fabricante'; // Sellers generally don't have industry in the same way
+      }
+
+      // Transacciones
+      document.getElementById('viewQuotes').textContent = data.quotes_count > 0 ? \`Sí (\${data.quotes_count})\` : 'No';
+      
+      const ordersBadge = document.getElementById('viewOrders');
+      if (data.orders_count > 0) {
+        ordersBadge.innerHTML = \`<span style="color: #10B981;">Sí (\${data.orders_count})</span>\`;
+      } else {
+        ordersBadge.textContent = 'No';
+      }
 
       document.getElementById('userCard').classList.add('active');
     }
@@ -569,20 +624,17 @@
         country: country
       };
 
-      let table = '';
+      let table = currentUserType === 'client' ? 'user_profile' : 'seller_profile';
 
       if (currentUserType === 'client') {
         updatePayload.nickname = document.getElementById('editNickname').value.trim();
-        table = 'user_profile';
-      } else {
-        table = 'seller_profile';
       }
 
       try {
         const { error } = await _supabase
           .from(table)
           .update(updatePayload)
-          .eq('id', currentUserRecord.id);
+          .eq('id', currentUserRecord.user_id);
 
         if (error) throw error;
         showToast('Éxito', 'Perfil actualizado correctamente.', 'success');
