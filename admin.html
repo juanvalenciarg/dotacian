@@ -255,11 +255,12 @@
         </a>
       </div>
       <nav class="sidebar-nav">
-        <a href="admin.html" id="nav-dashboard" class="nav-item active"><span>📊</span> Dashboard</a>
-        <a href="admin.usuarios.html" id="nav-users" class="nav-item"><span>👥</span> Gestión de Usuarios</a>
-        <a href="facturas.admin.html" class="nav-item"><span>💸</span> Facturación</a>
-        <a href="#" class="nav-item"><span>🛠️</span> Logs de Sistema</a>
-        <a href="#" class="nav-item"><span>🛡️</span> Seguridad</a>
+        <a href="admin.html" id="nav-dashboard" class="nav-item active">Dashboard</a>
+        <a href="admin.usuarios.html" id="nav-users" class="nav-item">Gestión de Clientes</a>
+        <a href="admin.sellers.html" id="nav-sellers" class="nav-item">Gestión de Fabricantes</a>
+        <a href="facturas.admin.html" class="nav-item">Facturación</a>
+        <a href="#" class="nav-item">Logs de Sistema</a>
+        <a href="#" class="nav-item">Seguridad</a>
       </nav>
     </aside>
 
@@ -283,16 +284,19 @@
               </div>
               <div class="metric-value" id="count-users">--</div>
               <div style="font-size: 0.75rem; color: var(--color-primary); margin-top: 0.5rem; display: flex; align-items: center; gap: 0.25rem;">
-                Ir a Gestión de Usuarios <span style="font-size: 0.8rem;">→</span>
+                Ir a Gestión de Clientes <span style="font-size: 0.8rem;">→</span>
               </div>
             </div>
 
-            <div class="metric-card">
+            <div class="metric-card" style="cursor: pointer;" onclick="window.location.href='admin.sellers.html'">
               <div class="metric-header">
                 <span>Fabricantes</span>
                 <div class="metric-icon">🏭</div>
               </div>
               <div class="metric-value" id="count-sellers">--</div>
+              <div style="font-size: 0.75rem; color: var(--color-primary); margin-top: 0.5rem; display: flex; align-items: center; gap: 0.25rem;">
+                Ir a Gestión de Fabricantes <span style="font-size: 0.8rem;">→</span>
+              </div>
             </div>
 
             <div class="metric-card">
