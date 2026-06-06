@@ -54,26 +54,89 @@
       border-color: var(--color-brand-primary);
     }
 
+    .drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(2px);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .drawer-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
     .user-card {
+      position: fixed;
+      top: 0;
+      right: -600px;
+      width: 100%;
+      max-width: 550px;
+      height: 100vh;
       background: white;
-      padding: 2rem;
-      border-radius: 1rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      display: none;
-      /* Oculto por defecto */
+      z-index: 1000;
+      box-shadow: -4px 0 15px rgba(0, 0, 0, 0.05);
+      transition: right 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
     .user-card.active {
-      display: block;
+      right: 0;
     }
 
-    .user-header {
+    .drawer-header {
+      padding: 2rem 2rem 1.5rem 2rem;
+      border-bottom: 1px solid #F1F5F9;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: white;
+    }
+
+    .drawer-content {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+      background: #FFFFFF;
+    }
+
+    .drawer-footer {
+      padding: 1.5rem 2rem;
+      border-top: 1px solid #E2E8F0;
+      background: #F8FAFC;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 1rem;
+    }
+
+    .form-section {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 1.5rem;
       margin-bottom: 1.5rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid #E2E8F0;
+    }
+
+    .form-section-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .role-badge {
@@ -114,20 +177,23 @@
     }
 
     .form-control {
-      padding: 0.75rem;
-      border: 1px solid #E2E8F0;
-      border-radius: 0.5rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid #CBD5E1;
+      border-radius: 8px;
       font-family: inherit;
+      font-size: 0.95rem;
+      color: #334155;
+      background: white;
+      transition: all 0.2s;
     }
 
-    .actions-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid #E2E8F0;
+    .form-control:focus {
+      outline: none;
+      border-color: var(--color-cyan);
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
     }
+
+
 
     .toast-container {
       position: fixed;
@@ -370,76 +436,93 @@
             </table>
           </div>
 
-          <!-- Tarjeta de Resultados (Oculta) -->
+          <!-- Tarjeta de Resultados (Oculta, ahora Drawer) -->
+          <div id="drawerOverlay" class="drawer-overlay" onclick="closeDrawer()"></div>
           <div id="userCard" class="user-card">
-            <div class="user-header">
+            <div class="drawer-header">
               <div>
-                <h2 id="cardTitle"
-                  style="margin: 0; font-family: var(--font-family-heading); color: var(--color-navy);">Datos del
-                  Usuario</h2>
-                <p id="cardEmail" style="margin: 0; color: var(--color-text-secondary); font-size: 0.875rem;">-</p>
+                <h2 id="cardTitle" style="margin: 0; font-family: var(--font-family-heading); color: var(--color-navy); font-size: 1.25rem;">Datos del Fabricante</h2>
+                <p id="cardEmail" style="margin: 0.25rem 0 0 0; color: var(--color-text-secondary); font-size: 0.875rem;">-</p>
               </div>
-              <span id="cardRole" class="role-badge role-client">Cliente</span>
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <span id="cardRole" class="role-badge role-seller">Fabricante</span>
+                <button onclick="closeDrawer()" style="background: none; border: none; font-size: 1.5rem; color: #94A3B8; cursor: pointer; line-height: 1;">&times;</button>
+              </div>
             </div>
 
-            <div class="form-grid">
+            <div class="drawer-content">
               <!-- Datos Personales -->
-              <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 0.5rem; border-bottom: 1px solid #E2E8F0; padding-bottom: 0.5rem;">
-                <h3 style="font-size: 1rem; color: #0F172A; margin: 0;">Datos Básicos</h3>
-              </div>
-              <div class="form-group">
-                <label>Nombre</label>
-                <input type="text" id="editFirstName" class="form-control">
-              </div>
-              <div class="form-group">
-                <label>Apellido</label>
-                <input type="text" id="editLastName" class="form-control">
-              </div>
-              <div class="form-group" id="nicknameGroup">
-                <label>Apodo / Nickname</label>
-                <input type="text" id="editNickname" class="form-control">
-              </div>
-              <div class="form-group">
-                <label>País</label>
-                <input type="text" id="editCountry" class="form-control" placeholder="MX o CO">
-              </div>
-
-              <!-- Registro y Actividad -->
-              <div class="form-group" style="grid-column: 1 / -1; margin-top: 1rem; margin-bottom: 0.5rem; border-bottom: 1px solid #E2E8F0; padding-bottom: 0.5rem;">
-                <h3 style="font-size: 1rem; color: #0F172A; margin: 0;">Registro y Tiempos</h3>
-              </div>
-              <div class="form-group">
-                <label>Fecha de Registro</label>
-                <div id="viewCreatedAt" style="font-weight: 600; color: #334155;">--</div>
-              </div>
-              <div class="form-group">
-                <label>Último Ingreso</label>
-                <div id="viewLastLogin" style="font-weight: 600; color: #334155;">--</div>
+              <div class="form-section">
+                <div class="form-section-title">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                  Datos Personales
+                </div>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Nombre</label>
+                    <input type="text" id="editFirstName" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label>Apellido</label>
+                    <input type="text" id="editLastName" class="form-control">
+                  </div>
+                  <div class="form-group" id="nicknameGroup">
+                    <label>Apodo / Nickname</label>
+                    <input type="text" id="editNickname" class="form-control" placeholder="Opcional">
+                  </div>
+                  <div class="form-group">
+                    <label>País (Ubicación de fábrica)</label>
+                    <input type="text" id="editCountry" class="form-control" placeholder="MX o CO">
+                  </div>
+                </div>
               </div>
 
-              <!-- Empresa y Sector -->
-              <div class="form-group" style="grid-column: 1 / -1; margin-top: 1rem; margin-bottom: 0.5rem; border-bottom: 1px solid #E2E8F0; padding-bottom: 0.5rem;">
-                <h3 style="font-size: 1rem; color: #0F172A; margin: 0;">Empresa y Transacciones</h3>
+              <!-- Empresa y Actividad -->
+              <div class="form-section">
+                <div class="form-section-title">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><path d="M9 9h6"></path><path d="M9 13h6"></path><path d="M9 17h6"></path></svg>
+                  Empresa y Actividad
+                </div>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Fábrica Asociada</label>
+                    <input type="text" id="editCompany" class="form-control" placeholder="Nombre de la fábrica">
+                  </div>
+                  <div class="form-group">
+                    <label>Sector / Industria</label>
+                    <input type="text" id="editIndustry" class="form-control" value="Fabricante" disabled>
+                  </div>
+                  <div class="form-group">
+                    <label>Cotizaciones Recibidas</label>
+                    <div id="viewQuotesCount" style="font-weight: 700; color: var(--color-cyan); font-size: 1.1rem;">0</div>
+                  </div>
+                  <div class="form-group">
+                    <label>Órdenes de Producción</label>
+                    <div id="viewOrdersCount" style="font-weight: 700; color: var(--color-brand-primary); font-size: 1.1rem;">0</div>
+                  </div>
+                </div>
               </div>
-              <div class="form-group">
-                <label>Fábrica Asociada</label>
-                <input type="text" id="editCompany" class="form-control" placeholder="Nombre de la fábrica">
-              </div>
-              <div class="form-group">
-                <label>Sector / Industria</label>
-                <input type="text" id="editIndustry" class="form-control" value="Fabricante" disabled>
-              </div>
-              <div class="form-group">
-                <label>Cotizaciones</label>
-                <div id="viewQuotes" style="font-weight: 600; color: #334155;">--</div>
-              </div>
-              <div class="form-group">
-                <label>Órdenes de Compra</label>
-                <div id="viewOrders" style="font-weight: 600; color: #334155;">--</div>
+
+              <!-- Registro y Tiempos -->
+              <div class="form-section">
+                <div class="form-section-title">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  Registro y Tiempos
+                </div>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Fecha de Registro</label>
+                    <div id="viewCreatedAt" style="font-weight: 600; color: #334155;">--</div>
+                  </div>
+                  <div class="form-group">
+                    <label>Último Acceso</label>
+                    <div id="viewLastSignIn" style="font-weight: 600; color: #334155;">--</div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="actions-bar">
+            <div class="drawer-footer">
               <button class="btn btn-outline" style="border-color: #991B1B; color: #991B1B; background: #FEF2F2;" onclick="deleteUser()">
                 Eliminar Fabricante
               </button>
@@ -626,7 +709,7 @@
 
       // Tiempos
       document.getElementById('viewCreatedAt').textContent = formatDate(data.created_at);
-      document.getElementById('viewLastLogin').textContent = formatDate(data.last_sign_in_at);
+      document.getElementById('viewLastSignIn').textContent = formatDate(data.last_sign_in_at);
 
       // Empresa
       if (data.role === 'client') {
@@ -636,16 +719,16 @@
       }
 
       // Transacciones
-      document.getElementById('viewQuotes').textContent = data.quotes_count > 0 ? "Sí (" + data.quotes_count + ")" : 'No';
-      
-      const ordersBadge = document.getElementById('viewOrders');
-      if (data.orders_count > 0) {
-        ordersBadge.innerHTML = '<span style="color: #10B981;">Sí (' + data.orders_count + ')</span>';
-      } else {
-        ordersBadge.textContent = 'No';
-      }
+      document.getElementById('viewQuotesCount').textContent = data.quotes_count || 0;
+      document.getElementById('viewOrdersCount').textContent = data.orders_count || 0;
 
+      document.getElementById('drawerOverlay').classList.add('active');
       document.getElementById('userCard').classList.add('active');
+    }
+
+    function closeDrawer() {
+      document.getElementById('drawerOverlay').classList.remove('active');
+      document.getElementById('userCard').classList.remove('active');
     }
 
     async function saveUser() {
@@ -732,7 +815,7 @@
         if (error) throw error;
         
         showToast('Eliminado', 'El fabricante ha sido eliminado permanentemente.', 'success');
-        document.getElementById('userCard').classList.remove('active');
+        closeDrawer();
         fetchUsers(); // Recargar la tabla
       } catch (err) {
         console.error("Error eliminando usuario:", err);
