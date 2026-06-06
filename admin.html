@@ -126,6 +126,98 @@
       right: 1rem;
       z-index: 9999;
     }
+
+    /* Dashboard Styles */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .metric-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .metric-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #64748B;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .metric-value {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: #0F172A;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .metric-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 0.75rem;
+      background: #F1F5F9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      background: white;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background: #F8FAFC;
+      border-radius: 0.5rem;
+      border-left: 4px solid #CBD5E1;
+    }
+
+    .status-item.pending { border-left-color: #F59E0B; }
+    .status-item.approved { border-left-color: #3B82F6; }
+    .status-item.production { border-left-color: #8B5CF6; }
+    .status-item.shipped { border-left-color: #06B6D4; }
+    .status-item.delivered { border-left-color: #10B981; }
+
+    .status-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #334155;
+      text-transform: capitalize;
+    }
+
+    .status-count {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #0F172A;
+    }
   </style>
 </head>
 
@@ -139,7 +231,8 @@
         </a>
       </div>
       <nav class="sidebar-nav">
-        <a href="admin.html" class="nav-item active"><span>👥</span> Gestión de Usuarios</a>
+        <a href="#" onclick="switchView('dashboard')" id="nav-dashboard" class="nav-item active"><span>📊</span> Dashboard</a>
+        <a href="#" onclick="switchView('users')" id="nav-users" class="nav-item"><span>👥</span> Gestión de Usuarios</a>
         <a href="facturas.admin.html" class="nav-item"><span>💸</span> Facturación</a>
         <a href="#" class="nav-item"><span>🛠️</span> Logs de Sistema</a>
         <a href="#" class="nav-item"><span>🛡️</span> Seguridad</a>
@@ -148,7 +241,7 @@
 
     <main class="main-content">
       <header class="app-header">
-        <h1>Gestión de Usuarios</h1>
+        <h1 id="pageTitle">Dashboard Principal</h1>
         <div class="algo-status">
           <span style="color: var(--color-cyan);">●</span> Panel Administrativo
         </div>
@@ -156,8 +249,60 @@
 
       <div class="app-container">
         
-        <!-- Buscador -->
-        <div class="search-container">
+        <!-- Vista del Dashboard -->
+        <div id="dashboardView">
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-header">
+                <span>Clientes</span>
+                <div class="metric-icon">🏢</div>
+              </div>
+              <div class="metric-value" id="count-users">--</div>
+            </div>
+            
+            <div class="metric-card">
+              <div class="metric-header">
+                <span>Fabricantes</span>
+                <div class="metric-icon">🏭</div>
+              </div>
+              <div class="metric-value" id="count-sellers">--</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-header">
+                <span>Catálogo Global</span>
+                <div class="metric-icon">👕</div>
+              </div>
+              <div class="metric-value" id="count-catalog">--</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-header">
+                <span>Cotizaciones</span>
+                <div class="metric-icon">📄</div>
+              </div>
+              <div class="metric-value" id="count-quotes">--</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-header">
+                <span>Órdenes Totales</span>
+                <div class="metric-icon">📦</div>
+              </div>
+              <div class="metric-value" id="count-orders">--</div>
+            </div>
+          </div>
+
+          <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; color: #0F172A; margin-bottom: 1rem;">Estado de Órdenes de Compra</h2>
+          <div class="status-grid" id="orders-status-container">
+            <div style="color: #64748B; font-size: 0.875rem;">Cargando estados...</div>
+          </div>
+        </div>
+
+        <!-- Vista de Gestión de Usuarios (Oculta por defecto) -->
+        <div id="userManagementView" style="display: none;">
+          <!-- Buscador -->
+          <div class="search-container">
           <div class="search-input-group">
             <label for="searchEmail">Buscar usuario por correo electrónico</label>
             <input type="email" id="searchEmail" class="search-input" placeholder="ejemplo@correo.com">
@@ -237,11 +382,93 @@
       if (error || !adminData) {
         await _supabase.auth.signOut();
         window.location.href = 'login.admin.html?error=unauthorized';
+      } else {
+        // Cargar métricas al iniciar sesión correctamente
+        loadDashboardMetrics();
       }
     }
 
     // Ejecutar validación inmediatamente
     checkAdminAuth();
+
+    // Lógica de Navegación
+    function switchView(viewName) {
+      document.getElementById('dashboardView').style.display = viewName === 'dashboard' ? 'block' : 'none';
+      document.getElementById('userManagementView').style.display = viewName === 'users' ? 'block' : 'none';
+      
+      document.getElementById('nav-dashboard').classList.toggle('active', viewName === 'dashboard');
+      document.getElementById('nav-users').classList.toggle('active', viewName === 'users');
+
+      document.getElementById('pageTitle').textContent = viewName === 'dashboard' ? 'Dashboard Principal' : 'Gestión de Usuarios';
+      
+      if(viewName === 'dashboard') {
+        loadDashboardMetrics();
+      }
+    }
+
+    // Lógica del Dashboard
+    async function getCount(table) {
+      const { count, error } = await _supabase.from(table).select('*', { count: 'exact', head: true });
+      if (error) {
+        console.error(`Error counting ${table}:`, error);
+        return 0;
+      }
+      return count;
+    }
+
+    async function loadDashboardMetrics() {
+      try {
+        const [usersCount, sellersCount, catalogCount, quotesCount, ordersCount] = await Promise.all([
+          getCount('user_profile'),
+          getCount('seller_profile'),
+          getCount('seller_catalog'),
+          getCount('company_quotes_requests'),
+          getCount('company_purchase_orders')
+        ]);
+
+        document.getElementById('count-users').textContent = usersCount;
+        document.getElementById('count-sellers').textContent = sellersCount;
+        document.getElementById('count-catalog').textContent = catalogCount;
+        document.getElementById('count-quotes').textContent = quotesCount;
+        document.getElementById('count-orders').textContent = ordersCount;
+
+        // Desglose de estados de órdenes
+        const { data: orders, error } = await _supabase.from('company_purchase_orders').select('status');
+        if (error) throw error;
+
+        const statusCounts = orders.reduce((acc, order) => {
+          const s = (order.status || 'desconocido').toLowerCase().trim();
+          acc[s] = (acc[s] || 0) + 1;
+          return acc;
+        }, {});
+
+        const container = document.getElementById('orders-status-container');
+        container.innerHTML = '';
+        
+        if (Object.keys(statusCounts).length === 0) {
+          container.innerHTML = '<div style="color: #64748B; font-size: 0.875rem;">No hay órdenes registradas.</div>';
+          return;
+        }
+
+        for (const [status, count] of Object.entries(statusCounts)) {
+          let cssClass = '';
+          if (['pendiente', 'pending'].includes(status)) cssClass = 'pending';
+          else if (['aprobada', 'approved'].includes(status)) cssClass = 'approved';
+          else if (['produccion', 'en_produccion', 'in_production'].includes(status)) cssClass = 'production';
+          else if (['enviada', 'shipped'].includes(status)) cssClass = 'shipped';
+          else if (['entregada', 'delivered'].includes(status)) cssClass = 'delivered';
+
+          container.innerHTML += `
+            <div class="status-item ${cssClass}">
+              <span class="status-label">${status}</span>
+              <span class="status-count">${count}</span>
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error("Error loading metrics:", err);
+      }
+    }
 
     async function searchUser() {
       const email = document.getElementById('searchEmail').value.trim();
