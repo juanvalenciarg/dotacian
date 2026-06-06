@@ -435,45 +435,29 @@
       }
     }
 
-    // Lógica del Dashboard
-    async function getCount(table) {
-      const { count, error } = await _supabase.from(table).select('*', { count: 'exact', head: true });
-      if (error) {
-        console.error(`Error counting ${table}:`, error);
-        return 0;
-      }
-      return count;
-    }
-
+    // Lógica del Dashboard utilizando RPC para saltar el RLS
     async function loadDashboardMetrics() {
       try {
-        const [usersCount, sellersCount, catalogCount, quotesCount, ordersCount] = await Promise.all([
-          getCount('user_profile'),
-          getCount('seller_profile'),
-          getCount('seller_catalog'),
-          getCount('company_quotes_requests'),
-          getCount('company_purchase_orders')
-        ]);
+        const { data, error } = await _supabase.rpc('get_admin_dashboard_metrics');
+        
+        if (error) {
+          console.error("Error al ejecutar RPC de métricas:", error);
+          showToast('Error', 'No se pudieron cargar las métricas (Falta RPC o permisos).', 'error');
+          return;
+        }
 
-        document.getElementById('count-users').textContent = usersCount;
-        document.getElementById('count-sellers').textContent = sellersCount;
-        document.getElementById('count-catalog').textContent = catalogCount;
-        document.getElementById('count-quotes').textContent = quotesCount;
-        document.getElementById('count-orders').textContent = ordersCount;
+        // Poblar métricas globales
+        document.getElementById('count-users').textContent = data.users || 0;
+        document.getElementById('count-sellers').textContent = data.sellers || 0;
+        document.getElementById('count-catalog').textContent = data.catalog || 0;
+        document.getElementById('count-quotes').textContent = data.quotes || 0;
+        document.getElementById('count-orders').textContent = data.orders || 0;
 
         // Desglose de estados de órdenes
-        const { data: orders, error } = await _supabase.from('company_purchase_orders').select('status');
-        if (error) throw error;
-
-        const statusCounts = orders.reduce((acc, order) => {
-          const s = (order.status || 'desconocido').toLowerCase().trim();
-          acc[s] = (acc[s] || 0) + 1;
-          return acc;
-        }, {});
-
+        const statusCounts = data.orders_status || {};
         const container = document.getElementById('orders-status-container');
         container.innerHTML = '';
-
+        
         if (Object.keys(statusCounts).length === 0) {
           container.innerHTML = '<div style="color: #64748B; font-size: 0.875rem;">No hay órdenes registradas.</div>';
           return;
@@ -495,7 +479,7 @@
           `;
         }
       } catch (err) {
-        console.error("Error loading metrics:", err);
+        console.error("Excepción en loadDashboardMetrics:", err);
       }
     }
 
