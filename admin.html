@@ -11,10 +11,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  
+
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
+
   <style>
     .search-container {
       background: white;
@@ -59,7 +59,8 @@
       padding: 2rem;
       border-radius: 1rem;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      display: none; /* Oculto por defecto */
+      display: none;
+      /* Oculto por defecto */
     }
 
     .user-card.active {
@@ -82,8 +83,16 @@
       font-weight: 600;
       text-transform: uppercase;
     }
-    .role-client { background: #DBEAFE; color: #1E40AF; }
-    .role-seller { background: #D1FAE5; color: #065F46; }
+
+    .role-client {
+      background: #DBEAFE;
+      color: #1E40AF;
+    }
+
+    .role-seller {
+      background: #D1FAE5;
+      color: #065F46;
+    }
 
     .form-grid {
       display: grid;
@@ -200,11 +209,25 @@
       border-left: 4px solid #CBD5E1;
     }
 
-    .status-item.pending { border-left-color: #F59E0B; }
-    .status-item.approved { border-left-color: #3B82F6; }
-    .status-item.production { border-left-color: #8B5CF6; }
-    .status-item.shipped { border-left-color: #06B6D4; }
-    .status-item.delivered { border-left-color: #10B981; }
+    .status-item.pending {
+      border-left-color: #F59E0B;
+    }
+
+    .status-item.approved {
+      border-left-color: #3B82F6;
+    }
+
+    .status-item.production {
+      border-left-color: #8B5CF6;
+    }
+
+    .status-item.shipped {
+      border-left-color: #06B6D4;
+    }
+
+    .status-item.delivered {
+      border-left-color: #10B981;
+    }
 
     .status-label {
       font-size: 0.875rem;
@@ -227,12 +250,15 @@
     <aside class="sidebar" style="background-color: #020617;">
       <div class="sidebar-brand" style="padding-top: 1.5rem; padding-bottom: 1.5rem;">
         <a href="admin.html">
-          <img src="assets/logos/logo_dotacian.admin.png" alt="dotacian admin" style="height: 38px; width: auto; display: block;">
+          <img src="assets/logos/logo_dotacian_admin.png" alt="dotacian admin"
+            style="height: 38px; width: auto; display: block;">
         </a>
       </div>
       <nav class="sidebar-nav">
-        <a href="#" onclick="switchView('dashboard')" id="nav-dashboard" class="nav-item active"><span>📊</span> Dashboard</a>
-        <a href="#" onclick="switchView('users')" id="nav-users" class="nav-item"><span>👥</span> Gestión de Usuarios</a>
+        <a href="#" onclick="switchView('dashboard')" id="nav-dashboard" class="nav-item active"><span>📊</span>
+          Dashboard</a>
+        <a href="#" onclick="switchView('users')" id="nav-users" class="nav-item"><span>👥</span> Gestión de
+          Usuarios</a>
         <a href="facturas.admin.html" class="nav-item"><span>💸</span> Facturación</a>
         <a href="#" class="nav-item"><span>🛠️</span> Logs de Sistema</a>
         <a href="#" class="nav-item"><span>🛡️</span> Seguridad</a>
@@ -248,7 +274,7 @@
       </header>
 
       <div class="app-container">
-        
+
         <!-- Vista del Dashboard -->
         <div id="dashboardView">
           <div class="metrics-grid">
@@ -259,7 +285,7 @@
               </div>
               <div class="metric-value" id="count-users">--</div>
             </div>
-            
+
             <div class="metric-card">
               <div class="metric-header">
                 <span>Fabricantes</span>
@@ -293,7 +319,8 @@
             </div>
           </div>
 
-          <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; color: #0F172A; margin-bottom: 1rem;">Estado de Órdenes de Compra</h2>
+          <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; color: #0F172A; margin-bottom: 1rem;">Estado
+            de Órdenes de Compra</h2>
           <div class="status-grid" id="orders-status-container">
             <div style="color: #64748B; font-size: 0.875rem;">Cargando estados...</div>
           </div>
@@ -303,53 +330,55 @@
         <div id="userManagementView" style="display: none;">
           <!-- Buscador -->
           <div class="search-container">
-          <div class="search-input-group">
-            <label for="searchEmail">Buscar usuario por correo electrónico</label>
-            <input type="email" id="searchEmail" class="search-input" placeholder="ejemplo@correo.com">
+            <div class="search-input-group">
+              <label for="searchEmail">Buscar usuario por correo electrónico</label>
+              <input type="email" id="searchEmail" class="search-input" placeholder="ejemplo@correo.com">
+            </div>
+            <button class="btn btn-primary" onclick="searchUser()" id="btnSearch">Buscar Usuario</button>
           </div>
-          <button class="btn btn-primary" onclick="searchUser()" id="btnSearch">Buscar Usuario</button>
+
+          <!-- Tarjeta de Resultados (Oculta) -->
+          <div id="userCard" class="user-card">
+            <div class="user-header">
+              <div>
+                <h2 id="cardTitle"
+                  style="margin: 0; font-family: var(--font-family-heading); color: var(--color-navy);">Datos del
+                  Usuario</h2>
+                <p id="cardEmail" style="margin: 0; color: var(--color-text-secondary); font-size: 0.875rem;">-</p>
+              </div>
+              <span id="cardRole" class="role-badge role-client">Cliente</span>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" id="editFirstName" class="form-control">
+              </div>
+              <div class="form-group">
+                <label>Apellido</label>
+                <input type="text" id="editLastName" class="form-control">
+              </div>
+              <div class="form-group" id="nicknameGroup">
+                <label>Apodo / Nickname</label>
+                <input type="text" id="editNickname" class="form-control">
+              </div>
+              <div class="form-group">
+                <label>País</label>
+                <input type="text" id="editCountry" class="form-control" placeholder="MX o CO">
+              </div>
+            </div>
+
+            <div class="actions-bar">
+              <button class="btn btn-outline" style="border-color: #EF4444; color: #EF4444;" onclick="resetPassword()">
+                Enviar correo de cambio de contraseña
+              </button>
+              <button class="btn btn-primary" onclick="saveUser()">
+                Guardar Cambios
+              </button>
+            </div>
+          </div>
+
         </div>
-
-        <!-- Tarjeta de Resultados (Oculta) -->
-        <div id="userCard" class="user-card">
-          <div class="user-header">
-            <div>
-              <h2 id="cardTitle" style="margin: 0; font-family: var(--font-family-heading); color: var(--color-navy);">Datos del Usuario</h2>
-              <p id="cardEmail" style="margin: 0; color: var(--color-text-secondary); font-size: 0.875rem;">-</p>
-            </div>
-            <span id="cardRole" class="role-badge role-client">Cliente</span>
-          </div>
-
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Nombre</label>
-              <input type="text" id="editFirstName" class="form-control">
-            </div>
-            <div class="form-group">
-              <label>Apellido</label>
-              <input type="text" id="editLastName" class="form-control">
-            </div>
-            <div class="form-group" id="nicknameGroup">
-              <label>Apodo / Nickname</label>
-              <input type="text" id="editNickname" class="form-control">
-            </div>
-            <div class="form-group">
-              <label>País</label>
-              <input type="text" id="editCountry" class="form-control" placeholder="MX o CO">
-            </div>
-          </div>
-
-          <div class="actions-bar">
-            <button class="btn btn-outline" style="border-color: #EF4444; color: #EF4444;" onclick="resetPassword()">
-              Enviar correo de cambio de contraseña
-            </button>
-            <button class="btn btn-primary" onclick="saveUser()">
-              Guardar Cambios
-            </button>
-          </div>
-        </div>
-
-      </div>
     </main>
   </div>
 
@@ -395,13 +424,13 @@
     function switchView(viewName) {
       document.getElementById('dashboardView').style.display = viewName === 'dashboard' ? 'block' : 'none';
       document.getElementById('userManagementView').style.display = viewName === 'users' ? 'block' : 'none';
-      
+
       document.getElementById('nav-dashboard').classList.toggle('active', viewName === 'dashboard');
       document.getElementById('nav-users').classList.toggle('active', viewName === 'users');
 
       document.getElementById('pageTitle').textContent = viewName === 'dashboard' ? 'Dashboard Principal' : 'Gestión de Usuarios';
-      
-      if(viewName === 'dashboard') {
+
+      if (viewName === 'dashboard') {
         loadDashboardMetrics();
       }
     }
@@ -444,7 +473,7 @@
 
         const container = document.getElementById('orders-status-container');
         container.innerHTML = '';
-        
+
         if (Object.keys(statusCounts).length === 0) {
           container.innerHTML = '<div style="color: #64748B; font-size: 0.875rem;">No hay órdenes registradas.</div>';
           return;
@@ -523,7 +552,7 @@
       currentUserType = type;
 
       document.getElementById('cardEmail').textContent = data.email;
-      
+
       const roleBadge = document.getElementById('cardRole');
       if (type === 'client') {
         roleBadge.textContent = 'Cliente';
@@ -549,7 +578,7 @@
       const fName = document.getElementById('editFirstName').value.trim();
       const lName = document.getElementById('editLastName').value.trim();
       const country = document.getElementById('editCountry').value.trim();
-      
+
       let updatePayload = {
         first_name: fName,
         last_name: lName,
