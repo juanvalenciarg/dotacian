@@ -318,7 +318,8 @@
       </div>
       <nav class="sidebar-nav">
         <a href="admin.html" id="nav-dashboard" class="nav-item"><span>📊</span> Dashboard</a>
-        <a href="admin.usuarios.html" id="nav-users" class="nav-item active"><span>👥</span> Gestión de Usuarios</a>
+        <a href="admin.usuarios.html" id="nav-users" class="nav-item active"><span>👥</span> Gestión de Clientes</a>
+        <a href="admin.sellers.html" id="nav-sellers" class="nav-item"><span>🏭</span> Gestión de Fabricantes</a>
         <a href="facturas.admin.html" class="nav-item"><span>💸</span> Facturación</a>
         <a href="#" class="nav-item"><span>🛠️</span> Logs de Sistema</a>
         <a href="#" class="nav-item"><span>🛡️</span> Seguridad</a>
@@ -327,7 +328,7 @@
 
     <main class="main-content">
       <header class="app-header">
-        <h1 id="pageTitle">Gestión de Usuarios</h1>
+        <h1 id="pageTitle">Gestión de Clientes</h1>
         <div class="algo-status">
           <span style="color: var(--color-cyan);">●</span> Panel Administrativo
         </div>
@@ -503,10 +504,17 @@
           return;
         }
 
+        const clients = data.filter(u => u.role === 'client');
+
+        if (clients.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">No hay clientes registrados.</td></tr>`;
+          return;
+        }
+
         tbody.innerHTML = '';
-        data.forEach(user => {
-          const roleClass = user.role === 'client' ? 'role-client' : (user.role === 'seller' ? 'role-seller' : 'role-admin');
-          const roleName = user.role === 'client' ? 'Cliente' : (user.role === 'seller' ? 'Fabricante' : 'Admin');
+        clients.forEach(user => {
+          const roleClass = 'role-client';
+          const roleName = 'Cliente';
           
           const tr = document.createElement('tr');
           tr.onclick = () => {
@@ -561,6 +569,10 @@
         }
 
         if (data && data.found) {
+          if (data.role !== 'client') {
+            showToast('Atención', 'Este usuario es un Fabricante. Por favor búscalo en la sección de Gestión de Fabricantes.', 'error');
+            return;
+          }
           fillCard(data);
         } else {
           showToast('No encontrado', 'No se encontró ningún usuario con ese correo.', 'error');
