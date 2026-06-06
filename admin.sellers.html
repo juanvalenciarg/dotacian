@@ -355,14 +355,16 @@
                 <tr>
                   <th>Usuario</th>
                   <th>Rol</th>
+                  <th>País</th>
                   <th>Empresa</th>
+                  <th>Industria</th>
                   <th>Fecha de Registro</th>
                   <th>Último Acceso</th>
                 </tr>
               </thead>
               <tbody id="usersTableBody">
                 <tr>
-                  <td colspan="5" style="text-align: center; color: #64748B; padding: 2rem;">Cargando lista de usuarios...</td>
+                  <td colspan="7" style="text-align: center; color: #64748B; padding: 2rem;">Cargando lista de usuarios...</td>
                 </tr>
               </tbody>
             </table>
@@ -495,19 +497,19 @@
         
         if (error) {
           console.error("Error loading users:", error);
-          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #EF4444;">Error al cargar usuarios. Asegúrate de crear el RPC en Supabase.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #EF4444;">Error al cargar usuarios. Asegúrate de crear el RPC en Supabase.</td></tr>`;
           return;
         }
 
         if (!data || data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">No hay usuarios registrados.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No hay usuarios registrados.</td></tr>`;
           return;
         }
 
         const sellers = data.filter(u => u.role === 'seller');
 
         if (sellers.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">No hay fabricantes registrados.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No hay fabricantes registrados.</td></tr>`;
           return;
         }
 
@@ -531,7 +533,9 @@
               </div>
             </td>
             <td><span class="role-badge ${roleClass}">${roleName}</span></td>
+            <td><span style="font-weight: 600; color: #475569;">${user.country || 'N/A'}</span></td>
             <td>${user.company_name}</td>
+            <td><span style="font-size: 0.875rem; background: #F1F5F9; padding: 0.25rem 0.5rem; border-radius: 0.25rem;">${user.industry || 'N/A'}</span></td>
             <td>${formatDateShort(user.created_at)}</td>
             <td>${formatDateShort(user.last_sign_in_at)}</td>
           `;
