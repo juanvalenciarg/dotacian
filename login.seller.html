@@ -310,7 +310,7 @@
       <div class="seller-auth-box">
 
         <a href="index.html" class="seller-logo">
-          <img src="assets/logos/logo_dotacian.png" alt="dotacian seller logo">
+          <img src="assets/logos/logo_dotacian.seller_original.png" alt="dotacian seller logo">
         </a>
 
         <div class="form-header">
@@ -374,13 +374,13 @@
   <script>
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-    
+
     let _supabase = null;
     try {
       if (typeof supabase !== 'undefined') {
-        _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token' } });
       }
-    } catch(err) {
+    } catch (err) {
       console.error("Supabase load error:", err);
     }
 
