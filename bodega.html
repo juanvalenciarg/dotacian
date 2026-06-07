@@ -1117,7 +1117,7 @@
     if (typeof window._supabase === 'undefined') {
       window.SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
       window.SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-      window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+      window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token' } });
     }
 
     let inventoryData = [];
@@ -1132,19 +1132,9 @@
         }
         currentCompanyId = sessionData.session.user.id;
 
-        // Cargar perfil
-        const { data: profile } = await _supabase.from('company_profile')
-          .select('company_name, industry')
-          .eq('id', currentCompanyId)
-          .single();
-
-        if (profile) {
-          document.getElementById('company-name-display').textContent = profile.company_name || 'Sin Nombre';
-          document.getElementById('dash-industry-val').textContent = profile.industry || 'General';
-          if (document.getElementById('pop-user-name')) {
-            document.getElementById('pop-user-name').textContent = profile.company_name;
-            document.getElementById('pop-user-email').textContent = sessionData.session.user.email;
-          }
+        // Asegurarnos de que el email aparezca
+        if (document.getElementById('pop-user-email')) {
+          document.getElementById('pop-user-email').textContent = sessionData.session.user.email;
         }
 
         await loadInventory();
