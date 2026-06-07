@@ -999,8 +999,8 @@
               </div>
 
               <!-- Quick Prompts -->
-              <div style="padding: 0 1rem 0.5rem 1rem; display: flex; gap: 0.5rem; overflow-x: auto; white-space: nowrap; scrollbar-width: none;">
-                <button onclick="sendDotMessage('Recomiéndame uniformes para restaurante')" style="background: white; border: 1px solid #E2E8F0; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.75rem; color: var(--color-navy); cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--color-cyan)'; this.style.color='var(--color-cyan)';" onmouseout="this.style.borderColor='#E2E8F0'; this.style.color='var(--color-navy)';">🍽 Uniformes para restaurante</button>
+              <div id="dotQuickPrompts" style="padding: 0 1rem 0.5rem 1rem; display: flex; gap: 0.5rem; overflow-x: auto; white-space: nowrap; scrollbar-width: none;">
+                <!-- Se llenarán dinámicamente -->
                 <button onclick="sendDotMessage('Busco ropa industrial resistente')" style="background: white; border: 1px solid #E2E8F0; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.75rem; color: var(--color-navy); cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--color-cyan)'; this.style.color='var(--color-cyan)';" onmouseout="this.style.borderColor='#E2E8F0'; this.style.color='var(--color-navy)';">👷 Ropa industrial</button>
                 <button onclick="sendDotMessage('Quiero armar una cotización nueva')" style="background: white; border: 1px solid #E2E8F0; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.75rem; color: var(--color-navy); cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--color-cyan)'; this.style.color='var(--color-cyan)';" onmouseout="this.style.borderColor='#E2E8F0'; this.style.color='var(--color-navy)';">📝 Armar cotización</button>
               </div>
@@ -1146,6 +1146,53 @@
         }
       }, 1000);
     }
+    
+    function updateDotPrompts(industry) {
+      const container = document.getElementById('dotQuickPrompts');
+      if (!container) return;
+      
+      let prompts = [];
+      const ind = (industry || '').toLowerCase();
+      
+      if (ind.includes('restaurante') || ind.includes('gastronom')) {
+        prompts = [
+          { text: '🍽 Uniformes para meseros', query: 'Ver uniformes para meseros' },
+          { text: '🍷 Opciones para bartenders', query: 'Ver uniformes para bartenders' },
+          { text: '🍳 Filipinas de chef', query: 'Ver filipinas para cocina' }
+        ];
+      } else if (ind.includes('salud') || ind.includes('medic') || ind.includes('hospital')) {
+        prompts = [
+          { text: '🩺 Pijamas quirúrgicas', query: 'Ver pijamas quirúrgicas' },
+          { text: '🥼 Batas médicas', query: 'Ver batas médicas' },
+          { text: '👟 Calzado clínico', query: 'Ver calzado clínico' }
+        ];
+      } else if (ind.includes('industria') || ind.includes('construccion') || ind.includes('logistica')) {
+        prompts = [
+          { text: '👷 Ropa de alta visibilidad', query: 'Ver ropa de alta visibilidad' },
+          { text: '🥾 Calzado de seguridad', query: 'Ver botas de seguridad' },
+          { text: '👖 Pantalones cargo', query: 'Ver pantalones tipo cargo' }
+        ];
+      } else if (ind.includes('hoteleria') || ind.includes('hotel')) {
+        prompts = [
+          { text: '🛎 Uniformes de recepción', query: 'Ver uniformes para recepción' },
+          { text: '🧹 Ropa para limpieza', query: 'Ver uniformes para limpieza y mucamas' },
+          { text: '👔 Trajes ejecutivos', query: 'Ver trajes ejecutivos' }
+        ];
+      } else {
+        // Genéricos
+        prompts = [
+          { text: '👕 Camisas polo', query: 'Ver camisas tipo polo' },
+          { text: '👖 Pantalones de trabajo', query: 'Ver pantalones de trabajo' },
+          { text: '📝 Armar cotización', query: 'Quiero armar una cotización nueva' }
+        ];
+      }
+      
+      let html = '';
+      prompts.forEach(p => {
+        html += `<button onclick="sendDotMessage('${p.query}')" style="background: white; border: 1px solid #E2E8F0; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.75rem; color: var(--color-navy); cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--color-cyan)'; this.style.color='var(--color-cyan)';" onmouseout="this.style.borderColor='#E2E8F0'; this.style.color='var(--color-navy)';">${p.text}</button>`;
+      });
+      container.innerHTML = html;
+    }
     // ------------------------------------
 
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
@@ -1176,6 +1223,10 @@
           userCountry = company.country || 'MX';
           if (typeof updateVersionIndicator === 'function') {
             updateVersionIndicator(userCountry);
+          }
+          // Actualizar prompts de dot basados en la industria
+          if (typeof updateDotPrompts === 'function') {
+            updateDotPrompts(company.industry);
           }
         }
 
