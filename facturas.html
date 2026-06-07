@@ -346,10 +346,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/utils.js?v=4"></script>
   <script>
-    const _supabase = supabase.createClient(
-      'https://awuhvewotmwelurmjvmu.supabase.co',
-      'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq'
-    );
+    const _supabase = supabase.createClient('https://awuhvewotmwelurmjvmu.supabase.co', 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq', { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token' } });
 
     async function init() {
       const { data: { session } } = await _supabase.auth.getSession();
@@ -357,8 +354,7 @@
 
       const companyId = session.user.id;
 
-      const compRes = await _supabase.from('company_profile').select('company_name').eq('id', companyId).single();
-      if (compRes.data) document.getElementById('company-name-display').textContent = compRes.data.company_name;
+      // La información de la empresa se carga globalmente a través de utils.js
 
       await loadInvoices(companyId);
     }
