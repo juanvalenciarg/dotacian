@@ -996,6 +996,28 @@
       }
     }
 
+    // Check si utils.js ya cargó la industria en el DOM
+    const dashIndustryVal = document.getElementById('dash-industry-val')?.textContent;
+    if (dashIndustryVal && dashIndustryVal !== 'Sector' && dashIndustryVal !== 'Cargando...') {
+      let mappedIndustry = dashIndustryVal;
+      const lower = dashIndustryVal.toLowerCase();
+      if (lower === 'restaurante' || lower === 'restaurantes') mappedIndustry = 'Restaurantes';
+      else if (lower === 'retail') mappedIndustry = 'Retail';
+      else if (lower === 'limpieza') mappedIndustry = 'Limpieza';
+      else if (lower === 'industrial') mappedIndustry = 'Industrial';
+      else if (lower === 'corporativo') mappedIndustry = 'Corporativo';
+      else if (lower === 'seguridad') mappedIndustry = 'Seguridad';
+      else if (lower === 'hotelería' || lower === 'hoteleria') mappedIndustry = 'Hotelería';
+      else if (lower === 'salud') mappedIndustry = 'Salud';
+      else if (lower === 'construcción' || lower === 'construccion') mappedIndustry = 'Construcción';
+      else if (lower === 'logística' || lower === 'logistica') mappedIndustry = 'Logística';
+
+      if (rolesByIndustry[mappedIndustry]) {
+        activeIndustry = mappedIndustry;
+        renderRoles(activeIndustry);
+      }
+    }
+
     window.addEventListener('userProfileLoaded', (e) => {
       const industry = e.detail.industry;
       if (industry) {
@@ -1334,7 +1356,7 @@
     if (typeof window._supabase === 'undefined') {
       window.SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
       window.SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-      window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+      window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token' } });
     }
   </script>
   <script src="assets/js/utils.js?v=4"></script>
