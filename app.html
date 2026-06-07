@@ -971,7 +971,8 @@
             <div class="dot-ai-card" style="display: flex; flex-direction: column; height: 450px;">
 
               <!-- Header -->
-              <div class="dot-ai-header" style="display: flex; justify-content: space-between; align-items: center; padding-right: 1.5rem;">
+              <div class="dot-ai-header"
+                style="display: flex; justify-content: space-between; align-items: center; padding-right: 1.5rem;">
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
                   <div class="dot-ai-avatar">d</div>
                   <div>
@@ -984,31 +985,50 @@
                     </div>
                   </div>
                 </div>
-                <button onclick="resetDotChat()" title="Reiniciar conversación" style="background: none; border: none; cursor: pointer; color: #94A3B8; display: flex; align-items: center; justify-content: center; padding: 0.25rem; border-radius: 50%; transition: background 0.2s, color 0.2s;" onmouseover="this.style.background='#F1F5F9'; this.style.color='#64748B';" onmouseout="this.style.background='none'; this.style.color='#94A3B8';">
+                <button onclick="resetDotChat()" title="Reiniciar conversación"
+                  style="background: none; border: none; cursor: pointer; color: #94A3B8; display: flex; align-items: center; justify-content: center; padding: 0.25rem; border-radius: 50%; transition: background 0.2s, color 0.2s;"
+                  onmouseover="this.style.background='#F1F5F9'; this.style.color='#64748B';"
+                  onmouseout="this.style.background='none'; this.style.color='#94A3B8';">
                   <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
                 </button>
               </div>
 
               <!-- Chat History -->
-              <div class="dot-ai-chat-history" id="dotChatHistory" style="flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; background: #FAFAFA;">
+              <div class="dot-ai-chat-history" id="dotChatHistory"
+                style="flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; background: #FAFAFA;">
                 <div class="chat-bubble assistant">
-                  ¡Hola! Soy <strong>dot</strong>, tu asistente de inteligencia artificial 🤖. Puedo ayudarte a buscar uniformes, armar cotizaciones o revisar tus pedidos. ¿En qué puedo ayudarte hoy?
+                  ¡Hola! Soy <strong>dot</strong>, tu asistente de inteligencia artificial 🤖. Puedo ayudarte a buscar
+                  uniformes, armar cotizaciones o revisar tus pedidos. ¿En qué puedo ayudarte hoy?
                 </div>
               </div>
 
               <!-- Quick Prompts -->
-              <div id="dotQuickPrompts" style="padding: 0 1rem 0.5rem 1rem; display: flex; gap: 0.5rem; overflow-x: auto; white-space: nowrap; scrollbar-width: none;">
+              <div id="dotQuickPrompts"
+                style="padding: 0 1rem 0.5rem 1rem; display: flex; gap: 0.5rem; overflow-x: auto; white-space: nowrap; scrollbar-width: none;">
                 <!-- Se llenarán dinámicamente -->
-                <button onclick="sendDotMessage('Busco ropa industrial resistente')" style="background: white; border: 1px solid #E2E8F0; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.75rem; color: var(--color-navy); cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--color-cyan)'; this.style.color='var(--color-cyan)';" onmouseout="this.style.borderColor='#E2E8F0'; this.style.color='var(--color-navy)';">👷 Ropa industrial</button>
-                <button onclick="sendDotMessage('Quiero armar una cotización nueva')" style="background: white; border: 1px solid #E2E8F0; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.75rem; color: var(--color-navy); cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--color-cyan)'; this.style.color='var(--color-cyan)';" onmouseout="this.style.borderColor='#E2E8F0'; this.style.color='var(--color-navy)';">📝 Armar cotización</button>
+                <button onclick="sendDotMessage('Busco ropa industrial resistente')"
+                  style="background: white; border: 1px solid #E2E8F0; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.75rem; color: var(--color-navy); cursor: pointer; transition: all 0.2s;"
+                  onmouseover="this.style.borderColor='var(--color-cyan)'; this.style.color='var(--color-cyan)';"
+                  onmouseout="this.style.borderColor='#E2E8F0'; this.style.color='var(--color-navy)';">👷 Ropa
+                  industrial</button>
+                <button onclick="sendDotMessage('Quiero armar una cotización nueva')"
+                  style="background: white; border: 1px solid #E2E8F0; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.75rem; color: var(--color-navy); cursor: pointer; transition: all 0.2s;"
+                  onmouseover="this.style.borderColor='var(--color-cyan)'; this.style.color='var(--color-cyan)';"
+                  onmouseout="this.style.borderColor='#E2E8F0'; this.style.color='var(--color-navy)';">📝 Armar
+                  cotización</button>
               </div>
 
               <!-- Input Row -->
               <div class="dot-ai-input-row" style="border-top: 1px solid #E2E8F0; padding: 1rem;">
-                <input type="text" id="dotChatInput" class="dot-ai-input" placeholder="Pregúntale a dot..." style="width: 100%; border: none; outline: none; background: #F1F5F9; padding: 0.8rem 1rem; border-radius: 20px; font-size: 0.9rem;" onkeypress="if(event.key === 'Enter') sendDotMessage(this.value)">
-                <button class="dot-ai-send-btn" onclick="sendDotMessage(document.getElementById('dotChatInput').value)" style="background: var(--color-cyan); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-left: 0.5rem; transition: background 0.2s;" onmouseover="this.style.background='#0891B2'" onmouseout="this.style.background='var(--color-cyan)'">
+                <input type="text" id="dotChatInput" class="dot-ai-input" placeholder="Pregúntale a dot..."
+                  style="width: 100%; border: none; outline: none; background: #F1F5F9; padding: 0.8rem 1rem; border-radius: 20px; font-size: 0.9rem;"
+                  onkeypress="if(event.key === 'Enter') sendDotMessage(this.value)">
+                <button class="dot-ai-send-btn" onclick="sendDotMessage(document.getElementById('dotChatInput').value)"
+                  style="background: var(--color-cyan); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-left: 0.5rem; transition: background 0.2s;"
+                  onmouseover="this.style.background='#0891B2'" onmouseout="this.style.background='var(--color-cyan)'">
                   <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                     <line x1="22" y1="2" x2="11" y2="13" />
                     <polygon points="22 2 15 22 11 13 2 9 22 2" />
@@ -1038,160 +1058,234 @@
       `;
     }
 
+    // La lógica de chat ahora funciona de forma segura a través de Supabase Edge Functions
+
     async function sendDotMessage(text) {
       if (!text || text.trim() === '') return;
-      
+
       const history = document.getElementById('dotChatHistory');
       const input = document.getElementById('dotChatInput');
-      
+
       // Limpiar input
       input.value = '';
-      
+
       // Agregar mensaje del usuario
       const userBubble = document.createElement('div');
       userBubble.className = 'chat-bubble user';
       userBubble.textContent = text;
       history.appendChild(userBubble);
-      
+
       // Scroll al final
       history.scrollTop = history.scrollHeight;
-      
+
       // Mostrar indicador de "escribiendo..."
       const typingBubble = document.createElement('div');
       typingBubble.className = 'chat-bubble assistant';
       typingBubble.id = 'dotTyping';
-      typingBubble.innerHTML = '<span style="font-size: 0.8rem; color: #94A3B8;">dot está buscando en el catálogo...</span>';
+      typingBubble.innerHTML = '<span style="font-size: 0.8rem; color: #94A3B8;">dot está analizando tu solicitud...</span>';
       history.appendChild(typingBubble);
       history.scrollTop = history.scrollHeight;
-      
-      // Simular un poco de tiempo para efecto "IA"
-      setTimeout(async () => {
+
+      try {
+        let aiMessage = "¡Claro! Encontré estas opciones en el catálogo que podrían interesarte:";
+        let searchKeywords = [];
+
+        // 1. Llamada a la Edge Function de Supabase
+        const { data, error: functionError } = await _supabase.functions.invoke('dot-chat', {
+          body: { text: text }
+        });
+
+        if (functionError) {
+          console.error("Error invoking edge function:", functionError);
+          // Fallback en caso de error
+          searchKeywords = text.toLowerCase().replace(/[^a-záéíóúñ0-9 ]/g, '').split(' ').filter(w => w.length > 3);
+        } else if (data) {
+          aiMessage = data.message || aiMessage;
+          searchKeywords = data.keywords || [];
+        }
+
+        // Remover burbuja "escribiendo"
         const tBubble = document.getElementById('dotTyping');
         if (tBubble) tBubble.remove();
-        
-        try {
-          // Extraer palabras clave simples (para el MVP)
-          const words = text.toLowerCase().replace(/[^a-záéíóúñ0-9 ]/g, '').split(' ').filter(w => w.length > 3);
-          
-          let query = _supabase.from('seller_catalog').select('id, name, base_price, images, wholesale_prices');
-          
-          // Si hay palabras clave, buscar la primera como filtro simple (ilike)
-          if (words.length > 0) {
-            query = query.ilike('name', `%${words[0]}%`);
-          }
-          
-          const { data: products, error } = await query.limit(3);
-          
-          const assistantBubble = document.createElement('div');
-          assistantBubble.className = 'chat-bubble assistant';
-          
-          if (error) throw error;
-          
-          if (products && products.length > 0) {
-            assistantBubble.innerHTML = `¡Claro! Encontré estas opciones en el catálogo que podrían interesarte para <em>"${text}"</em>:<br><br>`;
-            
-            // Contenedor de tarjetas (horizontal scroll)
-            const cardsContainer = document.createElement('div');
-            cardsContainer.style.display = 'flex';
-            cardsContainer.style.gap = '1rem';
-            cardsContainer.style.overflowX = 'auto';
-            cardsContainer.style.paddingBottom = '0.5rem';
-            cardsContainer.style.scrollbarWidth = 'none';
-            
-            products.forEach(p => {
-              const imgUrl = (p.images && p.images.length > 0) ? p.images[0] : 'assets/images/placeholder_uniform.jpg';
-              // Calcular mínimo desde wholesale_prices si existe
-              let minQty = 1;
-              if (p.wholesale_prices && p.wholesale_prices.length > 0) {
-                 minQty = p.wholesale_prices[0].min_qty || 1;
-              }
-              
-              const card = document.createElement('div');
-              card.style.minWidth = '180px';
-              card.style.background = 'white';
-              card.style.border = '1px solid #E2E8F0';
-              card.style.borderRadius = '12px';
-              card.style.overflow = 'hidden';
-              card.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
-              
-              card.innerHTML = `
-                <div style="height: 120px; background-image: url('${imgUrl}'); background-size: cover; background-position: center;"></div>
-                <div style="padding: 0.75rem;">
-                  <h4 style="margin: 0 0 0.25rem 0; font-size: 0.9rem; color: #0F172A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.name}</h4>
-                  <p style="margin: 0; font-size: 0.8rem; font-weight: 600; color: #10B981;">Desde $${p.base_price ? p.base_price.toLocaleString() : '0'}</p>
-                  <p style="margin: 0.25rem 0 0 0; font-size: 0.7rem; color: #64748B;">Min: ${minQty} uds</p>
-                  <button style="margin-top: 0.5rem; width: 100%; padding: 0.4rem; background: #F1F5F9; color: var(--color-cyan); border: 1px solid var(--color-cyan); border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='var(--color-cyan)'; this.style.color='white';" onmouseout="this.style.background='#F1F5F9'; this.style.color='var(--color-cyan)';">Añadir a Cotización</button>
-                </div>
-              `;
-              cardsContainer.appendChild(card);
-            });
-            
-            assistantBubble.appendChild(cardsContainer);
-          } else {
-            assistantBubble.innerHTML = `No encontré resultados exactos para <em>"${text}"</em> en este momento. Sin embargo, en la próxima versión Gemini podrá interpretar mejor tu solicitud. ¿Te gustaría ver el catálogo completo?`;
-          }
-          
-          history.appendChild(assistantBubble);
-          history.scrollTop = history.scrollHeight;
-          
-        } catch (err) {
-          console.error("Error buscando en catálogo:", err);
-          const errBubble = document.createElement('div');
-          errBubble.className = 'chat-bubble assistant';
-          errBubble.style.color = '#991B1B';
-          errBubble.style.background = '#FEF2F2';
-          errBubble.textContent = "Ups, hubo un problema conectando con el catálogo. Intenta de nuevo.";
-          history.appendChild(errBubble);
-          history.scrollTop = history.scrollHeight;
+
+        // 2. Búsqueda en Supabase
+        let query = _supabase.from('seller_catalog').select('id, name, base_price, images, wholesale_prices');
+
+        if (searchKeywords.length > 0) {
+          const filterStr = searchKeywords.map(kw => `name.ilike.%${kw}%`).join(',');
+          query = query.or(filterStr);
+        } else {
+          // Si no hay keywords (saludo o pregunta general), simplemente no devolvemos productos o damos recomendados
+          query = query.limit(0);
         }
-      }, 1000);
+
+        const { data: products, error } = await query.limit(4);
+        if (error) throw error;
+
+        // 3. Renderizar Respuesta
+        const assistantBubble = document.createElement('div');
+        assistantBubble.className = 'chat-bubble assistant';
+
+        if (products && products.length > 0) {
+          assistantBubble.innerHTML = `${aiMessage}<br><br>`;
+
+          // Contenedor de tarjetas (horizontal scroll)
+          const cardsContainer = document.createElement('div');
+          cardsContainer.style.display = 'flex';
+          cardsContainer.style.gap = '1rem';
+          cardsContainer.style.overflowX = 'auto';
+          cardsContainer.style.paddingBottom = '0.5rem';
+          cardsContainer.style.scrollbarWidth = 'none';
+
+          products.forEach(p => {
+            const imgUrl = (p.images && p.images.length > 0) ? p.images[0] : 'assets/images/placeholder_uniform.jpg';
+            let minQty = 1;
+            if (p.wholesale_prices && p.wholesale_prices.length > 0) {
+              minQty = p.wholesale_prices[0].min_qty || 1;
+            }
+
+            const card = document.createElement('div');
+            card.style.minWidth = '180px';
+            card.style.background = 'white';
+            card.style.border = '1px solid #E2E8F0';
+            card.style.borderRadius = '12px';
+            card.style.overflow = 'hidden';
+            card.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+
+            card.innerHTML = `
+              <div style="height: 120px; background-image: url('${imgUrl}'); background-size: cover; background-position: center;"></div>
+              <div style="padding: 0.75rem;">
+                <h4 style="margin: 0 0 0.25rem 0; font-size: 0.9rem; color: #0F172A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.name}</h4>
+                <p style="margin: 0; font-size: 0.8rem; font-weight: 600; color: #10B981;">Desde $${p.base_price ? p.base_price.toLocaleString() : '0'}</p>
+                <p style="margin: 0.25rem 0 0 0; font-size: 0.7rem; color: #64748B;">Min: ${minQty} uds</p>
+                <button style="margin-top: 0.5rem; width: 100%; padding: 0.4rem; background: #F1F5F9; color: var(--color-cyan); border: 1px solid var(--color-cyan); border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='var(--color-cyan)'; this.style.color='white';" onmouseout="this.style.background='#F1F5F9'; this.style.color='var(--color-cyan)';">Añadir a Cotización</button>
+              </div>
+            `;
+            cardsContainer.appendChild(card);
+          });
+
+          assistantBubble.appendChild(cardsContainer);
+        } else {
+          // Si encontró productos pero array está vacío, o es una charla general
+          if (searchKeywords.length === 0) {
+            assistantBubble.innerHTML = aiMessage;
+          } else {
+            assistantBubble.innerHTML = `${aiMessage}<br><br><span style="color:#64748B; font-size:0.85rem;">No encontré resultados exactos para tu búsqueda en este momento. Intenta buscar con otros términos o contacta a soporte.</span>`;
+          }
+        }
+
+        history.appendChild(assistantBubble);
+        history.scrollTop = history.scrollHeight;
+
+      } catch (err) {
+        console.error("Error buscando en catálogo:", err);
+        const tBubble = document.getElementById('dotTyping');
+        if (tBubble) tBubble.remove();
+        const errBubble = document.createElement('div');
+        errBubble.className = 'chat-bubble assistant';
+        errBubble.style.color = '#991B1B';
+        errBubble.style.background = '#FEF2F2';
+        errBubble.textContent = "Ups, hubo un problema conectando con el catálogo. Intenta de nuevo.";
+        history.appendChild(errBubble);
+        history.scrollTop = history.scrollHeight;
+      }
     }
-    
+
     function updateDotPrompts(industry) {
       const container = document.getElementById('dotQuickPrompts');
       if (!container) return;
-      
+
       let prompts = [];
-      const ind = (industry || '').toLowerCase();
-      
-      if (ind.includes('restaurante') || ind.includes('gastronom')) {
+      const ind = (industry || '').toLowerCase().trim();
+
+      if (ind === 'restaurante' || ind === 'restaurantes' || ind.includes('gastronom')) {
         prompts = [
           { text: '🍽 Uniformes para meseros', query: 'Ver uniformes para meseros' },
           { text: '🍷 Opciones para bartenders', query: 'Ver uniformes para bartenders' },
-          { text: '🍳 Filipinas de chef', query: 'Ver filipinas para cocina' }
+          { text: '🍳 Filipinas para chef', query: 'Ver uniformes para restaurantes' }
         ];
-      } else if (ind.includes('salud') || ind.includes('medic') || ind.includes('hospital')) {
+      } else if (ind === 'retail') {
+        prompts = [
+          { text: '🛍 Uniformes para vendedores', query: 'Ver uniformes para vendedores' },
+          { text: '👔 Camisas corporativas', query: 'Ver camisas corporativas' },
+          { text: '👕 Playeras tipo polo', query: 'Ver playeras polo para retail' }
+        ];
+      } else if (ind === 'limpieza') {
+        prompts = [
+          { text: '🧹 Ropa para intendencia', query: 'Ver uniformes para intendencia' },
+          { text: '🥾 Calzado antideslizante', query: 'Ver calzado antideslizante' },
+          { text: '👕 Batas de limpieza', query: 'Ver batas de limpieza' }
+        ];
+      } else if (ind === 'industrial') {
+        prompts = [
+          { text: '👷 Overoles industriales', query: 'Ver overoles industriales' },
+          { text: '🥾 Botas con casquillo', query: 'Ver botas de seguridad con casquillo' },
+          { text: '👖 Ropa de mezclilla uso rudo', query: 'Ver ropa de uso rudo' }
+        ];
+      } else if (ind === 'corporativo') {
+        prompts = [
+          { text: '👔 Trajes sastres', query: 'Ver trajes sastres' },
+          { text: '👗 Uniformes de oficina', query: 'Ver uniformes de oficina' },
+          { text: '🧥 Sacos ejecutivos', query: 'Ver sacos ejecutivos' }
+        ];
+      } else if (ind === 'seguridad') {
+        prompts = [
+          { text: '👮‍♂️ Uniformes tácticos', query: 'Ver uniformes tácticos' },
+          { text: '🥾 Botas tácticas', query: 'Ver botas tácticas' },
+          { text: '🧥 Chamarras de seguridad', query: 'Ver chamarras de seguridad' }
+        ];
+      } else if (ind === 'hotelería' || ind === 'hoteleria' || ind.includes('hotel')) {
+        prompts = [
+          { text: '🛎 Uniformes de recepción', query: 'Ver uniformes para recepción' },
+          { text: '🧹 Ropa para mucamas', query: 'Ver uniformes para limpieza y mucamas' },
+          { text: '👔 Trajes ejecutivos', query: 'Ver trajes ejecutivos' }
+        ];
+      } else if (ind === 'salud' || ind.includes('medic') || ind.includes('hospital')) {
         prompts = [
           { text: '🩺 Pijamas quirúrgicas', query: 'Ver pijamas quirúrgicas' },
           { text: '🥼 Batas médicas', query: 'Ver batas médicas' },
           { text: '👟 Calzado clínico', query: 'Ver calzado clínico' }
         ];
-      } else if (ind.includes('industria') || ind.includes('construccion') || ind.includes('logistica')) {
+      } else if (ind === 'construcción' || ind === 'construccion') {
         prompts = [
           { text: '👷 Ropa de alta visibilidad', query: 'Ver ropa de alta visibilidad' },
-          { text: '🥾 Calzado de seguridad', query: 'Ver botas de seguridad' },
-          { text: '👖 Pantalones cargo', query: 'Ver pantalones tipo cargo' }
+          { text: '🥾 Calzado de protección', query: 'Ver calzado de protección' },
+          { text: '🧤 Guantes y equipo', query: 'Ver guantes y equipo de seguridad' }
         ];
-      } else if (ind.includes('hoteleria') || ind.includes('hotel')) {
+      } else if (ind === 'logística' || ind === 'logistica') {
         prompts = [
-          { text: '🛎 Uniformes de recepción', query: 'Ver uniformes para recepción' },
-          { text: '🧹 Ropa para limpieza', query: 'Ver uniformes para limpieza y mucamas' },
-          { text: '👔 Trajes ejecutivos', query: 'Ver trajes ejecutivos' }
+          { text: '📦 Fajas lumbares', query: 'Ver fajas lumbares' },
+          { text: '🦺 Chalecos reflectantes', query: 'Ver chalecos reflectantes' },
+          { text: '👖 Pantalones cargo de trabajo', query: 'Ver pantalones cargo' }
         ];
       } else {
-        // Genéricos
         prompts = [
-          { text: '👕 Camisas polo', query: 'Ver camisas tipo polo' },
-          { text: '👖 Pantalones de trabajo', query: 'Ver pantalones de trabajo' },
-          { text: '📝 Armar cotización', query: 'Quiero armar una cotización nueva' }
+          { text: '✨ Ver catálogo completo', query: 'Ver el catálogo completo' },
+          { text: '👕 Camisas Oxford', query: 'Ver camisas tipo Oxford' },
+          { text: '👖 Pantalones de trabajo', query: 'Ver pantalones de trabajo' }
         ];
       }
-      
-      let html = '';
+
+      container.innerHTML = '';
       prompts.forEach(p => {
-        html += `<button onclick="sendDotMessage('${p.query}')" style="background: white; border: 1px solid #E2E8F0; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.75rem; color: var(--color-navy); cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--color-cyan)'; this.style.color='var(--color-cyan)';" onmouseout="this.style.borderColor='#E2E8F0'; this.style.color='var(--color-navy)';">${p.text}</button>`;
+        const btn = document.createElement('button');
+        btn.className = 'dot-quick-prompt';
+        btn.textContent = p.text;
+        btn.onclick = () => sendDotMessage(p.query);
+        // Estilos básicos para el prompt
+        btn.style.background = 'white';
+        btn.style.border = '1px solid #E2E8F0';
+        btn.style.borderRadius = '20px';
+        btn.style.padding = '0.5rem 1rem';
+        btn.style.fontSize = '0.8rem';
+        btn.style.color = 'var(--color-navy)';
+        btn.style.cursor = 'pointer';
+        btn.style.whiteSpace = 'nowrap';
+        btn.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
+        btn.onmouseover = () => { btn.style.background = '#F8FAFC'; btn.style.borderColor = '#CBD5E1'; };
+        btn.onmouseout = () => { btn.style.background = 'white'; btn.style.borderColor = '#E2E8F0'; };
+        container.appendChild(btn);
       });
-      container.innerHTML = html;
     }
     // ------------------------------------
 
