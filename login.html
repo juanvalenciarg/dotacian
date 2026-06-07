@@ -481,13 +481,22 @@
       });
     }
 
-    // Comprobar si hubo un rebote desde app.html por falta de sesión
+    // Comprobar si hubo un rebote desde app.html por falta de sesión o timeout
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('reason') === 'no_session') {
+    const reason = urlParams.get('reason');
+    if (reason) {
       const errorAlert = document.getElementById('login-error-alert');
       const errorText = document.getElementById('error-message-text');
       if (errorAlert && errorText) {
-        errorText.textContent = 'Tu sesión no pudo ser validada. Asegúrate de que las cookies/localStorage estén habilitados o intenta de nuevo.';
+        if (reason === 'timeout') {
+          errorText.textContent = 'Tu sesión se cerro por seguridad, vuelve a iniciar sesión';
+          // Cambiar a color advertencia para timeout
+          errorAlert.style.background = '#FFFBEB';
+          errorAlert.style.color = '#D97706';
+          errorAlert.style.borderColor = '#FCD34D';
+        } else if (reason === 'no_session') {
+          errorText.textContent = 'Tu sesión no pudo ser validada o expiró. Por favor inicia sesión nuevamente.';
+        }
         errorAlert.style.display = 'flex';
       }
     }
