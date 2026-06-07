@@ -746,17 +746,12 @@
       const { data: { session } } = await _supabase.auth.getSession();
       if (!session) { window.location.href = 'login.html'; return; }
 
-      // Get Country
-      const { data: profile } = await _supabase.from('user_profile').select('country').eq('id', session.user.id).maybeSingle();
-      const { data: compProfile } = await _supabase.from('company_profile').select('country').eq('id', session.user.id).maybeSingle();
-      userCountry = (compProfile && compProfile.country) || (profile && profile.country) || 'MX';
-
       if (typeof updateVersionIndicator === 'function') {
         updateVersionIndicator(userCountry);
       }
 
       await loadProduct(productId);
-      await loadRoles(session.user.id);
+      await loadRoles(window.globalProfileData.companyId);
       document.getElementById('loading-state').style.display = 'none';
       document.getElementById('config-content').style.display = 'block';
     }
@@ -980,7 +975,7 @@
         // Si hay un logo seleccionado, procesarlo
         if (selectedLogoFile) {
           const fileExt = selectedLogoFile.name.split('.').pop();
-          const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+          const fileName = `${window.globalProfileData.companyId}/${Date.now()}.${fileExt}`;
           const { data: uploadData, error: uploadError } = await _supabase.storage
             .from('logos')
             .upload(fileName, selectedLogoFile);
@@ -1029,7 +1024,7 @@
           const { data: roleDefs } = await _supabase
             .from('role_definition')
             .select('*')
-            .eq('company_id', user.id)
+            .eq('company_id', window.globalProfileData.companyId)
             .ilike('role_name', roleName.trim());
 
           const roleDef = roleDefs && roleDefs.length > 0 ? roleDefs[0] : null;
@@ -1045,7 +1040,7 @@
               await _supabase.from('role_definition').update({ items: items }).eq('id', roleDef.id);
             } else {
               await _supabase.from('role_definition').insert({
-                company_id: user.id,
+                company_id: window.globalProfileData.companyId,
                 role_name: roleName.trim(),
                 items: items,
                 renewal_frequency: 6
@@ -1069,7 +1064,10 @@
       }
     }
 
-    init();
+    window.addEventListener('userProfileLoaded', (e) => {
+      userCountry = e.detail.userCountry || 'MX';
+      init();
+    });
   </script>
   <script src="assets/js/utils.js?v=4"></script>
 
