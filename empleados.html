@@ -3016,11 +3016,30 @@
           };
         });
 
-        renderEmployees('Restaurante');
+        renderEmployees(activeEmployeeIndustry);
       } catch (err) {
         console.error("Error fetching employees:", err);
       }
     }
+
+    let activeEmployeeIndustry = 'Restaurante';
+
+    // Check si utils.js ya cargó la industria en el DOM
+    const dashIndustryVal = document.getElementById('dash-industry-val')?.textContent;
+    if (dashIndustryVal && dashIndustryVal !== 'Sector' && dashIndustryVal !== 'Cargando...') {
+      activeEmployeeIndustry = dashIndustryVal;
+    }
+
+    window.addEventListener('userProfileLoaded', (e) => {
+      if (e.detail.industry) {
+        activeEmployeeIndustry = e.detail.industry;
+        const indDisplay = document.getElementById('dash-industry-val');
+        if (indDisplay) indDisplay.textContent = activeEmployeeIndustry;
+        if (allEmployees && allEmployees.length > 0) {
+          renderEmployees(activeEmployeeIndustry);
+        }
+      }
+    });
 
     // Initial render
     window.onload = () => {
@@ -3099,7 +3118,7 @@
     if (typeof window._supabase === 'undefined') {
       window.SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
       window.SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-      window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+      window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token' } });
     }
   </script>
   <script src="assets/js/utils.js?v=4"></script>
