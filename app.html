@@ -1057,7 +1057,7 @@
           // Extraer palabras clave simples (para el MVP)
           const words = text.toLowerCase().replace(/[^a-záéíóúñ0-9 ]/g, '').split(' ').filter(w => w.length > 3);
           
-          let query = _supabase.from('seller_catalog').select('id, name, base_price, images, min_order');
+          let query = _supabase.from('seller_catalog').select('id, name, base_price, images, wholesale_prices');
           
           // Si hay palabras clave, buscar la primera como filtro simple (ilike)
           if (words.length > 0) {
@@ -1084,6 +1084,12 @@
             
             products.forEach(p => {
               const imgUrl = (p.images && p.images.length > 0) ? p.images[0] : 'assets/images/placeholder_uniform.jpg';
+              // Calcular mínimo desde wholesale_prices si existe
+              let minQty = 1;
+              if (p.wholesale_prices && p.wholesale_prices.length > 0) {
+                 minQty = p.wholesale_prices[0].min_qty || 1;
+              }
+              
               const card = document.createElement('div');
               card.style.minWidth = '180px';
               card.style.background = 'white';
@@ -1097,7 +1103,7 @@
                 <div style="padding: 0.75rem;">
                   <h4 style="margin: 0 0 0.25rem 0; font-size: 0.9rem; color: #0F172A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.name}</h4>
                   <p style="margin: 0; font-size: 0.8rem; font-weight: 600; color: #10B981;">Desde $${p.base_price ? p.base_price.toLocaleString() : '0'}</p>
-                  <p style="margin: 0.25rem 0 0 0; font-size: 0.7rem; color: #64748B;">Min: ${p.min_order || 1} uds</p>
+                  <p style="margin: 0.25rem 0 0 0; font-size: 0.7rem; color: #64748B;">Min: ${minQty} uds</p>
                   <button style="margin-top: 0.5rem; width: 100%; padding: 0.4rem; background: #F1F5F9; color: var(--color-cyan); border: 1px solid var(--color-cyan); border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='var(--color-cyan)'; this.style.color='white';" onmouseout="this.style.background='#F1F5F9'; this.style.color='var(--color-cyan)';">Añadir a Cotización</button>
                 </div>
               `;
