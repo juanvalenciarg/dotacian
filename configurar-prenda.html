@@ -721,6 +721,7 @@
     let selectedRoles = [];
     let selectedLogoFile = null;
     let userCountry = 'MX'; // Default
+    let currentCompanyId = null;
 
     function showToast(title, message, type = 'success') {
       const container = document.getElementById('toast-container');
@@ -752,12 +753,19 @@
       const { data: { session } } = await _supabase.auth.getSession();
       if (!session) { window.location.href = 'login.html'; return; }
 
+      let companyId = session.user.id;
+      const { data: profile } = await _supabase.from('user_profile').select('role, company_id').eq('id', session.user.id).maybeSingle();
+      if (profile && profile.role !== 'admin' && profile.company_id) {
+        companyId = profile.company_id;
+      }
+      currentCompanyId = companyId;
+
       if (typeof updateVersionIndicator === 'function') {
         updateVersionIndicator(userCountry);
       }
 
       await loadProduct(productId);
-      await loadRoles(window.globalProfileData.companyId);
+      await loadRoles(currentCompanyId);
       document.getElementById('loading-state').style.display = 'none';
       document.getElementById('config-content').style.display = 'block';
     }
@@ -981,7 +989,7 @@
         // Si hay un logo seleccionado, procesarlo
         if (selectedLogoFile) {
           const fileExt = selectedLogoFile.name.split('.').pop();
-          const fileName = `${window.globalProfileData.companyId}/${Date.now()}.${fileExt}`;
+          const fileName = `${currentCompanyId}/${Date.now()}.${fileExt}`;
           const { data: uploadData, error: uploadError } = await _supabase.storage
             .from('logos')
             .upload(fileName, selectedLogoFile);
@@ -1030,7 +1038,7 @@
           const { data: roleDefs } = await _supabase
             .from('role_definition')
             .select('*')
-            .eq('company_id', window.globalProfileData.companyId)
+            .eq('company_id', currentCompanyId)
             .ilike('role_name', roleName.trim());
 
           const roleDef = roleDefs && roleDefs.length > 0 ? roleDefs[0] : null;
@@ -1046,7 +1054,7 @@
               await _supabase.from('role_definition').update({ items: items }).eq('id', roleDef.id);
             } else {
               await _supabase.from('role_definition').insert({
-                company_id: window.globalProfileData.companyId,
+                company_id: currentCompanyId,
                 role_name: roleName.trim(),
                 items: items,
                 renewal_frequency: 6
