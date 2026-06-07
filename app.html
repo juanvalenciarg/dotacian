@@ -971,17 +971,24 @@
             <div class="dot-ai-card" style="display: flex; flex-direction: column; height: 450px;">
 
               <!-- Header -->
-              <div class="dot-ai-header">
-                <div class="dot-ai-avatar">d</div>
-                <div>
-                  <h3 class="dot-ai-title">dot AI <span>Agente IA</span></h3>
-                  <div
-                    style="font-size: 0.65rem; color: #10B981; font-weight: 600; display: flex; align-items: center; gap: 3px; margin-top: 1px;">
-                    <span
-                      style="display: inline-block; width: 5px; height: 5px; background: #10B981; border-radius: 50%;"></span>
-                    En línea
+              <div class="dot-ai-header" style="display: flex; justify-content: space-between; align-items: center; padding-right: 1.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div class="dot-ai-avatar">d</div>
+                  <div>
+                    <h3 class="dot-ai-title">dot AI <span>Agente IA</span></h3>
+                    <div
+                      style="font-size: 0.65rem; color: #10B981; font-weight: 600; display: flex; align-items: center; gap: 3px; margin-top: 1px;">
+                      <span
+                        style="display: inline-block; width: 5px; height: 5px; background: #10B981; border-radius: 50%;"></span>
+                      En línea
+                    </div>
                   </div>
                 </div>
+                <button onclick="resetDotChat()" title="Reiniciar conversación" style="background: none; border: none; cursor: pointer; color: #94A3B8; display: flex; align-items: center; justify-content: center; padding: 0.25rem; border-radius: 50%; transition: background 0.2s, color 0.2s;" onmouseover="this.style.background='#F1F5F9'; this.style.color='#64748B';" onmouseout="this.style.background='none'; this.style.color='#94A3B8';">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </button>
               </div>
 
               <!-- Chat History -->
@@ -1022,6 +1029,15 @@
   <script src="assets/js/utils.js?v=4"></script>
   <script>
     // --- LÓGICA DEL CHAT DOT (Catálogo) ---
+    function resetDotChat() {
+      const history = document.getElementById('dotChatHistory');
+      history.innerHTML = `
+        <div class="chat-bubble assistant">
+          ¡Hola! Soy <strong>dot</strong>, tu asistente de inteligencia artificial 🤖. Puedo ayudarte a buscar uniformes, armar cotizaciones o revisar tus pedidos. ¿En qué puedo ayudarte hoy?
+        </div>
+      `;
+    }
+
     async function sendDotMessage(text) {
       if (!text || text.trim() === '') return;
       
