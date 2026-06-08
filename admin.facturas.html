@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>dotacian admin | Facturación a Clientes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --sidebar-width: 260px;
+    }
+
+    body {
+      background-color: #0F172A;
+      color: white;
+    }
+
+    .app-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Admin */
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: #020617;
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 1.5rem;
+    }
+
+    .sidebar-brand {
+      font-family: var(--font-family-heading);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 2rem;
+    }
+
+    .sidebar-brand span {
+      color: var(--color-cyan);
+    }
+
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      color: #94A3B8;
+      text-decoration: none;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background: rgba(255, 255, 255, 0.05);
+      color: white;
+    }
+
+    .nav-item.active {
+      color: var(--color-cyan);
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 2.5rem;
+      overflow-y: auto;
+    }
+
+    .app-header {
+      margin-bottom: 2rem;
+    }
+
+    .app-header h1 {
+      font-family: var(--font-family-heading);
+      font-size: 2rem;
+      font-weight: 800;
+    }
+
+    .app-header p {
+      color: #94A3B8;
+    }
+
+    .admin-card {
+      background: #1E293B;
+      border: 1px solid #334155;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .table-dark {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table-dark th {
+      text-align: left;
+      padding: 1rem;
+      color: #94A3B8;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid #334155;
+    }
+
+    .table-dark td {
+      padding: 1rem;
+      border-bottom: 1px solid #334155;
+      font-size: 0.9rem;
+    }
+
+    .table-dark tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .btn-emit {
+      background: var(--color-cyan);
+      color: #020617;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      font-size: 0.8rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-emit:hover {
+      background: #06b6d4;
+      transform: translateY(-1px);
+    }
+
+    .status-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .st-pending {
+      background: rgba(245, 158, 11, 0.2);
+      color: #FCD34D;
+    }
+
+    .st-paid {
+      background: rgba(16, 185, 129, 0.2);
+      color: #6EE7B7;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.8);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #0F172A;
+      border: 1px solid #334155;
+      border-radius: 1rem;
+      width: 600px;
+      max-width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 2rem;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-title {
+      font-family: var(--font-family-heading);
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      color: #94A3B8;
+      margin-bottom: 0.4rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem;
+      background: #1E293B;
+      border: 1px solid #334155;
+      border-radius: 0.5rem;
+      color: white;
+      font-family: var(--font-family-primary);
+    }
+
+    .form-control:focus {
+      border-color: var(--color-cyan);
+      outline: none;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .file-drop {
+      border: 2px dashed #334155;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      color: #94A3B8;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .file-drop:hover {
+      border-color: var(--color-cyan);
+      color: white;
+    }
+
+    .file-drop input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .btn-cancel {
+      background: transparent;
+      color: #94A3B8;
+      border: 1px solid #334155;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+    }
+
+    .btn-cancel:hover {
+      background: #1E293B;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand" style="padding: 1.5rem 2rem;">
+        <a href="admin.html">
+          <img src="assets/logos/logo_dotacian_admin.png" alt="dotacian admin" style="width: 100%; max-width: 180px; height: auto; display: block;">
+        </a>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="admin.html" id="nav-dashboard" class="nav-item">Dashboard</a>
+        <a href="admin.usuarios.html" id="nav-users" class="nav-item">Gestión de Clientes</a>
+        <a href="admin.sellers.html" id="nav-sellers" class="nav-item">Gestión de Fabricantes</a>
+        <a href="admin.facturas.html" class="nav-item active">Facturación</a>
+        <a href="admin.blog.html" id="nav-blog" class="nav-item">Gestión de Blog</a>
+        <a href="#" class="nav-item">Logs de Sistema</a>
+        <a href="#" class="nav-item">Seguridad</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="app-header">
+        <h1>Facturación a Clientes</h1>
+        <p>Emite facturas por órdenes completadas y liquidadas.</p>
+      </header>
+
+      <div class="admin-card">
+        <h2 style="font-size: 1.1rem; margin-bottom: 1rem;">Órdenes Pendientes de Facturar</h2>
+        <table class="table-dark" id="pending-table">
+          <thead>
+            <tr>
+              <th>PO #</th>
+              <th>Cliente</th>
+              <th>Monto Total</th>
+              <th>Estado Pago</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="pending-body">
+            <tr>
+              <td colspan="5" style="text-align:center;">Cargando...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="admin-card">
+        <h2 style="font-size: 1.1rem; margin-bottom: 1rem;">Facturas Emitidas</h2>
+        <table class="table-dark" id="invoiced-table">
+          <thead>
+            <tr>
+              <th>Factura #</th>
+              <th>PO #</th>
+              <th>Cliente</th>
+              <th>Total</th>
+              <th>Archivos</th>
+            </tr>
+          </thead>
+          <tbody id="invoiced-body">
+            <tr>
+              <td colspan="5" style="text-align:center;">Cargando...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Emitir Factura -->
+  <div class="modal-backdrop" id="modalFactura">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">Subir Factura Oficial</div>
+      </div>
+
+      <div
+        style="background: rgba(6,182,212,0.1); border-left: 3px solid var(--color-cyan); padding: 1rem; margin-bottom: 1.5rem; border-radius: 0 0.5rem 0.5rem 0;">
+        <span style="font-size:0.8rem; color:#94A3B8; display:block;">Cliente:</span>
+        <strong id="m-client" style="color:white;"></strong><br>
+        <span style="font-size:0.8rem; color:#94A3B8; display:block; margin-top:0.5rem;">Orden / Monto:</span>
+        <strong id="m-order" style="color:white;"></strong> | <strong id="m-amount"
+          style="color:var(--color-cyan);"></strong>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>País Normativa</label>
+          <select class="form-control" id="f-country" onchange="toggleCountry()">
+            <option value="MX">México (CFDI 4.0)</option>
+            <option value="CO">Colombia (DIAN)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Número de Factura / Folio</label>
+          <input type="text" class="form-control" id="f-invoice-num" placeholder="Ej: F-1002">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label id="lbl-tax-id">RFC / NIT del Cliente</label>
+          <input type="text" class="form-control" id="f-tax-id">
+        </div>
+        <div class="form-group">
+          <label>Monto Facturado</label>
+          <input type="number" step="0.01" class="form-control" id="f-amount">
+        </div>
+      </div>
+
+      <div id="mx-fields">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Uso de CFDI</label>
+            <select class="form-control" id="f-uso">
+              <option value="G01">G01 - Adquisición de mercancías</option>
+              <option value="G03">G03 - Gastos en general</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Método de Pago</label>
+            <select class="form-control" id="f-metodo">
+              <option value="PUE">PUE - Pago en una sola exhibición</option>
+              <option value="PPD">PPD - Pago en parcialidades o diferido</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="co-fields" style="display:none;">
+        <div class="form-group">
+          <label>Tipo de Operación</label>
+          <select class="form-control" id="f-tipo-op">
+            <option value="10">Estándar</option>
+            <option value="09">AIU</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row" style="margin-top:1.5rem;">
+        <div class="form-group">
+          <div class="file-drop">
+            <input type="file" id="f-pdf" accept="application/pdf" onchange="handleFile('pdf', event)">
+            <span id="name-pdf">Subir PDF</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="file-drop">
+            <input type="file" id="f-xml" accept="application/xml,text/xml" onchange="handleFile('xml', event)">
+            <span id="name-xml">Subir XML</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+        <button class="btn-emit" id="btn-save" onclick="saveInvoice()">Guardar y Enviar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/utils.js?v=4"></script>
+  <script>
+    const _supabase = supabase.createClient('https://awuhvewotmwelurmjvmu.supabase.co', 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq', { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token' } });
+
+    let activePo = null;
+    let files = { pdf: null, xml: null };
+
+    async function loadData() {
+      // 1. Traer todas las órdenes que están completed
+      const { data: pos, error } = await _supabase
+        .from('company_purchase_orders')
+        .select('id, po_number, order_number, total_amount, company_id, company_profile(company_name, nit_rfc)')
+        .eq('status', 'completed')
+        .order('created_at', { ascending: false });
+
+      if (error) return console.error(error);
+
+      // 2. Traer facturas existentes
+      const { data: invoices } = await _supabase.from('company_invoices').select('*');
+      const invMap = {};
+      (invoices || []).forEach(inv => invMap[inv.po_id] = inv);
+
+      let pendingHtml = '';
+      let invoicedHtml = '';
+
+      (pos || []).forEach(po => {
+        const clientName = po.company_profile?.company_name || 'Desconocido';
+        const poNum = po.po_number || po.order_number || 'S/N';
+        const amt = parseFloat(po.total_amount).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
+
+        if (invMap[po.id]) {
+          const inv = invMap[po.id];
+          invoicedHtml += `
+            <tr>
+              <td><span style="color:var(--color-cyan); font-weight:600;">${inv.invoice_number}</span></td>
+              <td>${poNum}</td>
+              <td>${clientName}</td>
+              <td>$${parseFloat(inv.total_amount).toLocaleString('es-MX')}</td>
+              <td>
+                ${inv.pdf_url ? `<a href="${inv.pdf_url}" target="_blank" style="color:#EF4444; margin-right:0.5rem; font-weight:600; text-decoration:none;">PDF</a>` : ''}
+                ${inv.xml_url ? `<a href="${inv.xml_url}" target="_blank" style="color:#0EA5E9; font-weight:600; text-decoration:none;">XML</a>` : ''}
+              </td>
+            </tr>`;
+        } else {
+          pendingHtml += `
+            <tr>
+              <td><strong>${poNum}</strong></td>
+              <td>${clientName}</td>
+              <td>${amt}</td>
+              <td><span class="status-badge st-paid">PAGADA</span></td>
+              <td><button class="btn-emit" onclick='openModal(${JSON.stringify(po).replace(/'/g, "&apos;")})'>Emitir</button></td>
+            </tr>`;
+        }
+      });
+
+      document.getElementById('pending-body').innerHTML = pendingHtml || '<tr><td colspan="5" style="text-align:center;">No hay pendientes</td></tr>';
+      document.getElementById('invoiced-body').innerHTML = invoicedHtml || '<tr><td colspan="5" style="text-align:center;">No hay emitidas</td></tr>';
+    }
+
+    function toggleCountry() {
+      const c = document.getElementById('f-country').value;
+      document.getElementById('mx-fields').style.display = c === 'MX' ? 'block' : 'none';
+      document.getElementById('co-fields').style.display = c === 'CO' ? 'block' : 'none';
+      document.getElementById('lbl-tax-id').textContent = c === 'MX' ? 'RFC del Cliente' : 'NIT del Cliente';
+    }
+
+    function handleFile(type, event) {
+      const f = event.target.files[0];
+      if (!f) return;
+      files[type] = f;
+      document.getElementById(`name-${type}`).textContent = f.name;
+    }
+
+    function openModal(po) {
+      activePo = po;
+      document.getElementById('m-client').textContent = po.company_profile?.company_name || '';
+      document.getElementById('m-order').textContent = po.po_number || po.order_number;
+      document.getElementById('m-amount').textContent = `$${po.total_amount}`;
+
+      document.getElementById('f-amount').value = po.total_amount;
+      document.getElementById('f-tax-id').value = po.company_profile?.nit_rfc || '';
+
+      files = { pdf: null, xml: null };
+      document.getElementById('f-pdf').value = '';
+      document.getElementById('f-xml').value = '';
+      document.getElementById('name-pdf').textContent = 'Subir PDF';
+      document.getElementById('name-xml').textContent = 'Subir XML';
+
+      document.getElementById('modalFactura').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('modalFactura').classList.remove('open');
+      activePo = null;
+    }
+
+    async function saveInvoice() {
+      if (!activePo) return;
+      if (!files.pdf || !files.xml) return alert('Ambos archivos son obligatorios.');
+
+      const btn = document.getElementById('btn-save');
+      btn.disabled = true; btn.textContent = 'Subiendo...';
+
+      try {
+        const country = document.getElementById('f-country').value;
+        const invNum = document.getElementById('f-invoice-num').value.trim();
+        const taxId = document.getElementById('f-tax-id').value.trim();
+        const amt = parseFloat(document.getElementById('f-amount').value);
+
+        // Upload PDF
+        const pdfPath = `admin/${activePo.id}_${invNum}.pdf`;
+        await _supabase.storage.from('invoices').upload(pdfPath, files.pdf, { upsert: true });
+        const pdfUrl = _supabase.storage.from('invoices').getPublicUrl(pdfPath).data.publicUrl;
+
+        // Upload XML
+        const xmlPath = `admin/${activePo.id}_${invNum}.xml`;
+        await _supabase.storage.from('invoices').upload(xmlPath, files.xml, { upsert: true });
+        const xmlUrl = _supabase.storage.from('invoices').getPublicUrl(xmlPath).data.publicUrl;
+
+        let mxM = {}, coM = {};
+        if (country === 'MX') {
+          mxM = { uso_cfdi: document.getElementById('f-uso').value, metodo_pago: document.getElementById('f-metodo').value };
+        } else {
+          coM = { tipo_operacion: document.getElementById('f-tipo-op').value };
+        }
+
+        const { error } = await _supabase.from('company_invoices').insert({
+          po_id: activePo.id,
+          company_id: activePo.company_id,
+          invoice_number: invNum,
+          country: country,
+          tax_id: taxId,
+          legal_name: activePo.company_profile?.company_name || 'N/A',
+          subtotal: amt / 1.16,
+          tax_amount: amt - (amt / 1.16),
+          total_amount: amt,
+          pdf_url: pdfUrl,
+          xml_url: xmlUrl,
+          mx_metadata: mxM,
+          co_metadata: coM
+        });
+
+        if (error) throw error;
+
+        closeModal();
+        loadData();
+      } catch (err) {
+        console.error(err);
+        alert('Hubo un error al guardar.');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Guardar y Enviar';
+      }
+    }
+
+    loadData();
+  </script>
+</body>
+
+</html>
