@@ -11,6 +11,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  
+  <!-- Quill CSS -->
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -304,8 +307,7 @@
               Insertar Imagen
             </button>
           </div>
-          <textarea id="postContent" class="form-control" required
-            placeholder="Escribe tu artículo aquí... (puedes usar HTML para agregar negritas, listas o imágenes internas)"></textarea>
+          <div id="editor-container" style="height: 350px; background: white; font-family: inherit; font-size: 1rem; border-bottom-left-radius: 0.5rem; border-bottom-right-radius: 0.5rem;"></div>
         </div>
 
         <div class="form-actions">
@@ -320,10 +322,37 @@
   </div>
 
   <script src="assets/js/utils.js?v=4"></script>
+  <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
   <script>
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: 'dotacian-client-token' } });
+
+    // Configuración de Quill Editor
+    var toolbarOptions = [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      ['blockquote', 'code-block'],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'align': [] }],
+      [{ 'color': [] }, { 'background': [] }],
+      ['link'],
+      ['clean']
+    ];
+
+    var quill = new Quill('#editor-container', {
+      modules: {
+        toolbar: toolbarOptions
+      },
+      placeholder: 'Escribe tu artículo aquí...',
+      theme: 'snow'
+    });
+
+    // Ajustar borde superior del editor para que coincida con el tema
+    document.querySelector('.ql-toolbar').style.borderTopLeftRadius = '0.5rem';
+    document.querySelector('.ql-toolbar').style.borderTopRightRadius = '0.5rem';
+    document.querySelector('.ql-container').style.borderBottomLeftRadius = '0.5rem';
+    document.querySelector('.ql-container').style.borderBottomRightRadius = '0.5rem';
 
     async function checkAdminAuth() {
       const { data: { session } } = await _supabase.auth.getSession();
@@ -396,6 +425,7 @@
     function openModal() {
       document.getElementById('postForm').reset();
       document.getElementById('postId').value = '';
+      quill.setContents([]);
       document.getElementById('modalTitle').innerText = 'Nuevo Artículo';
       document.getElementById('postModal').classList.add('active');
     }
@@ -411,7 +441,7 @@
       document.getElementById('postSlug').value = post.slug;
       document.getElementById('postAuthor').value = post.author || '';
       document.getElementById('postImageUrl').value = post.image_url || '';
-      document.getElementById('postContent').value = post.content;
+      quill.clipboard.dangerouslyPasteHTML(post.content || '');
 
       document.getElementById('modalTitle').innerText = 'Editar Artículo';
       document.getElementById('postModal').classList.add('active');
@@ -429,7 +459,7 @@
         slug: document.getElementById('postSlug').value,
         author: document.getElementById('postAuthor').value,
         image_url: document.getElementById('postImageUrl').value,
-        content: document.getElementById('postContent').value
+        content: quill.root.innerHTML
       };
 
       try {
@@ -500,20 +530,10 @@
 
         const { data: { publicUrl } } = _supabase.storage.from('blog-images').getPublicUrl(filePath);
 
-        // Insert HTML tag into textarea at cursor position
-        const textarea = document.getElementById('postContent');
-        const imgTag = `\\n<img src="${publicUrl}" style="max-width: 100%; border-radius: 8px; margin: 1.5rem 0; display: block;" alt="Imagen del artículo">\\n`;
-
-        const startPos = textarea.selectionStart;
-        const endPos = textarea.selectionEnd;
-        const textValue = textarea.value;
-
-        textarea.value = textValue.substring(0, startPos) + imgTag + textValue.substring(endPos, textValue.length);
-
-        // Move cursor after the inserted tag
-        textarea.selectionStart = startPos + imgTag.length;
-        textarea.selectionEnd = startPos + imgTag.length;
-        textarea.focus();
+        // Insertar imagen en Quill en la posición actual del cursor
+        const range = quill.getSelection(true);
+        quill.insertEmbed(range.index, 'image', publicUrl);
+        quill.setSelection(range.index + 1);
 
         showToast('Éxito', 'Imagen insertada en el contenido.');
       } catch (error) {
