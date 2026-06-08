@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dotacian | Gestión de Leads</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* Estilos del Pipeline Comercial (Kanban) */
+    .kanban-board {
+      display: flex;
+      gap: 1.5rem;
+      overflow-x: auto;
+      padding-bottom: 1rem;
+      align-items: flex-start;
+      min-height: 600px;
+    }
+
+    .kanban-column {
+      flex: 0 0 320px;
+      background: #F8FAFC;
+      border-radius: 12px;
+      padding: 1rem;
+      border: 1px solid #E2E8F0;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .kanban-column-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #E2E8F0;
+      font-weight: 700;
+      color: #0F172A;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .kanban-column-header .count {
+      background: #E2E8F0;
+      color: #475569;
+      padding: 0.1rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+    }
+
+    /* Colores específicos de las columnas */
+    .col-nuevo { border-top: 4px solid #3B82F6; }
+    .col-contactado { border-top: 4px solid #F59E0B; }
+    .col-reunion { border-top: 4px solid #10B981; }
+    .col-rechazado { border-top: 4px solid #EF4444; }
+
+    .kanban-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      min-height: 50px;
+    }
+
+    .lead-card {
+      background: white;
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      border: 1px solid #E2E8F0;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .lead-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+      border-color: #CBD5E1;
+    }
+
+    .lead-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.5rem;
+    }
+
+    .lead-name {
+      font-weight: 700;
+      color: #0F172A;
+      font-size: 1rem;
+    }
+
+    .lead-date {
+      font-size: 0.75rem;
+      color: #64748B;
+    }
+
+    .lead-company {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .lead-details {
+      font-size: 0.8rem;
+      color: #64748B;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .lead-detail-badge {
+      background: #F1F5F9;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .lead-actions {
+      border-top: 1px solid #F1F5F9;
+      padding-top: 0.75rem;
+    }
+
+    .status-select {
+      width: 100%;
+      padding: 0.4rem;
+      border: 1px solid #E2E8F0;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      background: #F8FAFC;
+      color: #334155;
+      outline: none;
+      font-weight: 500;
+    }
+
+    .status-select:focus {
+      border-color: var(--color-cyan);
+    }
+
+    .toast-container {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 9999;
+    }
+
+    /* Ocultar el scrollbar de kanban pero permitir scroll */
+    .kanban-board::-webkit-scrollbar {
+      height: 8px;
+    }
+    .kanban-board::-webkit-scrollbar-track {
+      background: #f1f1f1; 
+      border-radius: 4px;
+    }
+    .kanban-board::-webkit-scrollbar-thumb {
+      background: #cbd5e1; 
+      border-radius: 4px;
+    }
+    .kanban-board::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8; 
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-layout admin-dark">
+    <!-- Sidebar -->
+    <aside class="sidebar" style="background-color: #020617;">
+      <div class="sidebar-brand" style="padding: 1.5rem 2rem;">
+        <a href="admin.html">
+          <img src="assets/logos/logo_dotacian_admin.png" alt="dotacian admin"
+            style="width: 100%; max-width: 180px; height: auto; display: block;">
+        </a>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="admin.html" id="nav-dashboard" class="nav-item">Dashboard</a>
+        <a href="admin.usuarios.html" id="nav-users" class="nav-item">Gestión de Clientes</a>
+        <a href="admin.sellers.html" id="nav-sellers" class="nav-item">Gestión de Fabricantes</a>
+        <a href="admin.leads.html" id="nav-leads" class="nav-item active">Gestión de Leads</a>
+        <a href="admin.facturas.html" class="nav-item">Facturación</a>
+        <a href="admin.blog.html" id="nav-blog" class="nav-item">Gestión de Blog</a>
+        <a href="#" class="nav-item">Logs de Sistema</a>
+        <a href="#" class="nav-item">Seguridad</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="app-header">
+        <h1 id="pageTitle">Pipeline Comercial (Leads)</h1>
+        <div class="algo-status">
+          <span style="color: var(--color-cyan);">●</span> Panel Administrativo
+        </div>
+      </header>
+
+      <div class="app-container">
+        
+        <!-- Tablero Kanban -->
+        <div class="kanban-board">
+          
+          <!-- Columna: Nuevo -->
+          <div class="kanban-column col-nuevo">
+            <div class="kanban-column-header">
+              <span>Nuevos</span>
+              <span class="count" id="count-nuevo">0</span>
+            </div>
+            <div class="kanban-cards" id="col-nuevo-cards">
+              <!-- Cards here -->
+            </div>
+          </div>
+
+          <!-- Columna: Contactado -->
+          <div class="kanban-column col-contactado">
+            <div class="kanban-column-header">
+              <span>Contactados</span>
+              <span class="count" id="count-contactado">0</span>
+            </div>
+            <div class="kanban-cards" id="col-contactado-cards">
+              <!-- Cards here -->
+            </div>
+          </div>
+
+          <!-- Columna: Reunión Agendada -->
+          <div class="kanban-column col-reunion">
+            <div class="kanban-column-header">
+              <span>Reunión Agendada</span>
+              <span class="count" id="count-reunion">0</span>
+            </div>
+            <div class="kanban-cards" id="col-reunion-cards">
+              <!-- Cards here -->
+            </div>
+          </div>
+
+          <!-- Columna: No Interesado -->
+          <div class="kanban-column col-rechazado">
+            <div class="kanban-column-header">
+              <span>No Interesados</span>
+              <span class="count" id="count-rechazado">0</span>
+            </div>
+            <div class="kanban-cards" id="col-rechazado-cards">
+              <!-- Cards here -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="assets/js/utils.js?v=4"></script>
+  <script>
+    const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: 'dotacian-client-token' } });
+
+    // Validación de sesión administrativa
+    async function checkAdminAuth() {
+      const { data: { session } } = await _supabase.auth.getSession();
+      if (!session) {
+        window.location.href = 'login.admin.html';
+        return;
+      }
+
+      // Validar que exista en admin_profile
+      const { data: adminData, error } = await _supabase
+        .from('admin_profile')
+        .select('id')
+        .eq('id', session.user.id)
+        .maybeSingle();
+
+      if (error || !adminData) {
+        await _supabase.auth.signOut();
+        window.location.href = 'login.admin.html?error=unauthorized';
+      } else {
+        loadLeads();
+      }
+    }
+
+    checkAdminAuth();
+
+    function showToast(title, message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.style.cssText = "background: white; border-left: 4px solid " + (type === 'error' ? '#EF4444' : '#10B981') + "; padding: 1rem 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 1rem; min-width: 300px;";
+      toast.innerHTML = `
+        <div>
+          <div style="font-weight: 700; font-size: 0.9rem; color: #0F172A;">${title}</div>
+          <div style="font-size: 0.875rem; color: #64748B;">${message}</div>
+        </div>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => { toast.remove(); }, 4000);
+    }
+
+    function formatDateShort(isoString) {
+      if (!isoString) return '';
+      return new Date(isoString).toLocaleDateString('es-MX', {
+        day: '2-digit', month: 'short'
+      });
+    }
+
+    async function loadLeads() {
+      try {
+        const { data, error } = await _supabase
+          .from('leads_dotacian')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error("Error al cargar leads:", error);
+          showToast('Error', 'No se pudieron cargar los leads. Verifica permisos RLS.', 'error');
+          return;
+        }
+
+        renderBoard(data || []);
+      } catch (err) {
+        console.error("Excepción al cargar leads:", err);
+      }
+    }
+
+    function renderBoard(leads) {
+      const columns = {
+        'nuevo': document.getElementById('col-nuevo-cards'),
+        'contactado': document.getElementById('col-contactado-cards'),
+        'reunion_agendada': document.getElementById('col-reunion-cards'),
+        'no_interesado': document.getElementById('col-rechazado-cards')
+      };
+
+      const counts = {
+        'nuevo': 0, 'contactado': 0, 'reunion_agendada': 0, 'no_interesado': 0
+      };
+
+      // Limpiar columnas
+      Object.values(columns).forEach(col => col.innerHTML = '');
+
+      leads.forEach(lead => {
+        // Normalizar status
+        let status = lead.status || 'nuevo';
+        if (!columns[status]) status = 'nuevo'; // Fallback
+
+        counts[status]++;
+
+        const card = document.createElement('div');
+        card.className = 'lead-card';
+        card.innerHTML = `
+          <div class="lead-header">
+            <span class="lead-name">${lead['first-name'] || ''} ${lead['last-name'] || ''}</span>
+            <span class="lead-date">${formatDateShort(lead.created_at)}</span>
+          </div>
+          <div class="lead-company">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><path d="M9 9h6"></path><path d="M9 13h6"></path><path d="M9 17h6"></path></svg>
+            ${lead.company || 'Sin Empresa'}
+          </div>
+          <div class="lead-details">
+            <div class="lead-detail-badge">
+               <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+               ${lead.email || 'N/A'}
+            </div>
+            <div class="lead-detail-badge">
+               <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+               ${lead.industry || 'N/A'}
+            </div>
+            <div class="lead-detail-badge">
+               <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+               ${lead.employees || 'N/A'} emp.
+            </div>
+            <div class="lead-detail-badge">
+               ${lead.country === 'México' ? '🇲🇽' : lead.country === 'Colombia' ? '🇨🇴' : '🌎'} ${lead.country || 'N/A'}
+            </div>
+          </div>
+          <div class="lead-actions">
+            <select class="status-select" onchange="updateLeadStatus('${lead.id}', this.value)">
+              <option value="nuevo" ${status === 'nuevo' ? 'selected' : ''}>Nuevo</option>
+              <option value="contactado" ${status === 'contactado' ? 'selected' : ''}>Contactado</option>
+              <option value="reunion_agendada" ${status === 'reunion_agendada' ? 'selected' : ''}>Reunión Agendada</option>
+              <option value="no_interesado" ${status === 'no_interesado' ? 'selected' : ''}>No Interesado</option>
+            </select>
+          </div>
+        `;
+        columns[status].appendChild(card);
+      });
+
+      // Update counters
+      document.getElementById('count-nuevo').textContent = counts['nuevo'];
+      document.getElementById('count-contactado').textContent = counts['contactado'];
+      document.getElementById('count-reunion').textContent = counts['reunion_agendada'];
+      document.getElementById('count-rechazado').textContent = counts['no_interesado'];
+    }
+
+    async function updateLeadStatus(leadId, newStatus) {
+      if (!leadId) return;
+
+      try {
+        const { error } = await _supabase
+          .from('leads_dotacian')
+          .update({ status: newStatus })
+          .eq('id', leadId);
+
+        if (error) {
+          console.error("Error al actualizar:", error);
+          showToast('Error', 'No se pudo actualizar el estado.', 'error');
+          // Recargar para revertir el select
+          loadLeads();
+          return;
+        }
+
+        showToast('Éxito', 'Estado del lead actualizado correctamente.');
+        loadLeads(); // Recargar el tablero para mover la tarjeta de columna
+      } catch (err) {
+        console.error("Excepción al actualizar:", err);
+        showToast('Error', 'Hubo un problema al conectar con el servidor.', 'error');
+        loadLeads();
+      }
+    }
+  </script>
+</body>
+
+</html>
