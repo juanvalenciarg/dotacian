@@ -312,7 +312,7 @@
     .table-container {
       background: white;
       border-radius: 0.75rem;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
       overflow-x: auto;
       margin-top: 2rem;
     }
@@ -386,6 +386,7 @@
         <a href="admin.html" id="nav-dashboard" class="nav-item">Dashboard</a>
         <a href="admin.usuarios.html" id="nav-users" class="nav-item">Gestión de Clientes</a>
         <a href="admin.sellers.html" id="nav-sellers" class="nav-item active">Gestión de Fabricantes</a>
+        <a href="admin.leads.html" id="nav-leads" class="nav-item">Gestión de Leads</a>
         <a href="admin.facturas.html" class="nav-item">Facturación</a>
         <a href="admin.blog.html" id="nav-blog" class="nav-item">Gestión de Blog</a>
         <a href="#" class="nav-item">Logs de Sistema</a>
@@ -402,10 +403,10 @@
       </header>
 
       <div class="app-container">
-        
+
         <!-- Vista de Gestión de Usuarios -->
         <div id="userManagementView">
-        <!-- End Vista del Dashboard -->
+          <!-- End Vista del Dashboard -->
           <!-- Buscador -->
           <div class="search-container">
             <div class="search-input-group">
@@ -431,7 +432,8 @@
               </thead>
               <tbody id="usersTableBody">
                 <tr>
-                  <td colspan="7" style="text-align: center; color: #64748B; padding: 2rem;">Cargando lista de usuarios...</td>
+                  <td colspan="7" style="text-align: center; color: #64748B; padding: 2rem;">Cargando lista de
+                    usuarios...</td>
                 </tr>
               </tbody>
             </table>
@@ -442,12 +444,16 @@
           <div id="userCard" class="user-card">
             <div class="drawer-header">
               <div>
-                <h2 id="cardTitle" style="margin: 0; font-family: var(--font-family-heading); color: var(--color-navy); font-size: 1.25rem;">Datos del Fabricante</h2>
-                <p id="cardEmail" style="margin: 0.25rem 0 0 0; color: var(--color-text-secondary); font-size: 0.875rem;">-</p>
+                <h2 id="cardTitle"
+                  style="margin: 0; font-family: var(--font-family-heading); color: var(--color-navy); font-size: 1.25rem;">
+                  Datos del Fabricante</h2>
+                <p id="cardEmail"
+                  style="margin: 0.25rem 0 0 0; color: var(--color-text-secondary); font-size: 0.875rem;">-</p>
               </div>
               <div style="display: flex; align-items: center; gap: 1rem;">
                 <span id="cardRole" class="role-badge role-seller">Fabricante</span>
-                <button onclick="closeDrawer()" style="background: none; border: none; font-size: 1.5rem; color: #94A3B8; cursor: pointer; line-height: 1;">&times;</button>
+                <button onclick="closeDrawer()"
+                  style="background: none; border: none; font-size: 1.5rem; color: #94A3B8; cursor: pointer; line-height: 1;">&times;</button>
               </div>
             </div>
 
@@ -455,7 +461,10 @@
               <!-- Datos Personales -->
               <div class="form-section">
                 <div class="form-section-title">
-                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
                   Datos Personales
                 </div>
                 <div class="form-grid">
@@ -481,7 +490,12 @@
               <!-- Empresa y Actividad -->
               <div class="form-section">
                 <div class="form-section-title">
-                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><path d="M9 9h6"></path><path d="M9 13h6"></path><path d="M9 17h6"></path></svg>
+                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+                    <path d="M9 9h6"></path>
+                    <path d="M9 13h6"></path>
+                    <path d="M9 17h6"></path>
+                  </svg>
                   Empresa y Actividad
                 </div>
                 <div class="form-grid">
@@ -495,11 +509,13 @@
                   </div>
                   <div class="form-group">
                     <label>Cotizaciones Recibidas</label>
-                    <div id="viewQuotesCount" style="font-weight: 700; color: var(--color-cyan); font-size: 1.1rem;">0</div>
+                    <div id="viewQuotesCount" style="font-weight: 700; color: var(--color-cyan); font-size: 1.1rem;">0
+                    </div>
                   </div>
                   <div class="form-group">
                     <label>Órdenes de Producción</label>
-                    <div id="viewOrdersCount" style="font-weight: 700; color: var(--color-brand-primary); font-size: 1.1rem;">0</div>
+                    <div id="viewOrdersCount"
+                      style="font-weight: 700; color: var(--color-brand-primary); font-size: 1.1rem;">0</div>
                   </div>
                 </div>
               </div>
@@ -507,7 +523,10 @@
               <!-- Registro y Tiempos -->
               <div class="form-section">
                 <div class="form-section-title">
-                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
                   Registro y Tiempos
                 </div>
                 <div class="form-grid">
@@ -524,7 +543,8 @@
             </div>
 
             <div class="drawer-footer">
-              <button class="btn btn-outline" style="border-color: #991B1B; color: #991B1B; background: #FEF2F2;" onclick="deleteUser()">
+              <button class="btn btn-outline" style="border-color: #991B1B; color: #991B1B; background: #FEF2F2;"
+                onclick="deleteUser()">
                 Eliminar Fabricante
               </button>
               <button class="btn btn-outline" style="border-color: #EF4444; color: #EF4444;" onclick="resetPassword()">
@@ -581,7 +601,7 @@
       try {
         const { data, error } = await _supabase.rpc('get_all_users_admin_list');
         const tbody = document.getElementById('usersTableBody');
-        
+
         if (error) {
           console.error("Error loading users:", error);
           tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #EF4444;">Error al cargar usuarios. Asegúrate de crear el RPC en Supabase.</td></tr>`;
@@ -604,14 +624,14 @@
         sellers.forEach(user => {
           const roleClass = 'role-seller';
           const roleName = 'Fabricante';
-          
+
           const tr = document.createElement('tr');
           tr.onclick = () => {
             document.getElementById('searchEmail').value = user.email;
             searchUser();
             window.scrollTo({ top: 0, behavior: 'smooth' });
           };
-          
+
           tr.innerHTML = `
             <td>
               <div class="user-info">
@@ -770,11 +790,11 @@
           seller_name: companyName,
           location: country
         };
-        
+
         const { error: compError } = await _supabase
           .from('seller_company')
           .upsert([companyPayload], { onConflict: 'id' });
-          
+
         if (compError) throw compError;
 
         if (error) throw error;
@@ -804,7 +824,7 @@
 
     async function deleteUser() {
       if (!currentUserRecord || !currentUserRecord.user_id) return;
-      
+
       const confirmDelete = confirm("¿Estás completamente seguro de que deseas eliminar este fabricante? Esta acción es irreversible y borrará todos sus datos.");
       if (!confirmDelete) return;
 
@@ -814,7 +834,7 @@
         });
 
         if (error) throw error;
-        
+
         showToast('Eliminado', 'El fabricante ha sido eliminado permanentemente.', 'success');
         closeDrawer();
         fetchUsers(); // Recargar la tabla
