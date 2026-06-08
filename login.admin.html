@@ -253,7 +253,7 @@
         const errorText = document.getElementById('error-message-text');
         errorText.textContent = 'Tu sesión fue cerrada porque no tienes privilegios de administrador.';
         errorAlert.style.display = 'flex';
-        
+
         // Limpiar la URL para que no persista el mensaje si recarga
         window.history.replaceState({}, document.title, window.location.pathname);
       }
@@ -326,6 +326,20 @@
           submitBtn.textContent = 'Acceder al Panel';
         }
       });
+    }
+    // Comprobar si hubo un rebote por timeout
+    const urlParams = new URLSearchParams(window.location.search);
+    const reason = urlParams.get('reason');
+    if (reason === 'timeout') {
+      const errorAlert = document.getElementById('login-error-alert');
+      const errorText = document.getElementById('error-message-text');
+      if (errorAlert && errorText) {
+        errorText.textContent = 'Tu sesión se cerro por seguridad, vuelve a iniciar sesión';
+        errorAlert.style.background = '#FFFBEB';
+        errorAlert.style.color = '#D97706';
+        errorAlert.style.borderColor = '#FCD34D';
+        errorAlert.style.display = 'flex';
+      }
     }
   </script>
 </body>
