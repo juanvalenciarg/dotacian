@@ -258,6 +258,7 @@
         <a href="admin.html" id="nav-dashboard" class="nav-item active">Dashboard</a>
         <a href="admin.usuarios.html" id="nav-users" class="nav-item">Gestión de Clientes</a>
         <a href="admin.sellers.html" id="nav-sellers" class="nav-item">Gestión de Fabricantes</a>
+        <a href="admin.leads.html" id="nav-leads" class="nav-item">Gestión de Leads</a>
         <a href="admin.facturas.html" class="nav-item">Facturación</a>
         <a href="admin.blog.html" id="nav-blog" class="nav-item">Gestión de Blog</a>
         <a href="#" class="nav-item">Logs de Sistema</a>
@@ -284,7 +285,8 @@
                 <div class="metric-icon">🏢</div>
               </div>
               <div class="metric-value" id="count-users">--</div>
-              <div style="font-size: 0.75rem; color: var(--color-primary); margin-top: 0.5rem; display: flex; align-items: center; gap: 0.25rem;">
+              <div
+                style="font-size: 0.75rem; color: var(--color-primary); margin-top: 0.5rem; display: flex; align-items: center; gap: 0.25rem;">
                 Ir a Gestión de Clientes <span style="font-size: 0.8rem;">→</span>
               </div>
             </div>
@@ -295,7 +297,8 @@
                 <div class="metric-icon">🏭</div>
               </div>
               <div class="metric-value" id="count-sellers">--</div>
-              <div style="font-size: 0.75rem; color: var(--color-primary); margin-top: 0.5rem; display: flex; align-items: center; gap: 0.25rem;">
+              <div
+                style="font-size: 0.75rem; color: var(--color-primary); margin-top: 0.5rem; display: flex; align-items: center; gap: 0.25rem;">
                 Ir a Gestión de Fabricantes <span style="font-size: 0.8rem;">→</span>
               </div>
             </div>
@@ -374,7 +377,7 @@
     async function loadDashboardMetrics() {
       try {
         const { data, error } = await _supabase.rpc('get_admin_dashboard_metrics');
-        
+
         if (error) {
           console.error("Error al ejecutar RPC de métricas:", error);
           showToast('Error', 'No se pudieron cargar las métricas (Falta RPC o permisos).', 'error');
@@ -392,7 +395,7 @@
         const statusCounts = data.orders_status || {};
         const container = document.getElementById('orders-status-container');
         container.innerHTML = '';
-        
+
         if (Object.keys(statusCounts).length === 0) {
           container.innerHTML = '<div style="color: #64748B; font-size: 0.875rem;">No hay órdenes registradas.</div>';
           return;
