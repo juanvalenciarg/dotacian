@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dotacian | Gestión de Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    .search-container {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-create {
+      background: var(--color-brand-primary);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-create:hover {
+      background: var(--color-cyan);
+    }
+
+    .blog-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .blog-table th, .blog-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid #E2E8F0;
+    }
+
+    .blog-table th {
+      background: #F8FAFC;
+      font-weight: 600;
+      color: #475569;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+    }
+
+    .blog-table td {
+      color: #0F172A;
+      font-size: 0.95rem;
+    }
+
+    .action-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #64748B;
+      padding: 0.25rem;
+      transition: color 0.2s;
+    }
+
+    .action-btn.edit:hover { color: #3B82F6; }
+    .action-btn.delete:hover { color: #EF4444; }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal-content {
+      background: white;
+      width: 100%;
+      max-width: 800px;
+      border-radius: 1rem;
+      padding: 2rem;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #E2E8F0;
+      padding-bottom: 1rem;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #0F172A;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #64748B;
+      cursor: pointer;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      color: #334155;
+      font-size: 0.875rem;
+    }
+
+    .form-control {
+      padding: 0.75rem;
+      border: 1px solid #E2E8F0;
+      border-radius: 0.5rem;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+
+    textarea.form-control {
+      min-height: 250px;
+      resize: vertical;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .btn-secondary {
+      background: #E2E8F0;
+      color: #475569;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-layout admin-dark">
+    <!-- Sidebar -->
+    <aside class="sidebar" style="background-color: #020617;">
+      <div class="sidebar-brand" style="padding: 1.5rem 2rem;">
+        <a href="admin.html">
+          <img src="assets/logos/logo_dotacian_admin.png" alt="dotacian admin"
+            style="width: 100%; max-width: 180px; height: auto; display: block;">
+        </a>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="admin.html" id="nav-dashboard" class="nav-item">Dashboard</a>
+        <a href="admin.usuarios.html" id="nav-users" class="nav-item">Gestión de Clientes</a>
+        <a href="admin.sellers.html" id="nav-sellers" class="nav-item">Gestión de Fabricantes</a>
+        <a href="facturas.admin.html" class="nav-item">Facturación</a>
+        <a href="admin.blog.html" id="nav-blog" class="nav-item active">Gestión de Blog</a>
+        <a href="#" class="nav-item">Logs de Sistema</a>
+        <a href="#" class="nav-item">Seguridad</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="app-header">
+        <h1 id="pageTitle">Gestión de Blog</h1>
+        <div class="algo-status">
+          <span style="color: var(--color-cyan);">●</span> Panel Administrativo
+        </div>
+      </header>
+
+      <div class="app-container">
+        <div class="search-container">
+          <h2 style="font-size: 1.25rem; font-family: 'Outfit'; color: #0F172A;">Artículos Publicados</h2>
+          <button class="btn-create" onclick="openModal()">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            Nuevo Artículo
+          </button>
+        </div>
+
+        <table class="blog-table" id="blog-table">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Autor</th>
+              <th>Fecha de Publicación</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="blog-table-body">
+            <tr>
+              <td colspan="4" style="text-align: center; color: #64748B;">Cargando artículos...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Formulario -->
+  <div class="modal-overlay" id="postModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Nuevo Artículo</div>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <form id="postForm" onsubmit="savePost(event)">
+        <input type="hidden" id="postId">
+        
+        <div class="form-group">
+          <label>Título del artículo</label>
+          <input type="text" id="postTitle" class="form-control" required placeholder="Ej: Las 5 tendencias en dotación corporativa">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Slug (URL amigable)</label>
+            <input type="text" id="postSlug" class="form-control" required placeholder="ej-tendencias-dotacion">
+          </div>
+          <div class="form-group">
+            <label>Autor</label>
+            <input type="text" id="postAuthor" class="form-control" placeholder="Ej: Equipo Dotacian">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>URL de Imagen de Portada</label>
+          <input type="url" id="postImageUrl" class="form-control" placeholder="https://ejemplo.com/imagen.jpg">
+          <small style="color: #64748B; margin-top: 0.25rem;">Pega la ruta de la imagen que quieres usar como encabezado.</small>
+        </div>
+
+        <div class="form-group">
+          <label>Contenido del Artículo</label>
+          <textarea id="postContent" class="form-control" required placeholder="Escribe tu artículo aquí... (puedes usar HTML para agregar negritas, listas o imágenes internas)"></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+          <button type="submit" class="btn-create" id="btnSavePost">Guardar Artículo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container" style="position: fixed; top: 1rem; right: 1rem; z-index: 9999;"></div>
+
+  <script src="assets/js/utils.js?v=4"></script>
+  <script>
+    const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: 'dotacian-client-token' } });
+
+    async function checkAdminAuth() {
+      const { data: { session } } = await _supabase.auth.getSession();
+      if (!session) {
+        window.location.href = 'login.admin.html';
+        return;
+      }
+      const { data: adminData } = await _supabase.from('admin_profile').select('id').eq('id', session.user.id).maybeSingle();
+      if (!adminData) {
+        await _supabase.auth.signOut();
+        window.location.href = 'login.admin.html?error=unauthorized';
+      } else {
+        loadPosts();
+      }
+    }
+    checkAdminAuth();
+
+    function generateSlug(text) {
+      return text.toString().toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\-]+/g, '')
+        .replace(/\-\-+/g, '-')
+        .replace(/^-+/, '')
+        .replace(/-+$/, '');
+    }
+
+    document.getElementById('postTitle').addEventListener('input', function(e) {
+      if(!document.getElementById('postId').value) {
+        document.getElementById('postSlug').value = generateSlug(e.target.value);
+      }
+    });
+
+    async function loadPosts() {
+      const tbody = document.getElementById('blog-table-body');
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Cargando artículos...</td></tr>';
+      
+      const { data, error } = await _supabase.from('blog_posts').select('*').order('created_at', { ascending: false });
+      
+      if (error) {
+        showToast('Error', 'No se pudieron cargar los artículos.', 'error');
+        return;
+      }
+      
+      if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #64748B;">No hay artículos registrados.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '';
+      data.forEach(post => {
+        const tr = document.createElement('tr');
+        const date = new Date(post.created_at).toLocaleDateString('es-ES');
+        
+        // Guardar la data para el botón editar
+        tr.dataset.post = JSON.stringify(post);
+        
+        tr.innerHTML = `
+          <td><strong>${post.title}</strong><br><small style="color:#64748B;">/${post.slug}</small></td>
+          <td>${post.author || '-'}</td>
+          <td>${date}</td>
+          <td>
+            <button class="action-btn edit" onclick='editPost(this)' title="Editar"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            <button class="action-btn delete" onclick="deletePost('${post.id}')" title="Eliminar"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openModal() {
+      document.getElementById('postForm').reset();
+      document.getElementById('postId').value = '';
+      document.getElementById('modalTitle').innerText = 'Nuevo Artículo';
+      document.getElementById('postModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('postModal').classList.remove('active');
+    }
+
+    function editPost(btn) {
+      const post = JSON.parse(btn.closest('tr').dataset.post);
+      document.getElementById('postId').value = post.id;
+      document.getElementById('postTitle').value = post.title;
+      document.getElementById('postSlug').value = post.slug;
+      document.getElementById('postAuthor').value = post.author || '';
+      document.getElementById('postImageUrl').value = post.image_url || '';
+      document.getElementById('postContent').value = post.content;
+      
+      document.getElementById('modalTitle').innerText = 'Editar Artículo';
+      document.getElementById('postModal').classList.add('active');
+    }
+
+    async function savePost(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSavePost');
+      btn.innerText = 'Guardando...';
+      btn.disabled = true;
+
+      const id = document.getElementById('postId').value;
+      const payload = {
+        title: document.getElementById('postTitle').value,
+        slug: document.getElementById('postSlug').value,
+        author: document.getElementById('postAuthor').value,
+        image_url: document.getElementById('postImageUrl').value,
+        content: document.getElementById('postContent').value
+      };
+
+      try {
+        if (id) {
+          const { error } = await _supabase.from('blog_posts').update(payload).eq('id', id);
+          if (error) throw error;
+          showToast('Actualizado', 'El artículo ha sido modificado.');
+        } else {
+          const { error } = await _supabase.from('blog_posts').insert([payload]);
+          if (error) throw error;
+          showToast('Publicado', 'El artículo ha sido publicado.');
+        }
+        closeModal();
+        loadPosts();
+      } catch (err) {
+        showToast('Error', err.message, 'error');
+      } finally {
+        btn.innerText = 'Guardar Artículo';
+        btn.disabled = false;
+      }
+    }
+
+    async function deletePost(id) {
+      if(!confirm("¿Estás seguro de que deseas eliminar este artículo? Esta acción no se puede deshacer.")) return;
+      
+      try {
+        const { error } = await _supabase.from('blog_posts').delete().eq('id', id);
+        if (error) throw error;
+        showToast('Eliminado', 'El artículo ha sido eliminado.');
+        loadPosts();
+      } catch (err) {
+        showToast('Error', err.message, 'error');
+      }
+    }
+
+    function showToast(title, message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.style.cssText = "background: white; border-left: 4px solid " + (type === 'error' ? '#EF4444' : '#10B981') + "; padding: 1rem 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 1rem; min-width: 300px;";
+      toast.innerHTML = `
+        <div>
+          <div style="font-weight: 700; font-size: 0.9rem; color: #0F172A;">${title}</div>
+          <div style="font-size: 0.875rem; color: #64748B;">${message}</div>
+        </div>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => { toast.remove(); }, 4000);
+    }
+  </script>
+</body>
+</html>
