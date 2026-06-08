@@ -15,103 +15,193 @@
   
   <style>
     .blog-header {
-      background: linear-gradient(135deg, var(--color-navy) 0%, #0c4a6e 100%);
-      padding: 6rem 2rem 4rem 2rem;
+      background: linear-gradient(135deg, #020617 0%, #0F172A 100%);
+      position: relative;
+      padding: 8rem 2rem 6rem 2rem;
       text-align: center;
       color: white;
-      margin-bottom: 3rem;
+      margin-bottom: 4rem;
+      overflow: hidden;
+    }
+
+    .blog-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -10%;
+      width: 50%;
+      height: 150%;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);
+      transform: rotate(-45deg);
+      pointer-events: none;
+    }
+
+    .blog-header::after {
+      content: '';
+      position: absolute;
+      bottom: -30%;
+      right: -10%;
+      width: 40%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+      pointer-events: none;
     }
 
     .blog-header h1 {
       font-family: var(--font-family-heading);
-      font-size: 3rem;
+      font-size: 3.5rem;
       font-weight: 800;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 1;
+      letter-spacing: -0.02em;
     }
 
     .blog-header p {
       font-size: 1.25rem;
-      color: rgba(255,255,255,0.8);
-      max-width: 600px;
+      color: #94A3B8;
+      max-width: 650px;
       margin: 0 auto;
+      position: relative;
+      z-index: 1;
+      line-height: 1.6;
     }
 
     .blog-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 2rem;
-      padding: 2rem;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2.5rem;
+      padding: 0 2rem 4rem 2rem;
       max-width: 1200px;
       margin: 0 auto;
     }
 
     .blog-card {
       background: white;
-      border-radius: 1rem;
+      border-radius: 1.25rem;
       overflow: hidden;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: pointer;
       display: flex;
       flex-direction: column;
+      border: 1px solid #F1F5F9;
+      position: relative;
     }
 
     .blog-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      transform: translateY(-8px);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+      border-color: #E2E8F0;
+    }
+
+    .blog-image-wrapper {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      overflow: hidden;
+      background: #F8FAFC;
     }
 
     .blog-image {
       width: 100%;
-      height: 200px;
+      height: 100%;
       object-fit: cover;
-      background: #E2E8F0;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .blog-card:hover .blog-image {
+      transform: scale(1.05);
     }
 
     .blog-content {
-      padding: 1.5rem;
+      padding: 2rem;
       display: flex;
       flex-direction: column;
       flex: 1;
     }
 
     .blog-meta {
-      font-size: 0.875rem;
-      color: var(--color-text-muted);
-      margin-bottom: 0.75rem;
+      font-size: 0.85rem;
+      color: #64748B;
+      margin-bottom: 1rem;
       display: flex;
-      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      font-weight: 500;
+    }
+
+    .blog-meta span {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
     }
 
     .blog-title {
       font-family: var(--font-family-heading);
-      font-size: 1.25rem;
+      font-size: 1.35rem;
       font-weight: 700;
-      color: var(--color-navy);
+      color: #0F172A;
       margin-bottom: 1rem;
       line-height: 1.4;
+      transition: color 0.2s;
+    }
+
+    .blog-card:hover .blog-title {
+      color: var(--color-brand-primary);
     }
 
     .blog-excerpt {
-      color: var(--color-text-secondary);
+      color: #475569;
       font-size: 0.95rem;
-      line-height: 1.5;
-      margin-bottom: 1.5rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
       flex: 1;
     }
 
     .blog-read-more {
-      color: var(--color-brand-primary);
+      color: var(--color-cyan);
       font-weight: 600;
-      font-size: 0.875rem;
-      text-decoration: none;
+      font-size: 0.9rem;
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: gap 0.3s ease;
     }
 
-    .blog-read-more:hover {
-      color: var(--color-cyan);
+    .blog-card:hover .blog-read-more {
+      gap: 0.75rem;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      grid-column: 1 / -1;
+      padding: 6rem 2rem;
+      background: #F8FAFC;
+      border-radius: 1.5rem;
+      border: 1px dashed #CBD5E1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+    .empty-state svg {
+      color: #94A3B8;
+      margin-bottom: 1rem;
+    }
+    .empty-state h3 {
+      font-family: var(--font-family-heading);
+      font-size: 1.5rem;
+      color: #0F172A;
+      margin: 0;
+    }
+    .empty-state p {
+      color: #64748B;
+      font-size: 1.1rem;
+      max-width: 400px;
     }
   </style>
 </head>
@@ -223,8 +313,13 @@
 
         if (!posts || posts.length === 0) {
           grid.innerHTML = `
-            <div style="text-align: center; grid-column: 1 / -1; padding: 4rem; color: var(--color-text-muted);">
-              Aún no hay artículos publicados. Vuelve pronto.
+            <div class="empty-state">
+              <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+              <h3>Próximamente</h3>
+              <p>Aún estamos preparando nuestros mejores artículos. Vuelve pronto para descubrir contenido exclusivo.</p>
             </div>
           `;
           return;
@@ -248,17 +343,25 @@
           card.onclick = () => window.location.href = `articulo.html?slug=${post.slug}`;
           
           card.innerHTML = `
-            <img src="${imageSrc}" alt="${post.title}" class="blog-image">
+            <div class="blog-image-wrapper">
+              <img src="${imageSrc}" alt="${post.title}" class="blog-image">
+            </div>
             <div class="blog-content">
               <div class="blog-meta">
-                <span>${dateString}</span>
-                <span>${post.author || 'Dotacian'}</span>
+                <span>
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  ${dateString}
+                </span>
+                <span>
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                  ${post.author || 'Dotacian'}
+                </span>
               </div>
               <h3 class="blog-title">${post.title}</h3>
               <p class="blog-excerpt">${excerpt}</p>
               <div class="blog-read-more">
                 Leer artículo
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M5 12h14M12 5l7 7-7 7"/>
                 </svg>
               </div>
