@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Artículo | Dotacian</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css">
+  
+  <style>
+    .article-header {
+      background: linear-gradient(135deg, var(--color-navy) 0%, #0c4a6e 100%);
+      padding: 6rem 2rem 4rem 2rem;
+      color: white;
+      text-align: center;
+      position: relative;
+    }
+
+    .article-back {
+      position: absolute;
+      top: 2rem;
+      left: 2rem;
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .article-back:hover {
+      color: white;
+    }
+
+    .article-meta {
+      font-size: 0.95rem;
+      color: var(--color-cyan);
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      font-weight: 500;
+    }
+
+    .article-title {
+      font-family: var(--font-family-heading);
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1.2;
+      max-width: 900px;
+      margin: 0 auto 2rem auto;
+    }
+
+    .article-hero-image {
+      width: 100%;
+      max-width: 1000px;
+      height: 400px;
+      object-fit: cover;
+      border-radius: 1rem;
+      margin: -2rem auto 3rem auto;
+      display: block;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 10;
+      background: #E2E8F0;
+    }
+
+    .article-content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      font-size: 1.125rem;
+      line-height: 1.8;
+      color: var(--color-text-primary);
+    }
+
+    .article-content h2 {
+      font-family: var(--font-family-heading);
+      font-size: 2rem;
+      color: var(--color-navy);
+      margin: 2.5rem 0 1rem 0;
+    }
+
+    .article-content p {
+      margin-bottom: 1.5rem;
+    }
+
+    .article-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 0.5rem;
+      margin: 2rem 0;
+    }
+
+    .article-content ul, .article-content ol {
+      margin-bottom: 1.5rem;
+      padding-left: 1.5rem;
+    }
+
+    .article-content li {
+      margin-bottom: 0.5rem;
+    }
+
+    .article-content blockquote {
+      border-left: 4px solid var(--color-cyan);
+      padding-left: 1.5rem;
+      font-style: italic;
+      color: var(--color-text-secondary);
+      margin: 2rem 0;
+      font-size: 1.25rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Minimal Header just for reading -->
+  <header class="header" style="background: rgba(10, 25, 47, 0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100;">
+    <div class="container" style="padding: 1rem 2rem;">
+      <div class="logo">
+        <a href="index.html">
+          <img src="assets/logos/logo_dotacian_admin.png" alt="dotacian logo" style="height: 40px; width: auto; display: block;">
+        </a>
+      </div>
+      <div class="header-actions">
+        <a href="blog.html" style="font-weight: 600; color: white; text-decoration: none;">Volver al Blog</a>
+      </div>
+    </div>
+  </header>
+
+  <div id="article-container">
+    <div style="text-align: center; padding: 6rem; color: var(--color-text-muted);">
+      Cargando artículo...
+    </div>
+  </div>
+
+  <!-- Footer Simple -->
+  <footer style="background: #0F172A; color: white; padding: 4rem 2rem 2rem 2rem; text-align: center; margin-top: 4rem;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <img src="assets/logos/logo_dotacian_admin.png" alt="Dotacian" style="height: 40px; margin-bottom: 1.5rem;">
+      <p style="color: rgba(255,255,255,0.6); font-size: 0.875rem;">© 2026 Dotacian. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <script>
+    // Supabase Configuration
+    const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+    const _supabaseBlog = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function loadArticle() {
+      const container = document.getElementById('article-container');
+      const urlParams = new URLSearchParams(window.location.search);
+      const slug = urlParams.get('slug');
+
+      if (!slug) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 6rem; color: #EF4444;">
+            Artículo no encontrado. <a href="blog.html" style="color: var(--color-cyan);">Volver al blog</a>
+          </div>
+        `;
+        return;
+      }
+
+      try {
+        const { data: post, error } = await _supabaseBlog
+          .from('blog_posts')
+          .select('*')
+          .eq('slug', slug)
+          .single();
+
+        if (error || !post) {
+          throw error || new Error("Not found");
+        }
+
+        const dateObj = new Date(post.created_at);
+        const dateString = dateObj.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+        const imageSrc = post.image_url ? post.image_url : 'assets/images/hero_image.png';
+
+        document.title = `${post.title} | Blog Dotacian`;
+
+        container.innerHTML = `
+          <section class="article-header">
+            <a href="blog.html" class="article-back">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+              </svg>
+              Volver
+            </a>
+            <div class="article-meta">
+              <span>${dateString}</span>
+              <span>•</span>
+              <span>Por ${post.author || 'Equipo Dotacian'}</span>
+            </div>
+            <h1 class="article-title">${post.title}</h1>
+          </section>
+
+          <img src="${imageSrc}" alt="${post.title}" class="article-hero-image">
+
+          <article class="article-content">
+            <!-- Para un MVP, renderizamos el HTML directamente si el admin lo escribió así, 
+                 o reemplazamos los saltos de línea por <br> si es texto plano -->
+            ${post.content.includes('<') ? post.content : post.content.replace(/\\n/g, '<br><br>')}
+          </article>
+        `;
+      } catch (err) {
+        console.error('Error loading article:', err);
+        container.innerHTML = `
+          <div style="text-align: center; padding: 6rem; color: #EF4444;">
+            El artículo no existe o hubo un error al cargarlo. <br><br>
+            <a href="blog.html" style="color: var(--color-cyan); font-weight: bold; text-decoration: none;">Volver al blog</a>
+          </div>
+        `;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadArticle);
+  </script>
+</body>
+</html>
