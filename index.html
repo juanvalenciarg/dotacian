@@ -997,6 +997,28 @@
           como Fabricante</a>
       </div>
     </div>
+    </div>
+  </section>
+
+  <!-- Blog Preview Section -->
+  <section id="blog-preview" style="padding: 6rem 0; background: #F8FAFC;">
+    <div class="container" style="text-align: center;">
+      <div style="display: inline-block; padding: 0.5rem 1.25rem; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: 100px; color: var(--color-cyan); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem;">
+        Recursos
+      </div>
+      <h2 style="font-size: 2.5rem; color: var(--color-navy); margin-bottom: 1rem; line-height: 1.2;">Últimas Novedades del Blog</h2>
+      <p style="font-size: 1.125rem; color: var(--color-text-secondary); max-width: 600px; margin: 0 auto 3rem auto;">
+        Descubre consejos, guías y noticias sobre la gestión inteligente de dotación y uniformes corporativos.
+      </p>
+      
+      <div class="blog-grid" id="index-blog-grid" style="padding: 0; margin-bottom: 3rem;">
+        <div style="text-align: center; grid-column: 1 / -1; padding: 2rem; color: var(--color-text-muted);">
+          Cargando artículos...
+        </div>
+      </div>
+      
+      <a href="blog.html" class="btn btn-outline" style="border-color: var(--color-cyan); color: var(--color-navy); padding: 0.8rem 2rem;">Ver todo el blog</a>
+    </div>
   </section>
 
   <!-- Final CTA & Footer -->
@@ -1209,6 +1231,83 @@
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token' } });
+
+    // Cargar últimos 3 artículos del blog
+    async function loadIndexBlogPosts() {
+      const grid = document.getElementById('index-blog-grid');
+      if (!grid) return;
+      
+      try {
+        const { data: posts, error } = await _supabase
+          .from('blog_posts')
+          .select('id, title, slug, author, created_at, content, image_url')
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        if (error) throw error;
+
+        if (!posts || posts.length === 0) {
+          grid.innerHTML = `
+            <div style="text-align: center; grid-column: 1 / -1; padding: 2rem; color: var(--color-text-muted);">
+              Aún no hay artículos publicados.
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = '';
+        posts.forEach(post => {
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = post.content;
+          let excerpt = tempDiv.textContent || tempDiv.innerText || '';
+          excerpt = excerpt.substring(0, 100) + '...';
+
+          const dateObj = new Date(post.created_at);
+          const dateString = dateObj.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+          const imageSrc = post.image_url ? post.image_url : 'assets/images/hero_image.png';
+
+          const card = document.createElement('div');
+          card.className = 'blog-card';
+          card.style.textAlign = 'left';
+          card.onclick = () => window.location.href = `articulo.html?slug=${post.slug}`;
+          
+          card.innerHTML = `
+            <div class="blog-image-wrapper">
+              <img src="${imageSrc}" alt="${post.title}" class="blog-image">
+            </div>
+            <div class="blog-content">
+              <div class="blog-meta">
+                <span>
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  ${dateString}
+                </span>
+              </div>
+              <h3 class="blog-title">${post.title}</h3>
+              <p class="blog-excerpt">${excerpt}</p>
+              <div class="blog-read-more">
+                Leer artículo
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </div>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      } catch (err) {
+        console.error('Error loading posts:', err);
+        grid.innerHTML = `
+          <div style="text-align: center; grid-column: 1 / -1; padding: 2rem; color: #EF4444;">
+            Error al cargar los artículos.
+          </div>
+        `;
+      }
+    }
+
+    // Ejecutar al cargar la página
+    document.addEventListener('DOMContentLoaded', () => {
+      loadIndexBlogPosts();
+    });
 
     // Contact Form Submission
     const contactForm = document.getElementById('contact-form');
