@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog | Dotacian</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css">
+  
+  <style>
+    .blog-header {
+      background: linear-gradient(135deg, var(--color-navy) 0%, #0c4a6e 100%);
+      padding: 6rem 2rem 4rem 2rem;
+      text-align: center;
+      color: white;
+      margin-bottom: 3rem;
+    }
+
+    .blog-header h1 {
+      font-family: var(--font-family-heading);
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+    }
+
+    .blog-header p {
+      font-size: 1.25rem;
+      color: rgba(255,255,255,0.8);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .blog-card {
+      background: white;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .blog-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .blog-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      background: #E2E8F0;
+    }
+
+    .blog-content {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .blog-meta {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .blog-title {
+      font-family: var(--font-family-heading);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-navy);
+      margin-bottom: 1rem;
+      line-height: 1.4;
+    }
+
+    .blog-excerpt {
+      color: var(--color-text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+      flex: 1;
+    }
+
+    .blog-read-more {
+      color: var(--color-brand-primary);
+      font-weight: 600;
+      font-size: 0.875rem;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .blog-read-more:hover {
+      color: var(--color-cyan);
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="header">
+    <div class="container">
+      <div class="logo">
+        <a href="index.html">
+          <img src="assets/logos/logo_dotacian.png" alt="dotacian logo" style="height: 80px; width: auto; display: block;">
+        </a>
+      </div>
+      <nav class="nav-links">
+        <a href="index.html#problema">Problema</a>
+        <a href="index.html#solucion">Solución</a>
+        <a href="index.html#precios">Precios</a>
+        <a href="index.html#fabricante">Fabricantes</a>
+        <a href="blog.html" style="color: var(--color-brand-primary); font-weight: 600;">Blog</a>
+      </nav>
+      <div class="header-actions">
+        <a href="login.html" style="font-weight: 600; color: var(--color-text-secondary); transition: color 0.2s;" onmouseover="this.style.color='var(--color-brand-primary)'" onmouseout="this.style.color='var(--color-text-secondary)'">Iniciar sesión</a>
+        <a href="onboarding.html" class="btn btn-primary" style="padding: 0.6rem 1.25rem; font-size: 0.9rem;">Crea tu cuenta</a>
+        <button class="header-mobile-toggle" id="mobile-menu-toggle" aria-label="Abrir menú">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-drawer" id="mobile-drawer">
+    <div class="drawer-header">
+      <div class="logo" style="display: flex; align-items: center;">
+        <img src="assets/logos/logo_dotacian.png" alt="dotacian logo" style="height: 45px; width: auto; display: block;">
+      </div>
+      <button class="drawer-close" id="drawer-close">&times;</button>
+    </div>
+    <nav class="drawer-nav">
+      <a href="index.html#problema">Problema</a>
+      <a href="index.html#solucion">Solución</a>
+      <a href="index.html#precios">Precios</a>
+      <a href="index.html#fabricante">Fabricante</a>
+      <a href="blog.html">Blog</a>
+      <div class="drawer-divider"></div>
+      <a href="login.html">Iniciar sesión</a>
+      <a href="onboarding.html" class="btn btn-primary">Crea tu cuenta</a>
+    </nav>
+  </div>
+
+  <section class="blog-header">
+    <h1>Blog de Dotacian</h1>
+    <p>Noticias, guías y consejos sobre la gestión inteligente de dotación y uniformes corporativos.</p>
+  </section>
+
+  <main style="min-height: 50vh;">
+    <div class="blog-grid" id="blog-grid">
+      <div style="text-align: center; grid-column: 1 / -1; padding: 4rem; color: var(--color-text-muted);">
+        Cargando artículos...
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer Simple -->
+  <footer style="background: #0F172A; color: white; padding: 4rem 2rem 2rem 2rem; text-align: center; margin-top: 4rem;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <img src="assets/logos/logo_dotacian_admin.png" alt="Dotacian" style="height: 40px; margin-bottom: 1.5rem;">
+      <p style="color: rgba(255,255,255,0.6); font-size: 0.875rem;">© 2026 Dotacian. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/utils.js?v=4"></script>
+  
+  <script>
+    // Supabase Configuration
+    const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+    const _supabaseBlog = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Mobile Drawer Logic
+    const toggleBtn = document.getElementById('mobile-menu-toggle');
+    const closeBtn = document.getElementById('drawer-close');
+    const drawer = document.getElementById('mobile-drawer');
+
+    const toggleMenu = () => {
+      drawer.classList.toggle('active');
+      toggleBtn.classList.toggle('open');
+      document.body.style.overflow = drawer.classList.contains('active') ? 'hidden' : '';
+    };
+
+    if (toggleBtn) toggleBtn.addEventListener('click', toggleMenu);
+    if (closeBtn) closeBtn.addEventListener('click', () => {
+      drawer.classList.remove('active');
+      toggleBtn.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+
+    async function loadBlogPosts() {
+      const grid = document.getElementById('blog-grid');
+      try {
+        const { data: posts, error } = await _supabaseBlog
+          .from('blog_posts')
+          .select('id, title, slug, author, created_at, content, image_url')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!posts || posts.length === 0) {
+          grid.innerHTML = `
+            <div style="text-align: center; grid-column: 1 / -1; padding: 4rem; color: var(--color-text-muted);">
+              Aún no hay artículos publicados. Vuelve pronto.
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = '';
+        posts.forEach(post => {
+          // Extraer un resumen del HTML/Markdown del content (o texto plano)
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = post.content;
+          let excerpt = tempDiv.textContent || tempDiv.innerText || '';
+          excerpt = excerpt.substring(0, 120) + '...';
+
+          const dateObj = new Date(post.created_at);
+          const dateString = dateObj.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+
+          const imageSrc = post.image_url ? post.image_url : 'assets/images/hero_image.png';
+
+          const card = document.createElement('div');
+          card.className = 'blog-card';
+          card.onclick = () => window.location.href = `articulo.html?slug=${post.slug}`;
+          
+          card.innerHTML = `
+            <img src="${imageSrc}" alt="${post.title}" class="blog-image">
+            <div class="blog-content">
+              <div class="blog-meta">
+                <span>${dateString}</span>
+                <span>${post.author || 'Dotacian'}</span>
+              </div>
+              <h3 class="blog-title">${post.title}</h3>
+              <p class="blog-excerpt">${excerpt}</p>
+              <div class="blog-read-more">
+                Leer artículo
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </div>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      } catch (err) {
+        console.error('Error loading posts:', err);
+        grid.innerHTML = `
+          <div style="text-align: center; grid-column: 1 / -1; padding: 4rem; color: #EF4444;">
+            Error al cargar los artículos. Por favor, intenta de nuevo más tarde.
+          </div>
+        `;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadBlogPosts);
+  </script>
+</body>
+</html>
