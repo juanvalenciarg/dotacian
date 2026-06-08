@@ -52,7 +52,8 @@
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
-    .blog-table th, .blog-table td {
+    .blog-table th,
+    .blog-table td {
       padding: 1rem;
       text-align: left;
       border-bottom: 1px solid #E2E8F0;
@@ -80,14 +81,22 @@
       transition: color 0.2s;
     }
 
-    .action-btn.edit:hover { color: #3B82F6; }
-    .action-btn.delete:hover { color: #EF4444; }
+    .action-btn.edit:hover {
+      color: #3B82F6;
+    }
+
+    .action-btn.delete:hover {
+      color: #EF4444;
+    }
 
     /* Modal Styles */
     .modal-overlay {
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5);
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(4px);
       display: none;
       justify-content: center;
@@ -95,7 +104,9 @@
       z-index: 9999;
     }
 
-    .modal-overlay.active { display: flex; }
+    .modal-overlay.active {
+      display: flex;
+    }
 
     .modal-content {
       background: white;
@@ -189,6 +200,7 @@
         <a href="admin.html" id="nav-dashboard" class="nav-item">Dashboard</a>
         <a href="admin.usuarios.html" id="nav-users" class="nav-item">Gestión de Clientes</a>
         <a href="admin.sellers.html" id="nav-sellers" class="nav-item">Gestión de Fabricantes</a>
+        <a href="admin.leads.html" id="nav-leads" class="nav-item">Gestión de Leads</a>
         <a href="admin.facturas.html" class="nav-item">Facturación</a>
         <a href="admin.blog.html" id="nav-blog" class="nav-item active">Gestión de Blog</a>
         <a href="#" class="nav-item">Logs de Sistema</a>
@@ -208,7 +220,9 @@
         <div class="search-container">
           <h2 style="font-size: 1.25rem; font-family: 'Outfit'; color: #0F172A;">Artículos Publicados</h2>
           <button class="btn-create" onclick="openModal()">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
             Nuevo Artículo
           </button>
         </div>
@@ -241,10 +255,11 @@
       </div>
       <form id="postForm" onsubmit="savePost(event)">
         <input type="hidden" id="postId">
-        
+
         <div class="form-group">
           <label>Título del artículo</label>
-          <input type="text" id="postTitle" class="form-control" required placeholder="Ej: Las 5 tendencias en dotación corporativa">
+          <input type="text" id="postTitle" class="form-control" required
+            placeholder="Ej: Las 5 tendencias en dotación corporativa">
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -261,9 +276,12 @@
         <div class="form-group">
           <label>Imagen de Portada (Sube un archivo o pega la URL)</label>
           <div style="display: flex; gap: 0.5rem; align-items: center;">
-            <input type="url" id="postImageUrl" class="form-control" style="flex: 1;" placeholder="https://ejemplo.com/imagen.jpg">
-            <input type="file" id="coverImageFile" accept="image/*" style="display: none;" onchange="uploadCoverImage(event)">
-            <button type="button" class="btn-secondary" onclick="document.getElementById('coverImageFile').click()" id="btnUploadCover">
+            <input type="url" id="postImageUrl" class="form-control" style="flex: 1;"
+              placeholder="https://ejemplo.com/imagen.jpg">
+            <input type="file" id="coverImageFile" accept="image/*" style="display: none;"
+              onchange="uploadCoverImage(event)">
+            <button type="button" class="btn-secondary" onclick="document.getElementById('coverImageFile').click()"
+              id="btnUploadCover">
               Subir Archivo
             </button>
           </div>
@@ -273,13 +291,21 @@
         <div class="form-group">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
             <label style="margin: 0;">Contenido del Artículo</label>
-            <input type="file" id="contentImageFile" accept="image/*" style="display: none;" onchange="uploadContentImage(event)">
-            <button type="button" class="btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="document.getElementById('contentImageFile').click()" id="btnUploadContentImg">
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            <input type="file" id="contentImageFile" accept="image/*" style="display: none;"
+              onchange="uploadContentImage(event)">
+            <button type="button" class="btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;"
+              onclick="document.getElementById('contentImageFile').click()" id="btnUploadContentImg">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                style="margin-right: 4px; vertical-align: middle;">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
               Insertar Imagen
             </button>
           </div>
-          <textarea id="postContent" class="form-control" required placeholder="Escribe tu artículo aquí... (puedes usar HTML para agregar negritas, listas o imágenes internas)"></textarea>
+          <textarea id="postContent" class="form-control" required
+            placeholder="Escribe tu artículo aquí... (puedes usar HTML para agregar negritas, listas o imágenes internas)"></textarea>
         </div>
 
         <div class="form-actions">
@@ -290,7 +316,8 @@
     </div>
   </div>
 
-  <div class="toast-container" id="toast-container" style="position: fixed; top: 1rem; right: 1rem; z-index: 9999;"></div>
+  <div class="toast-container" id="toast-container" style="position: fixed; top: 1rem; right: 1rem; z-index: 9999;">
+  </div>
 
   <script src="assets/js/utils.js?v=4"></script>
   <script>
@@ -323,8 +350,8 @@
         .replace(/-+$/, '');
     }
 
-    document.getElementById('postTitle').addEventListener('input', function(e) {
-      if(!document.getElementById('postId').value) {
+    document.getElementById('postTitle').addEventListener('input', function (e) {
+      if (!document.getElementById('postId').value) {
         document.getElementById('postSlug').value = generateSlug(e.target.value);
       }
     });
@@ -332,14 +359,14 @@
     async function loadPosts() {
       const tbody = document.getElementById('blog-table-body');
       tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Cargando artículos...</td></tr>';
-      
+
       const { data, error } = await _supabase.from('blog_posts').select('*').order('created_at', { ascending: false });
-      
+
       if (error) {
         showToast('Error', 'No se pudieron cargar los artículos.', 'error');
         return;
       }
-      
+
       if (!data || data.length === 0) {
         tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #64748B;">No hay artículos registrados.</td></tr>';
         return;
@@ -349,10 +376,10 @@
       data.forEach(post => {
         const tr = document.createElement('tr');
         const date = new Date(post.created_at).toLocaleDateString('es-ES');
-        
+
         // Guardar la data para el botón editar
         tr.dataset.post = JSON.stringify(post);
-        
+
         tr.innerHTML = `
           <td><strong>${post.title}</strong><br><small style="color:#64748B;">/${post.slug}</small></td>
           <td>${post.author || '-'}</td>
@@ -385,7 +412,7 @@
       document.getElementById('postAuthor').value = post.author || '';
       document.getElementById('postImageUrl').value = post.image_url || '';
       document.getElementById('postContent').value = post.content;
-      
+
       document.getElementById('modalTitle').innerText = 'Editar Artículo';
       document.getElementById('postModal').classList.add('active');
     }
@@ -472,17 +499,17 @@
         if (uploadError) throw uploadError;
 
         const { data: { publicUrl } } = _supabase.storage.from('blog-images').getPublicUrl(filePath);
-        
+
         // Insert HTML tag into textarea at cursor position
         const textarea = document.getElementById('postContent');
         const imgTag = `\\n<img src="${publicUrl}" style="max-width: 100%; border-radius: 8px; margin: 1.5rem 0; display: block;" alt="Imagen del artículo">\\n`;
-        
+
         const startPos = textarea.selectionStart;
         const endPos = textarea.selectionEnd;
         const textValue = textarea.value;
-        
+
         textarea.value = textValue.substring(0, startPos) + imgTag + textValue.substring(endPos, textValue.length);
-        
+
         // Move cursor after the inserted tag
         textarea.selectionStart = startPos + imgTag.length;
         textarea.selectionEnd = startPos + imgTag.length;
@@ -500,8 +527,8 @@
     }
 
     async function deletePost(id) {
-      if(!confirm("¿Estás seguro de que deseas eliminar este artículo? Esta acción no se puede deshacer.")) return;
-      
+      if (!confirm("¿Estás seguro de que deseas eliminar este artículo? Esta acción no se puede deshacer.")) return;
+
       try {
         const { error } = await _supabase.from('blog_posts').delete().eq('id', id);
         if (error) throw error;
@@ -527,4 +554,5 @@
     }
   </script>
 </body>
+
 </html>
