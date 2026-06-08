@@ -214,7 +214,7 @@
         <div class="kanban-board">
           
           <!-- Columna: Nuevo -->
-          <div class="kanban-column col-nuevo">
+          <div class="kanban-column col-nuevo" ondragover="event.preventDefault()" ondrop="dropLead(event, 'nuevo')">
             <div class="kanban-column-header">
               <span>Nuevos</span>
               <span class="count" id="count-nuevo">0</span>
@@ -225,7 +225,7 @@
           </div>
 
           <!-- Columna: Contactado -->
-          <div class="kanban-column col-contactado">
+          <div class="kanban-column col-contactado" ondragover="event.preventDefault()" ondrop="dropLead(event, 'contactado')">
             <div class="kanban-column-header">
               <span>Contactados</span>
               <span class="count" id="count-contactado">0</span>
@@ -236,7 +236,7 @@
           </div>
 
           <!-- Columna: Reunión Agendada -->
-          <div class="kanban-column col-reunion">
+          <div class="kanban-column col-reunion" ondragover="event.preventDefault()" ondrop="dropLead(event, 'reunion_agendada')">
             <div class="kanban-column-header">
               <span>Reunión Agendada</span>
               <span class="count" id="count-reunion">0</span>
@@ -247,7 +247,7 @@
           </div>
 
           <!-- Columna: No Interesado -->
-          <div class="kanban-column col-rechazado">
+          <div class="kanban-column col-rechazado" ondragover="event.preventDefault()" ondrop="dropLead(event, 'no_interesado')">
             <div class="kanban-column-header">
               <span>No Interesados</span>
               <span class="count" id="count-rechazado">0</span>
@@ -360,6 +360,8 @@
 
         const card = document.createElement('div');
         card.className = 'lead-card';
+        card.draggable = true;
+        card.ondragstart = (e) => { e.dataTransfer.setData('text/plain', lead.id); };
         card.innerHTML = `
           <div class="lead-header">
             <span class="lead-name">${lead['first-name'] || ''} ${lead['last-name'] || ''}</span>
@@ -403,6 +405,14 @@
       document.getElementById('count-contactado').textContent = counts['contactado'];
       document.getElementById('count-reunion').textContent = counts['reunion_agendada'];
       document.getElementById('count-rechazado').textContent = counts['no_interesado'];
+    }
+
+    function dropLead(event, newStatus) {
+      event.preventDefault();
+      const leadId = event.dataTransfer.getData('text/plain');
+      if (leadId) {
+        updateLeadStatus(leadId, newStatus);
+      }
     }
 
     async function updateLeadStatus(leadId, newStatus) {
