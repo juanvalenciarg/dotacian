@@ -21,6 +21,7 @@
       text-align: center;
       color: white;
       margin-bottom: 4rem;
+      margin-top: 144px; /* Empuja el banner hacia abajo para que el menú no lo cubra */
       overflow: hidden;
     }
 
@@ -203,47 +204,16 @@
       font-size: 1.1rem;
       max-width: 400px;
     }
-
-    /* Transparent Header */
-    .transparent-header {
-      background: transparent !important;
-      border-bottom: none !important;
-      box-shadow: none !important;
-    }
-    .transparent-header .nav-links a {
-      color: rgba(255, 255, 255, 0.7) !important;
-    }
-    .transparent-header .nav-links a:hover,
-    .transparent-header .nav-links a.active {
-      color: white !important;
-    }
-    .transparent-header .header-actions > a:not(.btn) {
-      color: rgba(255, 255, 255, 0.8) !important;
-    }
-    .transparent-header .header-actions > a:not(.btn):hover {
-      color: white !important;
-    }
-    .transparent-header .btn-primary {
-      background: rgba(255, 255, 255, 0.15) !important;
-      border: 1px solid rgba(255, 255, 255, 0.3) !important;
-      color: white !important;
-    }
-    .transparent-header .btn-primary:hover {
-      background: rgba(255, 255, 255, 0.25) !important;
-    }
-    .transparent-header .header-mobile-toggle span {
-      background-color: white !important;
-    }
   </style>
 </head>
 
 <body>
 
-  <header class="header transparent-header">
+  <header class="header">
     <div class="container">
       <div class="logo">
         <a href="index.html">
-          <img src="assets/logos/Logo_blanco.png" alt="dotacian logo" style="height: 80px; width: auto; display: block;">
+          <img src="assets/logos/logo_dotacian.png" alt="dotacian logo" style="height: 80px; width: auto; display: block;">
         </a>
       </div>
       <nav class="nav-links">
@@ -251,10 +221,10 @@
         <a href="index.html#solucion">Solución</a>
         <a href="index.html#precios">Precios</a>
         <a href="index.html#fabricante">Fabricantes</a>
-        <a href="blog.html" class="active" style="font-weight: 600;">Blog</a>
+        <a href="blog.html" style="color: var(--color-brand-primary); font-weight: 600;">Blog</a>
       </nav>
       <div class="header-actions">
-        <a href="login.html" style="font-weight: 600; transition: color 0.2s;">Iniciar sesión</a>
+        <a href="login.html" style="font-weight: 600; color: var(--color-text-secondary); transition: color 0.2s;" onmouseover="this.style.color='var(--color-brand-primary)'" onmouseout="this.style.color='var(--color-text-secondary)'">Iniciar sesión</a>
         <a href="onboarding.html" class="btn btn-primary" style="padding: 0.6rem 1.25rem; font-size: 0.9rem;">Crea tu cuenta</a>
         <button class="header-mobile-toggle" id="mobile-menu-toggle" aria-label="Abrir menú">
           <span></span>
