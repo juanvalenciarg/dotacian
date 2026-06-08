@@ -6,13 +6,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Blog | Dotacian</title>
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap"
+    rel="stylesheet">
+
   <link rel="stylesheet" href="styles.css">
-  
+
   <style>
     .blog-header {
       background: linear-gradient(135deg, #020617 0%, #0F172A 100%);
@@ -21,7 +23,8 @@
       text-align: center;
       color: white;
       margin-bottom: 4rem;
-      margin-top: 144px; /* Empuja el banner hacia abajo para que el menú no lo cubra */
+      margin-top: 144px;
+      /* Empuja el banner hacia abajo para que el menú no lo cubra */
       overflow: hidden;
     }
 
@@ -189,16 +192,19 @@
       align-items: center;
       gap: 1rem;
     }
+
     .empty-state svg {
       color: #94A3B8;
       margin-bottom: 1rem;
     }
+
     .empty-state h3 {
       font-family: var(--font-family-heading);
       font-size: 1.5rem;
       color: #0F172A;
       margin: 0;
     }
+
     .empty-state p {
       color: #64748B;
       font-size: 1.1rem;
@@ -213,7 +219,8 @@
     <div class="container">
       <div class="logo">
         <a href="index.html">
-          <img src="assets/logos/logo_dotacian.png" alt="dotacian logo" style="height: 80px; width: auto; display: block;">
+          <img src="assets/logos/logo_dotacian.png" alt="dotacian logo"
+            style="height: 80px; width: auto; display: block;">
         </a>
       </div>
       <nav class="nav-links">
@@ -224,8 +231,11 @@
         <a href="blog.html" style="color: var(--color-brand-primary); font-weight: 600;">Blog</a>
       </nav>
       <div class="header-actions">
-        <a href="login.html" style="font-weight: 600; color: var(--color-text-secondary); transition: color 0.2s;" onmouseover="this.style.color='var(--color-brand-primary)'" onmouseout="this.style.color='var(--color-text-secondary)'">Iniciar sesión</a>
-        <a href="onboarding.html" class="btn btn-primary" style="padding: 0.6rem 1.25rem; font-size: 0.9rem;">Crea tu cuenta</a>
+        <a href="login.html" style="font-weight: 600; color: var(--color-text-secondary); transition: color 0.2s;"
+          onmouseover="this.style.color='var(--color-brand-primary)'"
+          onmouseout="this.style.color='var(--color-text-secondary)'">Iniciar sesión</a>
+        <a href="onboarding.html" class="btn btn-primary" style="padding: 0.6rem 1.25rem; font-size: 0.9rem;">Crea tu
+          cuenta</a>
         <button class="header-mobile-toggle" id="mobile-menu-toggle" aria-label="Abrir menú">
           <span></span>
           <span></span>
@@ -238,7 +248,8 @@
   <div class="mobile-drawer" id="mobile-drawer">
     <div class="drawer-header">
       <div class="logo" style="display: flex; align-items: center;">
-        <img src="assets/logos/logo_dotacian.png" alt="dotacian logo" style="height: 45px; width: auto; display: block;">
+        <img src="assets/logos/logo_dotacian.png" alt="dotacian logo"
+          style="height: 45px; width: auto; display: block;">
       </div>
       <button class="drawer-close" id="drawer-close">&times;</button>
     </div>
@@ -255,7 +266,7 @@
   </div>
 
   <section class="blog-header">
-    <h1>Blog de Dotacian</h1>
+    <h1>The Dot, el blog de Dotacian</h1>
     <p>Noticias, guías y consejos sobre la gestión inteligente de dotación y uniformes corporativos.</p>
   </section>
 
@@ -268,7 +279,8 @@
   </main>
 
   <!-- Footer Simple -->
-  <footer style="background: #0F172A; color: white; padding: 4rem 2rem 2rem 2rem; text-align: center; margin-top: 4rem;">
+  <footer
+    style="background: #0F172A; color: white; padding: 4rem 2rem 2rem 2rem; text-align: center; margin-top: 4rem;">
     <div style="max-width: 1200px; margin: 0 auto;">
       <img src="assets/logos/logo_dotacian_admin.png" alt="Dotacian" style="height: 40px; margin-bottom: 1.5rem;">
       <p style="color: rgba(255,255,255,0.6); font-size: 0.875rem;">© 2026 Dotacian. Todos los derechos reservados.</p>
@@ -277,7 +289,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/utils.js?v=4"></script>
-  
+
   <script>
     // Supabase Configuration
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
@@ -342,7 +354,7 @@
           const card = document.createElement('div');
           card.className = 'blog-card';
           card.onclick = () => window.location.href = `articulo.html?slug=${post.slug}`;
-          
+
           card.innerHTML = `
             <div class="blog-image-wrapper">
               <img src="${imageSrc}" alt="${post.title}" class="blog-image">
@@ -383,4 +395,5 @@
     document.addEventListener('DOMContentLoaded', loadBlogPosts);
   </script>
 </body>
+
 </html>
