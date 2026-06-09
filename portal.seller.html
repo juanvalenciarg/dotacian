@@ -885,7 +885,7 @@
   <script>
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token' } });
     let userCountry = 'MX'; // Default
 
     async function initPortal() {
@@ -941,8 +941,8 @@
       const isDismissed = localStorage.getItem('dotacian_seller_setup_dismissed') === 'true';
 
       // 1. Check Company (33%)
-      const hasCompany = company && 
-        company.seller_name && 
+      const hasCompany = company &&
+        company.seller_name &&
         company.location &&
         company.legal_name &&
         company.tax_id &&
