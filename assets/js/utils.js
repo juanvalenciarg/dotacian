@@ -284,7 +284,7 @@ function showInactivityWarning() {
     modal.className = 'modal-overlay active';
     modal.style.zIndex = '9999';
     modal.innerHTML = `
-      <div class="modal-content" style="max-width: 400px; text-align: center; padding: 2.5rem 2rem;">
+      <div class="modal-content" style="background: white; border-radius: 1.5rem; max-width: 400px; width: 90%; text-align: center; padding: 2.5rem 2rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border: 1px solid #E2E8F0;">
         <div style="width: 56px; height: 56px; background: #FFFBEB; color: #D97706; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
           <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
         </div>
@@ -334,3 +334,45 @@ function setupAutoLogout() {
   
   resetInactivityTimer();
 }
+
+// Admin Leads Badge
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.location.pathname.includes('admin') && !window.location.pathname.includes('login')) {
+    setTimeout(async () => {
+      const navLeads = document.getElementById('nav-leads');
+      if (navLeads && typeof window._supabase !== 'undefined') {
+        try {
+          const { count, error } = await window._supabase
+            .from('leads_dotacian')
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'nuevo');
+          
+          if (!error && count > 0) {
+            navLeads.style.display = 'flex';
+            navLeads.style.justifyContent = 'space-between';
+            navLeads.style.alignItems = 'center';
+            
+            const badge = document.createElement('span');
+            badge.style.background = '#EF4444';
+            badge.style.color = 'white';
+            badge.style.borderRadius = '50%';
+            badge.style.width = '20px';
+            badge.style.height = '20px';
+            badge.style.display = 'flex';
+            badge.style.alignItems = 'center';
+            badge.style.justifyContent = 'center';
+            badge.style.fontSize = '0.7rem';
+            badge.style.fontWeight = '700';
+            badge.style.boxShadow = '0 0 0 2px #0F172A'; // Para que resalte en el fondo oscuro
+            badge.textContent = count > 9 ? '+9' : count;
+            
+            navLeads.appendChild(badge);
+          }
+        } catch(err) {
+          console.error('Error fetching leads count for badge:', err);
+        }
+      }
+    }, 1200); // Give Supabase time to initialize
+  }
+});
+
