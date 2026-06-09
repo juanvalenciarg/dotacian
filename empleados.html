@@ -615,7 +615,7 @@
           <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
             <div style="flex: 1;">
               <label>Talla Camisa</label>
-              <select id="empShirtSize" required
+              <select id="empShirtSize"
                 style="width: 100%; padding: 0.6rem; border: 1px solid var(--color-border); border-radius: 4px; background: white;">
                 <option value="">Selecciona...</option>
                 <option value="XS">XS</option>
@@ -629,7 +629,7 @@
             </div>
             <div style="flex: 1;">
               <label>Talla Pantalón</label>
-              <select id="empPantsSize" required
+              <select id="empPantsSize"
                 style="width: 100%; padding: 0.6rem; border: 1px solid var(--color-border); border-radius: 4px; background: white;">
                 <option value="">Selecciona...</option>
                 <optgroup label="Hombre">
@@ -659,7 +659,7 @@
             </div>
             <div style="flex: 1;">
               <label>Talla Zapatos</label>
-              <select id="empShoeSize" required
+              <select id="empShoeSize"
                 style="width: 100%; padding: 0.6rem; border: 1px solid var(--color-border); border-radius: 4px; background: white;">
                 <option value="">Selecciona...</option>
                 <option value="26">26</option>
@@ -2838,7 +2838,7 @@
         const companyId = sessionData?.session?.user?.id;
         if (!companyId) throw new Error("No session found");
 
-        const { error } = await _supabase.from('company_employees').insert([{
+        const { data: newEmp, error } = await _supabase.from('company_employees').insert([{
           company_id: companyId,
           first_name: name,
           last_name: lastName,
@@ -2849,19 +2849,35 @@
           shirt_size: shirtSize,
           pants_size: pantsSize,
           shoe_size: shoeSize,
+          sizes: {
+            'Camisa': shirtSize || '',
+            'Pantalón': pantsSize || '',
+            'Calzado': shoeSize || ''
+          },
           status: 'none'
-        }]);
+        }]).select().single();
 
         if (error) throw error;
 
         await fetchEmployees();
 
         closeModal();
-        document.getElementById('employeeForm').reset();
-        showToast("Empleado Agregado", `Se ha registrado a ${name} exitosamente.`);
+        const form = document.querySelector('.modal-form');
+        if (form) form.reset();
+
+        if (!shirtSize || !pantsSize || !shoeSize) {
+          const url = `${window.location.origin}/mi_dotacion.html?mode=tallas&emp_id=${newEmp.id}`;
+          navigator.clipboard.writeText(url).then(() => {
+            showToast("Empleado Agregado", `Se ha registrado a ${name}. Faltan tallas, se ha copiado el enlace de captura a tu portapapeles.`);
+          }).catch(() => {
+            showToast("Empleado Agregado", `Se ha registrado a ${name}. Faltan tallas.`);
+          });
+        } else {
+          showToast("Empleado Agregado", `Se ha registrado a ${name} exitosamente.`);
+        }
       } catch (err) {
         console.error("Error saving employee:", err);
-        showToast("Error", "Ocurrió un problema al guardar el empleado.");
+        showToast("Error", "Ocurrió un problema al guardar el empleado.", "error");
       }
     }
     let allEmployees = [];
