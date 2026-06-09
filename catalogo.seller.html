@@ -1208,11 +1208,13 @@
         session = currentSession;
 
         // Obtener datos de la empresa para el país y moneda
-        const { data: company } = await _supabase
+        const { data: companyData } = await _supabase
           .from('seller_company')
           .select('*')
           .eq('id', session.user.id)
           .limit(1);
+
+        const company = companyData && companyData.length > 0 ? companyData[0] : null;
 
         if (!company) {
           console.log('Seller company missing, checking profile...');
