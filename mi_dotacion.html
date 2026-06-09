@@ -535,15 +535,19 @@
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner" style="width:16px; height:16px; margin:0; display:inline-block; border-top-color:white; vertical-align:middle;"></span> Guardando...';
             try {
-              const { error: updateErr } = await _supabase.from('company_employees')
+              const { data: updatedData, error: updateErr } = await _supabase.from('company_employees')
                 .update({ 
                   shirt_size: document.getElementById('emp-size-camisa').value,
                   pants_size: document.getElementById('emp-size-pantalon').value,
                   shoe_size: document.getElementById('emp-size-calzado').value
                 })
-                .eq('id', empId);
+                .eq('id', empId)
+                .select();
 
               if (updateErr) throw updateErr;
+              if (!updatedData || updatedData.length === 0) {
+                throw new Error("Supabase RLS bloqueó la actualización (El usuario es anónimo).");
+              }
 
               document.getElementById('successModal').classList.add('active');
               const modalTitle = document.querySelector('#successModal h3');
