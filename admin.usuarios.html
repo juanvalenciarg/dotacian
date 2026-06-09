@@ -551,6 +551,14 @@
                     <div id="viewOrdersCount"
                       style="font-weight: 700; color: var(--color-brand-primary); font-size: 1.1rem;">0</div>
                   </div>
+                  <div class="form-group">
+                    <label>Roles Activos</label>
+                    <div id="viewActiveRoles" style="font-weight: 700; color: var(--color-navy); font-size: 1.1rem;">0</div>
+                  </div>
+                  <div class="form-group">
+                    <label>No. Empleados Registrados</label>
+                    <div id="viewEmployeesCount" style="font-weight: 700; color: var(--color-navy); font-size: 1.1rem;">0</div>
+                  </div>
                 </div>
               </div>
 
@@ -779,6 +787,29 @@
       // Transacciones
       document.getElementById('viewQuotesCount').textContent = data.quotes_count || 0;
       document.getElementById('viewOrdersCount').textContent = data.orders_count || 0;
+
+      // Roles y Empleados (async fetch)
+      if (data.role === 'client') {
+        document.getElementById('viewActiveRoles').textContent = '...';
+        document.getElementById('viewEmployeesCount').textContent = '...';
+        
+        _supabase.from('role_definition')
+          .select('*', { count: 'exact', head: true })
+          .eq('company_id', data.user_id)
+          .then(({ count }) => {
+            document.getElementById('viewActiveRoles').textContent = count || 0;
+          });
+
+        _supabase.from('company_employees')
+          .select('*', { count: 'exact', head: true })
+          .eq('company_id', data.user_id)
+          .then(({ count }) => {
+            document.getElementById('viewEmployeesCount').textContent = count || 0;
+          });
+      } else {
+        document.getElementById('viewActiveRoles').textContent = 'N/A';
+        document.getElementById('viewEmployeesCount').textContent = 'N/A';
+      }
 
       document.getElementById('drawerOverlay').classList.add('active');
       document.getElementById('userCard').classList.add('active');
