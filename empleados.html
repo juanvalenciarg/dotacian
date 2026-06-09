@@ -2549,14 +2549,41 @@
 
     let currentDetailEmployeeId = null;
 
+    function fallbackCopyTextToClipboard(text) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.top = "0";
+      textArea.style.left = "0";
+      textArea.style.position = "fixed";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showToast('Enlace copiado', 'Envía este enlace al empleado para que confirme sus tallas.');
+      } catch (err) {
+        console.error('Fallback: Oops, unable to copy', err);
+        showToast('Error', 'No se pudo copiar el enlace al portapapeles.', 'error');
+      }
+      document.body.removeChild(textArea);
+    }
+
     function copySizeLink() {
       if (!currentDetailEmployeeId) return;
-      const url = `${window.location.origin}/mi_dotacion.html?mode=tallas&emp_id=${currentDetailEmployeeId}`;
+      
+      let basePath = window.location.href.split('empleados.html')[0];
+      const url = `${basePath}mi_dotacion.html?mode=tallas&emp_id=${currentDetailEmployeeId}`;
+      
+      if (!navigator.clipboard) {
+        fallbackCopyTextToClipboard(url);
+        return;
+      }
+      
       navigator.clipboard.writeText(url).then(() => {
         showToast('Enlace copiado', 'Envía este enlace al empleado para que confirme sus tallas.');
       }).catch(err => {
-        console.error('No se pudo copiar: ', err);
-        showToast('Error', 'No se pudo copiar el enlace al portapapeles.', 'error');
+        console.error('Clipboard API failed: ', err);
+        fallbackCopyTextToClipboard(url);
       });
     }
 
@@ -2875,12 +2902,20 @@
         }
 
         if (requestSizes) {
-          const url = `${window.location.origin}/mi_dotacion.html?mode=tallas&emp_id=${newEmp.id}`;
-          navigator.clipboard.writeText(url).then(() => {
-            showToast("Empleado Agregado", `Se ha registrado a ${name}. Se ha copiado el enlace de captura a tu portapapeles.`);
-          }).catch(() => {
-            showToast("Empleado Agregado", `Se ha registrado a ${name}. No se pudo copiar el enlace.`);
-          });
+          let basePath = window.location.href.split('empleados.html')[0];
+          const url = `${basePath}mi_dotacion.html?mode=tallas&emp_id=${newEmp.id}`;
+          
+          if (!navigator.clipboard) {
+             fallbackCopyTextToClipboard(url);
+             showToast("Empleado Agregado", `Se ha registrado a ${name}. Se ha copiado el enlace de captura a tu portapapeles.`);
+          } else {
+            navigator.clipboard.writeText(url).then(() => {
+              showToast("Empleado Agregado", `Se ha registrado a ${name}. Se ha copiado el enlace de captura a tu portapapeles.`);
+            }).catch(() => {
+              fallbackCopyTextToClipboard(url);
+              showToast("Empleado Agregado", `Se ha registrado a ${name}. Se ha copiado el enlace de captura a tu portapapeles.`);
+            });
+          }
         } else {
           showToast("Empleado Agregado", `Se ha registrado a ${name} exitosamente.`);
         }
