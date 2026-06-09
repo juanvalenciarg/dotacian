@@ -657,14 +657,20 @@
       }
 
       function checkItems() {
+        const mode = getParameterByName('mode');
+        if (mode === 'tallas') return;
+
         const checkboxes = document.querySelectorAll('#delivery-checklist input[type="checkbox"]');
         const allChecked = Array.from(checkboxes).every(cb => cb.checked);
         const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
-        const isPartial = document.getElementById('partialReceipt').checked;
+        const isPartial = document.getElementById('partialReceipt');
+        const isPartialChecked = isPartial ? isPartial.checked : false;
         const isSigned = !isCanvasBlank();
 
         const confirmBtn = document.getElementById('startConfirmBtn');
-        confirmBtn.disabled = !(isSigned && (allChecked || (isPartial && anyChecked)));
+        if (confirmBtn) {
+          confirmBtn.disabled = !(isSigned && (allChecked || (isPartialChecked && anyChecked)));
+        }
       }
 
       function isCanvasBlank() {
