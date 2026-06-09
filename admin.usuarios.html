@@ -1037,23 +1037,93 @@
         }
         else if (type === 'employees') {
           title.textContent = 'Empleados Registrados';
-          const { data, error } = await _supabase.from('company_employees')
-            .select('*').eq('company_id', companyId).order('first_name');
-          if (error) throw error;
+          
+          const [empRes, rolesRes, deliveriesRes] = await Promise.all([
+            _supabase.from('company_employees').select('*').eq('company_id', companyId).order('first_name'),
+            _supabase.from('role_definition').select('role_name, renewal_frequency').eq('company_id', companyId),
+            _supabase.from('uniform_deliveries').select('*').eq('status', 'signed')
+          ]);
 
-          if (!data || data.length === 0) {
+          if (empRes.error) throw empRes.error;
+          const data = empRes.data || [];
+
+          if (data.length === 0) {
             body.innerHTML = '<p style="text-align: center; color: #64748b; padding: 3rem;">No hay empleados registrados.</p>';
             return;
           }
 
+          const renewalFreqMap = {};
+          if (rolesRes.data) {
+            rolesRes.data.forEach(r => {
+              if (r.role_name) renewalFreqMap[r.role_name.toLowerCase().trim()] = r.renewal_frequency || 6;
+            });
+          }
+
+          const employeeDeliveriesMap = {};
+          if (deliveriesRes.data) {
+            deliveriesRes.data.forEach(d => {
+              if (d.employee_id) {
+                if (!employeeDeliveriesMap[d.employee_id]) employeeDeliveriesMap[d.employee_id] = [];
+                employeeDeliveriesMap[d.employee_id].push(d);
+              }
+            });
+          }
+
+          const now = new Date();
+
           let tableHTML = `<table class="users-table" style="width: 100%; border-collapse: collapse;">
-            <thead style="position: sticky; top: 0; background: #f8fafc;"><tr><th style="padding:1rem; text-align:left;">Nombre</th><th style="padding:1rem; text-align:left;">Email</th><th style="padding:1rem; text-align:left;">Estado</th></tr></thead><tbody>`;
+            <thead style="position: sticky; top: 0; background: #f8fafc;">
+              <tr>
+                <th style="padding:1rem; text-align:left; color: #64748b; font-size: 0.75rem;">NOMBRE COMPLETO</th>
+                <th style="padding:1rem; text-align:left; color: #64748b; font-size: 0.75rem;">ROL</th>
+                <th style="padding:1rem; text-align:left; color: #64748b; font-size: 0.75rem;">ALERTA RENOVACIÓN</th>
+                <th style="padding:1rem; text-align:left; color: #64748b; font-size: 0.75rem;">ESTADO</th>
+              </tr>
+            </thead><tbody>`;
+
           data.forEach(e => {
-            const statusColor = e.status === 'active' ? '#10B981' : '#64748B';
+            let alertText = 'PENDIENTE';
+            let alertBg = '#F1F5F9';
+            let alertColor = '#475569';
+            
+            const empDeliveries = employeeDeliveriesMap[e.id] || [];
+            if (empDeliveries.length > 0) {
+              empDeliveries.sort((a, b) => new Date(b.signed_at || b.created_at) - new Date(a.signed_at || a.created_at));
+              const latestDel = empDeliveries[0];
+              const signedDate = new Date(latestDel.signed_at || latestDel.created_at);
+
+              const empRoleKey = (e.role || '').toLowerCase().trim();
+              const renewalMonths = renewalFreqMap[empRoleKey] || 6; 
+
+              const nextDate = new Date(signedDate);
+              nextDate.setMonth(nextDate.getMonth() + renewalMonths);
+
+              const diffTime = nextDate - now;
+              const diffMonths = diffTime / (1000 * 60 * 60 * 24 * 30.44);
+
+              if (diffTime < 0) {
+                alertText = 'VENCIDO';
+                alertBg = '#FEF2F2'; alertColor = '#EF4444';
+              } else if (diffMonths <= 1) {
+                alertText = 'PRÓXIMO A RENOVAR';
+                alertBg = '#FFFBEB'; alertColor = '#F59E0B';
+              } else {
+                alertText = 'AL DÍA';
+                alertBg = '#ECFDF5'; alertColor = '#10B981';
+              }
+            }
+
+            const roleName = e.role || '-';
+            const isActive = e.role_status === 'active' || e.role_status === null || e.role_status === '';
+            const estadoTexto = isActive ? 'ACTIVO' : 'INACTIVO';
+            const estadoColor = isActive ? '#059669' : '#EF4444';
+            const estadoBg = isActive ? '#ECFDF5' : '#FEF2F2';
+
             tableHTML += `<tr style="border-bottom: 1px solid #E2E8F0;">
               <td style="padding:1rem; font-weight: 600; color: #0f172a;">${e.first_name || ''} ${e.last_name || ''}</td>
-              <td style="padding:1rem; color: #475569;">${e.email || '-'}</td>
-              <td style="padding:1rem;"><span style="color: ${statusColor}; text-transform: capitalize; font-weight: 700; font-size: 0.8rem; background: ${statusColor}1A; padding: 4px 8px; border-radius: 4px;">${e.status || 'Activo'}</span></td>
+              <td style="padding:1rem; color: #475569; font-weight: 500;">${roleName}</td>
+              <td style="padding:1rem;"><span style="color: ${alertColor}; background: ${alertBg}; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">${alertText}</span></td>
+              <td style="padding:1rem;"><span style="color: ${estadoColor}; background: ${estadoBg}; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">${estadoTexto}</span></td>
             </tr>`;
           });
           tableHTML += `</tbody></table>`;
