@@ -730,14 +730,14 @@
       window.addEventListener('userProfileLoaded', (e) => {
         const { industry, userCountry: uc } = e.detail;
         if (uc) userCountry = uc;
-        
+
         const ind = (industry || '').toLowerCase();
         currentIndustry = ind || 'all';
-        
+
         updateSubcategoryFilters();
         applyFilters();
       });
-      
+
       // Cargar el marketplace de inmediato (el filtro se aplicará cuando dispare el evento o si ya disparó, aplica currentIndustry)
       await loadGlobalMarketplace();
     }
@@ -849,10 +849,10 @@
           filteredProducts = filteredProducts.filter(p => {
             const prodInd = (p.industry || '').toLowerCase();
             const sellerData = sellerDataMap[p.seller_id];
-            
+
             // Verifica que la industria del producto coincida
             const matchesIndustry = prodInd === currentIndustry;
-            
+
             // Verifica que el seller tenga definida esta industria
             let sellerHasIndustry = true; // Fallback por si no tiene configuración
             if (sellerData && sellerData.industries && Array.isArray(sellerData.industries)) {
@@ -908,7 +908,7 @@
               ` : ''}
             </div>
             <div class="uniform-info">
-              <span class="uniform-category">${p.subcategory || p.industry || 'General'}</span>
+              <span class="uniform-category">${p.subcategory || p.industry || 'General'} &nbsp;&bull;&nbsp; ${p.gender || 'Unisex'}</span>
               <h3 class="uniform-name">${p.name}</h3>
               <div class="uniform-footer">
                 <div class="uniform-price">Desde ${formattedPrice} <span>${curConfig.code}</span></div>
