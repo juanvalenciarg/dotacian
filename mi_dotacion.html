@@ -493,7 +493,11 @@
           const partialReceipt = document.getElementById('partialReceipt');
           if (partialReceipt) partialReceipt.parentElement.style.display = 'none';
           
-          let sizes = emp.sizes || {};
+          let sizes = {
+            'Camisa': emp.shirt_size || '',
+            'Pantalón': emp.pants_size || '',
+            'Calzado': emp.shoe_size || ''
+          };
 
           // Generar selects
           checklist.innerHTML = `
@@ -531,13 +535,12 @@
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner" style="width:16px; height:16px; margin:0; display:inline-block; border-top-color:white; vertical-align:middle;"></span> Guardando...';
             try {
-              const newSizes = {
-                'Camisa': document.getElementById('emp-size-camisa').value,
-                'Pantalón': document.getElementById('emp-size-pantalon').value,
-                'Calzado': document.getElementById('emp-size-calzado').value
-              };
               const { error: updateErr } = await _supabase.from('company_employees')
-                .update({ sizes: newSizes })
+                .update({ 
+                  shirt_size: document.getElementById('emp-size-camisa').value,
+                  pants_size: document.getElementById('emp-size-pantalon').value,
+                  shoe_size: document.getElementById('emp-size-calzado').value
+                })
                 .eq('id', empId);
 
               if (updateErr) throw updateErr;
