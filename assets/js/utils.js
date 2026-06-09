@@ -312,8 +312,12 @@ window.keepSessionActive = function() {
 async function logoutUser() {
   if (typeof _supabase !== 'undefined') {
     await _supabase.auth.signOut();
-    const isSeller = window.location.pathname.endsWith('.seller.html');
-    window.location.href = isSeller ? 'login.seller.html' : 'login.html';
+    const path = window.location.pathname;
+    let target = 'login.html';
+    if (path.includes('.seller.') || path.includes('seller')) target = 'mi-login.html';
+    else if (path.includes('admin')) target = 'login.admin.html';
+    
+    window.location.href = target + '?reason=timeout';
   }
 }
 
