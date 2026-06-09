@@ -823,7 +823,14 @@
             </select>
           </div>
           <div
-            style="grid-column: span 3; display: flex; justify-content: flex-end; margin-top: 0.25rem; margin-bottom: 0.5rem;">
+            style="grid-column: span 3; display: flex; justify-content: flex-end; margin-top: 0.25rem; margin-bottom: 0.5rem; gap: 0.5rem;">
+            <button id="btnCopySizeLink" onclick="copySizeLink()" class="btn btn-secondary"
+              style="padding: 0.6rem 1.25rem; font-size: 0.8125rem; background: white; color: #475569; border: 1px solid #E2E8F0; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; box-shadow: var(--shadow-sm); transition: all 0.2s;"
+              onmouseover="this.style.background='#F8FAFC';this.style.transform='translateY(-1px)';"
+              onmouseout="this.style.background='white';this.style.transform='translateY(0)';">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+              Solicitar Tallas
+            </button>
             <button id="btnActionEmployeeSizes" onclick="enableSizeEditing()" class="btn btn-primary"
               style="padding: 0.6rem 1.25rem; font-size: 0.8125rem; background: #06B6D4; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; box-shadow: var(--shadow-sm); transition: all 0.2s;"
               onmouseover="this.style.background='#0891B2';this.style.transform='translateY(-1px)';"
@@ -1373,7 +1380,7 @@
       `);
       frameDoc.close();
 
-      printFrame.onload = function() {
+      printFrame.onload = function () {
         printFrame.contentWindow.focus();
         printFrame.contentWindow.print();
         setTimeout(() => {
@@ -1862,6 +1869,8 @@
           Actualizar Tallas
         `;
       }
+      const btnLink = document.getElementById('btnCopySizeLink');
+      if (btnLink) btnLink.style.display = 'flex';
 
       document.getElementById('detailModal').classList.add('active');
     }
@@ -2533,11 +2542,25 @@
 
     let currentDetailEmployeeId = null;
 
+    function copySizeLink() {
+      if (!currentDetailEmployeeId) return;
+      const url = `${window.location.origin}/mi_dotacion.html?mode=tallas&emp_id=${currentDetailEmployeeId}`;
+      navigator.clipboard.writeText(url).then(() => {
+        showToast('Enlace copiado', 'Envía este enlace al empleado para que confirme sus tallas.');
+      }).catch(err => {
+        console.error('No se pudo copiar: ', err);
+        showToast('Error', 'No se pudo copiar el enlace al portapapeles.', 'error');
+      });
+    }
+
     function enableSizeEditing() {
       document.getElementById('detailShirtSize').disabled = false;
       document.getElementById('detailPantsSize').disabled = false;
       document.getElementById('detailShoeSize').disabled = false;
       document.getElementById('detailShirtSize').focus();
+
+      const btnLink = document.getElementById('btnCopySizeLink');
+      if (btnLink) btnLink.style.display = 'none';
 
       const btn = document.getElementById('btnActionEmployeeSizes');
       if (btn) {
@@ -2603,6 +2626,8 @@
           </svg>
           Actualizar Tallas
         `;
+        const btnLink = document.getElementById('btnCopySizeLink');
+        if (btnLink) btnLink.style.display = 'flex';
 
         await fetchEmployees();
       } catch (err) {
