@@ -1090,6 +1090,7 @@
           image: productData.images?.[0] || productData.image_url,
           seller_name: productData.seller_name,
           base_price: productData.base_price,
+          moq: productData.moq || 1,
           available_sizes: productData.size || (Array.isArray(productData.sizes) ? productData.sizes.join(', ') : 'Talla Única'),
           color: selectedColor || 'Predeterminado',
           logo_config: logoConfig,
