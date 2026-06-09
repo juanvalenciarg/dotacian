@@ -268,7 +268,27 @@
 
     <main class="main-content">
       <header class="app-header">
-        <h1 id="pageTitle">Dashboard Principal</h1>
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+          <h1 id="pageTitle" style="margin: 0;">Dashboard Principal</h1>
+          
+          <div style="display: flex; align-items: center; gap: 0.5rem; background: white; padding: 0.5rem; border-radius: 0.75rem; border: 1px solid #E2E8F0; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+            <svg width="16" height="16" fill="none" stroke="#64748B" stroke-width="2" viewBox="0 0 24 24" style="margin-left: 0.25rem;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <select id="dateFilter" onchange="handleDateFilterChange()" style="border: none; background: transparent; font-family: 'Inter', sans-serif; font-size: 0.85rem; color: #334155; font-weight: 500; outline: none; cursor: pointer; padding-right: 0.5rem;">
+              <option value="all">Todo el tiempo</option>
+              <option value="today">Hoy</option>
+              <option value="week">Esta semana</option>
+              <option value="15days">Últimos 15 días</option>
+              <option value="30days">Últimos 30 días</option>
+              <option value="custom">Fecha Personalizada</option>
+            </select>
+            <div id="customDateRange" style="display: none; align-items: center; gap: 0.5rem; border-left: 1px solid #E2E8F0; padding-left: 0.5rem;">
+              <input type="date" id="startDate" style="border: 1px solid #E2E8F0; border-radius: 0.25rem; padding: 0.15rem 0.25rem; font-family: 'Inter', sans-serif; font-size: 0.8rem; color: #334155; outline: none;">
+              <span style="color: #64748B; font-size: 0.85rem;">-</span>
+              <input type="date" id="endDate" style="border: 1px solid #E2E8F0; border-radius: 0.25rem; padding: 0.15rem 0.25rem; font-family: 'Inter', sans-serif; font-size: 0.8rem; color: #334155; outline: none;">
+              <button onclick="applyCustomDate()" style="background: var(--color-cyan); color: #0F172A; border: none; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: background 0.2s;">Aplicar</button>
+            </div>
+          </div>
+        </div>
         <div class="header-right" style="position: relative; display: flex; align-items: center;">
           <div id="header-company-badge" onclick="toggleUserPopover(event)"
             style="background: white; padding: 0.5rem 1rem; border-radius: 1.25rem; border: 1px solid #E2E8F0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 0.75rem; cursor: pointer; transition: all 0.3s ease; position: relative;">
@@ -407,14 +427,77 @@
     // Ejecutar validación inmediatamente
     checkAdminAuth();
 
+    // Logica de Filtro de Fechas
+    function handleDateFilterChange() {
+      const filter = document.getElementById('dateFilter').value;
+      const customRange = document.getElementById('customDateRange');
+      
+      if (filter === 'custom') {
+        customRange.style.display = 'flex';
+        return; // Esperar a que el usuario presione "Aplicar"
+      } else {
+        customRange.style.display = 'none';
+      }
+
+      let startDate = null;
+      let endDate = null;
+      const now = new Date();
+
+      if (filter === 'today') {
+        startDate = new Date(now.setHours(0,0,0,0)).toISOString();
+        endDate = new Date(new Date().setHours(23,59,59,999)).toISOString();
+      } else if (filter === 'week') {
+        const firstDay = new Date(now.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1))); // Lunes
+        firstDay.setHours(0,0,0,0);
+        startDate = firstDay.toISOString();
+        endDate = new Date().toISOString();
+      } else if (filter === '15days') {
+        const past15 = new Date();
+        past15.setDate(now.getDate() - 15);
+        startDate = past15.toISOString();
+        endDate = new Date().toISOString();
+      } else if (filter === '30days') {
+        const past30 = new Date();
+        past30.setDate(now.getDate() - 30);
+        startDate = past30.toISOString();
+        endDate = new Date().toISOString();
+      }
+
+      loadDashboardMetrics(startDate, endDate);
+    }
+
+    function applyCustomDate() {
+      const start = document.getElementById('startDate').value;
+      let end = document.getElementById('endDate').value;
+      
+      if (!start) {
+        showToast('Atención', 'Selecciona al menos una fecha de inicio', 'error');
+        return;
+      }
+      
+      let startDate = new Date(start + 'T00:00:00').toISOString();
+      let endDate = null;
+      
+      if (end) {
+        endDate = new Date(end + 'T23:59:59').toISOString();
+      } else {
+        endDate = new Date().toISOString();
+      }
+
+      loadDashboardMetrics(startDate, endDate);
+    }
+
     // Lógica del Dashboard utilizando RPC para saltar el RLS
-    async function loadDashboardMetrics() {
+    async function loadDashboardMetrics(startDate = null, endDate = null) {
       try {
-        const { data, error } = await _supabase.rpc('get_admin_dashboard_metrics');
+        const { data, error } = await _supabase.rpc('get_admin_dashboard_metrics', {
+          p_start_date: startDate,
+          p_end_date: endDate
+        });
 
         if (error) {
           console.error("Error al ejecutar RPC de métricas:", error);
-          showToast('Error', 'No se pudieron cargar las métricas (Falta RPC o permisos).', 'error');
+          showToast('Error', 'No se pudieron cargar las métricas. ¿Actualizaste la función en Supabase?', 'error');
           return;
         }
 
@@ -431,7 +514,7 @@
         container.innerHTML = '';
 
         if (Object.keys(statusCounts).length === 0) {
-          container.innerHTML = '<div style="color: #64748B; font-size: 0.875rem;">No hay órdenes registradas.</div>';
+          container.innerHTML = '<div style="color: #64748B; font-size: 0.875rem;">No hay órdenes registradas en este periodo.</div>';
           return;
         }
 
