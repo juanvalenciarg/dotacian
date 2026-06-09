@@ -388,14 +388,7 @@
                ${lead.country === 'México' ? '🇲🇽' : lead.country === 'Colombia' ? '🇨🇴' : '🌎'} ${lead.country || 'N/A'}
             </div>
           </div>
-          <div class="lead-actions">
-            <select class="status-select" onchange="updateLeadStatus('${lead.id}', this.value)">
-              <option value="nuevo" ${status === 'nuevo' ? 'selected' : ''}>Nuevo</option>
-              <option value="contactado" ${status === 'contactado' ? 'selected' : ''}>Contactado</option>
-              <option value="reunion_agendada" ${status === 'reunion_agendada' ? 'selected' : ''}>Reunión Agendada</option>
-              <option value="no_interesado" ${status === 'no_interesado' ? 'selected' : ''}>No Interesado</option>
-            </select>
-          </div>
+
         `;
         columns[status].appendChild(card);
       });
