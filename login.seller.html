@@ -434,6 +434,14 @@
             return;
           }
 
+          if (!data.session) {
+            errorText.textContent = 'Por favor verifica tu correo electrónico antes de iniciar sesión.';
+            errorAlert.style.display = 'flex';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Acceder al Portal Seller';
+            return;
+          }
+
           if (typeof showToast === 'function') {
             showToast('¡Bienvenido!', 'Sesión iniciada correctamente', 'success');
           }
