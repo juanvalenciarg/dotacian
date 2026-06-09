@@ -375,4 +375,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1200); // Give Supabase time to initialize
   }
 });
-
