@@ -1849,9 +1849,9 @@
       document.getElementById('confirmBtn').style.opacity = '1';
 
       currentDetailEmployeeId = db_id;
-      detailShirtSize.value = empObj ? (empObj.shirt_size || 'M') : 'M';
-      detailPantsSize.value = empObj ? (empObj.pants_size || '32') : '32';
-      detailShoeSize.value = empObj ? (empObj.shoe_size || '27') : '27';
+      detailShirtSize.value = empObj ? (empObj.shirt_size || '') : '';
+      detailPantsSize.value = empObj ? (empObj.pants_size || '') : '';
+      detailShoeSize.value = empObj ? (empObj.shoe_size || '') : '';
 
       // Make sizes read-only initially
       detailShirtSize.disabled = true;
@@ -2874,12 +2874,12 @@
           });
         }
 
-        if (requestSizes || !shirtSize || !pantsSize || !shoeSize) {
+        if (requestSizes) {
           const url = `${window.location.origin}/mi_dotacion.html?mode=tallas&emp_id=${newEmp.id}`;
           navigator.clipboard.writeText(url).then(() => {
-            showToast("Empleado Agregado", `Se ha registrado a ${name}. Faltan tallas, se ha copiado el enlace de captura a tu portapapeles.`);
+            showToast("Empleado Agregado", `Se ha registrado a ${name}. Se ha copiado el enlace de captura a tu portapapeles.`);
           }).catch(() => {
-            showToast("Empleado Agregado", `Se ha registrado a ${name}. Faltan tallas.`);
+            showToast("Empleado Agregado", `Se ha registrado a ${name}. No se pudo copiar el enlace.`);
           });
         } else {
           showToast("Empleado Agregado", `Se ha registrado a ${name} exitosamente.`);
