@@ -441,7 +441,7 @@
         grid-template-columns: 1fr;
         gap: 1rem;
       }
-      
+
       .main-image-viewer {
         border-radius: 16px;
       }
@@ -533,14 +533,16 @@
       <header class="app-header">
         <div class="header-left" style="display: flex; align-items: center;">
           <button class="mobile-menu-toggle" onclick="toggleSidebar()">
-            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" viewBox="0 0 24 24">
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="6" x2="21" y2="6"></line>
               <line x1="3" y1="18" x2="21" y2="18"></line>
             </svg>
           </button>
         </div>
-        <div class="header-right" style="display: flex; align-items: center; gap: 1.5rem; position: relative; padding-right: 1rem;">
+        <div class="header-right"
+          style="display: flex; align-items: center; gap: 1.5rem; position: relative; padding-right: 1rem;">
           <div id="header-company-badge" onclick="toggleUserPopover(event)"
             style="background: white; padding: 0.5rem 1rem; border-radius: 1.25rem; border: 1px solid var(--color-border); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 0.75rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative;">
             <div id="badge-industry-icon"
@@ -640,7 +642,8 @@
 
             <div class="product-info">
               <div id="product-status" class="status-pill">
-                <span class="pulse-dot" style="width: 8px; height: 8px; background: #10B981; border-radius: 50%;"></span>
+                <span class="pulse-dot"
+                  style="width: 8px; height: 8px; background: #10B981; border-radius: 50%;"></span>
                 Disponible para envío inmediato
               </div>
 
@@ -649,7 +652,8 @@
                   style="font-size: 2.25rem; margin: 0; color: var(--color-navy); line-height: 1.1; text-wrap: balance;">
                   Cargando...</h1>
                 <div style="display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap;">
-                  <span style="font-size: 1rem; color: #94A3B8; font-weight: 700; text-transform: uppercase;">Desde</span>
+                  <span
+                    style="font-size: 1rem; color: #94A3B8; font-weight: 700; text-transform: uppercase;">Desde</span>
                   <span id="product-price" class="product-price"
                     style="font-size: 1.75rem; color: var(--color-cyan); font-weight: 800;">$0</span>
                 </div>
@@ -722,6 +726,10 @@
                 <div class="meta-item">
                   <span class="meta-label">Género</span>
                   <span id="product-gender" class="meta-value">-</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">Pedido Mínimo</span>
+                  <span id="product-moq" class="meta-value">-</span>
                 </div>
               </div>
 
@@ -877,6 +885,7 @@
       document.getElementById('product-description').textContent = productData.description || 'No hay descripción disponible para este producto.';
       document.getElementById('product-sku').textContent = productData.sku || 'N/A';
       document.getElementById('product-gender').textContent = productData.gender || 'Unisex';
+      document.getElementById('product-moq').textContent = productData.moq ? `${productData.moq} unidades` : '1 unidad';
       document.getElementById('product-industry').textContent = productData.industry || productData.subcategory || 'General';
 
       // Status indicator
