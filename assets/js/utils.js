@@ -340,9 +340,14 @@ document.addEventListener('DOMContentLoaded', () => {
   if (window.location.pathname.includes('admin') && !window.location.pathname.includes('login')) {
     setTimeout(async () => {
       const navLeads = document.getElementById('nav-leads');
-      if (navLeads && typeof window._supabase !== 'undefined') {
+      if (navLeads && typeof supabase !== 'undefined') {
         try {
-          const { count, error } = await window._supabase
+          let localSupa = window._supabase;
+          if (!localSupa) {
+            localSupa = supabase.createClient('https://awuhvewotmwelurmjvmu.supabase.co', 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq', { auth: { storageKey: 'dotacian-client-token' } });
+          }
+          
+          const { count, error } = await localSupa
             .from('leads_dotacian')
             .select('*', { count: 'exact', head: true })
             .eq('status', 'nuevo');
@@ -363,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
             badge.style.justifyContent = 'center';
             badge.style.fontSize = '0.7rem';
             badge.style.fontWeight = '700';
-            badge.style.boxShadow = '0 0 0 2px #0F172A'; // Para que resalte en el fondo oscuro
+            badge.style.boxShadow = '0 0 0 2px #0F172A';
             badge.textContent = count > 9 ? '+9' : count;
             
             navLeads.appendChild(badge);
@@ -375,3 +380,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1200); // Give Supabase time to initialize
   }
 });
+
