@@ -1188,7 +1188,7 @@
   <script>
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token' } });
 
     let session = null;
     let sellerName = 'Dotacián Seller';
@@ -1201,6 +1201,7 @@
       try {
         const { data: { session: currentSession } } = await _supabase.auth.getSession();
         if (!currentSession) {
+          alert("Error: Sesión no encontrada en catalogo.seller.html. Revisa si hay bloqueadores de almacenamiento.");
           window.location.href = 'login.seller.html';
           return;
         }
