@@ -2,531 +2,767 @@
 <html lang="es">
 
 <head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>dotacian app | Mi Dotación</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>mi dotacian | Mi Dotación</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    /* Custom Confirm Modal Style */
-    .confirm-overlay {
+    /* === MI PORTAL — PERSONAL DASHBOARD === */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-family: var(--font-family-primary);
+      background: #F0FAFB;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .mi-dashboard {
+      min-height: 100vh;
+      max-width: 420px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* --- Top Header Bar --- */
+    .mi-topbar {
+      background: var(--color-navy);
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mi-topbar .logo-text {
+      font-family: var(--font-family-heading);
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: white;
+    }
+
+    .mi-topbar .logo-text span {
+      color: var(--color-cyan);
+    }
+
+    .mi-topbar .logout-btn {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.5);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-family-primary);
+      text-decoration: none;
+    }
+
+    /* --- Hero / Greeting --- */
+    .mi-hero {
+      background: linear-gradient(145deg, var(--color-navy) 0%, #0E3354 100%);
+      padding: 1.75rem 1.5rem 1.75rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mi-hero::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .mi-hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .mi-greeting {
+      color: rgba(255, 255, 255, 0.65);
+      font-size: 0.875rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .mi-name {
+      font-family: var(--font-family-heading);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 0.25rem;
+    }
+
+    .mi-role {
+      font-size: 0.8125rem;
+      color: var(--color-cyan);
+      font-weight: 500;
+    }
+
+    /* --- Cards Container --- */
+    .mi-cards {
+      flex: 1;
+      padding: 1.25rem 1.25rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .mi-card {
+      background: white;
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+    }
+
+    .mi-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      margin-bottom: 1rem;
+    }
+
+    .mi-card-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--color-cyan-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .mi-card-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-secondary);
+    }
+
+    /* --- Checklist UI --- */
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid #f1f5f9;
+      border-top-color: var(--color-cyan);
+      border-radius: 50%;
+      margin: 0 auto 0.75rem;
+      animation: spin 1s linear infinite;
+    }
+
+    .delivery-item-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      transition: all 0.2s;
+      margin-bottom: 0.75rem;
+    }
+
+    .delivery-item-row:has(input:checked) {
+      background: white;
+      border-color: var(--color-cyan);
+      box-shadow: 0 2px 8px rgba(6, 182, 212, 0.08);
+    }
+
+    .kit-info {
+      background: var(--color-smoke);
+      border: 1px solid var(--color-border);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .kit-info-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-navy);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* --- Signature Pad --- */
+    .signature-area {
+      margin-top: 1.5rem;
+      border: 1.5px dashed var(--color-border);
+      border-radius: 1rem;
+      background: #f8fafc;
+      padding: 1rem;
+    }
+
+    .signature-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-navy);
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+      display: block;
+      text-align: center;
+    }
+
+    .signature-pad {
+      width: 100%;
+      height: 120px;
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 0.5rem;
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    .signature-actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+
+    .clear-btn {
+      font-size: 0.7rem;
+      color: var(--color-text-secondary);
+      background: none;
+      border: none;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .confirm-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      width: 100%;
+      padding: 1.25rem;
+      background: var(--color-cyan);
+      color: var(--color-navy);
+      border: none;
+      border-radius: 1rem;
+      font-family: var(--font-family-heading);
+      font-size: 1.125rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 18px rgba(6, 182, 212, 0.35);
+      margin-top: 1.25rem;
+    }
+
+    .confirm-btn:disabled {
+      background: #cbd5e1;
+      box-shadow: none;
+      cursor: not-allowed;
+      color: #64748b;
+    }
+
+    /* --- Custom Modal --- */
+    .mi-modal-overlay {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(15, 23, 42, 0.4);
+      background: rgba(15, 23, 42, 0.85);
       backdrop-filter: blur(4px);
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
-      z-index: 10000;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
+      z-index: 1000;
+      padding: 2rem;
     }
 
-    .confirm-overlay.active {
-      opacity: 1;
-      visibility: visible;
+    .mi-modal-overlay.active {
+      display: flex;
     }
 
-    .confirm-card {
+    .mi-modal {
       background: white;
       width: 100%;
-      max-width: 400px;
+      max-width: 320px;
+      border-radius: 1.5rem;
       padding: 2rem;
-      border-radius: 24px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
-      transform: scale(0.9);
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       text-align: center;
-    }
-
-    .confirm-overlay.active .confirm-card {
-      transform: scale(1);
-    }
-
-    .confirm-icon {
-      width: 56px;
-      height: 56px;
-      background: #fee2e2;
-      color: #ef4444;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 1.5rem;
-    }
-
-    .confirm-title {
-      font-family: 'Outfit', sans-serif;
-      font-size: 1.25rem;
-      color: var(--color-navy);
-      margin-bottom: 0.75rem;
-    }
-
-    .confirm-desc {
-      font-size: 0.9375rem;
-      color: var(--color-text-secondary);
-      line-height: 1.5;
-      margin-bottom: 2rem;
-    }
-
-    .confirm-actions {
-      display: flex;
-      gap: 1rem;
-    }
-
-    .btn-danger {
-      background: #ef4444;
-      color: white;
-      border: none;
-    }
-
-    .btn-danger:hover {
-      background: #dc2626;
-      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
     }
   </style>
 </head>
 
 <body>
-  <!-- Custom Confirm Modal -->
-  <div class="confirm-overlay" id="confirmDeleteModal">
-    <div class="confirm-card">
-      <div class="confirm-icon">
-        <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-        </svg>
-      </div>
-      <h3 class="confirm-title">¿Eliminar esta configuración?</h3>
-      <p class="confirm-desc">Esta acción no se puede deshacer y el uniforme dejará de estar disponible en tu catálogo personalizado.</p>
-      <div class="confirm-actions">
-        <button class="btn btn-outline" style="flex: 1;" onclick="closeConfirmModal()">Cancelar</button>
-        <button class="btn btn-danger" style="flex: 1;" id="btnConfirmDelete">Eliminar</button>
+  <div class="mi-dashboard">
+    <!-- Success Modal -->
+    <div id="successModal" class="mi-modal-overlay">
+      <div class="mi-modal">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">✨</div>
+        <h3
+          style="font-family: var(--font-family-heading); font-size: 1.5rem; color: var(--color-navy); margin-bottom: 0.5rem;">
+          ¡Confirmado!</h3>
+        <p style="font-size: 0.9375rem; color: var(--color-text-secondary); line-height: 1.5; margin-bottom: 0.5rem;">Tu
+          dotación ha sido recibida y firmada correctamente.</p>
+        <p style="font-size: 0.8125rem; color: #64748B; font-style: italic; margin-bottom: 1.5rem;">Ya puedes cerrar
+          esta pestaña de forma segura.</p>
+        <button onclick="window.close()"
+          style="width: 100%; padding: 1rem; background: var(--color-cyan); color: var(--color-navy); border: none; border-radius: 1rem; font-family: var(--font-family-heading); font-weight: 700; cursor: pointer;">Entendido</button>
       </div>
     </div>
-  </div>
 
-  <div class="app-layout">
+    <!-- Top Bar -->
+    <div class="mi-topbar">
+      <div class="logo-text">mi <span>dotacian</span></div>
+      <a href="mi-login.html" class="logout-btn">Cerrar sesión</a>
+    </div>
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-brand">
-        <img src="assets/logos/logo_dotacian.png" alt="dotacian logo" style="width: 130px; height: auto;">
+    <!-- Hero Greeting -->
+    <div class="mi-hero">
+      <div class="mi-hero-content">
+        <p class="mi-greeting">Bienvenido 👋</p>
+        <h1 class="mi-name" id="hero-emp-name">Cargando...</h1>
+        <p class="mi-role" id="hero-emp-role">--</p>
       </div>
-      <nav class="sidebar-nav">
-        <a href="app.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <rect width="7" height="9" x="3" y="3" rx="1" />
-              <rect width="7" height="5" x="14" y="3" rx="1" />
-              <rect width="7" height="9" x="14" y="12" rx="1" />
-              <rect width="7" height="5" x="3" y="16" rx="1" />
-            </svg></span>
-          <span class="nav-label">Dashboard</span>
-        </a>
-        <a href="roles.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            </svg></span>
-          <span class="nav-label">Roles</span>
-        </a>
-        <div class="nav-group active">
-          <a href="#" class="nav-item">
-            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
-            </svg></span>
-            <span class="nav-label">Uniformes</span>
-            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
-          </a>
-          <div class="nav-sub-items">
-            <a href="uniformes.html" class="nav-sub-item">Marketplace</a>
-            <a href="mi_dotacion.html" class="nav-sub-item active">Mi dotación</a>
+    </div>
+
+    <!-- Floating Cards -->
+    <div class="mi-cards">
+      <div class="mi-card">
+        <div class="mi-card-header">
+          <div class="mi-card-icon">📦</div>
+          <span class="mi-card-title">Dotación asignada</span>
+        </div>
+
+        <div class="kit-info">
+          <div class="kit-info-title"><span>📋</span> Artículos a recibir</div>
+          <div id="delivery-checklist">
+            <div style="text-align: center; padding: 2rem; color: #94a3b8; font-size: 0.9rem;">
+              <div class="spinner"></div>
+              Cargando dotación...
+            </div>
           </div>
         </div>
-        <a href="sucursales.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
-              <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
-              <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
-              <path d="M10 6h4" />
-              <path d="M10 10h4" />
-              <path d="M10 14h4" />
-              <path d="M10 18h4" />
-            </svg></span>
-          <span class="nav-label">Sucursales</span>
-        </a>
-        <a href="empleados.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg></span>
-          <span class="nav-label">Empleados</span>
-        </a>
-        <div class="nav-group">
-          <a href="produccion.html" class="nav-item">
-            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="m7.5 4.27 9 5.15" />
-                <path
-                  d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-                <path d="m3.3 7 8.7 5 8.7-5" />
-                <path d="M12 22V12" />
-              </svg></span>
-            <span class="nav-label">Producción</span>
-            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor"
-                stroke-width="2" viewBox="0 0 24 24">
-                <path d="m6 9 6 6 6-6" />
-              </svg></span>
-          </a>
-          <div class="nav-sub-items">
-            <a href="cotizaciones.html" class="nav-sub-item">Cotizaciones</a>
-            <a href="muestras.html" class="nav-sub-item">Solicitud de Muestras</a>
-            <a href="ordenes.html" class="nav-sub-item">Órdenes de Compra</a>
-            <a href="seguimiento.html" class="nav-sub-item">Seguimiento</a>
+
+        <div class="signature-area">
+          <span class="signature-label">Firma aquí para confirmar</span>
+          <canvas id="signaturePad" class="signature-pad"></canvas>
+          <div class="signature-actions">
+            <button class="clear-btn" onclick="clearSignature()">Limpiar firma</button>
           </div>
         </div>
-        <a href="bodega.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <polyline points="21 8 21 21 3 21 3 8"></polyline>
-              <rect x="1" y="3" width="22" height="5"></rect>
-              <line x1="10" y1="12" x2="14" y2="12"></line>
-            </svg></span>
-          <span class="nav-label">Bodega</span>
-        </a>
-        <a href="#" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-            </svg></span>
-          <span class="nav-label">Alertas</span>
-        </a>
-        <div class="sidebar-spacer"></div>
-        <a href="index.html" class="nav-item nav-item-secondary">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" x2="9" y1="12" y2="12" />
-            </svg></span>
-          <span class="nav-label">Cerrar Sesión</span>
-        </a>
-        <a href="#" class="nav-item nav-item-secondary">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path
-                d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg></span>
-          <span class="nav-label">Configuración</span>
-        </a>
-      <div id="version-tag"></div></nav>
-    </aside>
 
-    <!-- Main Content -->
-    <main class="main-content">
-      <header class="app-header">
-        <div class="header-left">
-          <h1>Mi Dotación</h1>
-          <p class="header-subtitle">Catálogo de uniformes activos y configurados para tu empresa</p>
-        </div>
-        <div class="header-right">
-          <a href="https://wa.me/1234567890?text=Hola,%20necesito%20asesor%C3%ADa%20para%20un%20uniforme%20personalizado%20para%20mi%20empresa."
-            target="_blank" class="whatsapp-btn">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
-              <path
-                d="M12 0C5.373 0 0 5.373 0 12c0 2.123.556 4.116 1.528 5.845L.057 23.714a.5.5 0 0 0 .614.644l5.993-1.57A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-5.002-1.369l-.36-.214-3.713.974.992-3.617-.235-.371A9.818 9.818 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z" />
-            </svg>
-            Hablar con Diseño
-          </a>
-        </div>
-      </header>
+        <!-- Partial Receipt Toggle -->
+        <label
+          style="display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 0.75rem; cursor: pointer; margin-top: 1.5rem;">
+          <input type="checkbox" id="partialReceipt" onchange="checkItems()"
+            style="width: 18px; height: 18px; accent-color: #f59e0b;">
+          <div>
+            <div style="font-size: 0.875rem; font-weight: 600; color: #92400e;">Recepción parcial</div>
+            <div style="font-size: 0.75rem; color: #b45309;">No se entregaron todos los artículos</div>
+          </div>
+        </label>
 
-      <div class="app-container" id="miDotacionContent">
-        <div style="text-align: center; padding: 4rem 2rem; background: white; border-radius: var(--radius-lg); border: 1px solid var(--color-smoke); margin-top: 2rem;">
-          <svg width="48" height="48" fill="none" stroke="var(--color-navy)" stroke-width="1.5" viewBox="0 0 24 24" style="margin-bottom: 1rem; opacity: 0.5;">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-          <h2 style="color: var(--color-navy); font-size: 1.25rem; margin-bottom: 0.5rem;">Tu catálogo está en construcción</h2>
-          <p style="color: var(--color-text-secondary); max-width: 400px; margin: 0 auto;">Aquí podrás ver todos los kits y uniformes que has parametrizado en el Marketplace para asignarlos a tus empleados.</p>
-        </div>
+        <button class="confirm-btn" id="startConfirmBtn" onclick="submitConfirmation()" disabled>
+          <span>✍️</span> Confirmar y Firmar
+        </button>
       </div>
+    </div>
 
-      <script>
-        function renderAssignments() {
-          const assignments = JSON.parse(localStorage.getItem('dotacianAssignments') || '[]');
-          const content = document.getElementById('miDotacionContent');
+    <script>
+      const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+      const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+      const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token' } });
 
-          if (assignments.length > 0) {
-            let html = `<div class="catalog-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1rem;">`;
-            
-            // Render from newest to oldest
-            assignments.slice().reverse().forEach((item, index) => {
-              const originalIndex = assignments.length - 1 - index;
-              html += `
-                <div class="catalog-card" style="display: flex; flex-direction: column; background: white; border-radius: 16px; border: 1px solid var(--color-smoke); overflow: hidden; transition: all 0.3s ease; position: relative;">
-                  <button onclick="openDeleteConfirm(${originalIndex})" style="position: absolute; top: 12px; left: 12px; z-index: 10; background: white; border: 1px solid #fee2e2; color: #ef4444; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;" title="Eliminar">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                      <path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                    </svg>
-                  </button>
-                  <div class="catalog-img-wrap" style="height: 200px; position: relative; background: #f8fafc; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 1rem;">
-                    <img src="${item.img}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
-                    <span class="catalog-badge" style="position: absolute; top: 12px; right: 12px; background: rgba(15, 23, 42, 0.85); color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 500;">${item.vendor}</span>
-                  </div>
-                  <div class="catalog-content" style="padding: 1.25rem; flex: 1; display: flex; flex-direction: column;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                      <h3 style="font-size: 1rem; color: var(--color-navy); margin: 0;">${item.role}</h3>
-                      <span style="font-size: 0.75rem; color: var(--color-text-muted);">${item.date}</span>
-                    </div>
-                    <p style="font-size: 0.875rem; color: var(--color-text-secondary); margin-bottom: 1rem;">${item.productName}</p>
-                    
-                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: auto; padding-top: 1rem; border-top: 1px solid #f1f5f9;">
-                      <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 0.75rem; color: var(--color-text-muted);">Color:</span>
-                        <div style="width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--color-border); background-color: ${getColorHex(item.color)}"></div>
-                      </div>
-                      <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 0.75rem; color: var(--color-text-muted);">Logo:</span>
-                        <span style="font-size: 0.75rem; font-weight: 600; color: var(--color-navy); text-transform: capitalize;">${item.logo}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              `;
-            });
+      let currentDeliveryId = null;
+      let currentDelivery = null;
+      const canvas = document.getElementById('signaturePad');
+      const ctx = canvas.getContext('2d');
+      let drawing = false;
 
-            html += `</div>`;
-            content.innerHTML = html;
+      // Initialize
+      document.addEventListener('DOMContentLoaded', () => {
+        function getParameterByName(name, url = window.location.href) {
+          name = name.replace(/[\[\]]/g, '\\$&');
+          const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+          const results = regex.exec(url);
+          if (!results) return null;
+          if (!results[2]) return '';
+          return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        const rawId = getParameterByName('delivery_id');
+        const mode = getParameterByName('mode');
+        
+        currentDeliveryId = rawId ? rawId.trim() : null;
+
+        console.log("Full URL:", window.location.href);
+
+        if (mode === 'tallas') {
+          const empId = getParameterByName('emp_id');
+          if (empId) {
+            loadSizesForm(empId);
           } else {
-            content.innerHTML = `
-              <div style="text-align: center; padding: 4rem 2rem; background: white; border-radius: var(--radius-lg); border: 1px solid var(--color-smoke); margin-top: 2rem;">
-                <svg width="48" height="48" fill="none" stroke="var(--color-navy)" stroke-width="1.5" viewBox="0 0 24 24" style="margin-bottom: 1rem; opacity: 0.5;">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                <h2 style="color: var(--color-navy); font-size: 1.25rem; margin-bottom: 0.5rem;">Tu catálogo está en construcción</h2>
-                <p style="color: var(--color-text-secondary); max-width: 400px; margin: 0 auto;">Aquí podrás ver todos los kits y uniformes que has parametrizado en el Marketplace para asignarlos a tus empleados.</p>
-              </div>
-            `;
+            document.getElementById('hero-emp-name').textContent = "Enlace no válido";
+            document.getElementById('hero-emp-role').textContent = "No se detectó un ID de empleado.";
+            document.querySelector('.mi-cards').style.display = 'none';
+          }
+        } else {
+          if (currentDeliveryId && currentDeliveryId !== "") {
+            loadDeliveryData(currentDeliveryId);
+          } else {
+            document.getElementById('hero-emp-name').textContent = "Enlace no válido";
+            document.getElementById('hero-emp-role').textContent = "No se detectó un ID de entrega en la URL.";
+            document.querySelector('.mi-cards').style.display = 'none';
           }
         }
 
-        let pendingDeleteIndex = -1;
+        // Signature Logic
+        const getPos = (e) => {
+          const rect = canvas.getBoundingClientRect();
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+          return { x: clientX - rect.left, y: clientY - rect.top };
+        };
 
-        function openDeleteConfirm(index) {
-          pendingDeleteIndex = index;
-          document.getElementById('confirmDeleteModal').classList.add('active');
-          
-          // Set focus on delete for convenience or cancel for safety
-          document.getElementById('btnConfirmDelete').onclick = confirmDeletion;
-        }
+        const start = (e) => { drawing = true; const pos = getPos(e); ctx.moveTo(pos.x, pos.y); };
+        const move = (e) => {
+          if (!drawing) return;
+          e.preventDefault();
+          const pos = getPos(e);
+          ctx.lineTo(pos.x, pos.y);
+          ctx.stroke();
+        };
+        const stop = () => { drawing = false; ctx.beginPath(); checkItems(); };
 
-        function closeConfirmModal() {
-          document.getElementById('confirmDeleteModal').classList.remove('active');
-          pendingDeleteIndex = -1;
-        }
+        canvas.addEventListener('mousedown', start);
+        canvas.addEventListener('mousemove', move);
+        window.addEventListener('mouseup', stop);
+        canvas.addEventListener('touchstart', start);
+        canvas.addEventListener('touchmove', move);
+        canvas.addEventListener('touchend', stop);
 
-        function confirmDeletion() {
-          if (pendingDeleteIndex !== -1) {
-            let assignments = JSON.parse(localStorage.getItem('dotacianAssignments') || '[]');
-            assignments.splice(pendingDeleteIndex, 1);
-            localStorage.setItem('dotacianAssignments', JSON.stringify(assignments));
-            closeConfirmModal();
-            renderAssignments();
-          }
-        }
-
-        function removeAssignment(index) {
-          // Deprecated in favor of openDeleteConfirm
-          openDeleteConfirm(index);
-        }
-
-        document.addEventListener('DOMContentLoaded', renderAssignments);
-
-        function getColorHex(colorName) {
-          const map = {
-            'Blanco': '#E2E8F0',
-            'Negro': '#0F172A',
-            'Azul Marino': '#1E3A8A',
-            'Azul Navy': '#1E3A8A',
-            'Azul Rey': '#0055A4',
-            'Gris Marengo': '#475569',
-            'Café': '#4B3621'
-          };
-          return map[colorName] || '#cbd5e1';
-        }
-      </script>
-    </main>
-  </div>
-
-  <!-- Modal Configuration -->
-  <div class="modal-overlay" id="configModal">
-    <div class="modal-content-lg">
-      <div class="modal-header" style="align-items: flex-start;">
-        <div>
-          <h2 style="margin-bottom: 0.25rem;">Configurar: <span id="modalTitle">Camisa Oxford</span></h2>
-          <p id="modalVendor" style="font-size: 0.875rem; color: var(--color-text-secondary); margin: 0;">Vendido por: Marca</p>
-        </div>
-        <button class="btn-close" onclick="closeModal()" style="margin-top: 0.25rem;">✕</button>
-      </div>
-      <div class="modal-columns">
-
-        <!-- Left: Image & Colors -->
-        <div class="modal-visual">
-          <div class="visual-img-wrap">
-            <img id="modalImg" src="assets/oxford_shirt.png" alt="Preview">
-          </div>
-          <div class="color-picker">
-            <p style="font-size:0.875rem; font-weight:600; color:var(--color-navy); margin-bottom:0.5rem;">Variantes
-              Base:</p>
-            <div class="color-options" id="colorOptionsContainer">
-              <!-- Rendered dynamically -->
-            </div>
-          </div>
-        </div>
-
-        <!-- Right: Form -->
-        <div class="modal-form">
-          <div class="form-row">
-            <label for="roleName">Asignar este uniforme al Rol:</label>
-            <input type="text" id="roleName" placeholder="ej. Mesero Terraza">
-          </div>
-
-          <div class="form-row">
-            <label for="logoConfig">¿Deseas añadir logo?</label>
-            <select id="logoConfig" onchange="toggleLogoUpload()">
-              <option value="no">No</option>
-              <option value="bordado">Sí, bordado</option>
-              <option value="estampado">Sí, estampado</option>
-            </select>
-          </div>
-
-          <div class="form-row upload-box" id="logoUpload" style="display: none;">
-            <div class="upload-placeholder">
-              <span>📁 Haz clic o arrastra tu logo aquí (PNG/SVG)</span>
-            </div>
-          </div>
-
-
-
-          <div class="ai-info-box">
-            <div class="ai-info-icon">⚡</div>
-            <div class="ai-info-text">
-              <strong>Motor de Holgura IA activado</strong>
-              Este uniforme usará la lógica de tallado 'Regular/Movimiento' para garantizar la comodidad operativa y
-              reducir devoluciones.
-            </div>
-          </div>
-
-          <div class="modal-footer" style="margin-top:2rem; display:flex; justify-content:flex-end; gap:1rem;">
-            <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
-            <button class="btn btn-primary" onclick="saveConfig()">Guardar</button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const colorMap = {
-      'Blanco': '#E2E8F0',
-      'Negro': '#0F172A',
-      'Azul Marino': '#1E3A8A',
-      'Gris Marengo': '#475569'
-    };
-
-    function openModal(imgSrc, title, availableColors) {
-      document.getElementById('modalImg').src = imgSrc;
-      document.getElementById('modalTitle').textContent = title;
-
-      let vendorText = "";
-      if (window.event && window.event.target) {
-        const card = window.event.target.closest('.catalog-card');
-        if (card) {
-          const badge = card.querySelector('.catalog-badge');
-          if (badge) {
-            vendorText = badge.textContent;
-          }
-        }
-      }
-      const vendorEl = document.getElementById('modalVendor');
-      if (vendorEl) {
-        vendorEl.textContent = vendorText;
-        vendorEl.style.display = vendorText ? 'block' : 'none';
-      }
-
-      const colorContainer = document.getElementById('colorOptionsContainer');
-      colorContainer.innerHTML = '';
-
-      availableColors.forEach((color, index) => {
-        const circle = document.createElement('div');
-        circle.className = 'color-circle' + (index === 0 ? ' active' : '');
-        circle.style.backgroundColor = colorMap[color];
-        circle.onclick = function () { selectColor(this, color, title); };
-        colorContainer.appendChild(circle);
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#0f172a';
       });
 
-      document.getElementById('configModal').classList.add('active');
-    }
+      async function loadSizesForm(empId) {
+        const checklist = document.getElementById('delivery-checklist');
+        const heroName = document.getElementById('hero-emp-name');
+        const heroRole = document.getElementById('hero-emp-role');
 
-    function closeModal() {
-      document.getElementById('configModal').classList.remove('active');
-    }
+        try {
+          const { data: emp, error } = await _supabase
+            .from('company_employees')
+            .select('*')
+            .eq('id', empId)
+            .single();
 
-    function selectColor(el, colorName, title) {
-      document.querySelectorAll('.color-circle').forEach(c => c.classList.remove('active'));
-      el.classList.add('active');
+          if (error || !emp) throw error || new Error("Empleado no encontrado");
 
-      const img = document.getElementById('modalImg');
+          heroName.textContent = `${emp.first_name} ${emp.last_name}`;
+          heroRole.textContent = emp.role || 'Empleado';
 
-      if (title === 'Camisa Oxford Ejecutiva') {
-        if (colorName === 'Blanco') img.src = 'assets/oxford_shirt.png';
-        else if (colorName === 'Negro') img.src = 'assets/oxford_shirt_black.png';
-        else if (colorName === 'Azul Marino') img.src = 'assets/oxford_shirt_navy.png';
-        else if (colorName === 'Gris Marengo') img.src = 'assets/oxford_shirt_grey.png';
+          // Cambiar títulos y ocultar cosas de entrega
+          document.querySelector('.mi-card-title').textContent = 'Confirmación de Tallas';
+          document.querySelector('.kit-info-title').innerHTML = '<span>📏</span> Por favor selecciona tus tallas';
+          document.querySelector('.signature-area').style.display = 'none';
+          
+          const partialReceipt = document.getElementById('partialReceipt');
+          if (partialReceipt) partialReceipt.parentElement.style.display = 'none';
+          
+          let sizes = emp.sizes || {};
+
+          // Generar selects
+          checklist.innerHTML = `
+            <div style="display:flex; flex-direction:column; gap:1rem; padding-bottom: 1rem;">
+              <div>
+                <label style="display:block; font-size:0.75rem; color:#64748B; margin-bottom:0.25rem;">Talla de Camisa/Playera</label>
+                <select id="emp-size-camisa" style="width:100%; padding:0.75rem; border:1px solid #E2E8F0; border-radius:0.5rem; outline:none; background:white;">
+                  <option value="">Selecciona...</option>
+                  ${['XS','S','M','L','XL','2XL','3XL'].map(s => `<option value="${s}" ${sizes.Camisa === s ? 'selected':''}>${s}</option>`).join('')}
+                </select>
+              </div>
+              <div>
+                <label style="display:block; font-size:0.75rem; color:#64748B; margin-bottom:0.25rem;">Talla de Pantalón</label>
+                <select id="emp-size-pantalon" style="width:100%; padding:0.75rem; border:1px solid #E2E8F0; border-radius:0.5rem; outline:none; background:white;">
+                  <option value="">Selecciona...</option>
+                  ${Array.from({length: 21}, (_, i) => i + 26).map(s => `<option value="${s}" ${sizes['Pantalón'] === String(s) ? 'selected':''}>${s}</option>`).join('')}
+                  <option value="Unitalla" ${sizes['Pantalón'] === 'Unitalla' ? 'selected':''}>Unitalla</option>
+                </select>
+              </div>
+              <div>
+                <label style="display:block; font-size:0.75rem; color:#64748B; margin-bottom:0.25rem;">Talla de Calzado</label>
+                <select id="emp-size-calzado" style="width:100%; padding:0.75rem; border:1px solid #E2E8F0; border-radius:0.5rem; outline:none; background:white;">
+                  <option value="">Selecciona...</option>
+                  ${[22,23,24,25,26,27,28,29,30,31].map(s => `<option value="${s}" ${sizes.Calzado === String(s) ? 'selected':''}>${s}</option>`).join('')}
+                  <option value="Unitalla" ${sizes.Calzado === 'Unitalla' ? 'selected':''}>Unitalla</option>
+                </select>
+              </div>
+            </div>
+          `;
+
+          const btn = document.getElementById('startConfirmBtn');
+          btn.innerHTML = '<span>💾</span> Guardar Tallas';
+          btn.disabled = false;
+          btn.onclick = async () => {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner" style="width:16px; height:16px; margin:0; display:inline-block; border-top-color:white; vertical-align:middle;"></span> Guardando...';
+            try {
+              const newSizes = {
+                'Camisa': document.getElementById('emp-size-camisa').value,
+                'Pantalón': document.getElementById('emp-size-pantalon').value,
+                'Calzado': document.getElementById('emp-size-calzado').value
+              };
+              const { error: updateErr } = await _supabase.from('company_employees')
+                .update({ sizes: newSizes })
+                .eq('id', empId);
+
+              if (updateErr) throw updateErr;
+
+              document.getElementById('successModal').classList.add('active');
+              const modalTitle = document.querySelector('#successModal h3');
+              if(modalTitle) modalTitle.textContent = '¡Tallas Guardadas!';
+              const modalDesc = document.querySelector('#successModal p');
+              if(modalDesc) modalDesc.textContent = 'Tus tallas han sido confirmadas. Ya puedes cerrar esta ventana.';
+            } catch (err) {
+              console.error("Error saving sizes:", err);
+              alert("Hubo un error al guardar tus tallas.");
+              btn.disabled = false;
+              btn.innerHTML = '<span>💾</span> Guardar Tallas';
+            }
+          };
+
+        } catch (err) {
+          heroName.textContent = "Error de Conexión";
+          checklist.innerHTML = `<div style="text-align:center; padding:1.5rem; color:#ef4444; background:#fef2f2; border-radius:12px; border:1px solid #fee2e2; font-size:0.8rem;">
+            <b>Error al cargar el empleado:</b><br>
+            <span style="font-family: monospace; font-size: 0.75rem;">${err.message}</span>
+          </div>`;
+        }
       }
 
-      console.log('Color seleccionado:', colorName);
-    }
+      async function loadDeliveryData(id) {
+        const checklist = document.getElementById('delivery-checklist');
+        const heroName = document.getElementById('hero-emp-name');
+        const heroRole = document.getElementById('hero-emp-role');
 
-    function toggleLogoUpload() {
-      const val = document.getElementById('logoConfig').value;
-      const box = document.getElementById('logoUpload');
-      if (val !== 'no') {
-        box.style.display = 'block';
-      } else {
-        box.style.display = 'none';
-      }
-    }
+        if (window.location.protocol === 'file:') {
+          heroName.textContent = "Error de Protocolo";
+          checklist.innerHTML = '<div style="text-align:center; padding:1.5rem; color:#ef4444; background:#fef2f2; border-radius:12px; border:1px solid #fee2e2; font-size:0.8rem;"><b>Error:</b> Abre este archivo con Live Server.</div>';
+          return;
+        }
 
-    function saveConfig() {
-      const role = document.getElementById('roleName').value;
-      if (!role) {
-        alert("Por favor, ingresa el nombre del rol.");
-        return;
+        try {
+          // Fetch delivery details with employee and company info
+          const { data: del, error } = await _supabase
+            .from('uniform_deliveries')
+            .select('*, company_employees!inner(id, first_name, last_name, role, company_id)')
+            .eq('id', id)
+            .maybeSingle();
+
+          if (error) throw error;
+          if (!del) {
+            heroName.textContent = "No encontrado";
+            checklist.innerHTML = '<div style="text-align:center; padding:1rem; color:#64748B;">Entrega no existe o link expirado.</div>';
+            return;
+          }
+
+          // Store del in currentDelivery
+          currentDelivery = del;
+
+          // Bloquear si ya está firmado
+          if (del.status === 'signed') {
+            document.getElementById('successModal').classList.add('active');
+            return;
+          }
+
+          // 1. Mark as Delivered and Confirmed in the audit table (Simplificado + Log de Error)
+          try {
+            const { error: auditError } = await _supabase.from('confirmation_links')
+              .upsert({
+                delivery_id: id,
+                status: 'confirmed',
+                is_delivered: true,
+                delivered_at: new Date().toISOString()
+              }, { onConflict: 'delivery_id' });
+
+            if (auditError) console.error("--- ERROR DE AUDITORÍA (Carga) ---", auditError);
+          } catch (e) {
+            console.error("Excepción en auditoría:", e);
+          }
+
+          const emp = del.company_employees;
+          heroName.textContent = `${emp.first_name} ${emp.last_name}`;
+          heroRole.textContent = emp.role || 'Empleado';
+
+          // Store context IDs for later use in storage upload
+          canvas.dataset.companyId = emp.company_id;
+          canvas.dataset.employeeId = emp.id;
+
+          checklist.innerHTML = '';
+          if (del.items && Array.isArray(del.items)) {
+            del.items.forEach(item => {
+              const row = document.createElement('div');
+              row.className = 'delivery-item-row';
+              row.innerHTML = `
+                <input type="checkbox" onchange="checkItems()" checked style="width:20px; height:20px; accent-color:var(--color-cyan);"> 
+                <div style="flex:1;">
+                  <div style="font-size:0.9rem; font-weight:700; color:var(--color-navy);">${item.name}</div>
+                  <div style="font-size:0.75rem; color:#64748B;">Cantidad: ${item.qty} | Talla: ${item.size}</div>
+                </div>
+              `;
+              checklist.appendChild(row);
+            });
+          }
+          checkItems();
+        } catch (err) {
+          console.error('Error loading delivery:', err);
+          heroName.textContent = "Error de Conexión";
+          checklist.innerHTML = `<div style="text-align:center; padding:1.5rem; color:#ef4444; background:#fef2f2; border-radius:12px; border:1px solid #fee2e2; font-size:0.8rem;">
+            <b>Error al cargar la entrega:</b><br>
+            <span style="font-family: monospace; font-size: 0.75rem; word-break: break-all;">${err.message || err.details || JSON.stringify(err)}</span>
+          </div>`;
+        }
       }
-      alert("Configuración de " + role + " guardada exitosamente.");
-      closeModal();
-    }
-  </script>
-  <script src="assets/js/utils.js"></script>
+
+      function clearSignature() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        checkItems();
+      }
+
+      function checkItems() {
+        const checkboxes = document.querySelectorAll('#delivery-checklist input[type="checkbox"]');
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+        const isPartial = document.getElementById('partialReceipt').checked;
+        const isSigned = !isCanvasBlank();
+
+        const confirmBtn = document.getElementById('startConfirmBtn');
+        confirmBtn.disabled = !(isSigned && (allChecked || (isPartial && anyChecked)));
+      }
+
+      function isCanvasBlank() {
+        const blank = document.createElement('canvas');
+        blank.width = canvas.width;
+        blank.height = canvas.height;
+        return canvas.toDataURL() === blank.toDataURL();
+      }
+
+      async function submitConfirmation() {
+        if (!currentDeliveryId) return;
+        const btn = document.getElementById('startConfirmBtn');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> Subiendo firma...';
+
+        try {
+          const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+          if (!blob) throw new Error("No se pudo generar la imagen");
+
+          const fileName = `${canvas.dataset.companyId}/${canvas.dataset.employeeId}/${currentDeliveryId}_${Date.now()}.png`;
+
+          // 2. Upload PNG to Supabase Storage Bucket 'signatures'
+          const { data: uploadData, error: uploadError } = await _supabase.storage
+            .from('signatures')
+            .upload(fileName, blob, { cacheControl: '3600', upsert: true });
+
+          if (uploadError) {
+            console.error("Error subiendo firma:", uploadError);
+            throw new Error("No se pudo subir la imagen de la firma al servidor.");
+          }
+
+          // 3. Get the Public URL
+          const { data: { publicUrl } } = _supabase.storage.from('signatures').getPublicUrl(fileName);
+          const now = new Date().toISOString();
+
+          // 4. Update the delivery record
+          const { error: delUpdateError } = await _supabase
+            .from('uniform_deliveries')
+            .update({
+              status: 'signed',
+              signed_at: now,
+              signature_url: publicUrl
+            })
+            .eq('id', currentDeliveryId);
+
+          if (delUpdateError) {
+            console.error("Error actualizando entrega:", delUpdateError);
+            throw new Error("No se pudo actualizar el registro de entrega en la base de datos.");
+          }
+
+          // 5. Subtract delivered items from warehouse inventory (company_storage)
+          if (currentDelivery && currentDelivery.items && Array.isArray(currentDelivery.items)) {
+            const checkboxes = document.querySelectorAll('#delivery-checklist input[type="checkbox"]');
+            const storageSubtractions = [];
+
+            currentDelivery.items.forEach((item, index) => {
+              const isChecked = checkboxes[index] ? checkboxes[index].checked : false;
+              if (isChecked) {
+                storageSubtractions.push({
+                  company_id: canvas.dataset.companyId,
+                  sku: 'DELIVERY',
+                  product_name: item.name,
+                  category: 'Entrega de Uniformes',
+                  size: item.size || 'N/A',
+                  quantity: -Math.abs(item.qty || 1), // Negative quantity to deduct from stock
+                  status: 'available'
+                });
+              }
+            });
+
+            if (storageSubtractions.length > 0) {
+              const { error: storageErr } = await _supabase
+                .from('company_storage')
+                .insert(storageSubtractions);
+
+              if (storageErr) {
+                console.error("Error updating warehouse stock:", storageErr);
+                throw new Error("No se pudo actualizar el inventario de la bodega.");
+              }
+            }
+          }
+
+          // 6. Finalize audit trail (Opcional, no bloquea el éxito)
+          try {
+            await _supabase.from('confirmation_links').update({
+              is_signed: true, signed_at: now, status: 'signed'
+            }).eq('delivery_id', currentDeliveryId);
+          } catch (e) { console.warn("Error no crítico en auditoría:", e); }
+
+          // Solo si llegamos aquí mostramos el éxito
+          document.getElementById('successModal').classList.add('active');
+
+        } catch (err) {
+          console.error('Submission failed:', err);
+          alert('Hubo un error al guardar tu firma: ' + (err.message || 'Error desconocido'));
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }
+      }
+    </script>
 </body>
 
 </html>
