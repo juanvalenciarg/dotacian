@@ -973,17 +973,41 @@
           }
           
           let tableHTML = `<table class="users-table" style="width: 100%; border-collapse: collapse;">
-            <thead style="position: sticky; top: 0; background: #f8fafc;"><tr><th style="padding:1rem; text-align:left;">Fecha</th><th style="padding:1rem; text-align:left;">No. Cotización</th><th style="padding:1rem; text-align:left;">Producto</th><th style="padding:1rem; text-align:left;">Cantidad</th><th style="padding:1rem; text-align:left;">Estado</th></tr></thead><tbody>`;
+            <thead style="position: sticky; top: 0; background: #f8fafc;"><tr><th style="padding:1rem; text-align:left;">Fecha</th><th style="padding:1rem; text-align:left;">No. Cotización</th><th style="padding:1rem; text-align:left;">Producto</th><th style="padding:1rem; text-align:left;">Cantidad</th><th style="padding:1rem; text-align:left;">Valor</th><th style="padding:1rem; text-align:left;">Estado</th></tr></thead><tbody>`;
           
           data.forEach(q => {
             const date = formatDateShort(q.created_at);
             const statusColor = q.status === 'pending' ? '#D97706' : (q.status === 'approved' ? '#10B981' : '#64748B');
-            tableHTML += `<tr style="border-bottom: 1px solid #E2E8F0;">
+            const total = q.total_amount ? `$${q.total_amount.toLocaleString()}` : 'Por definir';
+            
+            let rawItems = [];
+            if (q.items) rawItems = q.items;
+            else if (q.sizes && q.sizes.items) rawItems = q.sizes.items;
+            
+            let itemsHtml = '<p style="margin:0; color:#94A3B8;">No hay detalle de productos estructurados.</p>';
+            if (rawItems.length > 0) {
+              itemsHtml = '<ul style="margin: 0; padding-left: 1.2rem; list-style-type: disc;">';
+              rawItems.forEach(it => {
+                itemsHtml += `<li><strong>${it.qty || it.quantity || 1}x</strong> ${it.name || it.product_name || 'Producto'} ${it.size ? '(Talla: '+it.size+')' : ''} ${it.unit_price ? ' - $'+it.unit_price.toLocaleString() : ''}</li>`;
+              });
+              itemsHtml += '</ul>';
+            }
+
+            tableHTML += `<tr style="border-bottom: 1px solid #E2E8F0; cursor: pointer;" onclick="toggleTxDetail('tx-detail-quote-${q.id}')" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='transparent'">
               <td style="padding:1rem;">${date}</td>
-              <td style="padding:1rem; font-weight: 600;">${q.quote_number || q.id}</td>
+              <td style="padding:1rem; font-weight: 600;">${q.quote_number || q.id.split('-')[0]}</td>
               <td style="padding:1rem;">${q.product_name || 'N/A'}</td>
               <td style="padding:1rem;">${q.quantity || 0}</td>
+              <td style="padding:1rem; font-weight: 600;">${total}</td>
               <td style="padding:1rem;"><span style="color: ${statusColor}; text-transform: capitalize; font-weight: 700; font-size: 0.8rem; background: ${statusColor}1A; padding: 4px 8px; border-radius: 4px;">${q.status || 'N/A'}</span></td>
+            </tr>
+            <tr id="tx-detail-quote-${q.id}" style="display: none; background: #F8FAFC;">
+              <td colspan="6" style="padding: 1.5rem;">
+                <div style="font-size: 0.85rem; color: #475569; background: white; padding: 1rem; border-radius: 0.5rem; border: 1px solid #E2E8F0;">
+                  <strong style="display:block; margin-bottom: 0.5rem; color: #0F172A;">Detalle de la Cotización</strong>
+                  ${itemsHtml}
+                </div>
+              </td>
             </tr>`;
           });
           tableHTML += `</tbody></table>`;
@@ -1001,13 +1025,35 @@
           }
 
           let tableHTML = `<table class="users-table" style="width: 100%; border-collapse: collapse;">
-            <thead style="position: sticky; top: 0; background: #f8fafc;"><tr><th style="padding:1rem; text-align:left;">Fecha</th><th style="padding:1rem; text-align:left;">ID de Orden</th><th style="padding:1rem; text-align:left;">Estado</th></tr></thead><tbody>`;
+            <thead style="position: sticky; top: 0; background: #f8fafc;"><tr><th style="padding:1rem; text-align:left;">Fecha</th><th style="padding:1rem; text-align:left;">ID de Orden</th><th style="padding:1rem; text-align:left;">Cantidad</th><th style="padding:1rem; text-align:left;">Valor</th><th style="padding:1rem; text-align:left;">Estado</th></tr></thead><tbody>`;
           data.forEach(o => {
             const date = formatDateShort(o.created_at);
-            tableHTML += `<tr style="border-bottom: 1px solid #E2E8F0;">
+            const total = o.total_amount ? `$${o.total_amount.toLocaleString()}` : 'N/A';
+            const qty = (o.items || []).reduce((acc, it) => acc + (it.qty || it.quantity || 1), 0);
+            
+            let itemsHtml = '<p style="margin:0; color:#94A3B8;">No hay detalle de productos para mostrar.</p>';
+            if (o.items && o.items.length > 0) {
+              itemsHtml = '<ul style="margin: 0; padding-left: 1.2rem; list-style-type: disc;">';
+              o.items.forEach(it => {
+                itemsHtml += `<li><strong>${it.qty || it.quantity || 1}x</strong> ${it.name || it.product_name || 'Producto'} ${it.size ? '(Talla: '+it.size+')' : ''} ${it.unit_price ? ' - $'+it.unit_price.toLocaleString() : ''}</li>`;
+              });
+              itemsHtml += '</ul>';
+            }
+
+            tableHTML += `<tr style="border-bottom: 1px solid #E2E8F0; cursor: pointer;" onclick="toggleTxDetail('tx-detail-order-${o.id}')" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='transparent'">
               <td style="padding:1rem;">${date}</td>
-              <td style="padding:1rem; font-weight: 600;">${o.id ? o.id.split('-')[0] : 'N/A'}</td>
+              <td style="padding:1rem; font-weight: 600;">${o.po_number || o.order_number || o.id.split('-')[0]}</td>
+              <td style="padding:1rem;">${qty}</td>
+              <td style="padding:1rem; font-weight: 600;">${total}</td>
               <td style="padding:1rem; text-transform: capitalize; font-weight: 600;">${o.status || 'N/A'}</td>
+            </tr>
+            <tr id="tx-detail-order-${o.id}" style="display: none; background: #F8FAFC;">
+              <td colspan="5" style="padding: 1.5rem;">
+                <div style="font-size: 0.85rem; color: #475569; background: white; padding: 1rem; border-radius: 0.5rem; border: 1px solid #E2E8F0;">
+                  <strong style="display:block; margin-bottom: 0.5rem; color: #0F172A;">Detalle de la Orden</strong>
+                  ${itemsHtml}
+                </div>
+              </td>
             </tr>`;
           });
           tableHTML += `</tbody></table>`;
@@ -1138,6 +1184,11 @@
     function closeDetailsModal() {
       document.getElementById('company-details-modal').classList.remove('active');
     }
+
+    window.toggleTxDetail = function(id) {
+      const el = document.getElementById(id);
+      if (el) el.style.display = el.style.display === 'none' ? 'table-row' : 'none';
+    };
 
     function showToast(title, message, type = 'success') {
       const container = document.getElementById('toast-container');
