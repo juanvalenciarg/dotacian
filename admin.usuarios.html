@@ -807,7 +807,6 @@
         _supabase.from('role_definition')
           .select('*', { count: 'exact', head: true })
           .eq('company_id', data.user_id)
-          .eq('is_active', true)
           .then(({ count, error }) => {
             if (error) console.error("Error al obtener roles activos:", error);
             document.getElementById('viewActiveRoles').textContent = count || 0;
@@ -1015,9 +1014,9 @@
           body.innerHTML = tableHTML;
         }
         else if (type === 'roles') {
-          title.textContent = 'Roles Activos';
+          title.textContent = 'Roles Registrados';
           const { data, error } = await _supabase.from('role_definition')
-            .select('*').eq('company_id', companyId).eq('is_active', true).order('role_name');
+            .select('*').eq('company_id', companyId).order('role_name');
           if (error) throw error;
 
           if (!data || data.length === 0) {
