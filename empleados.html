@@ -1084,6 +1084,28 @@
     </div>
   </div>
 
+  <!-- Size Link Modal -->
+  <div class="modal-overlay" id="sizeLinkModal" style="z-index: 10000;">
+    <div class="modal-content" style="max-width: 450px; text-align: center; padding: 2.5rem 2rem; border-radius: 20px;">
+      <h3 style="color: var(--color-navy); margin-bottom: 0.5rem; font-family: var(--font-family-heading); font-size: 1.5rem; font-weight: 700;">Enlace de Captura</h3>
+      <p style="color: var(--color-text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem;">Pídele al empleado que escanee el código QR o copia el link para enviárselo por WhatsApp o correo.</p>
+      
+      <div style="background: white; padding: 1rem; border-radius: 12px; border: 1px solid var(--color-border); display: inline-block; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);">
+        <img id="sizeLinkQRCode" src="" alt="Código QR de Tallas" style="width: 180px; height: 180px; display: block; margin: 0 auto;">
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; width: 100%; margin-bottom: 1.5rem;">
+        <input type="text" id="sizeLinkInput" readonly style="flex: 1; padding: 0.75rem 1rem; font-size: 0.875rem; border: 1px solid var(--color-border); border-radius: 10px; background: #f8fafc; color: var(--color-navy); font-weight: 500;">
+        <button type="button" onclick="copySizeLinkManually()" class="btn btn-primary" style="padding: 0.75rem 1.25rem; font-size: 0.875rem; font-weight: 700; border-radius: 10px; background: #06B6D4; color: white; border: none; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+          Copiar
+        </button>
+      </div>
+
+      <button onclick="document.getElementById('sizeLinkModal').classList.remove('active')" class="btn btn-outline" style="width: 100%; padding: 0.75rem; border-radius: 10px; font-weight: 600;">Cerrar</button>
+    </div>
+  </div>
+
   <script>
     function showNotification(message, type = 'success') {
       const toast = document.getElementById('notificationToast');
@@ -2547,43 +2569,35 @@
       closeDetailModal();
     }
 
-    let currentDetailEmployeeId = null;
-
-    function copySizeLink() {
-      if (!currentDetailEmployeeId) return;
-      
-      let loc = window.location.href;
-      let basePath = loc.substring(0, loc.lastIndexOf('/'));
-      const url = `${basePath}/mi_dotacion.html?mode=tallas&emp_id=${currentDetailEmployeeId}`;
-      
+    function copySizeLinkManually() {
+      const input = document.getElementById('sizeLinkInput');
+      input.select();
       let success = false;
-      const textArea = document.createElement("textarea");
-      textArea.value = url;
-      textArea.style.position = "fixed";
-      textArea.style.left = "-9999px";
-      document.body.appendChild(textArea);
-      textArea.select();
-      try {
-        success = document.execCommand('copy');
-      } catch (err) {
-        console.error('execCommand Error:', err);
-      }
-      document.body.removeChild(textArea);
-
+      try { success = document.execCommand('copy'); } catch(e) {}
+      
       if (success) {
         showToast('Enlace copiado', 'Envía este enlace al empleado para que confirme sus tallas.');
       } else if (navigator.clipboard) {
-        navigator.clipboard.writeText(url).then(() => {
+        navigator.clipboard.writeText(input.value).then(() => {
           showToast('Enlace copiado', 'Envía este enlace al empleado para que confirme sus tallas.');
-        }).catch(err => {
-          console.error('Clipboard API Error:', err);
-          showToast('Error', 'No se pudo copiar el enlace automáticamente. Por favor cópialo manualmente.', 'error');
-          prompt("Copia este enlace:", url);
+        }).catch(() => {
+          showToast('Error', 'No se pudo copiar automáticamente. Usa Ctrl+C o Cmd+C.', 'error');
         });
-      } else {
-        showToast('Error', 'Tu navegador no permite copiar automáticamente.', 'error');
-        prompt("Copia este enlace:", url);
       }
+    }
+
+    function generateAndShowSizeLink(url) {
+      document.getElementById('sizeLinkInput').value = url;
+      document.getElementById('sizeLinkQRCode').src = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + encodeURIComponent(url);
+      document.getElementById('sizeLinkModal').classList.add('active');
+    }
+
+    function copySizeLink() {
+      if (!currentDetailEmployeeId) return;
+      let loc = window.location.href;
+      let basePath = loc.substring(0, loc.lastIndexOf('/'));
+      const url = `${basePath}/mi_dotacion.html?mode=tallas&emp_id=${currentDetailEmployeeId}`;
+      generateAndShowSizeLink(url);
     }
 
     function enableSizeEditing() {
@@ -2905,29 +2919,8 @@
           let basePath = loc.substring(0, loc.lastIndexOf('/'));
           const url = `${basePath}/mi_dotacion.html?mode=tallas&emp_id=${newEmp.id}`;
           
-          let success = false;
-          const textArea = document.createElement("textarea");
-          textArea.value = url;
-          textArea.style.position = "fixed";
-          textArea.style.left = "-9999px";
-          document.body.appendChild(textArea);
-          textArea.select();
-          try { success = document.execCommand('copy'); } catch(e){}
-          document.body.removeChild(textArea);
-          
-          if (success) {
-            showToast("Empleado Agregado", `Se ha registrado a ${name}. Se ha copiado el enlace de captura a tu portapapeles.`);
-          } else if (navigator.clipboard) {
-            navigator.clipboard.writeText(url).then(() => {
-              showToast("Empleado Agregado", `Se ha registrado a ${name}. Se ha copiado el enlace de captura a tu portapapeles.`);
-            }).catch(() => {
-              showToast("Empleado Agregado", `Se ha registrado a ${name}. Tu navegador bloqueó el copiado automático.`, "error");
-              prompt("Copia este enlace manualmente:", url);
-            });
-          } else {
-             showToast("Empleado Agregado", `Se ha registrado a ${name}. Tu navegador no permite copiar automáticamente.`);
-             prompt("Copia este enlace manualmente:", url);
-          }
+          showToast("Empleado Agregado", `Se ha registrado a ${name} exitosamente.`);
+          generateAndShowSizeLink(url);
         } else {
           showToast("Empleado Agregado", `Se ha registrado a ${name} exitosamente.`);
         }
