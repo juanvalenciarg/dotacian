@@ -688,6 +688,13 @@
             </div>
           </div>
 
+          <div style="margin-bottom: 2rem; background: #F8FAFC; padding: 1rem; border-radius: 8px; border: 1px solid #E2E8F0;">
+            <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; font-size: 0.875rem; color: #334155; font-weight: 500;">
+              <input type="checkbox" id="empRequestSizes" style="width: 18px; height: 18px; accent-color: var(--color-cyan);" onchange="const s = this.checked; ['empShirtSize','empPantsSize','empShoeSize'].forEach(id => { const el = document.getElementById(id); el.disabled = s; if(s) el.value = ''; });">
+              No tengo las tallas, quiero generar un link para que el empleado las confirme
+            </label>
+          </div>
+
           <div style="display: flex; justify-content: flex-end; gap: 1rem;">
             <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
             <button type="submit" class="btn btn-primary">Guardar Empleado</button>
@@ -2832,6 +2839,7 @@
       const shirtSize = document.getElementById('empShirtSize').value;
       const pantsSize = document.getElementById('empPantsSize').value;
       const shoeSize = document.getElementById('empShoeSize').value;
+      const requestSizes = document.getElementById('empRequestSizes')?.checked;
 
       try {
         const { data: sessionData } = await _supabase.auth.getSession();
@@ -2863,9 +2871,15 @@
 
         closeModal();
         const form = document.querySelector('.modal-form');
-        if (form) form.reset();
+        if (form) {
+          form.reset();
+          ['empShirtSize','empPantsSize','empShoeSize'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.disabled = false;
+          });
+        }
 
-        if (!shirtSize || !pantsSize || !shoeSize) {
+        if (requestSizes || !shirtSize || !pantsSize || !shoeSize) {
           const url = `${window.location.origin}/mi_dotacion.html?mode=tallas&emp_id=${newEmp.id}`;
           navigator.clipboard.writeText(url).then(() => {
             showToast("Empleado Agregado", `Se ha registrado a ${name}. Faltan tallas, se ha copiado el enlace de captura a tu portapapeles.`);
