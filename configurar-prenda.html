@@ -804,7 +804,7 @@
   <script>
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token' } });
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token', multiTab: false } });
 
     let productData = null;
     let selectedRoles = [];
@@ -875,17 +875,38 @@
         .select('role_name')
         .eq('company_id', userId);
 
+      // Load role definitions to see if the item is already assigned
+      const { data: roleDefs } = await _supabase
+        .from('role_definition')
+        .select('role_name, items')
+        .eq('company_id', userId);
+
       if (error || !activeRoles || activeRoles.length === 0) {
         grid.innerHTML = '<div style="font-size: 0.85rem; color: #EF4444; width: 100%;">Aún no tienes roles habilitados. Configúralos primero en la sección de Roles.</div>';
         return;
       }
 
-      grid.innerHTML = activeRoles.map(r => `
-        <div class="role-card-item" onclick="toggleRoleSelection('${r.role_name}', this)">
+      // Reset selected roles to prevent duplicates on multiple loads
+      selectedRoles = [];
+
+      grid.innerHTML = activeRoles.map(r => {
+        const def = roleDefs?.find(d => d.role_name.trim().toLowerCase() === r.role_name.trim().toLowerCase());
+        const isAssigned = def && def.items && def.items.some(i => i.product_id === productData.id);
+        
+        if (isAssigned) {
+          selectedRoles.push(r.role_name);
+        }
+        
+        return `
+        <div class="role-card-item ${isAssigned ? 'selected' : ''}" onclick="toggleRoleSelection('${r.role_name}', this)">
           <div class="custom-checkbox"></div>
           <span class="role-card-label">${r.role_name}</span>
         </div>
-      `).join('');
+      `}).join('');
+
+      // Update button text based on pre-selections
+      const btn = document.getElementById('btn-save');
+      btn.textContent = selectedRoles.length > 0 ? `Asignar a ${selectedRoles.length} ${selectedRoles.length === 1 ? 'rol' : 'roles'}` : 'Asignar a rol';
     }
 
     function toggleRoleSelection(role, element) {
