@@ -63,6 +63,7 @@
   </script>
 
   <!-- Preconnect and Google Fonts -->
+  <link rel="preload" href="assets/images/hero_image.png" as="image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -129,7 +130,7 @@
       </div>
 
       <div class="hero-image-container position-relative">
-        <img src="assets/images/hero_image.png" alt="Profesionales uniformados de diversas industrias">
+        <img src="assets/images/hero_image.png" alt="Profesionales uniformados de diversas industrias" fetchpriority="high" decoding="async">
 
         <!-- UI Overlays para Realidad Aumentada -->
         <div class="ui-overlay overlay-chef-med">
@@ -1040,7 +1041,7 @@
 
       <div class="footer-content">
         <div class="logo">
-          <img src="assets/logos/logo_dotacian.png" alt="Dotacian"
+          <img src="assets/logos/logo_dotacian.png" alt="Dotacian" loading="lazy"
             style="height: 40px; width: auto; display: block; opacity: 0.85;">
         </div>
         <div class="footer-copy">
@@ -1187,9 +1188,9 @@
   <!-- Mobile Drawer Overlay -->
   <div class="mobile-drawer" id="mobile-drawer">
     <div class="drawer-header">
-      <div class="logo" style="display: flex; align-items: center;">
-        <img src="assets/logos/logo_dotacian.png" alt="dotacian logo"
-          style="height: 45px; width: auto; display: block;">
+      <div class="logo" style="margin-bottom: 2rem;">
+        <img src="assets/logos/logo_dotacian.png" alt="dotacian logo" loading="lazy"
+          style="height: 60px; width: auto; display: block; margin: 0 auto;">
       </div>
       <button class="drawer-close" id="drawer-close">&times;</button>
     </div>
@@ -1284,7 +1285,7 @@
 
           card.innerHTML = `
             <div class="blog-image-wrapper">
-              <img src="${imageSrc}" alt="${post.title}" class="blog-image">
+              <img src="${imageSrc}" alt="${post.title}" class="blog-image" loading="lazy">
             </div>
             <div class="blog-content">
               <div class="blog-meta">
