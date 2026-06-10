@@ -314,7 +314,8 @@ async function logoutUser() {
     await _supabase.auth.signOut();
     const path = window.location.pathname;
     let target = 'login.html';
-    if (path.includes('.seller.') || path.includes('seller')) target = 'mi-login.html';
+    if (path.includes('seller')) target = 'login.seller.html';
+    else if (path.includes('mi_') || path.includes('mi-')) target = 'mi-login.html';
     else if (path.includes('admin')) target = 'login.admin.html';
     
     window.location.href = target + '?reason=timeout';
@@ -344,7 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
           let localSupa = window._supabase;
           if (!localSupa) {
-            localSupa = supabase.createClient('https://awuhvewotmwelurmjvmu.supabase.co', 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq', { auth: { storageKey: 'dotacian-client-token' } });
+            localSupa = supabase.createClient('https://awuhvewotmwelurmjvmu.supabase.co', 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq', { auth: { storageKey: 'dotacian-client-token', multiTab: false } });
           }
           
           const { count, error } = await localSupa
@@ -380,4 +381,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1200); // Give Supabase time to initialize
   }
 });
-
