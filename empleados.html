@@ -2279,6 +2279,7 @@
     function buildKitRow(name, qty, img, id, moq = 1) {
       const wrapper = document.createElement('div');
       wrapper.dataset.kitId = id;
+      wrapper.dataset.moq = moq;
       wrapper.style.cssText = 'display:flex; align-items:center; gap:0.75rem; background:white; padding:0.75rem 1rem; border-radius:12px; border:1px solid #e2e8f0; transition:all 0.2s;';
       wrapper.onmouseover = () => wrapper.style.borderColor = '#bae6fd';
       wrapper.onmouseout = () => wrapper.style.borderColor = '#e2e8f0';
@@ -2315,7 +2316,7 @@
           <button type="button" onclick="stepQty(this, -1)"
             style="width:26px; height:26px; border:none; background:none; cursor:pointer; color:#475569; font-size:1rem; display:flex; align-items:center; justify-content:center; border-radius:5px; transition:background 0.15s;"
             onmouseover="this.style.background='#e2e8f0';" onmouseout="this.style.background='none';">−</button>
-          <input type="number" value="${qty}" min="${moq}" max="99" onchange="updateKitSummary()"
+          <input type="number" value="${qty}" min="1" max="99" onchange="updateKitSummary()"
             style="width:32px; border:none; text-align:center; font-size:0.875rem; font-weight:700; color:#0f172a; background:transparent; -moz-appearance:textfield; outline:none;">
           <button type="button" onclick="stepQty(this, 1)"
             style="width:26px; height:26px; border:none; background:none; cursor:pointer; color:#475569; font-size:1rem; display:flex; align-items:center; justify-content:center; border-radius:5px; transition:background 0.15s;"
@@ -2334,7 +2335,7 @@
 
     function stepQty(btn, delta) {
       const input = btn.parentElement.querySelector('input[type="number"]');
-      const min = parseInt(input.getAttribute('min')) || 1;
+      const min = 1; // Always allow stepping down to 1 so validation catches it instead
       const v = parseInt(input.value) + delta;
       if (v >= min && v <= 99) { input.value = v; updateKitSummary(); }
     }
@@ -2569,6 +2570,32 @@
     }
 
     function assignNewKit() {
+      const rows = document.querySelectorAll('#availableKitList [data-kit-id]');
+      let invalidItems = [];
+      
+      rows.forEach(row => {
+        const checkbox = row.querySelector('input[type="checkbox"]');
+        if (checkbox && checkbox.checked) {
+          const qtyInput = row.querySelector('input[type="number"]');
+          const nameInput = row.querySelector('input[type="text"]');
+          
+          if (qtyInput && nameInput) {
+            const qty = parseInt(qtyInput.value) || 0;
+            const moq = parseInt(row.dataset.moq) || 1;
+            const name = nameInput.value || 'Prenda sin nombre';
+            
+            if (qty < moq) {
+              invalidItems.push(`• ${name} (Mínimo: ${moq} unidades)`);
+            }
+          }
+        }
+      });
+      
+      if (invalidItems.length > 0) {
+        showToast("Cantidad Mínima Requerida", `No puedes cotizar estos artículos individualmente:\n${invalidItems.join('\n')}`, "error");
+        return;
+      }
+
       document.getElementById('quoteConfirmModal').classList.add('active');
     }
 
