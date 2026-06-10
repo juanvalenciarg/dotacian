@@ -2299,7 +2299,7 @@ ul {
 /* Welcome Banner (Dashboard, Roles, Empleados, Produccion, Bodega, Marketplace) */
 .welcome-banner {
   background: linear-gradient(135deg, var(--color-navy) 0%, #0c4a6e 100%);
-  padding: 7rem 3rem 4rem 3rem;
+  padding: 3rem 2rem;
   color: white;
   position: relative;
   overflow: visible;
@@ -2309,7 +2309,7 @@ ul {
 
 @media (max-width: 992px) {
   .welcome-banner {
-    padding: 6.5rem 1.5rem 2.5rem 1.5rem;
+    padding: 2.5rem 1.5rem;
   }
 
   .header-right {
