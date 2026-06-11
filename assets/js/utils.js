@@ -36,7 +36,8 @@ function updateVersionIndicator(country) {
   const container = document.getElementById('version-tag');
   if (!container) return;
   
-  const isColombia = country === 'CO' || country === 'Colombia';
+  const cStr = (country || '').trim().toUpperCase();
+  const isColombia = cStr === 'CO' || cStr === 'COLOMBIA';
   const flagUrl = isColombia 
     ? 'https://flagcdn.com/w40/co.png' 
     : 'https://flagcdn.com/w40/mx.png';
@@ -240,7 +241,8 @@ function toggleUserPopover(e) {
 }
 
 function getCurrencyConfig(country) {
-  const isColombia = country === 'CO' || country === 'Colombia';
+  const cStr = (country || '').trim().toUpperCase();
+  const isColombia = cStr === 'CO' || cStr === 'COLOMBIA';
   return {
     code: isColombia ? 'COP' : 'MXN',
     locale: isColombia ? 'es-CO' : 'es-MX',
@@ -381,3 +383,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1200); // Give Supabase time to initialize
   }
 });
+
