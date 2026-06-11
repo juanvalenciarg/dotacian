@@ -2360,13 +2360,39 @@
     function updateKitSummary() {
       const rows = document.querySelectorAll('#availableKitList [data-kit-id]');
       let count = 0, total = 0;
+      let hasInvalidItem = false;
       rows.forEach(row => {
         const cb = row.querySelector('input[type="checkbox"]');
-        const qty = parseInt(row.querySelector('input[type="number"]')?.value || 0);
-        if (cb && cb.checked) { count++; total += qty; }
+        const qtyInput = row.querySelector('input[type="number"]');
+        const qty = parseInt(qtyInput?.value || 0);
+        const moq = parseInt(row.dataset.moq) || 1;
+        if (cb && cb.checked) { 
+          count++; 
+          total += qty; 
+          if (qty < moq) hasInvalidItem = true;
+        }
       });
       const txt = document.getElementById('kitSummaryText');
       if (txt) txt.textContent = `${count} prenda${count !== 1 ? 's' : ''} · ${total} unidad${total !== 1 ? 'es' : ''} total`;
+
+      const btn = document.getElementById('confirmBtn');
+      if (btn) {
+        if (count === 0 || hasInvalidItem) {
+          btn.disabled = true;
+          btn.style.background = '#cbd5e1';
+          btn.style.cursor = 'not-allowed';
+          btn.style.boxShadow = 'none';
+          btn.onmouseover = null;
+          btn.onmouseout = null;
+        } else {
+          btn.disabled = false;
+          btn.style.background = '#06B6D4';
+          btn.style.cursor = 'pointer';
+          btn.style.boxShadow = '0 4px 14px rgba(6,182,212,0.35)';
+          btn.onmouseover = () => { btn.style.background='#0891B2'; btn.style.transform='translateY(-1px)'; };
+          btn.onmouseout = () => { btn.style.background='#06B6D4'; btn.style.transform='translateY(0)'; };
+        }
+      }
     }
 
     function terminateEmployee() {
