@@ -306,7 +306,93 @@
       </div>
 
       <div class="content-wrapper">
-        <div class="app-card" style="margin-top: -1.5rem; position: relative; z-index: 10;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: -1.5rem; position: relative; z-index: 10; margin-bottom: 2rem;">
+          
+          <!-- Card SaaS -->
+          <div class="app-card" style="margin-top: 0;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+              <div>
+                <h2 style="font-family: var(--font-family-heading); font-size: 1.15rem; margin-bottom: 0.25rem; color: var(--color-navy);">Licencia SaaS</h2>
+                <p style="color: var(--color-text-secondary); font-size: 0.85rem; margin: 0;">Proyección del mes en curso</p>
+              </div>
+              <div style="background: #E0F2FE; color: #0284C7; padding: 0.5rem; border-radius: 0.75rem;">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
+            
+            <div id="saas-loading" style="padding: 2rem 0; text-align: center;">
+              <div class="spinner-sm" style="width: 24px; height: 24px; border: 3px solid #E2E8F0; border-top-color: var(--color-cyan); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+            </div>
+            
+            <div id="saas-content" style="display: none;">
+              <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1.5rem;">
+                <span id="saas-total" style="font-family: var(--font-family-heading); font-size: 2.25rem; font-weight: 800; color: var(--color-cyan); line-height: 1;">$0.00</span>
+                <span id="saas-currency" style="font-size: 0.875rem; color: var(--color-text-secondary); font-weight: 500; text-transform: uppercase;">MXN</span>
+              </div>
+              
+              <div style="border-top: 1px solid #E2E8F0; padding-top: 1rem; margin-bottom: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                  <span style="color: var(--color-text-secondary);">Usuarios base activos:</span>
+                  <strong id="saas-active-users" style="color: var(--color-navy);">0</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                  <span style="color: var(--color-text-secondary);">Usuarios inactivos (prorrateados):</span>
+                  <strong id="saas-inactive-users" style="color: var(--color-navy);">0</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.875rem;">
+                  <span style="color: var(--color-text-secondary);">Tarifa aplicable:</span>
+                  <strong id="saas-rate" style="color: var(--color-navy);">$0.00 / mes</strong>
+                </div>
+              </div>
+              
+              <button onclick="generateSaasInvoice()" class="btn btn-primary" style="width: 100%; padding: 0.75rem; background: var(--color-navy); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: background 0.2s;">
+                Generar Factura SaaS
+              </button>
+            </div>
+          </div>
+          
+          <!-- Card Uniforms -->
+          <div class="app-card" style="margin-top: 0;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+              <div>
+                <h2 style="font-family: var(--font-family-heading); font-size: 1.15rem; margin-bottom: 0.25rem; color: var(--color-navy);">Uniformes Generados</h2>
+                <p style="color: var(--color-text-secondary); font-size: 0.85rem; margin: 0;">Cotizaciones / Entregas del mes</p>
+              </div>
+              <div style="background: #FEF3C7; color: #D97706; padding: 0.5rem; border-radius: 0.75rem;">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
+              </div>
+            </div>
+            
+            <div id="uniforms-loading" style="padding: 2rem 0; text-align: center;">
+              <div class="spinner-sm" style="width: 24px; height: 24px; border: 3px solid #E2E8F0; border-top-color: var(--color-cyan); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+            </div>
+            
+            <div id="uniforms-content" style="display: none;">
+              <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1.5rem;">
+                <span id="uniforms-total" style="font-family: var(--font-family-heading); font-size: 2.25rem; font-weight: 800; color: var(--color-navy); line-height: 1;">$0.00</span>
+                <span id="uniforms-currency" style="font-size: 0.875rem; color: var(--color-text-secondary); font-weight: 500; text-transform: uppercase;">MXN</span>
+              </div>
+              
+              <div style="border-top: 1px solid #E2E8F0; padding-top: 1rem; margin-bottom: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                  <span style="color: var(--color-text-secondary);">Cotizaciones procesadas:</span>
+                  <strong id="uniforms-count" style="color: var(--color-navy);">0</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.875rem;">
+                  <span style="color: var(--color-text-secondary);">Prendas totales:</span>
+                  <strong id="uniforms-items" style="color: var(--color-navy);">0</strong>
+                </div>
+              </div>
+              
+              <button onclick="generateUniformsInvoice()" class="btn btn-outline" style="width: 100%; padding: 0.75rem; border: 1px solid #E2E8F0; color: var(--color-navy); background: white; border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                Generar Factura Uniformes
+              </button>
+            </div>
+          </div>
+          
+        </div>
+
+        <div class="app-card" style="position: relative; z-index: 10;">
           <h2
             style="font-family: var(--font-family-heading); font-size: 1.25rem; margin-bottom: 1rem; color: var(--color-navy);">
             Historial de Facturas</h2>
@@ -346,7 +432,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/utils.js?v=4"></script>
   <script>
-    const _supabase = supabase.createClient('https://awuhvewotmwelurmjvmu.supabase.co', 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq', { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token' } });
+    const _supabase = supabase.createClient('https://awuhvewotmwelurmjvmu.supabase.co', 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq', { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token', multiTab: false } });
 
     async function init() {
       const { data: { session } } = await _supabase.auth.getSession();
@@ -356,7 +442,117 @@
 
       // La información de la empresa se carga globalmente a través de utils.js
 
-      await loadInvoices(companyId);
+      await Promise.all([
+        loadInvoices(companyId),
+        calculateProjections(companyId)
+      ]);
+    }
+
+    async function calculateProjections(companyId) {
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      const daysInMonth = endOfMonth.getDate();
+
+      try {
+        // 1. Calcular SaaS Proyectado
+        const { data: employees, error: empError } = await _supabase
+          .from('company_employees')
+          .select('created_at, role_status, status_updated_at')
+          .eq('company_id', companyId);
+          
+        if (empError) throw empError;
+
+        let activeCount = 0;
+        let proratedInactiveCount = 0;
+        let totalProratedDays = 0;
+
+        (employees || []).forEach(emp => {
+          const createdAt = new Date(emp.created_at);
+          const isActive = emp.role_status === 'active' || !emp.role_status;
+          
+          let startDate = createdAt > startOfMonth ? createdAt : startOfMonth;
+          let endDate = now; // Calculamos la proyección hasta HOY
+
+          if (!isActive) {
+            if (emp.status_updated_at) {
+              const deactivatedAt = new Date(emp.status_updated_at);
+              if (deactivatedAt >= startOfMonth) {
+                endDate = deactivatedAt;
+                const diffTime = Math.max(0, endDate - startDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                totalProratedDays += diffDays;
+                proratedInactiveCount++;
+              }
+            }
+          } else {
+            const diffTime = Math.max(0, now - startDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            totalProratedDays += diffDays;
+            activeCount++;
+          }
+        });
+
+        // Curva de precios
+        const totalEquivalentUsers = totalProratedDays / daysInMonth; 
+        let rate = 0;
+        if (activeCount > 0 || totalEquivalentUsers > 0) {
+          const k = Math.log(4) / Math.log(400);
+          const A = 2.0 * Math.pow(5, k);
+          const rateUSD = A / Math.pow(Math.max(5, activeCount > 0 ? activeCount : totalEquivalentUsers), k); 
+          const rateMultiplier = 20; // MXN
+          rate = rateUSD * rateMultiplier;
+        }
+
+        const totalSaasCost = totalEquivalentUsers * rate;
+
+        document.getElementById('saas-total').textContent = '$' + totalSaasCost.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('saas-active-users').textContent = activeCount;
+        document.getElementById('saas-inactive-users').textContent = proratedInactiveCount;
+        document.getElementById('saas-rate').textContent = '$' + rate.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' / mes';
+
+        document.getElementById('saas-loading').style.display = 'none';
+        document.getElementById('saas-content').style.display = 'block';
+
+        // 2. Calcular Uniformes Generados
+        const { data: quotes, error: quotesError } = await _supabase
+          .from('company_quotes_requests')
+          .select('total_price, items')
+          .eq('company_id', companyId)
+          .eq('status', 'approved')
+          .gte('created_at', startOfMonth.toISOString());
+
+        if (quotesError) throw quotesError;
+
+        let totalUniformsCost = 0;
+        let totalItemsCount = 0;
+        let quotesCount = (quotes || []).length;
+
+        (quotes || []).forEach(q => {
+          totalUniformsCost += parseFloat(q.total_price) || 0;
+          if (q.items && Array.isArray(q.items)) {
+            totalItemsCount += q.items.reduce((acc, it) => acc + (parseInt(it.qty) || 1), 0);
+          }
+        });
+
+        document.getElementById('uniforms-total').textContent = '$' + totalUniformsCost.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('uniforms-count').textContent = quotesCount;
+        document.getElementById('uniforms-items').textContent = totalItemsCount;
+
+        document.getElementById('uniforms-loading').style.display = 'none';
+        document.getElementById('uniforms-content').style.display = 'block';
+
+      } catch (err) {
+        console.error("Error calculating projections:", err);
+      }
+    }
+
+    function generateSaasInvoice() {
+      showToast('Generando...', 'La factura SaaS está siendo procesada.');
+    }
+
+    function generateUniformsInvoice() {
+      showToast('Generando...', 'La factura de uniformes está siendo procesada.');
     }
 
     async function loadInvoices(companyId) {
