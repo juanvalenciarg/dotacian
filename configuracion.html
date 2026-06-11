@@ -168,12 +168,15 @@
       .contact-grid {
         grid-template-columns: 1fr !important;
       }
+
       .config-card {
         padding: 1rem;
       }
+
       .app-container {
         padding: 0.5rem !important;
       }
+
       .config-section h3 {
         font-size: 1.05rem;
       }
@@ -183,18 +186,18 @@
       .hours-row {
         flex-wrap: wrap !important;
       }
-      .hours-row > div:last-child {
+
+      .hours-row>div:last-child {
         width: 100%;
         justify-content: flex-start !important;
         margin-top: 0.5rem;
       }
+
       .hours-grid {
         grid-template-columns: 1fr;
         padding: 0.75rem;
       }
     }
-
-
   </style>
 </head>
 
@@ -209,7 +212,7 @@
         </a>
       </div>
 
-                                    <nav class="sidebar-nav">
+      <nav class="sidebar-nav">
         <a href="app.html" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
               viewBox="0 0 24 24">
@@ -278,11 +281,11 @@
         <a href="facturas.html" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/>
-              <line x1="16" y1="17" x2="8" y2="17"/>
-              <polyline points="10 9 9 9 8 9"/>
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
             </svg></span>
           <span class="nav-label">Facturas</span>
         </a>
@@ -294,8 +297,10 @@
     <main class="main-content">
       <header class="app-header">
         <div class="header-left">
-          <button class="mobile-menu-toggle" onclick="toggleSidebar()" style="color: white; border: none; background: transparent; cursor: pointer;">
-            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <button class="mobile-menu-toggle" onclick="toggleSidebar()"
+            style="color: white; border: none; background: transparent; cursor: pointer;">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" viewBox="0 0 24 24">
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="6" x2="21" y2="6"></line>
               <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -367,7 +372,8 @@
 
       <div class="welcome-banner">
         <div class="welcome-content">
-          <h1 class="welcome-title" style="font-size: 2.5rem; font-weight: 800; margin: 0 0 0.5rem 0; letter-spacing: -0.02em;">
+          <h1 class="welcome-title"
+            style="font-size: 2.5rem; font-weight: 800; margin: 0 0 0.5rem 0; letter-spacing: -0.02em;">
             Configuración</h1>
           <p class="welcome-subtitle" style="font-size: 1.1rem; opacity: 0.9; margin: 0; max-width: 600px;">
             Ajustes del Sistema y Políticas</p>
@@ -376,327 +382,331 @@
 
       <div class="dashboard-content-wrapper">
         <div class="app-container" style="margin-top: 2rem;">
-        <div class="config-card">
-          <div class="config-header-actions">
-            <button class="btn-action btn-edit" id="btn-edit" onclick="toggleEdit()">
-              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-              </svg>
-              Editar Información
-            </button>
-          </div>
-
-          <form id="config-form" onsubmit="handleSave(event)">
-            <!-- Empresa Section -->
-            <div class="config-section">
-              <h3>Datos de la Empresa</h3>
-              <div class="form-grid">
-                <div class="form-group">
-                  <label>Nombre Comercial</label>
-                  <input type="text" id="company_name" disabled required>
-                </div>
-                <div class="form-group">
-                  <label>Razón Social</label>
-                  <input type="text" id="legal_name" disabled placeholder="Nombre legal de la empresa">
-                </div>
-                <div class="form-group">
-                  <label id="tax_label">ID Fiscal (NIT/RFC)</label>
-                  <div style="display: flex; gap: 0.5rem; align-items: center; width: 100%;">
-                    <input type="text" id="tax_id" disabled style="flex: 1;">
-                    <div id="dv_wrapper" style="display: none; align-items: center; gap: 0.5rem;">
-                      <span style="font-weight: bold; color: #64748B;">-</span>
-                      <input type="text" id="tax_dv" disabled
-                        style="width: 64px; text-align: center; padding-left: 0.25rem; padding-right: 0.25rem; border-radius: 8px;"
-                        placeholder="DV" maxlength="1">
-                    </div>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label>Sector / Industria</label>
-                  <select id="industry" disabled>
-                    <option value="restaurantes">Restaurantes</option>
-                    <option value="limpieza">Limpieza</option>
-                    <option value="industrial">Industrial</option>
-                    <option value="corporate">Corporativo</option>
-                    <option value="seguridad">Seguridad</option>
-                    <option value="hoteleria">Hotelería</option>
-                    <option value="retail">Retail</option>
-                    <option value="salud">Salud</option>
-                    <option value="construccion">Construcción</option>
-                    <option value="logistica">Logística</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>País de Operación</label>
-                  <input type="text" id="country" disabled>
-                </div>
-                <div class="form-group">
-                  <label>Número de Empleados</label>
-                  <input type="number" id="employee_count" disabled>
-                </div>
-                <div class="form-group">
-                  <label>Presupuesto anual estimado por empleado</label>
-                  <div class="input-group">
-                    <span class="input-prefix" id="budget_prefix">$</span>
-                    <input type="number" id="monthly_budget" disabled>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Logistica Section -->
-            <div class="config-section">
-              <h3>Logística y Entrega</h3>
-              <div class="form-grid">
-                <!-- Direccion -->
-                <div class="form-group">
-                  <label>Dirección Principal de Entrega</label>
-                  <input type="text" id="delivery_address" disabled>
-                </div>
-                <div class="form-group">
-                  <label>Departamento / Estado</label>
-                  <select id="delivery_state" disabled>
-                    <option value="">Selecciona una opción...</option>
-                  </select>
-                </div>
-
-                <!-- Hidden legacy input to maintain code stability -->
-                <input type="hidden" id="contact_phone">
-
-                <!-- Contacto 1 -->
-                <div class="form-group" style="grid-column: span 2; margin-top: 1rem;">
-                  <h4 style="color: var(--color-navy); margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 700;">
-                    Contacto Principal de Entrega</h4>
-                  <div class="contact-grid">
-                    <div>
-                      <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Nombre Completo</label>
-                      <input type="text" id="delivery_contact_1_name" disabled placeholder="Nombre del contacto"
-                        style="width: 100%; margin-top: 0.25rem;">
-                    </div>
-                    <div>
-                      <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Teléfono / WhatsApp</label>
-                      <input type="tel" id="delivery_contact_1_phone" disabled placeholder="Ej: +57 300 123 4567"
-                        style="width: 100%; margin-top: 0.25rem;">
-                    </div>
-                    <div>
-                      <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Correo Electrónico</label>
-                      <input type="email" id="delivery_contact_1_email" disabled placeholder="contacto@empresa.com"
-                        style="width: 100%; margin-top: 0.25rem;">
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Contacto 2 -->
-                <div class="form-group" style="grid-column: span 2; margin-top: 0.5rem;">
-                  <h4 style="color: var(--color-navy); margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 700;">
-                    Contacto Secundario de Entrega</h4>
-                  <div class="contact-grid">
-                    <div>
-                      <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Nombre Completo</label>
-                      <input type="text" id="delivery_contact_2_name" disabled placeholder="Nombre del contacto"
-                        style="width: 100%; margin-top: 0.25rem;">
-                    </div>
-                    <div>
-                      <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Teléfono / WhatsApp</label>
-                      <input type="tel" id="delivery_contact_2_phone" disabled placeholder="Ej: +57 300 123 4567"
-                        style="width: 100%; margin-top: 0.25rem;">
-                    </div>
-                    <div>
-                      <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Correo Electrónico</label>
-                      <input type="email" id="delivery_contact_2_email" disabled placeholder="contacto2@empresa.com"
-                        style="width: 100%; margin-top: 0.25rem;">
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Horarios de Entrega -->
-                <div class="form-group" style="grid-column: span 2; margin-top: 1rem;">
-                  <h4 style="color: var(--color-navy); margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 700;">
-                    Horarios de Entrega Autorizados</h4>
-                  <div class="hours-grid">
-
-                    <!-- Lunes -->
-                    <div class="hours-row"
-                      style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
-                      <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <input type="checkbox" id="hour_active_Lunes" class="hour-toggle"
-                          style="width: 18px; height: 18px; cursor: pointer;" disabled
-                          onchange="toggleDayHours('Lunes')">
-                        <span
-                          style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Lunes</span>
-                      </div>
-                      <div id="time_inputs_Lunes"
-                        style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
-                        <input type="time" id="hour_start_Lunes" class="hour-start"
-                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                          disabled value="08:00">
-                        <span style="color: #64748B; font-size: 0.8125rem;">a</span>
-                        <input type="time" id="hour_end_Lunes" class="hour-end"
-                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                          disabled value="17:00">
-                      </div>
-                    </div>
-
-                    <!-- Martes -->
-                    <div class="hours-row"
-                      style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
-                      <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <input type="checkbox" id="hour_active_Martes" class="hour-toggle"
-                          style="width: 18px; height: 18px; cursor: pointer;" disabled
-                          onchange="toggleDayHours('Martes')">
-                        <span
-                          style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Martes</span>
-                      </div>
-                      <div id="time_inputs_Martes"
-                        style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
-                        <input type="time" id="hour_start_Martes" class="hour-start"
-                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                          disabled value="08:00">
-                        <span style="color: #64748B; font-size: 0.8125rem;">a</span>
-                        <input type="time" id="hour_end_Martes" class="hour-end"
-                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                          disabled value="17:00">
-                      </div>
-                    </div>
-
-                    <!-- Miércoles -->
-                    <div class="hours-row"
-                      style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
-                      <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <input type="checkbox" id="hour_active_Miercoles" class="hour-toggle"
-                          style="width: 18px; height: 18px; cursor: pointer;" disabled
-                          onchange="toggleDayHours('Miercoles')">
-                        <span
-                          style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Miércoles</span>
-                      </div>
-                      <div id="time_inputs_Miercoles"
-                        style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
-                        <input type="time" id="hour_start_Miercoles" class="hour-start"
-                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                          disabled value="08:00">
-                        <span style="color: #64748B; font-size: 0.8125rem;">a</span>
-                        <input type="time" id="hour_end_Miercoles" class="hour-end"
-                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                          disabled value="17:00">
-                      </div>
-                    </div>
-
-                    <!-- Jueves -->
-                    <div class="hours-row"
-                      style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
-                      <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <input type="checkbox" id="hour_active_Jueves" class="hour-toggle"
-                          style="width: 18px; height: 18px; cursor: pointer;" disabled
-                          onchange="toggleDayHours('Jueves')">
-                        <span
-                          style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Jueves</span>
-                      </div>
-                      <div id="time_inputs_Jueves"
-                        style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
-                        <input type="time" id="hour_start_Jueves" class="hour-start"
-                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                          disabled value="08:00">
-                        <span style="color: #64748B; font-size: 0.8125rem;">a</span>
-                        <input type="time" id="hour_end_Jueves" class="hour-end"
-                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                          disabled value="17:00">
-                      </div>
-                    </div>
-
-                    <!-- Viernes -->
-                    <div class="hours-row"
-                      style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
-                      <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <input type="checkbox" id="hour_active_Viernes" class="hour-toggle"
-                          style="width: 18px; height: 18px; cursor: pointer;" disabled
-                          onchange="toggleDayHours('Viernes')">
-                        <span
-                          style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Viernes</span>
-                      </div>
-                      <div id="time_inputs_Viernes"
-                        style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
-                        <input type="time" id="hour_start_Viernes" class="hour-start"
-                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                          disabled value="08:00">
-                        <span style="color: #64748B; font-size: 0.8125rem;">a</span>
-                        <input type="time" id="hour_end_Viernes" class="hour-end"
-                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                          disabled value="17:00">
-                      </div>
-                    </div>
-
-                    <!-- Sábado -->
-                    <div class="hours-row"
-                      style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
-                      <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <input type="checkbox" id="hour_active_Sabado" class="hour-toggle"
-                          style="width: 18px; height: 18px; cursor: pointer;" disabled
-                          onchange="toggleDayHours('Sabado')">
-                        <span
-                          style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Sábado</span>
-                      </div>
-                      <div id="time_inputs_Sabado"
-                        style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
-                        <input type="time" id="hour_start_Sabado" class="hour-start"
-                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                          disabled value="08:00">
-                        <span style="color: #64748B; font-size: 0.8125rem;">a</span>
-                        <input type="time" id="hour_end_Sabado" class="hour-end"
-                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                          disabled value="14:00">
-                      </div>
-                    </div>
-
-                    <!-- Domingo -->
-                    <div class="hours-row"
-                      style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
-                      <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <input type="checkbox" id="hour_active_Domingo" class="hour-toggle"
-                          style="width: 18px; height: 18px; cursor: pointer;" disabled
-                          onchange="toggleDayHours('Domingo')">
-                        <span
-                          style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Domingo</span>
-                      </div>
-                      <div id="time_inputs_Domingo"
-                        style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
-                        <input type="time" id="hour_start_Domingo" class="hour-start"
-                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                          disabled value="08:00">
-                        <span style="color: #64748B; font-size: 0.8125rem;">a</span>
-                        <input type="time" id="hour_end_Domingo" class="hour-end"
-                          style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                          disabled value="12:00">
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div style="display: flex; justify-content: flex-end;">
-              <button type="submit" class="btn-action btn-save" id="btn-save">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-                  <polyline points="17 21 17 13 7 13 7 21" />
-                  <polyline points="7 3 7 8 15 8" />
+          <div class="config-card">
+            <div class="config-header-actions">
+              <button class="btn-action btn-edit" id="btn-edit" onclick="toggleEdit()">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                 </svg>
-                Guardar Cambios
+                Editar Información
               </button>
             </div>
-          </form>
+
+            <form id="config-form" onsubmit="handleSave(event)">
+              <!-- Empresa Section -->
+              <div class="config-section">
+                <h3>Datos de la Empresa</h3>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Nombre Comercial</label>
+                    <input type="text" id="company_name" disabled required>
+                  </div>
+                  <div class="form-group">
+                    <label>Razón Social</label>
+                    <input type="text" id="legal_name" disabled placeholder="Nombre legal de la empresa">
+                  </div>
+                  <div class="form-group">
+                    <label id="tax_label">ID Fiscal (NIT/RFC)</label>
+                    <div style="display: flex; gap: 0.5rem; align-items: center; width: 100%;">
+                      <input type="text" id="tax_id" disabled style="flex: 1;">
+                      <div id="dv_wrapper" style="display: none; align-items: center; gap: 0.5rem;">
+                        <span style="font-weight: bold; color: #64748B;">-</span>
+                        <input type="text" id="tax_dv" disabled
+                          style="width: 64px; text-align: center; padding-left: 0.25rem; padding-right: 0.25rem; border-radius: 8px;"
+                          placeholder="DV" maxlength="1">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Sector / Industria</label>
+                    <select id="industry" disabled>
+                      <option value="restaurantes">Restaurantes</option>
+                      <option value="limpieza">Limpieza</option>
+                      <option value="industrial">Industrial</option>
+                      <option value="corporate">Corporativo</option>
+                      <option value="seguridad">Seguridad</option>
+                      <option value="hoteleria">Hotelería</option>
+                      <option value="retail">Retail</option>
+                      <option value="salud">Salud</option>
+                      <option value="construccion">Construcción</option>
+                      <option value="logistica">Logística</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>País de Operación</label>
+                    <input type="text" id="country" disabled>
+                  </div>
+                  <div class="form-group">
+                    <label>Número de Empleados</label>
+                    <input type="number" id="employee_count" disabled>
+                  </div>
+                  <div class="form-group">
+                    <label>Presupuesto anual estimado por empleado</label>
+                    <div class="input-group">
+                      <span class="input-prefix" id="budget_prefix">$</span>
+                      <input type="number" id="monthly_budget" disabled>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Logistica Section -->
+              <div class="config-section">
+                <h3>Logística y Entrega</h3>
+                <div class="form-grid">
+                  <!-- Direccion -->
+                  <div class="form-group">
+                    <label>Dirección Principal de Entrega</label>
+                    <input type="text" id="delivery_address" disabled>
+                  </div>
+                  <div class="form-group">
+                    <label>Departamento / Estado</label>
+                    <select id="delivery_state" disabled>
+                      <option value="">Selecciona una opción...</option>
+                    </select>
+                  </div>
+
+                  <!-- Hidden legacy input to maintain code stability -->
+                  <input type="hidden" id="contact_phone">
+
+                  <!-- Contacto 1 -->
+                  <div class="form-group" style="grid-column: span 2; margin-top: 1rem;">
+                    <h4 style="color: var(--color-navy); margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 700;">
+                      Contacto Principal de Entrega</h4>
+                    <div class="contact-grid">
+                      <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Nombre Completo</label>
+                        <input type="text" id="delivery_contact_1_name" disabled placeholder="Nombre del contacto"
+                          style="width: 100%; margin-top: 0.25rem;">
+                      </div>
+                      <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Teléfono /
+                          WhatsApp</label>
+                        <input type="tel" id="delivery_contact_1_phone" disabled placeholder="Ej: +57 300 123 4567"
+                          style="width: 100%; margin-top: 0.25rem;">
+                      </div>
+                      <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Correo
+                          Electrónico</label>
+                        <input type="email" id="delivery_contact_1_email" disabled placeholder="contacto@empresa.com"
+                          style="width: 100%; margin-top: 0.25rem;">
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Contacto 2 -->
+                  <div class="form-group" style="grid-column: span 2; margin-top: 0.5rem;">
+                    <h4 style="color: var(--color-navy); margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 700;">
+                      Contacto Secundario de Entrega</h4>
+                    <div class="contact-grid">
+                      <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Nombre Completo</label>
+                        <input type="text" id="delivery_contact_2_name" disabled placeholder="Nombre del contacto"
+                          style="width: 100%; margin-top: 0.25rem;">
+                      </div>
+                      <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Teléfono /
+                          WhatsApp</label>
+                        <input type="tel" id="delivery_contact_2_phone" disabled placeholder="Ej: +57 300 123 4567"
+                          style="width: 100%; margin-top: 0.25rem;">
+                      </div>
+                      <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Correo
+                          Electrónico</label>
+                        <input type="email" id="delivery_contact_2_email" disabled placeholder="contacto2@empresa.com"
+                          style="width: 100%; margin-top: 0.25rem;">
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Horarios de Entrega -->
+                  <div class="form-group" style="grid-column: span 2; margin-top: 1rem;">
+                    <h4 style="color: var(--color-navy); margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 700;">
+                      Horarios de Entrega Autorizados</h4>
+                    <div class="hours-grid">
+
+                      <!-- Lunes -->
+                      <div class="hours-row"
+                        style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                          <input type="checkbox" id="hour_active_Lunes" class="hour-toggle"
+                            style="width: 18px; height: 18px; cursor: pointer;" disabled
+                            onchange="toggleDayHours('Lunes')">
+                          <span
+                            style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Lunes</span>
+                        </div>
+                        <div id="time_inputs_Lunes"
+                          style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
+                          <input type="time" id="hour_start_Lunes" class="hour-start"
+                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                            disabled value="08:00">
+                          <span style="color: #64748B; font-size: 0.8125rem;">a</span>
+                          <input type="time" id="hour_end_Lunes" class="hour-end"
+                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                            disabled value="17:00">
+                        </div>
+                      </div>
+
+                      <!-- Martes -->
+                      <div class="hours-row"
+                        style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                          <input type="checkbox" id="hour_active_Martes" class="hour-toggle"
+                            style="width: 18px; height: 18px; cursor: pointer;" disabled
+                            onchange="toggleDayHours('Martes')">
+                          <span
+                            style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Martes</span>
+                        </div>
+                        <div id="time_inputs_Martes"
+                          style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
+                          <input type="time" id="hour_start_Martes" class="hour-start"
+                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                            disabled value="08:00">
+                          <span style="color: #64748B; font-size: 0.8125rem;">a</span>
+                          <input type="time" id="hour_end_Martes" class="hour-end"
+                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                            disabled value="17:00">
+                        </div>
+                      </div>
+
+                      <!-- Miércoles -->
+                      <div class="hours-row"
+                        style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                          <input type="checkbox" id="hour_active_Miercoles" class="hour-toggle"
+                            style="width: 18px; height: 18px; cursor: pointer;" disabled
+                            onchange="toggleDayHours('Miercoles')">
+                          <span
+                            style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Miércoles</span>
+                        </div>
+                        <div id="time_inputs_Miercoles"
+                          style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
+                          <input type="time" id="hour_start_Miercoles" class="hour-start"
+                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                            disabled value="08:00">
+                          <span style="color: #64748B; font-size: 0.8125rem;">a</span>
+                          <input type="time" id="hour_end_Miercoles" class="hour-end"
+                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                            disabled value="17:00">
+                        </div>
+                      </div>
+
+                      <!-- Jueves -->
+                      <div class="hours-row"
+                        style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                          <input type="checkbox" id="hour_active_Jueves" class="hour-toggle"
+                            style="width: 18px; height: 18px; cursor: pointer;" disabled
+                            onchange="toggleDayHours('Jueves')">
+                          <span
+                            style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Jueves</span>
+                        </div>
+                        <div id="time_inputs_Jueves"
+                          style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
+                          <input type="time" id="hour_start_Jueves" class="hour-start"
+                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                            disabled value="08:00">
+                          <span style="color: #64748B; font-size: 0.8125rem;">a</span>
+                          <input type="time" id="hour_end_Jueves" class="hour-end"
+                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                            disabled value="17:00">
+                        </div>
+                      </div>
+
+                      <!-- Viernes -->
+                      <div class="hours-row"
+                        style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                          <input type="checkbox" id="hour_active_Viernes" class="hour-toggle"
+                            style="width: 18px; height: 18px; cursor: pointer;" disabled
+                            onchange="toggleDayHours('Viernes')">
+                          <span
+                            style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Viernes</span>
+                        </div>
+                        <div id="time_inputs_Viernes"
+                          style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
+                          <input type="time" id="hour_start_Viernes" class="hour-start"
+                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                            disabled value="08:00">
+                          <span style="color: #64748B; font-size: 0.8125rem;">a</span>
+                          <input type="time" id="hour_end_Viernes" class="hour-end"
+                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                            disabled value="17:00">
+                        </div>
+                      </div>
+
+                      <!-- Sábado -->
+                      <div class="hours-row"
+                        style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                          <input type="checkbox" id="hour_active_Sabado" class="hour-toggle"
+                            style="width: 18px; height: 18px; cursor: pointer;" disabled
+                            onchange="toggleDayHours('Sabado')">
+                          <span
+                            style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Sábado</span>
+                        </div>
+                        <div id="time_inputs_Sabado"
+                          style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
+                          <input type="time" id="hour_start_Sabado" class="hour-start"
+                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                            disabled value="08:00">
+                          <span style="color: #64748B; font-size: 0.8125rem;">a</span>
+                          <input type="time" id="hour_end_Sabado" class="hour-end"
+                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                            disabled value="14:00">
+                        </div>
+                      </div>
+
+                      <!-- Domingo -->
+                      <div class="hours-row"
+                        style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                          <input type="checkbox" id="hour_active_Domingo" class="hour-toggle"
+                            style="width: 18px; height: 18px; cursor: pointer;" disabled
+                            onchange="toggleDayHours('Domingo')">
+                          <span
+                            style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Domingo</span>
+                        </div>
+                        <div id="time_inputs_Domingo"
+                          style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
+                          <input type="time" id="hour_start_Domingo" class="hour-start"
+                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                            disabled value="08:00">
+                          <span style="color: #64748B; font-size: 0.8125rem;">a</span>
+                          <input type="time" id="hour_end_Domingo" class="hour-end"
+                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
+                            disabled value="12:00">
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end;">
+                <button type="submit" class="btn-action btn-save" id="btn-save">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                    <polyline points="17 21 17 13 7 13 7 21" />
+                    <polyline points="7 3 7 8 15 8" />
+                  </svg>
+                  Guardar Cambios
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
   </div>
-</main>
-</div>
+  </main>
+  </div>
 
-<script>
+  <script>
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token', multiTab: false } });
     window._supabase = _supabase;
 
     let session = null;
@@ -1038,7 +1048,7 @@
       btn.innerHTML = '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Guardar Cambios';
     }
 
-    init();
+    window.onload = init;
   </script>
 </body>
 
