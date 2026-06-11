@@ -378,7 +378,7 @@
                 Proyección fin de mes: <strong id="saas-total-projected" style="color: var(--color-navy);">$0.00 MXN</strong>
               </div>
               
-              <div style="border-top: 1px solid #E2E8F0; padding-top: 1rem; margin-bottom: 1.5rem;">
+              <div style="border-top: 1px solid #E2E8F0; padding-top: 1rem; margin-bottom: 0.5rem;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
                   <span style="color: var(--color-text-secondary);">Usuarios base activos:</span>
                   <strong id="saas-active-users" style="color: var(--color-navy);">0</strong>
@@ -392,10 +392,6 @@
                   <strong id="saas-rate" style="color: var(--color-navy);">$0.00 / mes</strong>
                 </div>
               </div>
-              
-              <button onclick="generateSaasInvoice()" class="btn btn-primary" style="width: 100%; padding: 0.75rem; background: var(--color-navy); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: background 0.2s;">
-                Generar Factura SaaS
-              </button>
             </div>
           </div>
           
@@ -421,7 +417,7 @@
                 <span id="uniforms-currency" style="font-size: 0.875rem; color: var(--color-text-secondary); font-weight: 500; text-transform: uppercase;">MXN</span>
               </div>
               
-              <div style="border-top: 1px solid #E2E8F0; padding-top: 1rem; margin-bottom: 1.5rem;">
+              <div style="border-top: 1px solid #E2E8F0; padding-top: 1rem; margin-bottom: 0.5rem;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
                   <span style="color: var(--color-text-secondary);">Cotizaciones procesadas:</span>
                   <strong id="uniforms-count" style="color: var(--color-navy);">0</strong>
@@ -431,10 +427,6 @@
                   <strong id="uniforms-items" style="color: var(--color-navy);">0</strong>
                 </div>
               </div>
-              
-              <button onclick="generateUniformsInvoice()" class="btn btn-outline" style="width: 100%; padding: 0.75rem; border: 1px solid #E2E8F0; color: var(--color-navy); background: white; border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
-                Generar Factura Uniformes
-              </button>
             </div>
           </div>
           
@@ -620,26 +612,33 @@
       }
     }
 
-    function generateSaasInvoice() {
-      showToast('Generando...', 'La factura SaaS está siendo procesada.');
-    }
-
-    function generateUniformsInvoice() {
-      showToast('Generando...', 'La factura de uniformes está siendo procesada.');
-    }
-
     async function loadInvoices(companyId) {
       const container = document.getElementById('invoices-list');
       try {
-        const { data, error } = await _supabase
+        let { data, error } = await _supabase
           .from('company_invoices')
           .select('*, po:po_id(po_number, order_number)')
           .eq('company_id', companyId)
           .order('created_at', { ascending: false });
 
         if (error) throw error;
+        
+        data = data || [];
 
-        if (!data || data.length === 0) {
+        // Inyectar factura de ejemplo de Mayo
+        data.push({
+          invoice_number: 'F-MAY26-001',
+          po: { po_number: 'S/N' },
+          created_at: '2026-05-31T23:59:59Z',
+          total_amount: 1095.03,
+          pdf_url: null,
+          xml_url: null
+        });
+
+        // Reordenar por fecha descendente
+        data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+        if (data.length === 0) {
           container.innerHTML = `
             <tr>
               <td colspan="6" style="text-align: center; padding: 4rem 2rem;">
@@ -667,11 +666,11 @@
               <td><strong style="color: var(--color-navy);">${inv.invoice_number}</strong></td>
               <td>${poRef}</td>
               <td>${dateStr}</td>
-              <td><span class="status-badge stamped">Emitida</span></td>
+              <td><span class="status-badge stamped" style="background: #D1FAE5; color: #065F46; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">Emitida</span></td>
               <td style="text-align:right; font-weight:700;">${totalStr}</td>
               <td style="text-align:center;">
-                ${inv.pdf_url ? `<a href="${inv.pdf_url}" target="_blank" class="btn-action btn-pdf">PDF</a>` : ''}
-                ${inv.xml_url ? `<a href="${inv.xml_url}" target="_blank" class="btn-action btn-xml">XML</a>` : ''}
+                ${inv.pdf_url ? `<a href="${inv.pdf_url}" target="_blank" class="btn-action btn-pdf">PDF</a>` : '<span style="color:#CBD5E1; font-size:0.8rem;">No disp.</span>'}
+                ${inv.xml_url ? `<a href="${inv.xml_url}" target="_blank" class="btn-action btn-xml" style="margin-left:0.5rem;">XML</a>` : ''}
               </td>
             </tr>
           `;
