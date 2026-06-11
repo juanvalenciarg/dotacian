@@ -325,9 +325,12 @@
             </div>
             
             <div id="saas-content" style="display: none;">
-              <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1.5rem;">
-                <span id="saas-total" style="font-family: var(--font-family-heading); font-size: 2.25rem; font-weight: 800; color: var(--color-cyan); line-height: 1;">$0.00</span>
-                <span id="saas-currency" style="font-size: 0.875rem; color: var(--color-text-secondary); font-weight: 500; text-transform: uppercase;">MXN</span>
+              <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <span id="saas-total-current" style="font-family: var(--font-family-heading); font-size: 2.25rem; font-weight: 800; color: var(--color-cyan); line-height: 1;">$0.00</span>
+                <span style="font-size: 0.875rem; color: var(--color-text-secondary); font-weight: 500; text-transform: uppercase;">MXN (A la fecha)</span>
+              </div>
+              <div style="margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--color-text-secondary);">
+                Proyección fin de mes: <strong id="saas-total-projected" style="color: var(--color-navy);">$0.00 MXN</strong>
               </div>
               
               <div style="border-top: 1px solid #E2E8F0; padding-top: 1rem; margin-bottom: 1.5rem;">
@@ -465,48 +468,59 @@
 
         let activeCount = 0;
         let proratedInactiveCount = 0;
-        let totalProratedDays = 0;
+        let totalProratedDaysCurrent = 0;
+        let totalProratedDaysProjected = 0;
 
         (employees || []).forEach(emp => {
           const createdAt = new Date(emp.created_at);
           const isActive = emp.role_status === 'active' || !emp.role_status;
           
           let startDate = createdAt > startOfMonth ? createdAt : startOfMonth;
-          let endDate = now; // Calculamos la proyección hasta HOY
+          let endDateCurrent = now; 
+          let endDateProjected = endOfMonth;
 
           if (!isActive) {
             if (emp.status_updated_at) {
               const deactivatedAt = new Date(emp.status_updated_at);
               if (deactivatedAt >= startOfMonth) {
-                endDate = deactivatedAt;
-                const diffTime = Math.max(0, endDate - startDate);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                totalProratedDays += diffDays;
+                endDateCurrent = deactivatedAt < now ? deactivatedAt : now;
+                endDateProjected = deactivatedAt;
+                
+                const diffTimeCurrent = Math.max(0, endDateCurrent - startDate);
+                const diffTimeProjected = Math.max(0, endDateProjected - startDate);
+                
+                totalProratedDaysCurrent += Math.ceil(diffTimeCurrent / (1000 * 60 * 60 * 24));
+                totalProratedDaysProjected += Math.ceil(diffTimeProjected / (1000 * 60 * 60 * 24));
                 proratedInactiveCount++;
               }
             }
           } else {
-            const diffTime = Math.max(0, now - startDate);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            totalProratedDays += diffDays;
+            const diffTimeCurrent = Math.max(0, now - startDate);
+            const diffTimeProjected = Math.max(0, endOfMonth - startDate);
+            totalProratedDaysCurrent += Math.ceil(diffTimeCurrent / (1000 * 60 * 60 * 24));
+            totalProratedDaysProjected += Math.ceil(diffTimeProjected / (1000 * 60 * 60 * 24));
             activeCount++;
           }
         });
 
         // Curva de precios
-        const totalEquivalentUsers = totalProratedDays / daysInMonth; 
+        const totalEquivalentUsersCurrent = totalProratedDaysCurrent / daysInMonth; 
+        const totalEquivalentUsersProjected = totalProratedDaysProjected / daysInMonth; 
+        
         let rate = 0;
-        if (activeCount > 0 || totalEquivalentUsers > 0) {
+        if (activeCount > 0 || totalEquivalentUsersProjected > 0) {
           const k = Math.log(4) / Math.log(400);
           const A = 2.0 * Math.pow(5, k);
-          const rateUSD = A / Math.pow(Math.max(5, activeCount > 0 ? activeCount : totalEquivalentUsers), k); 
+          const rateUSD = A / Math.pow(Math.max(5, activeCount > 0 ? activeCount : totalEquivalentUsersProjected), k); 
           const rateMultiplier = 20; // MXN
           rate = rateUSD * rateMultiplier;
         }
 
-        const totalSaasCost = totalEquivalentUsers * rate;
+        const totalSaasCostCurrent = totalEquivalentUsersCurrent * rate;
+        const totalSaasCostProjected = totalEquivalentUsersProjected * rate;
 
-        document.getElementById('saas-total').textContent = '$' + totalSaasCost.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('saas-total-current').textContent = '$' + totalSaasCostCurrent.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('saas-total-projected').textContent = '$' + totalSaasCostProjected.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         document.getElementById('saas-active-users').textContent = activeCount;
         document.getElementById('saas-inactive-users').textContent = proratedInactiveCount;
         document.getElementById('saas-rate').textContent = '$' + rate.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' / mes';
@@ -514,10 +528,16 @@
         document.getElementById('saas-loading').style.display = 'none';
         document.getElementById('saas-content').style.display = 'block';
 
+      } catch (err) {
+        console.error("Error calculating SaaS projection:", err);
+        document.getElementById('saas-loading').style.display = 'none';
+      }
+
+      try {
         // 2. Calcular Uniformes Generados
         const { data: quotes, error: quotesError } = await _supabase
           .from('company_quotes_requests')
-          .select('total_price, items')
+          .select('*')
           .eq('company_id', companyId)
           .eq('status', 'approved')
           .gte('created_at', startOfMonth.toISOString());
@@ -532,6 +552,13 @@
           totalUniformsCost += parseFloat(q.total_price) || 0;
           if (q.items && Array.isArray(q.items)) {
             totalItemsCount += q.items.reduce((acc, it) => acc + (parseInt(it.qty) || 1), 0);
+          } else if (typeof q.items === 'string') {
+            try {
+              const parsedItems = JSON.parse(q.items);
+              if (Array.isArray(parsedItems)) {
+                totalItemsCount += parsedItems.reduce((acc, it) => acc + (parseInt(it.qty) || 1), 0);
+              }
+            } catch(e) {}
           }
         });
 
@@ -543,7 +570,8 @@
         document.getElementById('uniforms-content').style.display = 'block';
 
       } catch (err) {
-        console.error("Error calculating projections:", err);
+        console.error("Error calculating Uniforms projection:", err);
+        document.getElementById('uniforms-loading').style.display = 'none';
       }
     }
 
