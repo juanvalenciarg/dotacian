@@ -932,7 +932,13 @@
       document.getElementById('product-description').textContent = productData.description || 'No hay descripción disponible para este producto.';
       document.getElementById('product-sku').textContent = productData.sku || 'N/A';
       document.getElementById('product-gender').textContent = productData.gender || 'Unisex';
-      document.getElementById('product-moq').textContent = productData.moq ? `${productData.moq} unidades` : '1 unidad';
+      const moqEl = document.getElementById('product-moq');
+      const moqVal = parseInt(productData.moq) || 1;
+      if (moqVal > 1) {
+        moqEl.innerHTML = `<span style="display:inline-flex; align-items:center; gap:4px; background:#fffbeb; color:#d97706; padding:4px 8px; border-radius:6px; font-weight:700; font-size:0.85rem; border:1px solid #fde68a;"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg> ${moqVal} unidades</span>`;
+      } else {
+        moqEl.textContent = '1 unidad';
+      }
       document.getElementById('product-industry').textContent = productData.industry || productData.subcategory || 'General';
 
       // Status indicator
