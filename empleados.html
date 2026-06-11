@@ -2420,7 +2420,7 @@
       if (!dbIds || dbIds.length === 0) return;
       try {
         const { error } = await _supabase.from('company_employees')
-          .update({ role_status: 'inactive' })
+          .update({ role_status: 'inactive', status_updated_at: new Date().toISOString() })
           .in('id', dbIds);
 
         if (error) throw error;
@@ -2444,7 +2444,7 @@
 
       try {
         const { error } = await _supabase.from('company_employees')
-          .update({ role_status: newStatus })
+          .update({ role_status: newStatus, status_updated_at: new Date().toISOString() })
           .eq('id', dbId);
 
         if (error) throw error;
@@ -2964,7 +2964,8 @@
           shirt_size: shirtSize,
           pants_size: pantsSize,
           shoe_size: shoeSize,
-          status: 'none'
+          status: 'none',
+          status_updated_at: new Date().toISOString()
         }]).select().single();
 
         if (error) throw error;
