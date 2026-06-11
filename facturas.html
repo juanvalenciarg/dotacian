@@ -372,7 +372,7 @@
             <div id="saas-content" style="display: none;">
               <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.5rem;">
                 <span id="saas-total-current" style="font-family: var(--font-family-heading); font-size: 2.25rem; font-weight: 800; color: var(--color-cyan); line-height: 1;">$0.00</span>
-                <span style="font-size: 0.875rem; color: var(--color-text-secondary); font-weight: 500; text-transform: uppercase;">MXN (A la fecha)</span>
+                <span id="saas-currency" style="font-size: 0.875rem; color: var(--color-text-secondary); font-weight: 500; text-transform: uppercase;">MXN (A la fecha)</span>
               </div>
               <div style="margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--color-text-secondary);">
                 Proyección fin de mes: <strong id="saas-total-projected" style="color: var(--color-navy);">$0.00 MXN</strong>
@@ -540,6 +540,11 @@
           }
         });
 
+        const userCountryRaw = localStorage.getItem('dotacian_user_country') || 'CO';
+        const userCountry = userCountryRaw.trim().toUpperCase();
+        const isColombia = userCountry === 'CO' || userCountry === 'COLOMBIA';
+        const currencyCode = isColombia ? 'COP' : 'MXN';
+
         // Curva de precios
         const totalEquivalentUsersCurrent = totalProratedDaysCurrent / daysInMonth; 
         const totalEquivalentUsersProjected = totalProratedDaysProjected / daysInMonth; 
@@ -549,18 +554,19 @@
           const k = Math.log(4) / Math.log(400);
           const A = 2.0 * Math.pow(5, k);
           const rateUSD = A / Math.pow(Math.max(5, activeCount > 0 ? activeCount : totalEquivalentUsersProjected), k); 
-          const rateMultiplier = 20; // MXN
+          const rateMultiplier = isColombia ? 4000 : 20; // COP/MXN
           rate = rateUSD * rateMultiplier;
         }
 
         const totalSaasCostCurrent = totalEquivalentUsersCurrent * rate;
         const totalSaasCostProjected = totalEquivalentUsersProjected * rate;
 
-        document.getElementById('saas-total-current').textContent = '$' + totalSaasCostCurrent.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        document.getElementById('saas-total-projected').textContent = '$' + totalSaasCostProjected.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('saas-total-current').textContent = formatCurrency(totalSaasCostCurrent, userCountry);
+        document.getElementById('saas-currency').textContent = currencyCode + ' (A la fecha)';
+        document.getElementById('saas-total-projected').textContent = formatCurrency(totalSaasCostProjected, userCountry) + ' ' + currencyCode;
         document.getElementById('saas-active-users').textContent = activeCount;
         document.getElementById('saas-inactive-users').textContent = proratedInactiveCount;
-        document.getElementById('saas-rate').textContent = '$' + rate.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' / mes';
+        document.getElementById('saas-rate').textContent = formatCurrency(rate, userCountry) + ' / mes';
 
         document.getElementById('saas-loading').style.display = 'none';
         document.getElementById('saas-content').style.display = 'block';
@@ -599,7 +605,13 @@
           }
         });
 
-        document.getElementById('uniforms-total').textContent = '$' + totalUniformsCost.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const userCountryRaw = localStorage.getItem('dotacian_user_country') || 'CO';
+        const userCountry = userCountryRaw.trim().toUpperCase();
+        const isColombia = userCountry === 'CO' || userCountry === 'COLOMBIA';
+        const currencyCode = isColombia ? 'COP' : 'MXN';
+
+        document.getElementById('uniforms-total').textContent = formatCurrency(totalUniformsCost, userCountry);
+        document.getElementById('uniforms-currency').textContent = currencyCode;
         document.getElementById('uniforms-count').textContent = quotesCount;
         document.getElementById('uniforms-items').textContent = totalItemsCount;
 
@@ -628,12 +640,64 @@
         // Inyectar factura de ejemplo de Mayo
         data.push({
           invoice_number: 'F-MAY26-001',
-          po: { po_number: 'S/N' },
-          created_at: '2026-05-31T23:59:59Z',
-          total_amount: 1095.03,
-          pdf_url: null,
-          xml_url: null
-        });
+        // Fetch POs to see if there are completed ones missing invoices
+        const { data: pos, error: posErr } = await _supabase
+          .from('company_purchase_orders')
+          .select('*')
+          .eq('company_id', companyId);
+
+        if (!posErr && pos && pos.length > 0) {
+          const quoteIds = pos.reduce((acc, po) => {
+            if (po.quote_ids && Array.isArray(po.quote_ids)) {
+              po.quote_ids.forEach(id => { if (id) acc.add(id); });
+            }
+            return acc;
+          }, new Set());
+
+          let quotesMap = {};
+          if (quoteIds.size > 0) {
+            const { data: quotesData } = await _supabase
+              .from('company_quotes_requests')
+              .select('id, sizes')
+              .in('id', Array.from(quoteIds));
+            if (quotesData) {
+              quotesMap = quotesData.reduce((acc, q) => ({ ...acc, [q.id]: q }), {});
+            }
+          }
+
+          pos.forEach(po => {
+            // Check if PO is paid (has final payment proof) or is completed
+            let isPaid = false;
+            let finalPaymentProofUrl = '';
+            
+            const quoteId = po.quote_ids && po.quote_ids[0];
+            const quote = quoteId ? quotesMap[quoteId] : null;
+
+            if (quote && quote.sizes && quote.sizes.final_payment_proof_url) {
+              finalPaymentProofUrl = quote.sizes.final_payment_proof_url;
+            }
+            if (!finalPaymentProofUrl && po.items && po.items[0] && po.items[0].final_payment_proof_url) {
+              finalPaymentProofUrl = po.items[0].final_payment_proof_url;
+            }
+            
+            if (finalPaymentProofUrl || po.status === 'completed') {
+              // check if it's already invoiced
+              const hasInvoice = data.find(inv => inv.po_id === po.id);
+              if (!hasInvoice) {
+                data.push({
+                  is_po_placeholder: true,
+                  po_id: po.id,
+                  invoice_number: 'Por Facturar',
+                  po: { po_number: po.po_number || po.order_number },
+                  created_at: po.created_at,
+                  total_amount: po.total_amount,
+                  pdf_url: null,
+                  xml_url: null
+                });
+              }
+            }
+          });
+        }
 
         // Reordenar por fecha descendente
         data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -656,10 +720,28 @@
           return;
         }
 
+        const userCountryRaw = localStorage.getItem('dotacian_user_country') || 'CO';
+        const userCountry = userCountryRaw.trim().toUpperCase();
+
         container.innerHTML = data.map(inv => {
           const poRef = inv.po?.po_number || inv.po?.order_number || 'S/N';
           const dateStr = new Date(inv.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
-          const totalStr = `$${parseFloat(inv.total_amount).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
+          const totalStr = formatCurrency(inv.total_amount, userCountry);
+
+          if (inv.is_po_placeholder) {
+            return `
+              <tr>
+                <td><strong style="color: #94A3B8; font-style: italic;">${inv.invoice_number}</strong></td>
+                <td>${poRef}</td>
+                <td>${dateStr}</td>
+                <td><span class="status-badge" style="background: #FFF7ED; color: #C2410C; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">Pendiente</span></td>
+                <td style="text-align:right; font-weight:700;">${totalStr}</td>
+                <td style="text-align:center;">
+                  <button class="btn-action" style="background: var(--color-cyan); color: white; border: none;" onclick="requestInvoice('${inv.po_id}')">Solicitar</button>
+                </td>
+              </tr>
+            `;
+          }
 
           return `
             <tr>
@@ -702,6 +784,19 @@
       if (layout) {
         layout.classList.toggle('sidebar-open');
       }
+    }
+
+    async function requestInvoice(poId) {
+      // Stub function to handle invoice request
+      if(typeof showToast === 'function') {
+        showToast('Solicitud Enviada', 'Se ha solicitado la facturación para esta orden de compra.');
+      } else {
+        alert('Se ha solicitado la facturación para esta orden de compra.');
+      }
+      
+      // In a real scenario, this would call a Supabase function or insert into a table
+      // Example:
+      // await _supabase.from('invoice_requests').insert({ po_id: poId, company_id: session.user.id });
     }
   </script>
 </body>
