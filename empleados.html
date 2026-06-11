@@ -1869,9 +1869,10 @@
       availableKitList.innerHTML = '';
       items.forEach((item, index) => {
         const moq = item.moq || 1;
-        const qty = Math.max(item.quantity || item.qty || 1, moq);
+        const qty = item.quantity || item.qty || 1;
         const img = item.image || item.img || '';
-        availableKitList.appendChild(buildKitRow(item.name, qty, img, index, moq));
+        const size = guessSize(item.name, empObj);
+        availableKitList.appendChild(buildKitRow(item.name, qty, img, index, moq, size));
       });
       updateKitSummary();
 
@@ -2276,7 +2277,7 @@
         });
     }
 
-    function buildKitRow(name, qty, img, id, moq = 1) {
+    function buildKitRow(name, qty, img, id, moq = 1, size = '') {
       const wrapper = document.createElement('div');
       wrapper.dataset.kitId = id;
       wrapper.dataset.moq = moq;
@@ -2307,7 +2308,7 @@
             placeholder="Nombre de la prenda"
             onfocus="this.style.background='#f0f9ff'; this.style.borderRadius='6px'; this.style.padding='2px 6px';"
             onblur="this.style.background='transparent'; this.style.padding='0';">
-          <div style="font-size:0.7rem; color:#94a3b8; margin-top:1px;">Toca para editar</div>
+          <div style="font-size:0.7rem; color:#94a3b8; margin-top:1px;">${size ? `Talla a cotizar: <strong style="color:var(--color-navy);">${size}</strong> • ` : ''}Toca para editar</div>
           ${moqWarning}
         </div>
 
