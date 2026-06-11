@@ -640,6 +640,13 @@
         // Inyectar factura de ejemplo de Mayo
         data.push({
           invoice_number: 'F-MAY26-001',
+          po: { po_number: 'S/N' },
+          created_at: '2026-05-31T23:59:59Z',
+          total_amount: 1095.03,
+          pdf_url: null,
+          xml_url: null
+        });
+
         // Fetch POs to see if there are completed ones missing invoices
         const { data: pos, error: posErr } = await _supabase
           .from('company_purchase_orders')
