@@ -565,8 +565,7 @@
 
     @media (max-width: 1200px) {
       .welcome-banner {
-        margin-top: 5rem;
-        padding-top: 3rem;
+        padding-top: 7rem;
       }
     }
 
@@ -885,7 +884,7 @@
   <script>
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token' } });
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: window.location.href.includes('.seller.html') || window.location.href.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token', multiTab: false } });
     let userCountry = 'MX'; // Default
 
     async function initPortal() {
