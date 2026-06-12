@@ -466,7 +466,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/utils.js?v=4"></script>
   <script>
-    const _supabase = supabase.createClient('https://awuhvewotmwelurmjvmu.supabase.co', 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq');
+    const _supabase = supabase.createClient('https://awuhvewotmwelurmjvmu.supabase.co', 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq', { auth: { storageKey: window.location.href.includes('.seller.html') || window.location.href.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token', multiTab: false } });
 
     function normalizeText(str) {
       return (str || '').trim().toLowerCase()
@@ -536,7 +536,7 @@
             .from('company_invoices')
             .select('po_id, pdf_url, xml_url, invoice_number')
             .in('po_id', poIds);
-          
+
           invoiceMap = (invoices || []).reduce((acc, i) => ({ ...acc, [i.po_id]: i }), {});
         }
 
@@ -624,21 +624,21 @@
               };
             }
           } else if (o.items) {
-             const itms = Array.isArray(o.items) ? o.items : [];
-             itms.forEach(it => {
-               const itemName = it.product_name || it.name;
-               if (!itemName) return;
-               const normName = normalizeText(itemName);
-               const keyName = itemName + (it.size ? `_${it.size}` : '');
-               itemsObj[keyName] = {
-                 displayName: itemName,
-                 quantity: it.qty || it.quantity || 1,
-                 sku: it.sku || sellerProductSkus[normName] || '-',
-                 sizes: it.sizes || (it.size ? { [it.size]: it.qty || it.quantity || 1 } : { 'Única': it.qty || it.quantity || 1 }),
-                 unit_price: it.unit_price || it.price || 0,
-                 logo_config: it.logo_config || null
-               };
-             });
+            const itms = Array.isArray(o.items) ? o.items : [];
+            itms.forEach(it => {
+              const itemName = it.product_name || it.name;
+              if (!itemName) return;
+              const normName = normalizeText(itemName);
+              const keyName = itemName + (it.size ? `_${it.size}` : '');
+              itemsObj[keyName] = {
+                displayName: itemName,
+                quantity: it.qty || it.quantity || 1,
+                sku: it.sku || sellerProductSkus[normName] || '-',
+                sizes: it.sizes || (it.size ? { [it.size]: it.qty || it.quantity || 1 } : { 'Única': it.qty || it.quantity || 1 }),
+                unit_price: it.unit_price || it.price || 0,
+                logo_config: it.logo_config || null
+              };
+            });
           }
 
           let detailsHtml = `
@@ -655,21 +655,21 @@
                 </thead>
                 <tbody>
                   ${Object.entries(itemsObj).map(([key, item]) => {
-                    const name = item.displayName || key;
-                    const sizeBadges = Object.entries(item.sizes || {}).map(([sz, qty]) => `<span style="background: #F1F5F9; color: var(--color-navy); padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 0.75rem; margin-right: 0.4rem; white-space: nowrap;">${sz} (${qty})</span>`).join('');
-                    const baseGarmentImg = item.image || sellerProductImages[normalizeText(name)] || 'assets/placeholder.png';
+            const name = item.displayName || key;
+            const sizeBadges = Object.entries(item.sizes || {}).map(([sz, qty]) => `<span style="background: #F1F5F9; color: var(--color-navy); padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 0.75rem; margin-right: 0.4rem; white-space: nowrap;">${sz} (${qty})</span>`).join('');
+            const baseGarmentImg = item.image || sellerProductImages[normalizeText(name)] || 'assets/placeholder.png';
 
-                    let logoInfoHtml = '';
-                    if (item.logo_config) {
-                      const techLabel = item.logo_config.technique === 'bordado' ? '🧵 Bordado' : '🎨 Estampado';
-                      const dims = `${item.logo_config.width_cm || '?'} x ${item.logo_config.height_cm || '?'} cm`;
-                      const safeLogoUrl = item.logo_config.url || '';
-                      const safeTop = item.logo_config.preview_top_pct || '30%';
-                      const safeLeft = item.logo_config.preview_left_pct || '50%';
-                      const safeSize = item.logo_config.preview_size_px || 100;
-                      const safeContainerWidth = item.logo_config.container_width_px || 500;
+            let logoInfoHtml = '';
+            if (item.logo_config) {
+              const techLabel = item.logo_config.technique === 'bordado' ? '🧵 Bordado' : '🎨 Estampado';
+              const dims = `${item.logo_config.width_cm || '?'} x ${item.logo_config.height_cm || '?'} cm`;
+              const safeLogoUrl = item.logo_config.url || '';
+              const safeTop = item.logo_config.preview_top_pct || '30%';
+              const safeLeft = item.logo_config.preview_left_pct || '50%';
+              const safeSize = item.logo_config.preview_size_px || 100;
+              const safeContainerWidth = item.logo_config.container_width_px || 500;
 
-                      logoInfoHtml = `
+              logoInfoHtml = `
                         <div style="margin-top: 6px; display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; flex-wrap: wrap;">
                           <span style="background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.2); color: var(--color-cyan); padding: 2px 6px; border-radius: 6px; font-weight: 700;">${techLabel}</span>
                           <span style="color: #64748B; font-weight: 600; display: inline-flex; align-items: center; gap: 2px;">📐 ${dims}</span>
@@ -684,9 +684,9 @@
                           ` : ''}
                         </div>
                       `;
-                    }
+            }
 
-                    return `
+            return `
                       <tr style="border-bottom: 1px solid #F1F5F9;">
                         <td style="padding: 12px; font-weight: 700; color: var(--color-navy); text-align: left;">
                           <div style="font-weight: 800; color: var(--color-navy);">${name}</div>
@@ -700,7 +700,7 @@
                         </td>
                       </tr>
                     `;
-                  }).join('')}
+          }).join('')}
                 </tbody>
               </table>
             </div>
@@ -730,34 +730,34 @@
                        <button class="btn-step" onclick="advanceStep('${o.id}', '${o.status}', ${o.isQuote ? "'quote'" : "'po'"})">
                          Pasar a ${PRODUCTION_STEPS[currentStepIndex + 1].label}
                        </button>
-                     ` : (o.invoice ? 
-                         `<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem;">
+                     ` : (o.invoice ?
+              `<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem;">
                             <span style="color: #10B981; font-weight: 800; font-size: 0.75rem;">✓ COMPLETADA</span>
                             <a href="${o.invoice.pdf_url}" target="_blank" style="color: var(--color-cyan); font-weight: 700; font-size: 0.75rem; text-decoration: none;">📄 Ver Factura</a>
-                          </div>` 
-                         : 
-                         `<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem;">
+                          </div>`
+              :
+              `<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem;">
                             <span style="color: #10B981; font-weight: 800; font-size: 0.75rem;">✓ COMPLETADA</span>
                             <button onclick='openInvoiceModal(${JSON.stringify(o).replace(/'/g, "&apos;")})' style="background: #10B981; color: white; padding: 0.3rem 0.6rem; font-size: 0.7rem; font-weight: 700; border-radius: 6px; border: none; cursor: pointer;">Subir Factura</button>
                           </div>`
-                     )}
+            )}
                    </div>
                 </div>
               </div>
 
               <div class="steps-container">
                 ${PRODUCTION_STEPS.map((step, idx) => {
-            let statusClass = '';
-            if (idx < currentStepIndex) statusClass = 'completed';
-            else if (idx === currentStepIndex) statusClass = 'active';
+              let statusClass = '';
+              if (idx < currentStepIndex) statusClass = 'completed';
+              else if (idx === currentStepIndex) statusClass = 'active';
 
-            return `
+              return `
                     <div class="step-item ${statusClass}" onclick="updateToStep('${o.id}', '${step.id}', ${o.isQuote ? "'quote'" : "'po'"})">
                       <div class="step-label">${step.label}</div>
                       <div class="step-bar"></div>
                     </div>
                   `;
-          }).join('')}
+            }).join('')}
               </div>
               
               ${detailsHtml}
@@ -931,57 +931,86 @@
       <div id="visualRefMeta"
         style="margin-top: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; background: #F8FAFC; padding: 1rem; border-radius: 12px; border: 1px solid #E2E8F0; text-align: left; font-size: 0.8rem;">
         <div>
-          <span style="color: #64748B; font-weight: 600; text-transform: uppercase; font-size: 0.65rem; display: block; letter-spacing: 0.05em;">Técnica</span>
+          <span
+            style="color: #64748B; font-weight: 600; text-transform: uppercase; font-size: 0.65rem; display: block; letter-spacing: 0.05em;">Técnica</span>
           <span id="visualRefTechnique" style="font-weight: 700; color: #0F172A;">Bordado</span>
         </div>
         <div>
-          <span style="color: #64748B; font-weight: 600; text-transform: uppercase; font-size: 0.65rem; display: block; letter-spacing: 0.05em;">Dimensiones Aprox.</span>
+          <span
+            style="color: #64748B; font-weight: 600; text-transform: uppercase; font-size: 0.65rem; display: block; letter-spacing: 0.05em;">Dimensiones
+            Aprox.</span>
           <span id="visualRefDims" style="font-weight: 700; color: #0F172A;">10 x 5 cm</span>
         </div>
       </div>
     </div>
   </div>
   <!-- Modal Emitir Factura Seller -->
-  <div class="modal-backdrop" id="modalFacturaSeller" style="display: none; position: fixed; inset: 0; background: rgba(2, 6, 23, 0.8); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 10000;">
-    <div class="modal-box" style="background: white; border: 1px solid #E2E8F0; border-radius: 1rem; width: 500px; max-width: 90%; padding: 2rem;">
-      <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-        <div class="modal-title" style="font-family: var(--font-family-heading); font-size: 1.25rem; font-weight: 800; color: #0F172A;">Subir Factura Oficial</div>
-        <button onclick="closeInvoiceModal()" style="background: none; border: none; font-size: 1.25rem; color: #94A3B8; cursor: pointer;">✕</button>
+  <div class="modal-backdrop" id="modalFacturaSeller"
+    style="display: none; position: fixed; inset: 0; background: rgba(2, 6, 23, 0.8); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 10000;">
+    <div class="modal-box"
+      style="background: white; border: 1px solid #E2E8F0; border-radius: 1rem; width: 500px; max-width: 90%; padding: 2rem;">
+      <div class="modal-header"
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div class="modal-title"
+          style="font-family: var(--font-family-heading); font-size: 1.25rem; font-weight: 800; color: #0F172A;">Subir
+          Factura Oficial</div>
+        <button onclick="closeInvoiceModal()"
+          style="background: none; border: none; font-size: 1.25rem; color: #94A3B8; cursor: pointer;">✕</button>
       </div>
 
-      <div style="background: #F8FAFC; border-left: 3px solid var(--color-cyan); padding: 1rem; margin-bottom: 1.5rem; border-radius: 0 0.5rem 0.5rem 0;">
+      <div
+        style="background: #F8FAFC; border-left: 3px solid var(--color-cyan); padding: 1rem; margin-bottom: 1.5rem; border-radius: 0 0.5rem 0.5rem 0;">
         <span style="font-size:0.8rem; color:#64748B; display:block;">Cliente:</span>
         <strong id="m-inv-client" style="color:#0F172A;"></strong><br>
         <span style="font-size:0.8rem; color:#64748B; display:block; margin-top:0.5rem;">NIT/RFC:</span>
         <strong id="m-inv-tax" style="color:#0F172A;"></strong><br>
         <span style="font-size:0.8rem; color:#64748B; display:block; margin-top:0.5rem;">Orden / Monto:</span>
-        <strong id="m-inv-order" style="color:#0F172A;"></strong> | <strong id="m-inv-amount" style="color:var(--color-cyan);"></strong>
+        <strong id="m-inv-order" style="color:#0F172A;"></strong> | <strong id="m-inv-amount"
+          style="color:var(--color-cyan);"></strong>
       </div>
 
       <div style="margin-bottom: 1rem;">
-        <label style="display: block; font-size: 0.8rem; color: #64748B; font-weight: 600; margin-bottom: 0.4rem;">Folio / Número de Factura *</label>
-        <input type="text" id="f-inv-num" style="width: 100%; padding: 0.75rem; border: 1px solid #CBD5E1; border-radius: 0.5rem; font-family: inherit;" placeholder="Ej: F-1002">
+        <label style="display: block; font-size: 0.8rem; color: #64748B; font-weight: 600; margin-bottom: 0.4rem;">Folio
+          / Número de Factura *</label>
+        <input type="text" id="f-inv-num"
+          style="width: 100%; padding: 0.75rem; border: 1px solid #CBD5E1; border-radius: 0.5rem; font-family: inherit;"
+          placeholder="Ej: F-1002">
       </div>
 
       <div style="margin-bottom: 1.5rem;">
-        <label style="display: block; font-size: 0.8rem; color: #64748B; font-weight: 600; margin-bottom: 0.4rem;">Archivo PDF (Obligatorio) *</label>
-        <div style="border: 2px dashed #CBD5E1; border-radius: 0.5rem; padding: 1.5rem; text-align: center; position: relative; cursor: pointer;" onmouseover="this.style.borderColor='var(--color-cyan)'" onmouseout="this.style.borderColor='#CBD5E1'">
-          <input type="file" id="f-inv-pdf" accept="application/pdf" onchange="handleInvoiceFile('pdf', event)" style="position: absolute; inset: 0; opacity: 0; cursor: pointer;">
-          <span id="name-inv-pdf" style="color: #64748B; font-size: 0.9rem; font-weight: 500;">Haz clic o arrastra tu PDF aquí</span>
+        <label
+          style="display: block; font-size: 0.8rem; color: #64748B; font-weight: 600; margin-bottom: 0.4rem;">Archivo
+          PDF (Obligatorio) *</label>
+        <div
+          style="border: 2px dashed #CBD5E1; border-radius: 0.5rem; padding: 1.5rem; text-align: center; position: relative; cursor: pointer;"
+          onmouseover="this.style.borderColor='var(--color-cyan)'" onmouseout="this.style.borderColor='#CBD5E1'">
+          <input type="file" id="f-inv-pdf" accept="application/pdf" onchange="handleInvoiceFile('pdf', event)"
+            style="position: absolute; inset: 0; opacity: 0; cursor: pointer;">
+          <span id="name-inv-pdf" style="color: #64748B; font-size: 0.9rem; font-weight: 500;">Haz clic o arrastra tu
+            PDF aquí</span>
         </div>
       </div>
 
       <div style="margin-bottom: 1.5rem;">
-        <label style="display: block; font-size: 0.8rem; color: #64748B; font-weight: 600; margin-bottom: 0.4rem;">Archivo XML (Opcional para CFDI/DIAN)</label>
-        <div style="border: 2px dashed #CBD5E1; border-radius: 0.5rem; padding: 1.5rem; text-align: center; position: relative; cursor: pointer;" onmouseover="this.style.borderColor='var(--color-cyan)'" onmouseout="this.style.borderColor='#CBD5E1'">
-          <input type="file" id="f-inv-xml" accept="application/xml,text/xml" onchange="handleInvoiceFile('xml', event)" style="position: absolute; inset: 0; opacity: 0; cursor: pointer;">
-          <span id="name-inv-xml" style="color: #64748B; font-size: 0.9rem; font-weight: 500;">Haz clic o arrastra tu XML aquí</span>
+        <label
+          style="display: block; font-size: 0.8rem; color: #64748B; font-weight: 600; margin-bottom: 0.4rem;">Archivo
+          XML (Opcional para CFDI/DIAN)</label>
+        <div
+          style="border: 2px dashed #CBD5E1; border-radius: 0.5rem; padding: 1.5rem; text-align: center; position: relative; cursor: pointer;"
+          onmouseover="this.style.borderColor='var(--color-cyan)'" onmouseout="this.style.borderColor='#CBD5E1'">
+          <input type="file" id="f-inv-xml" accept="application/xml,text/xml" onchange="handleInvoiceFile('xml', event)"
+            style="position: absolute; inset: 0; opacity: 0; cursor: pointer;">
+          <span id="name-inv-xml" style="color: #64748B; font-size: 0.9rem; font-weight: 500;">Haz clic o arrastra tu
+            XML aquí</span>
         </div>
       </div>
 
       <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
-        <button onclick="closeInvoiceModal()" style="background: white; color: #64748B; border: 1px solid #CBD5E1; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">Cancelar</button>
-        <button id="btn-save-inv" onclick="saveInvoiceSeller()" style="background: var(--color-cyan); color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">Subir Factura</button>
+        <button onclick="closeInvoiceModal()"
+          style="background: white; color: #64748B; border: 1px solid #CBD5E1; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">Cancelar</button>
+        <button id="btn-save-inv" onclick="saveInvoiceSeller()"
+          style="background: var(--color-cyan); color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">Subir
+          Factura</button>
       </div>
     </div>
   </div>
@@ -990,7 +1019,7 @@
     let invoiceActivePo = null;
     let invoiceFiles = { pdf: null, xml: null };
 
-    window.openInvoiceModal = function(po) {
+    window.openInvoiceModal = function (po) {
       invoiceActivePo = po;
       document.getElementById('m-inv-client').textContent = po.company_profile?.company_name || 'Desconocido';
       document.getElementById('m-inv-tax').textContent = po.company_profile?.tax_id || 'No registrado';
@@ -1007,26 +1036,26 @@
       document.getElementById('modalFacturaSeller').style.display = 'flex';
     };
 
-    window.closeInvoiceModal = function() {
+    window.closeInvoiceModal = function () {
       document.getElementById('modalFacturaSeller').style.display = 'none';
       invoiceActivePo = null;
     };
 
-    window.handleInvoiceFile = function(type, event) {
+    window.handleInvoiceFile = function (type, event) {
       const f = event.target.files[0];
       if (!f) return;
       invoiceFiles[type] = f;
       document.getElementById(`name-inv-${type}`).textContent = f.name;
     };
 
-    window.saveInvoiceSeller = async function() {
+    window.saveInvoiceSeller = async function () {
       if (!invoiceActivePo) return;
       const invNum = document.getElementById('f-inv-num').value.trim();
       if (!invNum) return alert('Por favor, ingresa el Folio o Número de Factura.');
       if (!invoiceFiles.pdf) return alert('El archivo PDF es obligatorio.');
 
       const btn = document.getElementById('btn-save-inv');
-      btn.disabled = true; 
+      btn.disabled = true;
       btn.textContent = 'Subiendo...';
 
       try {
@@ -1073,7 +1102,7 @@
         console.error(err);
         alert('Hubo un error al subir la factura: ' + err.message);
       } finally {
-        btn.disabled = false; 
+        btn.disabled = false;
         btn.textContent = 'Subir Factura';
       }
     };
