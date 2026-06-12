@@ -654,7 +654,7 @@
   <script>
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: window.location.href.includes('.seller.html') || window.location.href.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token', multiTab: false } });
 
     function normalizeText(str) {
       return (str || '').trim().toLowerCase()
@@ -725,9 +725,7 @@
       const { data: { session } } = await _supabase.auth.getSession();
       if (!session || !session.user || !session.user.id || session.user.id === 'undefined') {
         console.warn("No active seller session or invalid user ID.");
-        if (body) {
-          body.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 3rem; color: var(--color-text-muted); font-size: 0.9rem;">No tiene cotizaciones pendientes por confirmar</td></tr>`;
-        }
+        window.location.href = 'login.seller.html';
         return;
       }
       const sellerId = session.user.id;
