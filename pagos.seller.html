@@ -1000,10 +1000,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/utils.js?v=4"></script>
   <script>
-    const _supabase = supabase.createClient(
-      'https://awuhvewotmwelurmjvmu.supabase.co',
-      'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq'
-    );
+    const _supabase = supabase.createClient('https://awuhvewotmwelurmjvmu.supabase.co', 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq', { auth: { storageKey: window.location.href.includes('.seller.html') || window.location.href.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token', multiTab: false } });
 
     let currentTab = 'pending';
     let allData = { pending: [], partial: [], paid: [] };
