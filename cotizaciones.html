@@ -1098,7 +1098,23 @@
         // 1. Populate Active (Pending from Seller)
         const activeQuotes = rawAutomatic.filter(q => {
           const status = (q.status || '').trim().toLowerCase();
-          return status !== 'approved' && status !== 'aprobada' && status !== 'cotizada' && status !== 'cotizado';
+          
+          let allQuoted = true;
+          if (q.sizes && q.sizes.items) {
+             const items = q.sizes.items;
+             if (Array.isArray(items)) {
+                 allQuoted = items.every(it => (it.unit_price || it.price || 0) > 0);
+             } else {
+                 allQuoted = Object.values(items).every(it => (it.unit_price || it.price || 0) > 0);
+             }
+          } else {
+             allQuoted = (q.unit_price || q.price || 0) > 0;
+          }
+
+          if (status === 'approved' || status === 'aprobada') return false;
+          if (!allQuoted) return true;
+          
+          return status !== 'cotizada' && status !== 'cotizado';
         });
 
         // 2. Fetch history from company_quotes_requests instead of seller_quotes
@@ -1111,7 +1127,20 @@
             .in('status', ['cotizada', 'aprobada'])
             .order('created_at', { ascending: false });
 
-          const historyQuotesRaw = historyData || [];
+          const historyQuotesRaw = (historyData || []).filter(q => {
+            let allQuoted = true;
+            if (q.sizes && q.sizes.items) {
+               const items = q.sizes.items;
+               if (Array.isArray(items)) {
+                   allQuoted = items.every(it => (it.unit_price || it.price || 0) > 0);
+               } else {
+                   allQuoted = Object.values(items).every(it => (it.unit_price || it.price || 0) > 0);
+               }
+            } else {
+               allQuoted = (q.unit_price || q.price || 0) > 0;
+            }
+            return allQuoted;
+          });
 
           // Using global sellerMap pre-fetched at the beginning of the function
 
