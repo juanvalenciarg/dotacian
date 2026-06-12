@@ -339,8 +339,6 @@ function setupAutoLogout() {
 }
 
 // Admin Leads Badge
-const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-const isSellerContext = window.location.href.includes('.seller.html') || window.location.href.includes('seller');
 document.addEventListener('DOMContentLoaded', () => {
   if (window.location.pathname.includes('admin') && !window.location.pathname.includes('login')) {
     setTimeout(async () => {
@@ -349,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
           let localSupa = window._supabase;
           if (!localSupa) {
-            localSupa = supabase.createClient('https://awuhvewotmwelurmjvmu.supabase.co', SUPABASE_ANON_KEY, { auth: { storageKey: 'dotacian-client-token', multiTab: false } });
+            localSupa = supabase.createClient('https://awuhvewotmwelurmjvmu.supabase.co', 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq', { auth: { storageKey: 'dotacian-client-token', multiTab: false } });
           }
           
           const { count, error } = await localSupa
@@ -385,3 +383,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1200); // Give Supabase time to initialize
   }
 });
+
