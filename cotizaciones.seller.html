@@ -880,7 +880,6 @@
             <td>
               <div style="font-weight: 700; color: var(--color-navy); font-size: 0.9rem;">${q.company_profile?.company_name || 'Desconocida'}</div>
               ${q.company_profile?.legal_name ? `<div style="font-size: 0.75rem; color: #64748B; font-weight: 500; margin-top: 2px;">${q.company_profile.legal_name}</div>` : ''}
-              ${q.company_profile?.tax_id ? `<div style="font-size: 0.7rem; color: var(--color-cyan); font-weight: 600; font-family: monospace; margin-top: 2px;">ID Fiscal: ${q.company_profile.tax_id}${q.company_profile.dv ? `-${q.company_profile.dv}` : ''}</div>` : ''}
             </td>
             <td style="color: #64748B; font-weight: 500;">${date}</td>
             <td>${statusBadge}</td>
@@ -1410,7 +1409,6 @@
             <td>
               <div style="font-weight: 700; color: var(--color-navy); font-size: 0.9rem;">${compName}</div>
               ${legalName ? `<div style="font-size: 0.75rem; color: #64748B; font-weight: 500; margin-top: 2px;">${legalName}</div>` : ''}
-              ${taxId ? `<div style="font-size: 0.7rem; color: var(--color-cyan); font-weight: 600; font-family: monospace; margin-top: 2px;">ID Fiscal: ${taxId}${dv ? `-${dv}` : ''}</div>` : ''}
             </td>
             <td style="color: #64748B; font-weight: 500;">${date}<br><div style="margin-top:4px;">${statusBadge}</div></td>
             <td style="font-weight: 700; color: var(--color-navy);">${formatCurrency(total)}</td>
