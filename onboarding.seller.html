@@ -570,7 +570,7 @@
     <header class="ob-header">
       <div class="ob-logo">
         <a href="index.html">
-          <img src="assets/logos/logo_dotacian.png" alt="dotacian seller">
+          <img src="assets/logos/logo_dotacian.seller_original.png" alt="dotacian seller">
         </a>
       </div>
     </header>
@@ -830,7 +830,7 @@
     // Supabase
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: window.location.href.includes('.seller.html') || window.location.href.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token', multiTab: false } });
 
     window.onload = () => {
       triggerChatStep(0);
