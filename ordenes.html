@@ -1195,7 +1195,7 @@
           } catch (e) {
             console.warn("Error getting count of POs", e);
           }
-          const poNumber = 'PO-' + String(countPOs + 1).padStart(7, '0');
+          const poNumber = 'PO-' + String(countPOs + 1).padStart(7, '0') + '-' + Math.floor(1000 + Math.random() * 9000);
 
           // Normalize items for the PO
           const orderItems = [];
@@ -1345,7 +1345,7 @@
           } catch (e) {
             console.warn("Error getting count of POs", e);
           }
-          const poNumber = 'PO-' + String(countPOs + 1).padStart(7, '0');
+          const poNumber = 'PO-' + String(countPOs + 1).padStart(7, '0') + '-' + Math.floor(1000 + Math.random() * 9000);
 
           // Insert into company_purchase_orders
           const { error: poErr } = await _supabase
@@ -1893,7 +1893,7 @@
     if (typeof window._supabase === 'undefined') {
       window.SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
       window.SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-      window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token' } });
+      window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token', multiTab: false } });
     }
   </script>
   <script src="assets/js/utils.js?v=4"></script>
