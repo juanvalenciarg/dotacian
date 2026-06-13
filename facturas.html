@@ -351,33 +351,48 @@
       </div>
 
       <div class="content-wrapper">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: -1.5rem; position: relative; z-index: 10; margin-bottom: 2rem;">
-          
+        <div
+          style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: -1.5rem; position: relative; z-index: 10; margin-bottom: 2rem;">
+
           <!-- Card SaaS -->
           <div class="app-card" style="margin-top: 0;">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
               <div>
-                <h2 style="font-family: var(--font-family-heading); font-size: 1.15rem; margin-bottom: 0.25rem; color: var(--color-navy);">Licencia SaaS</h2>
-                <p style="color: var(--color-text-secondary); font-size: 0.85rem; margin: 0;">Proyección del mes en curso</p>
+                <h2
+                  style="font-family: var(--font-family-heading); font-size: 1.15rem; margin-bottom: 0.25rem; color: var(--color-navy);">
+                  Licencia SaaS</h2>
+                <p style="color: var(--color-text-secondary); font-size: 0.85rem; margin: 0;">Proyección del mes en
+                  curso</p>
               </div>
               <div style="background: #E0F2FE; color: #0284C7; padding: 0.5rem; border-radius: 0.75rem;">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
               </div>
             </div>
-            
+
             <div id="saas-loading" style="padding: 2rem 0; text-align: center;">
-              <div class="spinner-sm" style="width: 24px; height: 24px; border: 3px solid #E2E8F0; border-top-color: var(--color-cyan); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+              <div class="spinner-sm"
+                style="width: 24px; height: 24px; border: 3px solid #E2E8F0; border-top-color: var(--color-cyan); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;">
+              </div>
             </div>
-            
+
             <div id="saas-content" style="display: none;">
               <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.5rem;">
-                <span id="saas-total-current" style="font-family: var(--font-family-heading); font-size: 2.25rem; font-weight: 800; color: var(--color-cyan); line-height: 1;">$0.00</span>
-                <span id="saas-currency" style="font-size: 0.875rem; color: var(--color-text-secondary); font-weight: 500; text-transform: uppercase;">MXN (A la fecha)</span>
+                <span id="saas-total-current"
+                  style="font-family: var(--font-family-heading); font-size: 2.25rem; font-weight: 800; color: var(--color-cyan); line-height: 1;">$0.00</span>
+                <span id="saas-currency"
+                  style="font-size: 0.875rem; color: var(--color-text-secondary); font-weight: 500; text-transform: uppercase;">MXN
+                  (A la fecha)</span>
               </div>
               <div style="margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--color-text-secondary);">
-                Proyección fin de mes: <strong id="saas-total-projected" style="color: var(--color-navy);">$0.00 MXN</strong>
+                Proyección fin de mes: <strong id="saas-total-projected" style="color: var(--color-navy);">$0.00
+                  MXN</strong>
               </div>
-              
+
               <div style="border-top: 1px solid #E2E8F0; padding-top: 1rem; margin-bottom: 0.5rem;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
                   <span style="color: var(--color-text-secondary);">Usuarios base activos:</span>
@@ -394,29 +409,39 @@
               </div>
             </div>
           </div>
-          
+
           <!-- Card Uniforms -->
           <div class="app-card" style="margin-top: 0;">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
               <div>
-                <h2 style="font-family: var(--font-family-heading); font-size: 1.15rem; margin-bottom: 0.25rem; color: var(--color-navy);">Uniformes Generados</h2>
-                <p style="color: var(--color-text-secondary); font-size: 0.85rem; margin: 0;">Cotizaciones / Entregas del mes</p>
+                <h2
+                  style="font-family: var(--font-family-heading); font-size: 1.15rem; margin-bottom: 0.25rem; color: var(--color-navy);">
+                  Uniformes Generados</h2>
+                <p style="color: var(--color-text-secondary); font-size: 0.85rem; margin: 0;">Cotizaciones / Entregas
+                  del mes</p>
               </div>
               <div style="background: #FEF3C7; color: #D97706; padding: 0.5rem; border-radius: 0.75rem;">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
+                </svg>
               </div>
             </div>
-            
+
             <div id="uniforms-loading" style="padding: 2rem 0; text-align: center;">
-              <div class="spinner-sm" style="width: 24px; height: 24px; border: 3px solid #E2E8F0; border-top-color: var(--color-cyan); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+              <div class="spinner-sm"
+                style="width: 24px; height: 24px; border: 3px solid #E2E8F0; border-top-color: var(--color-cyan); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;">
+              </div>
             </div>
-            
+
             <div id="uniforms-content" style="display: none;">
               <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1.5rem;">
-                <span id="uniforms-total" style="font-family: var(--font-family-heading); font-size: 2.25rem; font-weight: 800; color: var(--color-navy); line-height: 1;">$0.00</span>
-                <span id="uniforms-currency" style="font-size: 0.875rem; color: var(--color-text-secondary); font-weight: 500; text-transform: uppercase;">MXN</span>
+                <span id="uniforms-total"
+                  style="font-family: var(--font-family-heading); font-size: 2.25rem; font-weight: 800; color: var(--color-navy); line-height: 1;">$0.00</span>
+                <span id="uniforms-currency"
+                  style="font-size: 0.875rem; color: var(--color-text-secondary); font-weight: 500; text-transform: uppercase;">MXN</span>
               </div>
-              
+
               <div style="border-top: 1px solid #E2E8F0; padding-top: 1rem; margin-bottom: 0.5rem;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
                   <span style="color: var(--color-text-secondary);">Cotizaciones procesadas:</span>
@@ -429,7 +454,7 @@
               </div>
             </div>
           </div>
-          
+
         </div>
 
         <div class="app-card" style="position: relative; z-index: 10;">
@@ -500,7 +525,7 @@
           .from('company_employees')
           .select('created_at, role_status, status_updated_at')
           .eq('company_id', companyId);
-          
+
         if (empError) throw empError;
 
         let activeCount = 0;
@@ -511,9 +536,9 @@
         (employees || []).forEach(emp => {
           const createdAt = new Date(emp.created_at);
           const isActive = emp.role_status === 'active' || !emp.role_status;
-          
+
           let startDate = createdAt > startOfMonth ? createdAt : startOfMonth;
-          let endDateCurrent = now; 
+          let endDateCurrent = now;
           let endDateProjected = endOfMonth;
 
           if (!isActive) {
@@ -522,10 +547,10 @@
               if (deactivatedAt >= startOfMonth) {
                 endDateCurrent = deactivatedAt < now ? deactivatedAt : now;
                 endDateProjected = deactivatedAt;
-                
+
                 const diffTimeCurrent = Math.max(0, endDateCurrent - startDate);
                 const diffTimeProjected = Math.max(0, endDateProjected - startDate);
-                
+
                 totalProratedDaysCurrent += Math.ceil(diffTimeCurrent / (1000 * 60 * 60 * 24));
                 totalProratedDaysProjected += Math.ceil(diffTimeProjected / (1000 * 60 * 60 * 24));
                 proratedInactiveCount++;
@@ -546,20 +571,24 @@
         const currencyCode = isColombia ? 'COP' : 'MXN';
 
         // Curva de precios
-        const totalEquivalentUsersCurrent = totalProratedDaysCurrent / daysInMonth; 
-        const totalEquivalentUsersProjected = totalProratedDaysProjected / daysInMonth; 
-        
+        const totalEquivalentUsersCurrent = totalProratedDaysCurrent / daysInMonth;
+        const totalEquivalentUsersProjected = totalProratedDaysProjected / daysInMonth;
+
         let rate = 0;
-        if (activeCount > 0 || totalEquivalentUsersProjected > 0) {
+        let totalSaasCostCurrent = 0;
+        let totalSaasCostProjected = 0;
+        const effectiveUsers = Math.max(activeCount, totalEquivalentUsersProjected);
+
+        if (effectiveUsers > 5) {
           const k = Math.log(4) / Math.log(400);
           const A = 2.0 * Math.pow(5, k);
-          const rateUSD = A / Math.pow(Math.max(5, activeCount > 0 ? activeCount : totalEquivalentUsersProjected), k); 
+          const rateUSD = A / Math.pow(effectiveUsers, k);
           const rateMultiplier = isColombia ? 4000 : 20; // COP/MXN
           rate = rateUSD * rateMultiplier;
-        }
 
-        const totalSaasCostCurrent = totalEquivalentUsersCurrent * rate;
-        const totalSaasCostProjected = totalEquivalentUsersProjected * rate;
+          totalSaasCostCurrent = totalEquivalentUsersCurrent * rate;
+          totalSaasCostProjected = totalEquivalentUsersProjected * rate;
+        }
 
         document.getElementById('saas-total-current').textContent = formatCurrency(totalSaasCostCurrent, userCountry);
         document.getElementById('saas-currency').textContent = currencyCode + ' (A la fecha)';
@@ -582,10 +611,19 @@
           .from('company_quotes_requests')
           .select('*')
           .eq('company_id', companyId)
-          .eq('status', 'approved')
+          .eq('status', 'aprobada')
           .gte('created_at', startOfMonth.toISOString());
 
         if (quotesError) throw quotesError;
+
+        // También obtener las órdenes de compra del mes
+        const { data: pos, error: posError } = await _supabase
+          .from('company_purchase_orders')
+          .select('*')
+          .eq('company_id', companyId)
+          .gte('created_at', startOfMonth.toISOString());
+
+        if (posError) throw posError;
 
         let totalUniformsCost = 0;
         let totalItemsCount = 0;
@@ -601,7 +639,26 @@
               if (Array.isArray(parsedItems)) {
                 totalItemsCount += parsedItems.reduce((acc, it) => acc + (parseInt(it.qty) || 1), 0);
               }
-            } catch(e) {}
+            } catch (e) { }
+          }
+        });
+
+        (pos || []).forEach(po => {
+          // Evitar doble conteo si la PO viene de una cotización ya aprobada (que ya sumamos arriba)
+          if (po.quote_ids && po.quote_ids.length > 0) return;
+
+          totalUniformsCost += parseFloat(po.total_amount) || 0;
+          quotesCount++; // Contar esta PO como una "cotización/orden" procesada
+
+          if (po.items && Array.isArray(po.items)) {
+            totalItemsCount += po.items.reduce((acc, it) => acc + (parseInt(it.quantity || it.qty) || 1), 0);
+          } else if (typeof po.items === 'string') {
+            try {
+              const parsedItems = JSON.parse(po.items);
+              if (Array.isArray(parsedItems)) {
+                totalItemsCount += parsedItems.reduce((acc, it) => acc + (parseInt(it.quantity || it.qty) || 1), 0);
+              }
+            } catch (e) { }
           }
         });
 
@@ -634,7 +691,7 @@
           .order('created_at', { ascending: false });
 
         if (error) throw error;
-        
+
         data = data || [];
 
         // Inyectar factura de ejemplo de Mayo
@@ -676,7 +733,7 @@
             // Check if PO is paid (has final payment proof) or is completed
             let isPaid = false;
             let finalPaymentProofUrl = '';
-            
+
             const quoteId = po.quote_ids && po.quote_ids[0];
             const quote = quoteId ? quotesMap[quoteId] : null;
 
@@ -686,7 +743,7 @@
             if (!finalPaymentProofUrl && po.items && po.items[0] && po.items[0].final_payment_proof_url) {
               finalPaymentProofUrl = po.items[0].final_payment_proof_url;
             }
-            
+
             if (finalPaymentProofUrl || po.status === 'completed') {
               // check if it's already invoiced
               const hasInvoice = data.find(inv => inv.po_id === po.id);
@@ -795,12 +852,12 @@
 
     async function requestInvoice(poId) {
       // Stub function to handle invoice request
-      if(typeof showToast === 'function') {
+      if (typeof showToast === 'function') {
         showToast('Solicitud Enviada', 'Se ha solicitado la facturación para esta orden de compra.');
       } else {
         alert('Se ha solicitado la facturación para esta orden de compra.');
       }
-      
+
       // In a real scenario, this would call a Supabase function or insert into a table
       // Example:
       // await _supabase.from('invoice_requests').insert({ po_id: poId, company_id: session.user.id });
