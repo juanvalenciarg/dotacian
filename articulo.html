@@ -213,7 +213,7 @@
   <footer
     style="background: #0F172A; color: white; padding: 4rem 2rem 2rem 2rem; text-align: center; margin-top: 4rem;">
     <div style="max-width: 1200px; margin: 0 auto;">
-      <img src="assets/logos/logo_dotacian_admin.png" alt="Dotacian" style="height: 40px; margin-bottom: 1.5rem;">
+      <img src="assets/logos/logo_dotacian.png" alt="Dotacian" style="height: 40px; margin-bottom: 1.5rem;">
       <p style="color: rgba(255,255,255,0.6); font-size: 0.875rem;">© 2026 Dotacian. Todos los derechos reservados.</p>
     </div>
   </footer>
@@ -268,6 +268,27 @@
         if (error || !post) {
           throw error || new Error("Not found");
         }
+
+        // --- View Tracking Logic ---
+        const viewKey = `viewed_article_${post.id}`;
+        const hasViewed = localStorage.getItem(viewKey);
+        
+        let newTotal = (post.views_total || 0) + 1;
+        let newUnique = post.views_unique || 0;
+        
+        if (!hasViewed) {
+          newUnique += 1;
+          localStorage.setItem(viewKey, 'true');
+        }
+        
+        // Update without blocking page load
+        _supabaseBlog.from('blog_posts').update({
+           views_total: newTotal,
+           views_unique: newUnique
+        }).eq('id', post.id).then(({error}) => {
+           if(error) console.error("Error updating views", error);
+        });
+        // ---------------------------
 
         const dateObj = new Date(post.created_at);
         const dateString = dateObj.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
