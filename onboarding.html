@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="styles.css">
   <!-- SDKs & Utils -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/utils.js?v=4"></script>
 
   <style>
     /* =============================================
@@ -691,7 +691,7 @@
     // Supabase Configuration
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token', multiTab: false } });
 
     // Initial Trigger
     window.onload = () => {
@@ -840,9 +840,19 @@
         });
 
         if (authError) throw authError;
-        if (!authData.user) throw new Error('No se recibió información válida del usuario.');
 
-        userId = authData.user.id;
+        // Force sign in to establish local session
+        const { data: signInData, error: signInError } = await _supabase.auth.signInWithPassword({
+          email: email,
+          password: pass
+        });
+        
+        if (signInError) console.warn("Auto sign-in error:", signInError);
+
+        const currentUser = signInData?.user || authData.user;
+        if (!currentUser) throw new Error('No se recibió información válida del usuario.');
+
+        userId = currentUser.id;
 
         // Save to user_profile
         const profileData = {
