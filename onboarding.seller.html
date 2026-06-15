@@ -973,7 +973,17 @@
         });
 
         if (authError) throw authError;
-        userId = authData.user.id;
+
+        // Force sign in to establish local session
+        const { data: signInData, error: signInError } = await _supabase.auth.signInWithPassword({
+          email: email,
+          password: pass
+        });
+        
+        if (signInError) console.warn("Auto sign-in error:", signInError);
+
+        const currentUser = signInData?.user || authData.user;
+        userId = currentUser.id;
 
         // Upsert to seller_profile
         const { error: profileError } = await _supabase.from('seller_profile').upsert({
