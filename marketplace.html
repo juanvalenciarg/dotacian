@@ -630,6 +630,15 @@
         <p class="welcome-subtitle">Explora y solicita uniformes corporativos.</p>
       </div>
 
+      <div id="setup-warning-banner" style="display: none; background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 12px; padding: 1rem 1.5rem; margin: 1rem 2rem; align-items: center; gap: 1rem; color: #92400E; max-width: 1400px; margin-left: auto; margin-right: auto; width: calc(100% - 4rem);">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink: 0;">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <div style="font-weight: 500; font-size: 0.95rem;">
+          Finaliza la configuración de tu cuenta para explorar todas las opciones que tenemos para tu industria en el Marketplace.
+        </div>
+      </div>
+
       <div class="dashboard-content-wrapper">
         <div class="marketplace-container" style="padding: 0; max-width: 1400px; margin: 0 auto;">
           <div class="filter-section">
@@ -668,7 +677,7 @@
   <script>
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token' } });
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token', multiTab: false } });
 
     const subcategoryData = {
       limpieza: ['Filipinas', 'Pantalones', 'Batas', 'Cofias', 'Mandiles'],
@@ -733,6 +742,15 @@
 
         const ind = (industry || '').toLowerCase();
         currentIndustry = ind || 'all';
+
+        const warningBanner = document.getElementById('setup-warning-banner');
+        if (warningBanner) {
+          if (!industry) {
+            warningBanner.style.display = 'flex';
+          } else {
+            warningBanner.style.display = 'none';
+          }
+        }
 
         updateSubcategoryFilters();
         applyFilters();
