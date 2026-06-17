@@ -745,7 +745,7 @@
 
         const warningBanner = document.getElementById('setup-warning-banner');
         if (warningBanner) {
-          if (!industry) {
+          if (!industry || industry === 'Sector' || ind === 'sector') {
             warningBanner.style.display = 'flex';
           } else {
             warningBanner.style.display = 'none';
