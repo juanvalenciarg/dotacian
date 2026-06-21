@@ -1990,7 +1990,7 @@ ul {
   }
 
   .header-actions .country-select-wrapper,
-  .header-actions a:not(.btn) {
+  .header-actions a {
     display: none;
   }
 
@@ -2183,8 +2183,7 @@ ul {
     display: flex;
   }
 
-  .header-actions a:not(.btn),
-  .header-actions .btn-primary {
+  .header-actions a {
     display: none;
     /* Hide login and main CTA in header on small mobile */
   }
