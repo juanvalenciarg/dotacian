@@ -402,12 +402,16 @@
             style="background: white; padding: 0.5rem 1rem; border-radius: 1.25rem; border: 1px solid #E2E8F0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 0.75rem; cursor: pointer; transition: all 0.3s ease; position: relative;">
             <div id="badge-industry-icon"
               style="width: 32px; height: 32px; background: #F1F5F9; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--color-cyan); font-size: 1.2rem;">
-              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
             </div>
             <div style="display: flex; flex-direction: column;">
               <span id="admin-name-display"
                 style="font-weight: 700; color: #0F172A; font-size: 0.85rem; line-height: 1.2;">Administrador</span>
-              <span style="font-size: 0.65rem; color: #64748B; font-weight: 600; text-transform: uppercase;">Panel Admin</span>
+              <span style="font-size: 0.65rem; color: #64748B; font-weight: 600; text-transform: uppercase;">Panel
+                Admin</span>
             </div>
             <div style="margin-left: 0.25rem; color: #64748B;">
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -420,7 +424,8 @@
               <div class="popover-label">Usuario</div>
               <div id="pop-user-name" class="popover-value" style="font-size: 0.9rem;">Administrador</div>
               <div class="popover-label">Correo Electrónico</div>
-              <div id="pop-user-email" class="popover-value" style="margin-bottom: 0; font-size: 0.8rem;">Cargando...</div>
+              <div id="pop-user-email" class="popover-value" style="margin-bottom: 0; font-size: 0.8rem;">Cargando...
+              </div>
               <hr style="margin: 1rem 0; border: none; border-top: 1px solid #E2E8F0;">
               <a href="#" onclick="logoutUser(); return false;"
                 style="color: #EF4444; font-size: 0.85rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; transition: color 0.2s;">
@@ -441,10 +446,16 @@
         <!-- Vista de Gestión de Usuarios -->
         <div id="userManagementView">
           <!-- End Vista del Dashboard -->
-          <!-- Buscador -->
+          <!-- Buscador y Botón Nuevo -->
+          <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+            <button class="btn btn-glow" onclick="openNewClientModal()" style="background: var(--color-cyan); color: #080A10; border: none; padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+              Crear Nuevo Cliente
+            </button>
+          </div>
           <div class="search-container">
             <div class="search-input-group">
-              <label for="searchEmail">Buscar usuario por correo electrónico (para ver detalles completos)</label>
+              <label for="searchEmail">Buscar usuario por correo electrónico</label>
               <input type="email" id="searchEmail" class="search-input" placeholder="ejemplo@correo.com">
             </div>
             <button class="btn btn-primary" onclick="searchUser()" id="btnSearch">Buscar</button>
@@ -543,19 +554,27 @@
                   </div>
                   <div class="form-group">
                     <label>Cotizaciones Realizadas</label>
-                    <div id="viewQuotesCount" onclick="openDetailsModal('quotes')" style="font-weight: 700; color: var(--color-cyan); font-size: 1.1rem; cursor: pointer; text-decoration: underline;" title="Ver cotizaciones">0</div>
+                    <div id="viewQuotesCount" onclick="openDetailsModal('quotes')"
+                      style="font-weight: 700; color: var(--color-cyan); font-size: 1.1rem; cursor: pointer; text-decoration: underline;"
+                      title="Ver cotizaciones">0</div>
                   </div>
                   <div class="form-group">
                     <label>Órdenes de Compra</label>
-                    <div id="viewOrdersCount" onclick="openDetailsModal('orders')" style="font-weight: 700; color: var(--color-brand-primary); font-size: 1.1rem; cursor: pointer; text-decoration: underline;" title="Ver órdenes de compra">0</div>
+                    <div id="viewOrdersCount" onclick="openDetailsModal('orders')"
+                      style="font-weight: 700; color: var(--color-brand-primary); font-size: 1.1rem; cursor: pointer; text-decoration: underline;"
+                      title="Ver órdenes de compra">0</div>
                   </div>
                   <div class="form-group">
                     <label>Roles Activos</label>
-                    <div id="viewActiveRoles" onclick="openDetailsModal('roles')" style="font-weight: 700; color: var(--color-navy); font-size: 1.1rem; cursor: pointer; text-decoration: underline;" title="Ver roles activos">0</div>
+                    <div id="viewActiveRoles" onclick="openDetailsModal('roles')"
+                      style="font-weight: 700; color: var(--color-navy); font-size: 1.1rem; cursor: pointer; text-decoration: underline;"
+                      title="Ver roles activos">0</div>
                   </div>
                   <div class="form-group">
                     <label>No. Empleados Registrados</label>
-                    <div id="viewEmployeesCount" onclick="openDetailsModal('employees')" style="font-weight: 700; color: var(--color-navy); font-size: 1.1rem; cursor: pointer; text-decoration: underline;" title="Ver empleados">0</div>
+                    <div id="viewEmployeesCount" onclick="openDetailsModal('employees')"
+                      style="font-weight: 700; color: var(--color-navy); font-size: 1.1rem; cursor: pointer; text-decoration: underline;"
+                      title="Ver empleados">0</div>
                   </div>
                 </div>
               </div>
@@ -607,9 +626,37 @@
         <button onclick="closeDetailsModal()" style="background: none; border: none; cursor: pointer; color: #64748b; font-size: 1.5rem;">&times;</button>
       </div>
       <div id="details-modal-body" style="max-height: 500px; overflow-y: auto;">
-        <!-- Lista generada via JS -->
         <p style="text-align: center; color: #64748b;">Cargando...</p>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal Crear Nuevo Cliente -->
+  <div id="new-client-modal" class="modal-overlay" style="z-index: 10000;">
+    <div class="modal-content" style="max-width: 500px; width: 95%; background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #E2E8F0; padding-bottom: 1rem;">
+        <h2 style="font-size: 1.25rem; color: #0f172a; font-weight: 700; margin: 0; font-family: var(--font-family-heading, 'Outfit');">Nuevo Cliente</h2>
+        <button onclick="closeNewClientModal()" style="background: none; border: none; cursor: pointer; color: #64748b; font-size: 1.5rem;">&times;</button>
+      </div>
+      <form id="new-client-form" onsubmit="createNewClient(event)">
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label>Nombre</label>
+          <input type="text" id="newClientFirstName" class="form-control" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label>Apellido</label>
+          <input type="text" id="newClientLastName" class="form-control" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label>Correo Electrónico (Acceso)</label>
+          <input type="email" id="newClientEmail" class="form-control" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label>Contraseña Provisoria</label>
+          <input type="text" id="newClientPassword" class="form-control" minlength="6" required>
+        </div>
+        <button type="submit" id="btnCreateClient" class="btn btn-primary" style="width: 100%;">Crear Cliente</button>
+      </form>
     </div>
   </div>
 
@@ -619,7 +666,7 @@
   <script>
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: 'dotacian-client-token' } });
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: 'dotacian-client-token', multiTab: false } });
 
     let currentUserRecord = null;
     let currentUserType = null; // 'client' or 'seller'
@@ -694,7 +741,7 @@
             </td>
             <td><span class="role-badge ${roleClass}">${roleName}</span></td>
             <td><span style="font-weight: 600; color: #475569;">${user.country || 'N/A'}</span></td>
-            <td>${user.company_name}</td>
+            <td><span style="font-weight: 600; color: #0F172A;">${user.company_name || 'N/A'}</span></td>
             <td><span style="font-size: 0.875rem; background: #F1F5F9; padding: 0.25rem 0.5rem; border-radius: 0.25rem;">${user.industry || 'N/A'}</span></td>
             <td>${formatDateShort(user.created_at)}</td>
             <td>${formatDateShort(user.last_sign_in_at)}</td>
@@ -803,7 +850,7 @@
       if (data.role === 'client') {
         document.getElementById('viewActiveRoles').textContent = '...';
         document.getElementById('viewEmployeesCount').textContent = '...';
-        
+
         _supabase.from('role_definition')
           .select('*', { count: 'exact', head: true })
           .eq('company_id', data.user_id)
@@ -845,7 +892,7 @@
         country: country
       };
 
-      let table = currentUserType === 'client' ? 'user_profile' : 'seller_profile';
+      let table = currentUserType === 'client' ? 'company_user' : 'seller_profile';
 
       if (currentUserType === 'client') {
         updatePayload.nickname = document.getElementById('editNickname').value.trim();
@@ -956,7 +1003,7 @@
       const modal = document.getElementById('company-details-modal');
       const title = document.getElementById('details-modal-title');
       const body = document.getElementById('details-modal-body');
-      
+
       modal.classList.add('active');
       body.innerHTML = '<p style="text-align: center; color: #64748b; padding: 3rem;">Cargando información...</p>';
 
@@ -966,29 +1013,29 @@
           const { data, error } = await _supabase.from('company_quotes_requests')
             .select('*').eq('company_id', companyId).order('created_at', { ascending: false });
           if (error) throw error;
-          
+
           if (!data || data.length === 0) {
             body.innerHTML = '<p style="text-align: center; color: #64748b; padding: 3rem;">No hay cotizaciones registradas.</p>';
             return;
           }
-          
+
           let tableHTML = `<table class="users-table" style="width: 100%; border-collapse: collapse;">
             <thead style="position: sticky; top: 0; background: #f8fafc;"><tr><th style="padding:1rem; text-align:left;">Fecha</th><th style="padding:1rem; text-align:left;">No. Cotización</th><th style="padding:1rem; text-align:left;">Producto</th><th style="padding:1rem; text-align:left;">Cantidad</th><th style="padding:1rem; text-align:left;">Valor</th><th style="padding:1rem; text-align:left;">Estado</th></tr></thead><tbody>`;
-          
+
           data.forEach(q => {
             const date = formatDateShort(q.created_at);
             const statusColor = q.status === 'pending' ? '#D97706' : (q.status === 'approved' ? '#10B981' : '#64748B');
             const total = q.total_amount ? `$${q.total_amount.toLocaleString()}` : 'Por definir';
-            
+
             let rawItems = [];
             if (q.items) rawItems = q.items;
             else if (q.sizes && q.sizes.items) rawItems = q.sizes.items;
-            
+
             let itemsHtml = '<p style="margin:0; color:#94A3B8;">No hay detalle de productos estructurados.</p>';
             if (rawItems.length > 0) {
               itemsHtml = '<ul style="margin: 0; padding-left: 1.2rem; list-style-type: disc;">';
               rawItems.forEach(it => {
-                itemsHtml += `<li><strong>${it.qty || it.quantity || 1}x</strong> ${it.name || it.product_name || 'Producto'} ${it.size ? '(Talla: '+it.size+')' : ''} ${it.unit_price ? ' - $'+it.unit_price.toLocaleString() : ''}</li>`;
+                itemsHtml += `<li><strong>${it.qty || it.quantity || 1}x</strong> ${it.name || it.product_name || 'Producto'} ${it.size ? '(Talla: ' + it.size + ')' : ''} ${it.unit_price ? ' - $' + it.unit_price.toLocaleString() : ''}</li>`;
               });
               itemsHtml += '</ul>';
             }
@@ -1012,7 +1059,7 @@
           });
           tableHTML += `</tbody></table>`;
           body.innerHTML = tableHTML;
-        } 
+        }
         else if (type === 'orders') {
           title.textContent = 'Órdenes de Compra';
           const { data, error } = await _supabase.from('company_purchase_orders')
@@ -1030,12 +1077,12 @@
             const date = formatDateShort(o.created_at);
             const total = o.total_amount ? `$${o.total_amount.toLocaleString()}` : 'N/A';
             const qty = (o.items || []).reduce((acc, it) => acc + (it.qty || it.quantity || 1), 0);
-            
+
             let itemsHtml = '<p style="margin:0; color:#94A3B8;">No hay detalle de productos para mostrar.</p>';
             if (o.items && o.items.length > 0) {
               itemsHtml = '<ul style="margin: 0; padding-left: 1.2rem; list-style-type: disc;">';
               o.items.forEach(it => {
-                itemsHtml += `<li><strong>${it.qty || it.quantity || 1}x</strong> ${it.name || it.product_name || 'Producto'} ${it.size ? '(Talla: '+it.size+')' : ''} ${it.unit_price ? ' - $'+it.unit_price.toLocaleString() : ''}</li>`;
+                itemsHtml += `<li><strong>${it.qty || it.quantity || 1}x</strong> ${it.name || it.product_name || 'Producto'} ${it.size ? '(Talla: ' + it.size + ')' : ''} ${it.unit_price ? ' - $' + it.unit_price.toLocaleString() : ''}</li>`;
               });
               itemsHtml += '</ul>';
             }
@@ -1083,7 +1130,7 @@
         }
         else if (type === 'employees') {
           title.textContent = 'Empleados Registrados';
-          
+
           const [empRes, rolesRes, deliveriesRes] = await Promise.all([
             _supabase.from('company_employees').select('*').eq('company_id', companyId).order('first_name'),
             _supabase.from('role_definition').select('role_name, renewal_frequency').eq('company_id', companyId),
@@ -1131,7 +1178,7 @@
             let alertText = 'PENDIENTE';
             let alertBg = '#F1F5F9';
             let alertColor = '#475569';
-            
+
             const empDeliveries = employeeDeliveriesMap[e.id] || [];
             if (empDeliveries.length > 0) {
               empDeliveries.sort((a, b) => new Date(b.signed_at || b.created_at) - new Date(a.signed_at || a.created_at));
@@ -1139,7 +1186,7 @@
               const signedDate = new Date(latestDel.signed_at || latestDel.created_at);
 
               const empRoleKey = (e.role || '').toLowerCase().trim();
-              const renewalMonths = renewalFreqMap[empRoleKey] || 6; 
+              const renewalMonths = renewalFreqMap[empRoleKey] || 6;
 
               const nextDate = new Date(signedDate);
               nextDate.setMonth(nextDate.getMonth() + renewalMonths);
@@ -1175,7 +1222,7 @@
           tableHTML += `</tbody></table>`;
           body.innerHTML = tableHTML;
         }
-      } catch(err) {
+      } catch (err) {
         console.error(err);
         body.innerHTML = '<p style="text-align: center; color: #EF4444; padding: 3rem;">No tienes permisos para ver estos detalles o hubo un error de conexión.</p>';
       }
@@ -1185,7 +1232,7 @@
       document.getElementById('company-details-modal').classList.remove('active');
     }
 
-    window.toggleTxDetail = function(id) {
+    window.toggleTxDetail = function (id) {
       const el = document.getElementById(id);
       if (el) el.style.display = el.style.display === 'none' ? 'table-row' : 'none';
     };
@@ -1203,6 +1250,78 @@
       container.appendChild(toast);
       setTimeout(() => { toast.remove(); }, 4000);
     }
+      // -- Lógica para Crear Cliente desde Admin sin cerrar sesión --
+      function openNewClientModal() {
+        document.getElementById('new-client-modal').classList.add('active');
+      }
+      function closeNewClientModal() {
+        document.getElementById('new-client-modal').classList.remove('active');
+        document.getElementById('new-client-form').reset();
+      }
+
+      async function createNewClient(e) {
+        e.preventDefault();
+        const fName = document.getElementById('newClientFirstName').value.trim();
+        const lName = document.getElementById('newClientLastName').value.trim();
+        const email = document.getElementById('newClientEmail').value.trim();
+        const password = document.getElementById('newClientPassword').value;
+        const btn = document.getElementById('btnCreateClient');
+
+        btn.disabled = true;
+        btn.textContent = 'Creando...';
+
+        try {
+          // Instancia secundaria temporal para no interferir con la sesión del Admin
+          const tempClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+              storageKey: 'dotacian-temp-signup',
+              persistSession: false,
+              autoRefreshToken: false,
+              detectSessionInUrl: false
+            }
+          });
+
+          const { data, error } = await tempClient.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+              data: { first_name: fName, last_name: lName }
+            }
+          });
+
+          if (error) throw error;
+          
+          if (data && data.user) {
+            const { error: profileError } = await _supabase.from('company_user').upsert({
+              id: data.user.id,
+              first_name: fName,
+              last_name: lName,
+              email: email,
+              role: 'client',
+              created_at: new Date().toISOString()
+            }, { onConflict: 'id' });
+
+            if (profileError) console.warn("Error upserting to company_user:", profileError);
+
+            showToast('Éxito', 'Cliente creado correctamente.', 'success');
+            closeNewClientModal();
+            loadAllUsers(); // recargar tabla
+          }
+
+        } catch (err) {
+          console.error("Error creando cliente:", err);
+          showToast('Error', err.message || 'No se pudo crear el cliente', 'error');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Crear Cliente';
+        }
+      }
+
+      document.addEventListener('click', (e) => {
+        if (e.target.id === 'new-client-modal') {
+          closeNewClientModal();
+        }
+      });
   </script>
 </body>
 
