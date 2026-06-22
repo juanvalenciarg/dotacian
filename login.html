@@ -380,7 +380,7 @@
     let _supabase = null;
     try {
       if (typeof supabase !== 'undefined') {
-        _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token' } });
+        _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token', multiTab: false } });
       }
     } catch (err) {
       console.error("Supabase load error:", err);
@@ -451,21 +451,31 @@
             showToast('¡Bienvenido!', 'Sesión iniciada correctamente', 'success');
           }
 
-          // Guardar el país en localStorage para el indicador de versión
+          // Validar si el usuario completó su onboarding
           try {
             const { data: userProfile } = await _supabase
-              .from('user_profile')
-              .select('country')
+              .from('company_user')
+              .select('country, company_name')
               .eq('id', data.user.id)
               .single();
 
-            if (userProfile && userProfile.country) {
-              localStorage.setItem('dotacian_user_country', userProfile.country);
+            if (userProfile) {
+              if (userProfile.country) {
+                localStorage.setItem('dotacian_user_country', userProfile.country);
+              }
+              
+              // Redirigir a onboarding si faltan datos clave
+              if (!userProfile.company_name || !userProfile.country) {
+                setTimeout(() => {
+                  window.location.href = 'onboarding.html';
+                }, 1000);
+                return;
+              }
             }
-          } catch (e) { console.warn("Error guardando país:", e); }
+          } catch (e) { console.warn("Error validando perfil:", e); }
 
           setTimeout(() => {
-            window.location.href = 'app.html';
+            window.location.href = 'dot.html';
           }, 1000);
 
         } catch (err) {
