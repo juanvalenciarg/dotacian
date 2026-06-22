@@ -532,119 +532,45 @@
             </svg>
           </button>
 
-          <div class="ob-footer">
-            ¿Ya tienes una cuenta registrada? <a href="login.html">Inicia sesión</a>
-          </div>
+
         </div>
 
-        <!-- STEP 1: Personal Name -->
+        <!-- STEP 1: Company details -->
         <div id="panel-1" class="interactive-panel">
           <div class="input-grid-2">
             <div class="input-wrapper">
-              <label for="firstName">Tu Nombre</label>
-              <input type="text" id="firstName" class="modern-input" placeholder="Ej. Ana" autocomplete="off"
-                oninput="validateStep1()">
+              <label for="companyName">Nombre de la Empresa</label>
+              <input type="text" id="companyName" class="modern-input" placeholder="Ej. Dotacian S.A.S" autocomplete="off" oninput="validateStep1()">
             </div>
             <div class="input-wrapper">
-              <label for="lastName">Tu Apellido</label>
-              <input type="text" id="lastName" class="modern-input" placeholder="Ej. García" autocomplete="off"
-                oninput="validateStep1()">
+              <label for="industry">Sector / Industria</label>
+              <input type="text" id="industry" class="modern-input" placeholder="Ej. Restaurantes" autocomplete="off" oninput="validateStep1()">
             </div>
           </div>
-
-          <div class="input-wrapper" style="margin-top: 1rem; margin-bottom: 1.5rem; text-align: left;">
-            <label for="preferredName">¿Cómo te gusta que te llamen?</label>
-            <input type="text" id="preferredName" class="modern-input" placeholder="Ej. Ani / Juanito"
-              autocomplete="off" oninput="validateStep1()">
-          </div>
-
           <button id="btn-next-1" class="btn-glow" onclick="nextStep(2)" disabled>
             Continuar
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path d="M5 12h14m-7-7 7 7-7 7" />
-            </svg>
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
           </button>
         </div>
 
-        <!-- STEP 2: Corporate Email -->
+        <!-- STEP 2: Country Selector -->
         <div id="panel-2" class="interactive-panel">
-          <div class="input-wrapper">
-            <label for="email">Correo Electrónico Corporativo</label>
-            <input type="email" id="email" class="modern-input" placeholder="ana@empresa.com" autocomplete="off"
-              oninput="validateStep2()">
-          </div>
-
-          <button id="btn-next-2" class="btn-glow" onclick="nextStep(3)" disabled>
-            Continuar
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path d="M5 12h14m-7-7 7 7-7 7" />
-            </svg>
-          </button>
-        </div>
-
-        <!-- STEP 3: Account Passwords -->
-        <div id="panel-3" class="interactive-panel">
-          <div class="input-grid-2">
-            <div class="input-wrapper">
-              <label for="password">Contraseña</label>
-              <div style="position: relative;">
-                <input type="password" id="password" class="modern-input" placeholder="Min. 6 caracteres"
-                  oninput="validateStep3()">
-                <button type="button" class="eye-toggle" onclick="togglePassword('password', this)">
-                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                  </svg>
-                </button>
-              </div>
-            </div>
-            <div class="input-wrapper">
-              <label for="confirmPassword">Confirmar Contraseña</label>
-              <div style="position: relative;">
-                <input type="password" id="confirmPassword" class="modern-input" placeholder="Repite contraseña"
-                  oninput="validateStep3()">
-                <button type="button" class="eye-toggle" onclick="togglePassword('confirmPassword', this)">
-                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-          <div id="passwordError" class="password-error-msg">Las contraseñas no coinciden, revisa nuevamente.</div>
-
-          <button id="btn-next-3" class="btn-glow" onclick="nextStep(4)" disabled>
-            Continuar
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path d="M5 12h14m-7-7 7 7-7 7" />
-            </svg>
-          </button>
-        </div>
-
-        <!-- STEP 4: Country Selector -->
-        <div id="panel-4" class="interactive-panel">
           <div class="country-grid">
             <div class="country-card" id="country-mx" onclick="selectCountry('México', 'country-mx')">
-              <span class="country-flag">🇲🇽</span>
-              <span class="country-name">México</span>
+              <span class="country-flag">🇲🇽</span><span class="country-name">México</span>
             </div>
             <div class="country-card" id="country-co" onclick="selectCountry('Colombia', 'country-co')">
-              <span class="country-flag">🇨🇴</span>
-              <span class="country-name">Colombia</span>
+              <span class="country-flag">🇨🇴</span><span class="country-name">Colombia</span>
             </div>
           </div>
-
-          <button id="btn-next-4" class="btn-glow" onclick="submitOnboarding()" disabled>
-            Crear cuenta y continuar
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path d="M5 12h14m-7-7 7 7-7 7" />
-            </svg>
+          <button id="btn-next-2" class="btn-glow" onclick="submitOnboarding()" disabled>
+            Finalizar Configuración
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
           </button>
         </div>
 
-        <!-- STEP 5: Loading / AI Processing -->
-        <div id="panel-5" class="interactive-panel" style="text-align: center;">
+        <!-- STEP 3: Loading / AI Processing -->
+        <div id="panel-3" class="interactive-panel" style="text-align: center;">
           <div id="loadingStatusText" class="loading-status-text">Iniciando perfil seguro...</div>
         </div>
 
@@ -655,31 +581,22 @@
   <div class="toast-container" id="toast-container"></div>
 
   <script>
-    // Conversational Dialogue Configuration
     const stepsConfig = {
       0: {
-        text: "¡Hola! Soy dot, tu asistente inteligente.",
-        subtext: "Estoy aquí para guiarte en tu registro inicial. ¿Comenzamos?"
+        text: "¡Hola! Veo que es tu primera vez aquí.",
+        subtext: "Estoy aquí para guiarte a terminar la configuración de tu empresa. ¿Comenzamos?"
       },
       1: {
-        text: "Encantado. Para iniciar tu perfil, ¿cuál es tu nombre y apellido?",
-        subtext: "Ingresa tu nombre y apellido para poder identificarte más fácil."
+        text: "Para iniciar, ¿cuál es el nombre de tu empresa?",
+        subtext: "Ingresa el nombre de la empresa y la industria a la que pertenecen."
       },
       2: {
-        text: "Excelente, {name}. ¿Qué dirección de correo corporativo utilizaremos?",
-        subtext: "Este será tu correo de acceso principal al sistema dotacian y donde recibirás reportes automatizados."
+        text: "Excelente. ¿Dónde operan principalmente?",
+        subtext: "Selecciona el país operativo para configurar las monedas y catálogos."
       },
       3: {
-        text: "¡Perfecto! Ahora definamos una clave secreta para tu perfil.",
-        subtext: "Tu contraseña debe contar con al menos 6 caracteres combinando números o símbolos para mayor seguridad."
-      },
-      4: {
-        text: "Último detalle, ¿dónde opera principalmente tu empresa?",
-        subtext: "Selecciona el país operativo para configurar los presupuestos, monedas y formatos oficiales correspondientes."
-      },
-      5: {
-        text: "Creando tu cuenta y bases de datos...",
-        subtext: "Estamos configurando tu entorno de trabajo seguro. Esto tomará solo unos segundos..."
+        text: "Guardando configuración de tu empresa...",
+        subtext: "Estamos configurando tu entorno de trabajo. Esto tomará solo unos segundos..."
       }
     };
 
@@ -747,78 +664,34 @@
 
     // Input Validations
     function validateStep1() {
-      const fName = document.getElementById('firstName').value.trim();
-      const lName = document.getElementById('lastName').value.trim();
-      const pName = document.getElementById('preferredName').value.trim();
+      const cName = document.getElementById('companyName').value.trim();
+      const industry = document.getElementById('industry').value.trim();
       const btn = document.getElementById('btn-next-1');
-      btn.disabled = !(fName.length > 0 && lName.length > 0 && pName.length > 0);
-    }
-
-    function validateStep2() {
-      const email = document.getElementById('email').value.trim();
-      const btn = document.getElementById('btn-next-2');
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      btn.disabled = !emailRegex.test(email);
-    }
-
-    function validateStep3() {
-      const pass = document.getElementById('password').value;
-      const confirm = document.getElementById('confirmPassword').value;
-      const btn = document.getElementById('btn-next-3');
-      const errEl = document.getElementById('passwordError');
-
-      if (pass.length >= 6 && confirm.length > 0) {
-        if (pass !== confirm) {
-          errEl.style.display = 'block';
-          btn.disabled = true;
-        } else {
-          errEl.style.display = 'none';
-          btn.disabled = false;
-        }
-      } else {
-        errEl.style.display = 'none';
-        btn.disabled = true;
-      }
+      btn.disabled = !(cName.length > 0 && industry.length > 0);
     }
 
     function selectCountry(country, cardId) {
       selectedCountryVal = country;
       document.querySelectorAll('.country-card').forEach(c => c.classList.remove('selected'));
       document.getElementById(cardId).classList.add('selected');
-      document.getElementById('btn-next-4').disabled = false;
-    }
-
-    function togglePassword(inputId, btn) {
-      const input = document.getElementById(inputId);
-      const icon = btn.querySelector('svg');
-      if (input.type === 'password') {
-        input.type = 'text';
-        icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
-      } else {
-        input.type = 'password';
-        icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
-      }
+      document.getElementById('btn-next-2').disabled = false;
     }
 
     // Supabase Submission Process
     async function submitOnboarding() {
-      const fName = document.getElementById('firstName').value.trim();
-      const lName = document.getElementById('lastName').value.trim();
-      const pName = document.getElementById('preferredName').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const pass = document.getElementById('password').value;
+      const cName = document.getElementById('companyName').value.trim();
+      const industry = document.getElementById('industry').value.trim();
 
-      triggerChatStep(5);
+      triggerChatStep(3);
 
       const orb = document.getElementById('agent-orb');
       orb.classList.add('thinking');
 
       const statusEl = document.getElementById('loadingStatusText');
       const messages = [
-        'Enviando credenciales seguras...',
-        'Inicializando tu perfil administrativo...',
-        'Configurando tablas corporativas...',
-        'Creando portal dotacian...'
+        'Actualizando perfil seguro...',
+        'Configurando tu dashboard corporativo...',
+        'Creando entorno de la empresa...'
       ];
 
       let msgIdx = 0;
@@ -830,57 +703,36 @@
       }, 700);
 
       try {
-        // Sign Up with Supabase Auth
-        const { data: authData, error: authError } = await _supabase.auth.signUp({
-          email: email,
-          password: pass,
-          options: {
-            data: { first_name: fName, last_name: lName, nickname: pName }
-          }
-        });
+        const { data: { session }, error: sessionError } = await _supabase.auth.getSession();
+        if (sessionError || !session) {
+          window.location.href = 'login.html';
+          return;
+        }
 
-        if (authError) throw authError;
+        const userId = session.user.id;
 
-        // Force sign in to establish local session
-        const { data: signInData, error: signInError } = await _supabase.auth.signInWithPassword({
-          email: email,
-          password: pass
-        });
-        
-        if (signInError) console.warn("Auto sign-in error:", signInError);
-
-        const currentUser = signInData?.user || authData.user;
-        if (!currentUser) throw new Error('No se recibió información válida del usuario.');
-
-        userId = currentUser.id;
-
-        // Save to user_profile
-        const profileData = {
-          id: userId,
-          first_name: fName,
-          last_name: lName,
-          nickname: pName,
-          email: email,
-          country: selectedCountryVal,
-          created_at: new Date().toISOString()
-        };
-
+        // Update company_user
         const { error: profileError } = await _supabase
-          .from('user_profile')
-          .upsert([profileData], { onConflict: 'id' });
+          .from('company_user')
+          .update({
+            company_name: cName,
+            industry: industry,
+            country: selectedCountryVal
+          })
+          .eq('id', userId);
 
         if (profileError) throw profileError;
 
         clearInterval(statusTimer);
         statusEl.textContent = "¡Todo listo! Ingresando a tu dashboard...";
-        showToast('¡Éxito!', 'Cuenta creada correctamente.', 'success');
+        showToast('¡Éxito!', 'Perfil configurado correctamente.', 'success');
 
         orb.classList.remove('thinking');
         orb.style.boxShadow = "0 0 40px #10B981";
         orb.style.background = "radial-gradient(circle at 30% 30%, #34D399 0%, #059669 50%, #064E3B 100%)";
 
         setTimeout(() => {
-          window.location.href = 'app.html';
+          window.location.href = 'dot.html';
         }, 1200);
 
       } catch (err) {
