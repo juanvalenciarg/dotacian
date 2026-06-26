@@ -272,21 +272,21 @@
         // --- View Tracking Logic ---
         const viewKey = `viewed_article_${post.id}`;
         const hasViewed = localStorage.getItem(viewKey);
-        
+
         let newTotal = (post.views_total || 0) + 1;
         let newUnique = post.views_unique || 0;
-        
+
         if (!hasViewed) {
           newUnique += 1;
           localStorage.setItem(viewKey, 'true');
         }
-        
+
         // Update without blocking page load
         _supabaseBlog.from('blog_posts').update({
-           views_total: newTotal,
-           views_unique: newUnique
-        }).eq('id', post.id).then(({error}) => {
-           if(error) console.error("Error updating views", error);
+          views_total: newTotal,
+          views_unique: newUnique
+        }).eq('id', post.id).then(({ error }) => {
+          if (error) console.error("Error updating views", error);
         });
         // ---------------------------
 
