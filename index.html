@@ -63,7 +63,7 @@
   </script>
 
   <!-- Preconnect and Google Fonts -->
-  <link rel="preload" href="assets/images/hero_image.png" as="image">
+  <link rel="preload" href="assets/images/banner_web.jpg" as="image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -86,13 +86,14 @@
         </a>
       </div>
       <div style="display: flex; align-items: center; gap: 2rem;">
-        <nav class="nav-links">
+        <nav class="nav-links" style="display: flex; gap: 1.5rem;">
           <a href="#como-funciona" style="color: white; font-weight: 600;">Producto</a>
+          <a href="blog.html" style="color: white; font-weight: 600;">Recursos</a>
         </nav>
         <div class="header-actions">
           <a href="#agendar-demo" class="btn"
-            style="background-color: var(--color-cyan); color: var(--color-navy); border: none; font-weight: 700;">Agendar
-            Demo</a>
+            style="background-color: var(--color-cyan); color: var(--color-navy); border: none; font-weight: 700;">Agenda
+            un demo</a>
           <button class="header-mobile-toggle" id="mobile-menu-toggle" aria-label="Abrir menú">
             <span style="background-color: white;"></span>
             <span style="background-color: white;"></span>
@@ -305,17 +306,26 @@
     <div class="container" style="max-width: 900px;">
       <div class="section-header center">
         <h2>Paga solo por lo que usas</h2>
-        <p style="color: var(--color-text-secondary); font-size: 1.125rem; max-width: 600px; margin: 1rem auto 3rem auto;">Sin costos ocultos. Paga una pequeña tarifa por empleado activo. Descuentos automáticos por volumen que se aplican al instante.</p>
+        <p
+          style="color: var(--color-text-secondary); font-size: 1.125rem; max-width: 600px; margin: 1rem auto 3rem auto;">
+          Sin costos ocultos. Paga una pequeña tarifa por empleado activo. Descuentos automáticos por volumen que se
+          aplican al instante.</p>
       </div>
 
-      <div class="simulator-card" style="background: white; border: 1px solid var(--color-border); border-radius: 24px; padding: 3rem; box-shadow: 0 20px 40px rgba(0,0,0,0.04);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+      <div class="simulator-card"
+        style="background: white; border: 1px solid var(--color-border); border-radius: 24px; padding: 3rem; box-shadow: 0 20px 40px rgba(0,0,0,0.04);">
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
           <div>
-            <h3 style="font-family: var(--font-family-heading); font-size: 1.5rem; color: var(--color-navy); margin-bottom: 0.25rem;">Simulador de Inversión</h3>
-            <p style="color: var(--color-text-secondary); font-size: 0.95rem;">Empieza completamente gratis hasta 5 empleados.</p>
+            <h3
+              style="font-family: var(--font-family-heading); font-size: 1.5rem; color: var(--color-navy); margin-bottom: 0.25rem;">
+              Simulador de Inversión</h3>
+            <p style="color: var(--color-text-secondary); font-size: 0.95rem;">Empieza completamente gratis hasta 5
+              empleados.</p>
           </div>
           <div>
-            <select id="currency-select" class="country-select" style="padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--color-border); font-family: 'Inter', sans-serif; font-weight: 600; color: var(--color-navy); background: var(--color-smoke); outline: none;">
+            <select id="currency-select" class="country-select"
+              style="padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--color-border); font-family: 'Inter', sans-serif; font-weight: 600; color: var(--color-navy); background: var(--color-smoke); outline: none;">
               <option value="COP" selected>Pesos Colombianos (COP)</option>
               <option value="MXN">Pesos Mexicanos (MXN)</option>
             </select>
@@ -324,8 +334,10 @@
 
         <div style="margin-bottom: 3rem;">
           <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; align-items: flex-end;">
-            <label for="employee-slider" style="font-weight: 600; color: var(--color-navy); font-size: 1.1rem;">Número de empleados</label>
-            <input type="number" id="employee-input" value="5" min="1" max="2000" style="width: 100px; padding: 0.5rem; text-align: center; border: 2px solid var(--color-cyan); border-radius: 8px; font-weight: 700; font-size: 1.2rem; color: var(--color-navy); outline: none; transition: border-color 0.2s;">
+            <label for="employee-slider" style="font-weight: 600; color: var(--color-navy); font-size: 1.1rem;">Número
+              de empleados</label>
+            <input type="number" id="employee-input" value="5" min="1" max="2000"
+              style="width: 100px; padding: 0.5rem; text-align: center; border: 2px solid var(--color-cyan); border-radius: 8px; font-weight: 700; font-size: 1.2rem; color: var(--color-navy); outline: none; transition: border-color 0.2s;">
           </div>
           <style>
             input[type=range]::-webkit-slider-thumb {
@@ -336,9 +348,10 @@
               background: white;
               border: 4px solid var(--color-cyan);
               cursor: pointer;
-              box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+              box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
               margin-top: -8px;
             }
+
             input[type=range]::-moz-range-thumb {
               height: 24px;
               width: 24px;
@@ -346,8 +359,9 @@
               background: white;
               border: 4px solid var(--color-cyan);
               cursor: pointer;
-              box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+              box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
             }
+
             input[type=range]::-webkit-slider-runnable-track {
               width: 100%;
               height: 8px;
@@ -355,26 +369,34 @@
               border-radius: 4px;
             }
           </style>
-          <input type="range" id="employee-slider" min="1" max="2000" value="5" style="width: 100%; height: 8px; border-radius: 4px; outline: none; -webkit-appearance: none; background: linear-gradient(to right, var(--color-cyan) 0%, var(--color-cyan) 0.25%, var(--color-smoke-mid) 0.25%, var(--color-smoke-mid) 100%);">
-          <div style="display: flex; justify-content: space-between; margin-top: 0.75rem; color: var(--color-text-muted); font-size: 0.85rem; font-weight: 600;">
+          <input type="range" id="employee-slider" min="1" max="2000" value="5"
+            style="width: 100%; height: 8px; border-radius: 4px; outline: none; -webkit-appearance: none; background: linear-gradient(to right, var(--color-cyan) 0%, var(--color-cyan) 0.25%, var(--color-smoke-mid) 0.25%, var(--color-smoke-mid) 100%);">
+          <div
+            style="display: flex; justify-content: space-between; margin-top: 0.75rem; color: var(--color-text-muted); font-size: 0.85rem; font-weight: 600;">
             <span>1</span>
             <span>2000+</span>
           </div>
         </div>
 
-        <div style="background: var(--color-smoke); border-radius: 16px; padding: 2rem; display: flex; flex-direction: column; gap: 1rem; position: relative; overflow: hidden;">
-          <div id="free-badge" style="position: absolute; top: -1px; right: -1px; background: var(--color-brand-primary); color: white; padding: 0.5rem 2rem; font-weight: 700; font-size: 0.85rem; border-bottom-left-radius: 16px; text-transform: uppercase; letter-spacing: 0.05em; display: block;">¡Plan Gratis!</div>
-          
+        <div
+          style="background: var(--color-smoke); border-radius: 16px; padding: 2rem; display: flex; flex-direction: column; gap: 1rem; position: relative; overflow: hidden;">
+          <div id="free-badge"
+            style="position: absolute; top: -1px; right: -1px; background: var(--color-brand-primary); color: white; padding: 0.5rem 2rem; font-weight: 700; font-size: 0.85rem; border-bottom-left-radius: 16px; text-transform: uppercase; letter-spacing: 0.05em; display: block;">
+            ¡Plan Gratis!</div>
+
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <span style="color: var(--color-text-secondary); font-weight: 500;">Tarifa por empleado</span>
-            <span id="price-per-user-display" style="font-weight: 700; color: var(--color-navy); font-size: 1.25rem;">$0.00</span>
+            <span id="price-per-user-display"
+              style="font-weight: 700; color: var(--color-navy); font-size: 1.25rem;">$0.00</span>
           </div>
-          
+
           <div style="height: 1px; background: var(--color-border); width: 100%;"></div>
 
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="color: var(--color-navy); font-weight: 700; font-size: 1.1rem;">Inversión Total <span style="font-size: 0.85rem; color: var(--color-text-secondary); font-weight: 400;">/ mes</span></span>
-            <span id="total-price-display" style="font-family: var(--font-family-heading); font-size: 3rem; font-weight: 800; color: var(--color-cyan); line-height: 1;">$0</span>
+            <span style="color: var(--color-navy); font-weight: 700; font-size: 1.1rem;">Inversión Total <span
+                style="font-size: 0.85rem; color: var(--color-text-secondary); font-weight: 400;">/ mes</span></span>
+            <span id="total-price-display"
+              style="font-family: var(--font-family-heading); font-size: 3rem; font-weight: 800; color: var(--color-cyan); line-height: 1;">$0</span>
           </div>
         </div>
 
@@ -383,7 +405,7 @@
   </section>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
       const slider = document.getElementById('employee-slider');
       const input = document.getElementById('employee-input');
       const pricePerUserDisplay = document.getElementById('price-per-user-display');
@@ -391,7 +413,7 @@
       const currencySelect = document.getElementById('currency-select');
       const freeBadge = document.getElementById('free-badge');
 
-      const EX_MXN = 18.0; 
+      const EX_MXN = 18.0;
       const EX_COP = 4000.0;
 
       function updatePricing() {
@@ -413,7 +435,7 @@
           // Use a power curve Total = A * x^B to ensure total cost always increases
           // while per-user cost decreases from $6 (at 6 users) to $0.4 (at 2000 users).
           // Total(6) = 36, Total(2000) = 800
-          const B = Math.log(800/36) / Math.log(2000/6);
+          const B = Math.log(800 / 36) / Math.log(2000 / 6);
           const A = 36 / Math.pow(6, B);
           totalUSD = A * Math.pow(employees, B);
           pricePerUserUSD = totalUSD / employees;
@@ -435,7 +457,7 @@
         let finalPricePerUser = pricePerUserUSD * exchangeRate;
         let finalTotal = totalUSD * exchangeRate;
 
-        if(currency === 'COP') {
+        if (currency === 'COP') {
           pricePerUserDisplay.innerHTML = `${symbol} ${Math.round(finalPricePerUser).toLocaleString('es-CO')} <span style="font-size: 0.85rem; color: var(--color-text-secondary); margin-left: 0.15rem;">${currencyCode}</span>`;
           totalPriceDisplay.textContent = `${symbol}${Math.round(finalTotal).toLocaleString('es-CO')}`;
         } else if (currency === 'MXN') {
@@ -454,15 +476,15 @@
       }
 
       slider.addEventListener('input', updatePricing);
-      input.addEventListener('input', function() {
+      input.addEventListener('input', function () {
         let val = parseInt(this.value) || 1;
-        if(val > 2000) val = 2000;
+        if (val > 2000) val = 2000;
         slider.value = val;
         updatePricing();
       });
-      
+
       currencySelect.addEventListener('change', updatePricing);
-      
+
       updatePricing();
     });
   </script>
@@ -628,20 +650,25 @@
     <div class="container">
       <div class="demo-wrapper">
         <div class="demo-content">
-          <h2 style="font-size: 3.5rem; font-family: var(--font-family-heading); line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -0.02em; color: white;">Agenda una demo de 30 minutos.</h2>
+          <h2
+            style="font-size: 3.5rem; font-family: var(--font-family-heading); line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -0.02em; color: white;">
+            Agenda una demo de 30 minutos.</h2>
           <p style="font-size: 1.25rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 3rem;">
-            Elige un horario que te convenga. Te mostraremos exactamente cómo funciona Dotacian. 
+            Elige un horario que te convenga. Te mostraremos exactamente cómo funciona Dotacian.
           </p>
           <ul class="demo-features" style="margin-bottom: 4rem;">
-            <li style="align-items: flex-start; gap: 1rem; color: rgba(255, 255, 255, 0.9); font-size: 1.1rem; line-height: 1.5;">
+            <li
+              style="align-items: flex-start; gap: 1rem; color: rgba(255, 255, 255, 0.9); font-size: 1.1rem; line-height: 1.5;">
               <span style="color: var(--color-cyan); font-weight: bold; font-size: 1.5rem; line-height: 1;">—</span>
               <span>Mira a Dot responder una solicitud de uniformes en tiempo real y coordinar entregas.</span>
             </li>
-            <li style="align-items: flex-start; gap: 1rem; color: rgba(255, 255, 255, 0.9); font-size: 1.1rem; line-height: 1.5;">
+            <li
+              style="align-items: flex-start; gap: 1rem; color: rgba(255, 255, 255, 0.9); font-size: 1.1rem; line-height: 1.5;">
               <span style="color: var(--color-cyan); font-weight: bold; font-size: 1.5rem; line-height: 1;">—</span>
               <span>Observa cómo cotiza, verifica stock con proveedores y procesa órdenes automáticamente.</span>
             </li>
-            <li style="align-items: flex-start; gap: 1rem; color: rgba(255, 255, 255, 0.9); font-size: 1.1rem; line-height: 1.5;">
+            <li
+              style="align-items: flex-start; gap: 1rem; color: rgba(255, 255, 255, 0.9); font-size: 1.1rem; line-height: 1.5;">
               <span style="color: var(--color-cyan); font-weight: bold; font-size: 1.5rem; line-height: 1;">—</span>
               <span>Llévate un plan de implementación claro — tiempos, costos y cómo operamos de principio a fin.</span>
             </li>
@@ -649,9 +676,13 @@
 
         </div>
 
-        <div class="demo-calendar-container" style="flex: 1.2; width: 100%; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); overflow: hidden; min-height: 650px; position: relative;">
+        <div class="demo-calendar-container"
+          style="flex: 1.2; width: 100%; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); overflow: hidden; min-height: 650px; position: relative;">
           <!-- Embedded Google Calendar Scheduling Iframe -->
-          <iframe src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ0V1Hs33shxkmbR4RK-JI_UAeo_ffqS6jY1nvqWPAD980ATaIYM1y_8S8MOR1-YvQOce6Ug6Vc_?gv=true" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; background: transparent;" frameborder="0" title="Google Calendar Appointment Scheduling"></iframe>
+          <iframe
+            src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ0V1Hs33shxkmbR4RK-JI_UAeo_ffqS6jY1nvqWPAD980ATaIYM1y_8S8MOR1-YvQOce6Ug6Vc_?gv=true"
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; background: transparent;"
+            frameborder="0" title="Google Calendar Appointment Scheduling"></iframe>
         </div>
       </div>
     </div>
@@ -848,8 +879,11 @@
     </div>
     <nav class="drawer-nav">
       <a href="#como-funciona" style="font-weight: 600;">Producto</a>
+      <a href="blog.html" style="font-weight: 600;">Recursos</a>
       <div class="drawer-divider"></div>
-      <a href="#agendar-demo" class="btn" style="background-color: var(--color-cyan); color: var(--color-navy); border: none; font-weight: 700; text-align: center; margin-top: 1rem;">Agendar Demo</a>
+      <a href="#agendar-demo" class="btn"
+        style="background-color: var(--color-cyan); color: var(--color-navy); border: none; font-weight: 700; text-align: center; margin-top: 1rem;">Agendar
+        Demo</a>
     </nav>
   </div>
 
