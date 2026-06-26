@@ -220,48 +220,43 @@
       <div class="logo">
         <a href="index.html">
           <img src="assets/logos/logo_dotacian.png" alt="dotacian logo"
-            style="height: 80px; width: auto; display: block;">
+            style="height: 50px; width: auto; display: block; filter: brightness(0) invert(1);">
         </a>
       </div>
-      <nav class="nav-links">
-        <a href="index.html#problema">Problema</a>
-        <a href="index.html#solucion">Solución</a>
-        <a href="index.html#precios">Precios</a>
-        <a href="index.html#fabricante">Fabricantes</a>
-        <a href="blog.html" style="color: var(--color-brand-primary); font-weight: 600;">Blog</a>
-      </nav>
-      <div class="header-actions">
-        <a href="login.html" style="font-weight: 600; color: var(--color-text-secondary); transition: color 0.2s;"
-          onmouseover="this.style.color='var(--color-brand-primary)'"
-          onmouseout="this.style.color='var(--color-text-secondary)'">Iniciar sesión</a>
-        <a href="onboarding.html" class="btn btn-primary" style="padding: 0.6rem 1.25rem; font-size: 0.9rem;">Crea tu
-          cuenta</a>
-        <button class="header-mobile-toggle" id="mobile-menu-toggle" aria-label="Abrir menú">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
+      <div style="display: flex; align-items: center; gap: 2rem;">
+        <nav class="nav-links" style="display: flex; gap: 1.5rem;">
+          <a href="index.html#como-funciona" style="color: white; font-weight: 600;">Producto</a>
+          <a href="blog.html" style="color: white; font-weight: 600;">Recursos</a>
+        </nav>
+        <div class="header-actions">
+          <a href="index.html#agendar-demo" class="btn"
+            style="background-color: var(--color-cyan); color: var(--color-navy); border: none; font-weight: 700;">Agendar
+            Demo</a>
+          <button class="header-mobile-toggle" id="mobile-menu-toggle" aria-label="Abrir menú">
+            <span style="background-color: white;"></span>
+            <span style="background-color: white;"></span>
+            <span style="background-color: white;"></span>
+          </button>
+        </div>
       </div>
     </div>
   </header>
 
   <div class="mobile-drawer" id="mobile-drawer">
     <div class="drawer-header">
-      <div class="logo" style="display: flex; align-items: center;">
-        <img src="assets/logos/logo_dotacian.png" alt="dotacian logo"
-          style="height: 45px; width: auto; display: block;">
+      <div class="logo" style="margin-bottom: 2rem;">
+        <img src="assets/logos/logo_dotacian.png" alt="dotacian logo" loading="lazy"
+          style="height: 60px; width: auto; display: block; margin: 0 auto;">
       </div>
       <button class="drawer-close" id="drawer-close">&times;</button>
     </div>
     <nav class="drawer-nav">
-      <a href="index.html#problema">Problema</a>
-      <a href="index.html#solucion">Solución</a>
-      <a href="index.html#precios">Precios</a>
-      <a href="index.html#fabricante">Fabricante</a>
-      <a href="blog.html">Blog</a>
+      <a href="index.html#como-funciona" style="font-weight: 600;">Producto</a>
+      <a href="blog.html" style="font-weight: 600;">Recursos</a>
       <div class="drawer-divider"></div>
-      <a href="login.html">Iniciar sesión</a>
-      <a href="onboarding.html" class="btn btn-primary">Crea tu cuenta</a>
+      <a href="index.html#agendar-demo" class="btn"
+        style="background-color: var(--color-cyan); color: var(--color-navy); border: none; font-weight: 700; text-align: center; margin-top: 1rem;">Agendar
+        Demo</a>
     </nav>
   </div>
 
