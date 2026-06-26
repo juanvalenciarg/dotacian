@@ -18,11 +18,11 @@
   <style>
     .article-header {
       background: linear-gradient(135deg, #020617 0%, #0F172A 100%);
-      padding: 8rem 2rem 6rem 2rem;
+      padding: 12rem 2rem 6rem 2rem;
       color: white;
       text-align: center;
       position: relative;
-      margin-top: 144px;
+      margin-top: 0;
       overflow: hidden;
     }
 
@@ -51,7 +51,7 @@
 
     .article-back {
       position: absolute;
-      top: 2rem;
+      top: 8rem;
       left: 2rem;
       color: rgba(255, 255, 255, 0.7);
       text-decoration: none;
@@ -99,23 +99,32 @@
       display: block;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
       position: relative;
-      z-index: 10;
-      background: #E2E8F0;
+      z-index: 20;
     }
 
     .article-content {
       max-width: 800px;
-      margin: 0 auto;
-      padding: 0 2rem;
-      font-size: 1.125rem;
+      margin: 0 auto 4rem auto;
+      font-size: 1.15rem;
       line-height: 1.8;
-      color: var(--color-text-primary);
+      color: #334155;
+      padding: 0 2rem;
     }
 
     .article-content h2 {
       font-family: var(--font-family-heading);
       font-size: 2rem;
-      color: var(--color-navy);
+      font-weight: 700;
+      color: #0F172A;
+      margin: 3rem 0 1.5rem 0;
+      letter-spacing: -0.01em;
+    }
+
+    .article-content h3 {
+      font-family: var(--font-family-heading);
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #1E293B;
       margin: 2.5rem 0 1rem 0;
     }
 
@@ -123,15 +132,7 @@
       margin-bottom: 1.5rem;
     }
 
-    .article-content img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 0.5rem;
-      margin: 2rem 0;
-    }
-
-    .article-content ul,
-    .article-content ol {
+    .article-content ul, .article-content ol {
       margin-bottom: 1.5rem;
       padding-left: 1.5rem;
     }
@@ -158,48 +159,43 @@
       <div class="logo">
         <a href="index.html">
           <img src="assets/logos/logo_dotacian.png" alt="dotacian logo"
-            style="height: 80px; width: auto; display: block;">
+            style="height: 50px; width: auto; display: block; filter: brightness(0) invert(1);">
         </a>
       </div>
-      <nav class="nav-links">
-        <a href="index.html#problema">Problema</a>
-        <a href="index.html#solucion">Solución</a>
-        <a href="index.html#precios">Precios</a>
-        <a href="index.html#fabricante">Fabricantes</a>
-        <a href="blog.html" style="color: var(--color-brand-primary); font-weight: 600;">Blog</a>
-      </nav>
-      <div class="header-actions">
-        <a href="login.html" style="font-weight: 600; color: var(--color-text-secondary); transition: color 0.2s;"
-          onmouseover="this.style.color='var(--color-brand-primary)'"
-          onmouseout="this.style.color='var(--color-text-secondary)'">Iniciar sesión</a>
-        <a href="onboarding.html" class="btn btn-primary" style="padding: 0.6rem 1.25rem; font-size: 0.9rem;">Crea tu
-          cuenta</a>
-        <button class="header-mobile-toggle" id="mobile-menu-toggle" aria-label="Abrir menú">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
+      <div style="display: flex; align-items: center; gap: 2rem;">
+        <nav class="nav-links" style="display: flex; gap: 1.5rem;">
+          <a href="index.html#como-funciona" style="color: white; font-weight: 600;">Producto</a>
+          <a href="blog.html" style="color: white; font-weight: 600;">Recursos</a>
+        </nav>
+        <div class="header-actions">
+          <a href="index.html#agendar-demo" class="btn"
+            style="background-color: var(--color-cyan); color: var(--color-navy); border: none; font-weight: 700;">Agendar
+            Demo</a>
+          <button class="header-mobile-toggle" id="mobile-menu-toggle" aria-label="Abrir menú">
+            <span style="background-color: white;"></span>
+            <span style="background-color: white;"></span>
+            <span style="background-color: white;"></span>
+          </button>
+        </div>
       </div>
     </div>
   </header>
 
   <div class="mobile-drawer" id="mobile-drawer">
     <div class="drawer-header">
-      <div class="logo" style="display: flex; align-items: center;">
-        <img src="assets/logos/logo_dotacian.png" alt="dotacian logo"
-          style="height: 45px; width: auto; display: block;">
+      <div class="logo" style="margin-bottom: 2rem;">
+        <img src="assets/logos/logo_dotacian.png" alt="dotacian logo" loading="lazy"
+          style="height: 60px; width: auto; display: block; margin: 0 auto;">
       </div>
       <button class="drawer-close" id="drawer-close">&times;</button>
     </div>
     <nav class="drawer-nav">
-      <a href="index.html#problema">Problema</a>
-      <a href="index.html#solucion">Solución</a>
-      <a href="index.html#precios">Precios</a>
-      <a href="index.html#fabricante">Fabricante</a>
-      <a href="blog.html">Blog</a>
+      <a href="index.html#como-funciona" style="font-weight: 600;">Producto</a>
+      <a href="blog.html" style="font-weight: 600;">Recursos</a>
       <div class="drawer-divider"></div>
-      <a href="login.html">Iniciar sesión</a>
-      <a href="onboarding.html" class="btn btn-primary">Crea tu cuenta</a>
+      <a href="index.html#agendar-demo" class="btn"
+        style="background-color: var(--color-cyan); color: var(--color-navy); border: none; font-weight: 700; text-align: center; margin-top: 1rem;">Agendar
+        Demo</a>
     </nav>
   </div>
 
