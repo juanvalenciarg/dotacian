@@ -12,8 +12,69 @@
     rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
   <link rel="stylesheet" href="/styles.css">
   <style>
+    /* Calendario (Flatpickr) - Fecha de Nacimiento */
+    .flatpickr-calendar {
+      font-family: 'Inter', sans-serif;
+      border-radius: 1rem;
+      box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.25);
+      border: 1px solid var(--color-border);
+      overflow: hidden;
+    }
+
+    .flatpickr-months {
+      background: var(--color-navy);
+      padding: 0.5rem 0;
+    }
+
+    .flatpickr-month {
+      color: white;
+    }
+
+    .flatpickr-current-month .flatpickr-monthDropdown-months,
+    .flatpickr-current-month input.cur-year {
+      color: white;
+      font-weight: 600;
+    }
+
+    .flatpickr-current-month .flatpickr-monthDropdown-months option {
+      color: var(--color-navy);
+    }
+
+    .flatpickr-prev-month svg,
+    .flatpickr-next-month svg {
+      fill: white;
+    }
+
+    .flatpickr-weekdays {
+      background: var(--color-navy);
+    }
+
+    span.flatpickr-weekday {
+      background: var(--color-navy);
+      color: rgba(255, 255, 255, 0.7);
+      font-weight: 600;
+    }
+
+    .flatpickr-day.selected,
+    .flatpickr-day.selected:hover {
+      background: var(--color-cyan);
+      border-color: var(--color-cyan);
+      color: white;
+    }
+
+    .flatpickr-day.today {
+      border-color: var(--color-cyan);
+    }
+
+    .flatpickr-day:hover {
+      background: var(--color-smoke);
+    }
+
     .filter-chip {
       padding: 0.5rem 1.25rem;
       border-radius: 999px;
@@ -559,7 +620,7 @@
             </div>
             <div style="flex: 1;">
               <label>Fecha de Nacimiento</label>
-              <input type="date" id="empBirthDate" required>
+              <input type="text" id="empBirthDate" placeholder="dd/mm/aaaa" autocomplete="off" required>
             </div>
           </div>
 
@@ -1423,6 +1484,7 @@
 
     function closeModal() {
       document.getElementById('employeeModal').classList.remove('active');
+      if (window.empBirthDatePicker) window.empBirthDatePicker.clear();
     }
 
     function openActionModal() {
@@ -3188,11 +3250,25 @@
       }
     });
 
+    function initBirthDatePicker() {
+      window.empBirthDatePicker = flatpickr("#empBirthDate", {
+        locale: "es",
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d/m/Y",
+        allowInput: true,
+        maxDate: "today",
+        minDate: "1940-01-01",
+        disableMobile: true
+      });
+    }
+
     // Initial render
     window.onload = () => {
       setTimeout(fetchEmployees, 1000); // Wait for Supabase to init
       setTimeout(loadActiveRoles, 1000); // Wait for Supabase to init
       setTimeout(loadRoleGarments, 1000); // Load configured garments from DB
+      initBirthDatePicker();
     };
 
     window.roleGarments = {};
