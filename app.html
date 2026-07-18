@@ -777,37 +777,6 @@
                 <div class="stat-header">
                   <div class="stat-icon-box cyan">
                     <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                      <circle cx="9" cy="7" r="4" />
-                      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                    </svg>
-                  </div>
-                </div>
-                <div class="stat-info">
-                  <span class="stat-label-p">Empleados Activos</span>
-                  <span id="stat-active-employees" class="stat-value-p">0</span>
-                </div>
-              </div>
-
-              <div class="stat-card-premium">
-                <div class="stat-header">
-                  <div class="stat-icon-box blue">
-                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                    </svg>
-                  </div>
-                </div>
-                <div class="stat-info">
-                  <span class="stat-label-p">Roles Activos</span>
-                  <span id="stat-roles-count" class="stat-value-p">0</span>
-                </div>
-              </div>
-
-              <div class="stat-card-premium">
-                <div class="stat-header">
-                  <div class="stat-icon-box indigo">
-                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                       <path
                         d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
                       <path d="m3.3 7 8.7 5 8.7-5" />
@@ -816,24 +785,67 @@
                   </div>
                 </div>
                 <div class="stat-info">
-                  <span class="stat-label-p">Producción Activa</span>
-                  <span id="stat-active-production" class="stat-value-p">0</span>
+                  <span class="stat-label-p">Pendientes de Entrega</span>
+                  <span id="stat-pending-delivery" class="stat-value-p">0</span>
                 </div>
               </div>
 
-              <div class="stat-card-premium">
+              <div class="stat-card-premium" style="--card-color: #F59E0B;">
                 <div class="stat-header">
-                  <div class="stat-icon-box purple">
+                  <div class="stat-icon-box">
                     <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                      <polyline points="22 4 12 14.01 9 11.01" />
+                      <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
                     </svg>
                   </div>
                 </div>
                 <div class="stat-info">
-                  <span class="stat-label-p">Uniformes Entregados</span>
-                  <span id="stat-delivered-uniforms" class="stat-value-p">0</span>
+                  <span class="stat-label-p">Alertas Activas</span>
+                  <span id="stat-alerts" class="stat-value-p">0</span>
                 </div>
+              </div>
+
+              <div class="stat-card-premium" style="--card-color: #059669;">
+                <div class="stat-header">
+                  <div class="stat-icon-box">
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                      <line x1="12" y1="1" x2="12" y2="23"></line>
+                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div class="stat-info">
+                  <span class="stat-label-p">Gasto del Mes</span>
+                  <span id="stat-monthly-spend" class="stat-value-p">$0</span>
+                </div>
+              </div>
+
+              <div class="stat-card-premium" style="--card-color: #EF4444;">
+                <div class="stat-header">
+                  <div class="stat-icon-box">
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="stat-info">
+                  <span class="stat-label-p">Empleados sin Dotación</span>
+                  <span id="stat-no-uniform" class="stat-value-p">0</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="app-card" style="padding: 2rem; margin-top: 1.5rem;">
+              <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.25rem;">
+                Uniformes comprados por mes</h3>
+              <p style="color: #64748B; font-size: 0.875rem; margin-bottom: 1.5rem;">Volumen de prendas adquiridas en
+                los últimos 6 meses.</p>
+              <div style="position: relative; height: 280px;">
+                <canvas id="monthlyPurchaseChart"></canvas>
               </div>
             </div>
           </div> <!-- Close dashboard-left -->
@@ -1021,49 +1033,94 @@
         console.error("Error checking employees configuration progress:", e);
       }
 
-      // 4. Check active production and delivered uniforms from signed deliveries and POs
-      let prodCount = 0;
-      let deliverCount = 0;
+      // 4. Pendientes de Entrega: prendas en bodega sin entregar
+      let pendingDeliveryCount = 0;
       try {
-        const { count: pCount, error: pErr } = await _supabase
-          .from('company_purchase_orders')
-          .select('*', { count: 'exact', head: true })
-          .eq('company_id', userId)
-          .eq('status', 'produccion');
-        if (!pErr) prodCount = pCount || 0;
-
-        // Query signed uniform deliveries for this company's employees
-        const { data: employees, error: empErr } = await _supabase
-          .from('company_employees')
-          .select('id')
+        const { data: storageData, error: storageErr } = await _supabase
+          .from('company_storage')
+          .select('quantity')
           .eq('company_id', userId);
-
-        if (!empErr && employees && employees.length > 0) {
-          const employeeIds = employees.map(emp => emp.id);
-          const { count: dCount, error: dErr } = await _supabase
-            .from('uniform_deliveries')
-            .select('*', { count: 'exact', head: true })
-            .in('employee_id', employeeIds)
-            .eq('status', 'signed');
-
-          if (!dErr) deliverCount = dCount || 0;
+        if (!storageErr && storageData) {
+          pendingDeliveryCount = storageData.reduce((sum, item) => sum + (item.quantity || 0), 0);
         }
       } catch (e) {
-        console.error("Error checking POs and deliveries stats:", e);
+        console.error("Error loading pending delivery stat:", e);
+      }
+
+      // 5. Alertas Activas + Empleados sin Dotación (misma lógica que el semáforo de Empleados)
+      let alertsCount = 0;
+      let noUniformCount = 0;
+      try {
+        const [empListRes, roleDefRes, deliveriesRes] = await Promise.all([
+          _supabase.from('company_employees').select('id, role, role_status').eq('company_id', userId),
+          _supabase.from('role_definition').select('role_name, renewal_frequency').eq('company_id', userId),
+          _supabase.from('uniform_deliveries').select('employee_id, status, signed_at, created_at').eq('status', 'signed')
+        ]);
+
+        const activeEmployeeList = (empListRes.data || []).filter(e => e.role_status !== 'inactive');
+
+        const renewalFreqMap = {};
+        (roleDefRes.data || []).forEach(r => {
+          if (r.role_name) renewalFreqMap[r.role_name.toLowerCase().trim()] = r.renewal_frequency || 6;
+        });
+
+        const deliveriesByEmployee = {};
+        (deliveriesRes.data || []).forEach(d => {
+          if (!d.employee_id) return;
+          if (!deliveriesByEmployee[d.employee_id]) deliveriesByEmployee[d.employee_id] = [];
+          deliveriesByEmployee[d.employee_id].push(d);
+        });
+
+        const nowDate = new Date();
+        activeEmployeeList.forEach(emp => {
+          const empDeliveries = deliveriesByEmployee[emp.id] || [];
+          if (empDeliveries.length === 0) {
+            noUniformCount++;
+            return;
+          }
+          empDeliveries.sort((a, b) => new Date(b.signed_at || b.created_at) - new Date(a.signed_at || a.created_at));
+          const latest = empDeliveries[0];
+          const signedDate = new Date(latest.signed_at || latest.created_at);
+          const renewalMonths = renewalFreqMap[(emp.role || '').toLowerCase().trim()] || 6;
+          const nextDate = new Date(signedDate);
+          nextDate.setMonth(nextDate.getMonth() + renewalMonths);
+          const diffMonths = (nextDate - nowDate) / (1000 * 60 * 60 * 24 * 30.44);
+          if (diffMonths <= 1) alertsCount++; // vencido o próximo a renovar en <= 1 mes
+        });
+      } catch (e) {
+        console.error("Error loading alerts/no-uniform stats:", e);
+      }
+
+      // 6. Gasto del Mes: total de órdenes de compra creadas este mes calendario
+      let monthlySpend = 0;
+      try {
+        const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+        const { data: poData, error: poErr } = await _supabase
+          .from('company_purchase_orders')
+          .select('total_amount, created_at')
+          .eq('company_id', userId)
+          .gte('created_at', startOfMonth);
+        if (!poErr && poData) {
+          monthlySpend = poData.reduce((sum, po) => sum + (Number(po.total_amount) || 0), 0);
+        }
+      } catch (e) {
+        console.error("Error loading monthly spend stat:", e);
       }
 
       // Update Card statistics on page dynamically
-      const activeEmployeesEl = document.getElementById('stat-active-employees');
-      if (activeEmployeesEl) activeEmployeesEl.textContent = empCount;
+      const pendingDeliveryEl = document.getElementById('stat-pending-delivery');
+      if (pendingDeliveryEl) pendingDeliveryEl.textContent = pendingDeliveryCount;
 
-      const rolesCountEl = document.getElementById('stat-roles-count');
-      if (rolesCountEl) rolesCountEl.textContent = rolesCount;
+      const alertsEl = document.getElementById('stat-alerts');
+      if (alertsEl) alertsEl.textContent = alertsCount;
 
-      const activeProductionEl = document.getElementById('stat-active-production');
-      if (activeProductionEl) activeProductionEl.textContent = prodCount;
+      const monthlySpendEl = document.getElementById('stat-monthly-spend');
+      if (monthlySpendEl) monthlySpendEl.textContent = `$${Math.round(monthlySpend).toLocaleString('es-CO')}`;
 
-      const deliveredUniformsEl = document.getElementById('stat-delivered-uniforms');
-      if (deliveredUniformsEl) deliveredUniformsEl.textContent = deliverCount;
+      const noUniformEl = document.getElementById('stat-no-uniform');
+      if (noUniformEl) noUniformEl.textContent = noUniformCount;
+
+      loadMonthlyPurchaseChart(userId);
 
 
       let completedSteps = 0;
@@ -1129,7 +1186,73 @@
         layout.classList.toggle('sidebar-open');
       }
     }
+
+    let monthlyPurchaseChartInstance = null;
+    async function loadMonthlyPurchaseChart(userId) {
+      const canvas = document.getElementById('monthlyPurchaseChart');
+      if (!canvas || typeof Chart === 'undefined') return;
+
+      const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+      const now = new Date();
+      const labels = [];
+      const volumes = [0, 0, 0, 0, 0, 0];
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        labels.push(monthNames[d.getMonth()]);
+      }
+
+      try {
+        const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString();
+        const { data: poData, error } = await _supabase
+          .from('company_purchase_orders')
+          .select('items, created_at')
+          .eq('company_id', userId)
+          .gte('created_at', sixMonthsAgo);
+
+        if (!error && poData) {
+          poData.forEach(po => {
+            const created = new Date(po.created_at);
+            const monthsAgo = (now.getFullYear() - created.getFullYear()) * 12 + (now.getMonth() - created.getMonth());
+            const idx = 5 - monthsAgo;
+            if (idx >= 0 && idx < 6) {
+              const items = Array.isArray(po.items) ? po.items : [];
+              const qty = items.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
+              volumes[idx] += qty;
+            }
+          });
+        }
+      } catch (e) {
+        console.error('Error loading monthly purchase chart:', e);
+      }
+
+      if (monthlyPurchaseChartInstance) {
+        monthlyPurchaseChartInstance.destroy();
+      }
+
+      monthlyPurchaseChartInstance = new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Prendas compradas',
+            data: volumes,
+            backgroundColor: '#06b6d4',
+            borderRadius: 6,
+            maxBarThickness: 48
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } }
+          }
+        }
+      });
+    }
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
   <script src="assets/js/dot-widget.js"></script>
