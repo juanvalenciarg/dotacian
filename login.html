@@ -459,23 +459,13 @@
               .eq('id', data.user.id)
               .single();
 
-            if (userProfile) {
-              if (userProfile.country) {
-                localStorage.setItem('dotacian_user_country', userProfile.country);
-              }
-              
-              // Redirigir a onboarding si faltan datos clave
-              if (!userProfile.company_name || !userProfile.country) {
-                setTimeout(() => {
-                  window.location.href = 'onboarding.html';
-                }, 1000);
-                return;
-              }
+            if (userProfile && userProfile.country) {
+              localStorage.setItem('dotacian_user_country', userProfile.country);
             }
           } catch (e) { console.warn("Error validando perfil:", e); }
 
           setTimeout(() => {
-            window.location.href = 'dot.html';
+            window.location.href = '/app/dashboard';
           }, 1000);
 
         } catch (err) {
