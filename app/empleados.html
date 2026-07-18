@@ -14,10 +14,6 @@
   <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
   <link rel="stylesheet" href="/styles.css">
   <style>
-    :root {
-      --sidebar-width: 80px;
-    }
-
     .filter-chip {
       padding: 0.5rem 1.25rem;
       border-radius: 999px;
@@ -178,24 +174,6 @@
       z-index: 10;
     }
 
-    .nav-label, .nav-sub-items, .nav-item span:last-child {
-      display: none !important;
-    }
-    .nav-item {
-      justify-content: center !important;
-      padding: 0.875rem 0 !important;
-      margin-bottom: 0.8rem !important;
-    }
-    .nav-icon {
-      margin: 0 !important;
-      font-size: 1.4rem !important;
-    }
-    .sidebar-header {
-      padding: 1.5rem 0 !important;
-      display: flex !important;
-      justify-content: center !important;
-    }
-    
     @media (max-width: 992px) {
       .app-header {
         left: 0;
@@ -239,7 +217,7 @@
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
           <span class="nav-label">Roles</span>
         </a>
-        <a href="/app/empleados" class="nav-item">
+        <a href="/app/empleados" class="nav-item active">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
           <span class="nav-label">Empleados</span>
         </a>
