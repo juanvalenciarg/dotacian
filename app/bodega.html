@@ -1,0 +1,2124 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <link rel="icon" type="image/svg+xml" href="/assets/logos/favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dotacian | Bodega</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    :root {
+      --sidebar-width: 80px;
+    }
+
+    .bodega-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-en-bodega {
+      background: #DBEAFE;
+      color: #1D4ED8;
+    }
+
+    .badge-listo {
+      background: #D1FAE5;
+      color: #065F46;
+    }
+
+    .badge-en-transito {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      border: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .stat-value {
+      font-family: var(--font-family-heading);
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--color-navy);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.8125rem;
+      color: var(--color-text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    .action-btn {
+      padding: 0.4rem 0.9rem;
+      border-radius: var(--radius-md);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+
+    .action-btn-primary {
+      background: var(--color-cyan);
+      color: var(--color-navy);
+    }
+
+    .action-btn-primary:hover {
+      filter: brightness(1.08);
+    }
+
+    .action-btn-outline {
+      background: white;
+      border: 1.5px solid var(--color-border);
+      color: var(--color-navy);
+    }
+
+    .action-btn-outline:hover {
+      border-color: var(--color-cyan);
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-pill {
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1.5px solid var(--color-border);
+      background: white;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-pill.active,
+    .filter-pill:hover {
+      border-color: var(--color-cyan);
+      color: var(--color-navy);
+      background: var(--color-cyan-dim);
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(14, 23, 44, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 1.5rem;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 2rem;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: none;
+      border: none;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+
+    .modal-close:hover {
+      color: var(--color-navy);
+    }
+
+    .kpi-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      max-width: 1100px;
+      margin: 0 auto 3rem auto;
+    }
+
+    .large-kpi-card {
+      background: linear-gradient(145deg, #ffffff, #f8fafc);
+      border-radius: 1.5rem;
+      padding: 3rem 2rem;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+    }
+
+    .large-kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--color-cyan), var(--color-navy));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .large-kpi-card:hover {
+      border-color: rgba(6, 182, 212, 0.3);
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    }
+
+    .large-kpi-card:hover::before {
+      opacity: 1;
+    }
+
+    .large-kpi-icon-wrapper {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-cyan-dim);
+      color: var(--color-cyan);
+      box-shadow: inset 0 0 0 1px rgba(6, 182, 212, 0.1);
+    }
+
+    .kpi-icon-2 {
+      background: #FEF3C7;
+      color: #D97706;
+      box-shadow: inset 0 0 0 1px rgba(217, 119, 6, 0.1);
+    }
+
+    .large-kpi-value {
+      font-family: var(--font-family-heading);
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--color-navy);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.03em;
+    }
+
+    .large-kpi-label {
+      font-size: 1.125rem;
+      color: var(--color-text-secondary);
+      font-weight: 600;
+      font-family: var(--font-family-heading);
+    }
+
+    .large-kpi-subtext {
+      font-size: 0.8125rem;
+      color: var(--color-text-muted);
+      margin-top: 1.25rem;
+      padding: 0.35rem 1rem;
+      background: var(--color-bg);
+      border-radius: 999px;
+      border: 1px solid var(--color-border);
+      transition: all 0.2s;
+    }
+
+    .large-kpi-card:hover .large-kpi-subtext {
+      background: white;
+      border-color: var(--color-cyan);
+      color: var(--color-navy);
+    }
+
+    /* ── Alerts Panel ─────────────────────────────────────── */
+    .alerts-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(14, 23, 44, 0.45);
+      backdrop-filter: blur(3px);
+      z-index: 1999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .alerts-backdrop.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .alerts-panel {
+      position: fixed;
+      top: 0;
+      right: -460px;
+      width: 440px;
+      max-width: 95vw;
+      height: 100vh;
+      background: #fff;
+      z-index: 2000;
+      box-shadow: -8px 0 40px rgba(0, 0, 0, 0.14);
+      display: flex;
+      flex-direction: column;
+      transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .alerts-panel.open {
+      right: 0;
+    }
+
+    .alerts-panel-header {
+      padding: 1.5rem 1.5rem 1rem;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .alerts-section-title {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+      margin: 1.25rem 0 0.75rem;
+    }
+
+    .alert-item {
+      display: flex;
+      gap: 0.875rem;
+      align-items: flex-start;
+      padding: 0.875rem 1rem;
+      border-radius: 12px;
+      margin-bottom: 0.5rem;
+      border: 1px solid transparent;
+      transition: background 0.15s;
+    }
+
+    .alert-item:hover {
+      background: #F8FAFC;
+    }
+
+    .alert-item.alert-warning {
+      background: #FFFBEB;
+      border-color: #FDE68A;
+    }
+
+    .alert-item.alert-danger {
+      background: #FEF2F2;
+      border-color: #FECACA;
+    }
+
+    .alert-item-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .alert-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: #EF4444;
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 800;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 0.5rem;
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 1001;
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.5);
+      z-index: 900;
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .app-layout.sidebar-open .sidebar-overlay {
+      display: block;
+      opacity: 1;
+    }
+
+    @media (max-width: 992px) {
+      .main-content {
+        margin-left: 0;
+      }
+
+      .mobile-menu-toggle {
+        display: none;
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        padding: 0.5rem;
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        z-index: 1001;
+      }
+
+      .sidebar {
+        z-index: 1000;
+      }
+
+      .welcome-banner {
+        padding: 5rem 1.5rem 2rem 1.5rem;
+      }
+
+      .header-right {
+        position: static !important;
+        flex-direction: column;
+        align-items: flex-start !important;
+        margin-top: 1rem;
+        gap: 1rem !important;
+      }
+    }
+
+    /* Main Content Refinement */
+    .main-content {
+      flex: 1;
+      margin-left: 80px;
+      padding: 0;
+      background: #F8FAFC;
+    }
+
+    .app-header {
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: transparent;
+      border: none;
+      position: absolute;
+      top: 0;
+      left: 80px;
+      right: 0;
+      z-index: 10;
+    }
+
+    .nav-label, .nav-sub-items, .nav-item span:last-child {
+      display: none !important;
+    }
+    .nav-item {
+      justify-content: center !important;
+      padding: 0.875rem 0 !important;
+      margin-bottom: 0.8rem !important;
+    }
+    .nav-icon {
+      margin: 0 !important;
+      font-size: 1.4rem !important;
+    }
+    .sidebar-header {
+      padding: 1.5rem 0 !important;
+      display: flex !important;
+      justify-content: center !important;
+    }
+    
+    @media (max-width: 992px) {
+      .app-header {
+        left: 0;
+        padding: 1rem 1.5rem;
+      }
+      .main-content {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-layout" id="app-layout-wrapper">
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <!-- Sidebar (shared) -->
+        <aside class="sidebar" style="display: flex; flex-direction: column;">
+      <!-- TOP: dot AI -->
+      <div class="sidebar-header" style="position: relative; display: flex; justify-content: center; padding: 1.5rem 0 1rem 0 !important; overflow: visible;">
+        <a href="/dot.html" class="nav-item dot-brand" style="display: flex; align-items: center; justify-content: center; text-decoration: none; border-radius: 50%; padding: 0; background: transparent; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';">
+          <img src="/assets/logos/favicon.svg" alt="dot AI" style="width: 42px; height: 42px; object-fit: contain;">
+        </a>
+      </div>
+      
+      <!-- MIDDLE: Navigation -->
+      <nav class="sidebar-nav" style="flex: 1; display: flex; flex-direction: column; overflow-y: auto;">
+        <a href="/app/dashboard" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="/app/roles" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+          <span class="nav-label">Roles</span>
+        </a>
+        <a href="/app/empleados" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          <span class="nav-label">Empleados</span>
+        </a>
+        <a href="/app/bodega" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg></span>
+          <span class="nav-label">Bodega</span>
+        </a>
+      </nav>
+
+      <!-- BOTTOM: Secondary Menu -->
+      <div class="sidebar-footer" style="padding: 1.5rem 0; display: flex; justify-content: center; position: relative;">
+        <div class="header-right" style="position: relative; display: flex; justify-content: center; width: 100%; padding: 0;">
+          <div id="header-company-badge" onclick="toggleUserPopover(event)"
+            style="width: 36px; height: 36px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; box-shadow: var(--shadow-sm); transition: transform 0.2s, background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';" onmouseout="this.style.background='rgba(255,255,255,0.05)';">
+            <div id="badge-industry-icon" style="display: none;"></div>
+            <span id="company-name-display" style="display: none;"></span>
+            <span id="dash-industry-val" style="display: none;"></span>
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0-2.73.73l.15-.08a2 2 0 0 1-2 0l.43.25a2 2 0 0 1-1-1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1-1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>
+          </div>
+
+          <!-- Popover (Abriendo hacia arriba y a la derecha) -->
+          <div id="user-popover" class="user-popover" style="left: 60px; bottom: 0; top: auto; right: auto; min-width: 250px;">
+            <div class="popover-label">Usuario</div>
+            <div id="pop-user-name" class="popover-value">Cargando...</div>
+            <div class="popover-label">Correo Electrónico</div>
+            <div id="pop-user-email" class="popover-value" style="margin-bottom: 0;">Cargando...</div>
+            <div class="popover-label" style="margin-top: 1rem;">País</div>
+            <div id="version-tag" style="margin-top: 0.25rem; display: flex;"></div>
+            <hr style="margin: 1rem 0; border: none; border-top: 1px solid var(--color-smoke-mid);">
+            <a href="#"
+              style="color: var(--color-navy); font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; margin-bottom: 0.5rem; transition: color 0.2s;"
+              onmouseover="this.style.color='var(--color-cyan)'" onmouseout="this.style.color='var(--color-navy)'">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+              </svg>
+              Alertas
+            </a>
+            <a href="/configuracion.html"
+              style="color: var(--color-navy); font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; margin-bottom: 0.5rem; transition: color 0.2s;"
+              onmouseover="this.style.color='var(--color-cyan)'" onmouseout="this.style.color='var(--color-navy)'">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path
+                  d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0-2.73.73l.15-.08a2 2 0 0 1-2 0l.43.25a2 2 0 0 1-1-1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1-1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              Configuración
+            </a>
+            <a href="/login.html"
+              style="color: #EF4444; font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; transition: color 0.2s;"
+              onmouseover="this.style.color='#DC2626'" onmouseout="this.style.color='#EF4444'">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              Cerrar Sesión
+            </a>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="app-header">
+        <div class="header-left" style="display: flex; align-items: center;">
+          <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" viewBox="0 0 24 24">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="dashboard-content-wrapper" style="padding-top: 5rem;">
+        <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end;">
+          <div>
+            <h1 class="dot-greeting" style="text-align: left; margin-bottom: 0.5rem; font-size: 3rem; background: linear-gradient(90deg, #94A3B8 0%, #1E293B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Bodega</h1>
+            <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;">Uniformes en stock — producidos pero pendientes de entrega al empleado</p>
+          </div>
+        </div>
+        <div class="app-container">
+          <!-- Main KPI Area -->
+          <div class="kpi-container">
+
+            <div class="large-kpi-card" onclick="openInventoryModal()">
+              <button
+                style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--color-text-muted); cursor: pointer; padding: 0.5rem; z-index: 10;"
+                onclick="event.stopPropagation(); this.closest('.large-kpi-card').style.display='none';">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+              <div class="large-kpi-icon-wrapper">
+                <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round" viewBox="0 0 24 24">
+                  <path
+                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                  </path>
+                  <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                  <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>
+              </div>
+              <div class="large-kpi-value" id="kpiTotalPrendas">0</div>
+              <div class="large-kpi-label">Prendas Totales en Bodega</div>
+              <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; justify-content: center;">
+                <button class="btn btn-outline"
+                  style="border-radius: 99px; font-size: 0.8125rem; padding: 0.5rem 1rem; border-color: var(--color-cyan); color: var(--color-navy);"
+                  onclick="event.stopPropagation(); openInventoryModal();">
+                  Ver desglose
+                </button>
+                <button class="btn btn-primary"
+                  style="border-radius: 99px; font-size: 0.8125rem; padding: 0.5rem 1rem; background: var(--color-navy); color: white; border: none;"
+                  onclick="event.stopPropagation(); openAdjustModal();">
+                  Ajustar Inventario
+                </button>
+              </div>
+            </div>
+
+            <div class="large-kpi-card" style="cursor: default;">
+              <button
+                style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--color-text-muted); cursor: pointer; padding: 0.5rem; z-index: 10;"
+                onclick="event.stopPropagation(); this.closest('.large-kpi-card').style.display='none';">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+              <div class="large-kpi-icon-wrapper"
+                style="background: #ECFDF5; color: #059669; box-shadow: inset 0 0 0 1px rgba(5, 150, 105, 0.1);">
+                <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round" viewBox="0 0 24 24">
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+              </div>
+              <div class="large-kpi-value" id="kpiValorBodega">$0</div>
+              <div class="large-kpi-label">Valor del Inventario</div>
+              <div class="large-kpi-subtext"
+                style="color: #059669; font-weight: 700; display: flex; align-items: center; gap: 4px;">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                  <polyline points="17 6 23 6 23 12"></polyline>
+                </svg>
+                +12.5% vs mes anterior
+              </div>
+            </div>
+
+            <div class="large-kpi-card" style="cursor: default; padding: 1.5rem;">
+              <button
+                style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--color-text-muted); cursor: pointer; padding: 0.5rem; z-index: 10;"
+                onclick="event.stopPropagation(); this.closest('.large-kpi-card').style.display='none';">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+              <h3
+                style="font-size: 1.125rem; color: var(--color-navy); font-weight: 700; margin-bottom: 1rem; align-self: flex-start; font-family: var(--font-family-heading);">
+                Distribución por Producto</h3>
+              <div style="width: 100%; height: 200px; position: relative;">
+                <canvas id="bodegaPieChart"></canvas>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Time Series Chart -->
+          <div style="max-width: 1100px; margin: 0 auto 3rem auto;">
+            <div class="large-kpi-card" style="cursor: default; padding: 2.5rem 2rem; align-items: flex-start;">
+              <button
+                style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--color-text-muted); cursor: pointer; padding: 0.5rem; z-index: 10;"
+                onclick="event.stopPropagation(); this.closest('.large-kpi-card').style.display='none';">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+              <div
+                style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 2rem;">
+                <div>
+                  <h3
+                    style="font-size: 1.25rem; color: var(--color-navy); font-weight: 700; margin-bottom: 0.25rem; font-family: var(--font-family-heading);">
+                    Histórico de Stock</h3>
+                  <p style="color: var(--color-text-secondary); font-size: 0.875rem;">Visualiza los picos de inventario
+                    en
+                    los últimos 6 meses.</p>
+                </div>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                  <style>
+                    .time-filter-btn {
+                      border: none;
+                      background: transparent;
+                      padding: 0.3rem 0.8rem;
+                      font-size: 0.75rem;
+                      font-weight: 600;
+                      border-radius: 6px;
+                      cursor: pointer;
+                      color: var(--color-text-secondary);
+                      transition: all 0.2s;
+                    }
+
+                    .time-filter-btn:hover {
+                      color: var(--color-navy);
+                    }
+
+                    .time-filter-btn.active {
+                      background: white;
+                      color: var(--color-navy);
+                      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                    }
+                  </style>
+                  <div style="display: flex; background: #F1F5F9; border-radius: 8px; padding: 3px; gap: 2px;">
+                    <button id="btnTimeDay" class="time-filter-btn" onclick="updateHistoricalChart('day')">Día</button>
+                    <button id="btnTimeMonth" class="time-filter-btn active"
+                      onclick="updateHistoricalChart('month')">Mes</button>
+                    <button id="btnTimeYear" class="time-filter-btn"
+                      onclick="updateHistoricalChart('year')">Año</button>
+                  </div>
+                  <div class="bodega-badge badge-listo" style="margin-left: 0.5rem;">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"
+                      viewBox="0 0 24 24">
+                      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                      <polyline points="17 6 23 6 23 12"></polyline>
+                    </svg>
+                    Tendencia
+                  </div>
+                </div>
+              </div>
+              <div style="width: 100%; height: 280px; position: relative;">
+                <canvas id="bodegaTimeChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inventory Breakdown Modal -->
+      <div class="modal-overlay" id="inventoryModal">
+        <div class="modal-content">
+          <button class="modal-close" onclick="closeInventoryModal()">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+
+          <h2
+            style="font-family: var(--font-family-heading); color: var(--color-navy); font-size: 1.5rem; margin-bottom: 0.5rem;">
+            Desglose de Inventario</h2>
+          <p style="color: var(--color-text-secondary); font-size: 0.875rem; margin-bottom: 1.5rem;">Unidades
+            disponibles por tipo de prenda, talla y condición.</p>
+
+          <!-- Stats Summary -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+            <div
+              style="background: #f0fdfa; border: 1px solid #ccfbf1; padding: 1rem; border-radius: 12px; display: flex; align-items: center; gap: 0.75rem;">
+              <div
+                style="width: 32px; height: 32px; border-radius: 8px; background: #0d9488; color: white; display: flex; align-items: center; justify-content: center;">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div>
+                <div style="font-size: 0.65rem; text-transform: uppercase; color: #0f766e; font-weight: 700;">Stock
+                  Nuevo</div>
+                <div id="newStockCount" style="font-size: 1.25rem; font-weight: 700; color: #0f766e;">0</div>
+              </div>
+            </div>
+            <div
+              style="background: #f0f9ff; border: 1px solid #e0f2fe; padding: 1rem; border-radius: 12px; display: flex; align-items: center; gap: 0.75rem;">
+              <div
+                style="width: 32px; height: 32px; border-radius: 8px; background: #0284c7; color: white; display: flex; align-items: center; justify-content: center;">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </div>
+              <div>
+                <div style="font-size: 0.65rem; text-transform: uppercase; color: #0369a1; font-weight: 700;">Seminuevos
+                </div>
+                <div id="usedStockCount" style="font-size: 1.25rem; font-weight: 700; color: #0369a1;">0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Search Bar -->
+          <div style="position: relative; margin-bottom: 1.25rem;">
+            <input type="text" id="inventorySearch" placeholder="Buscar por producto o talla..."
+              onkeyup="renderInventoryTable(this.value)"
+              style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid var(--color-border); border-radius: 12px; font-size: 0.875rem; outline: none; border-color: var(--color-cyan);">
+            <span
+              style="position: absolute; left: 0.875rem; top: 50%; transform: translateY(-50%); color: var(--color-text-muted);">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+            </span>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Talla</th>
+                  <th>Estado</th>
+                  <th>Cantidad</th>
+                </tr>
+              </thead>
+              <tbody id="inventoryTableBody">
+                <!-- Data populated by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Quick Actions -->
+          <div
+            style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div style="color: var(--color-text-muted); font-size: 0.75rem; flex: 1; min-width: 200px;">
+              * Los seminuevos provienen de devoluciones automatizadas.
+            </div>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <button class="btn btn-outline"
+                style="font-size: 0.75rem; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.35rem;"
+                onclick="downloadInventoryExcel()">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="8" y1="13" x2="16" y2="13"></line>
+                  <line x1="8" y1="17" x2="16" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                Excel
+              </button>
+              <button class="btn btn-outline"
+                style="font-size: 0.75rem; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.35rem;"
+                onclick="downloadInventoryPDF()">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                PDF
+              </button>
+              <button class="btn btn-outline" style="font-size: 0.75rem; padding: 0.5rem 1rem; margin-left: 0.5rem;"
+                onclick="closeInventoryModal()">Cerrar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ajuste de Inventario Modal (REDESIGNED) -->
+      <div class="modal-overlay" id="adjustModal">
+        <div class="modal-content">
+          <button class="modal-close" onclick="closeAdjustModal()">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+
+          <h2
+            style="font-family: var(--font-family-heading); color: var(--color-navy); font-size: 1.5rem; margin-bottom: 0.5rem;">
+            Ajuste de Inventario</h2>
+          <p style="color: var(--color-text-secondary); font-size: 0.875rem; margin-bottom: 1.5rem;">Los cambios se
+            reflejan automáticamente en el cálculo de cotizaciones.</p>
+
+          <!-- Add / Remove Toggle -->
+          <div
+            style="display: flex; background: #F1F5F9; border-radius: 12px; padding: 4px; margin-bottom: 1.5rem; gap: 4px;"
+            id="adjustTypeToggle">
+            <button id="btnModeAdd" onclick="setAdjustMode('add')"
+              style="flex: 1; padding: 0.6rem; border-radius: 8px; border: none; font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: all 0.2s; background: var(--color-cyan); color: var(--color-navy);">
+              ＋ Agregar prendas
+            </button>
+            <button id="btnModeRemove" onclick="setAdjustMode('remove')"
+              style="flex: 1; padding: 0.6rem; border-radius: 8px; border: none; font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: all 0.2s; background: transparent; color: var(--color-text-secondary);">
+              － Quitar prendas
+            </button>
+          </div>
+
+          <!-- Info banner (changes based on mode) -->
+          <div id="adjustInfoBanner"
+            style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.875rem 1rem; border-radius: 10px; margin-bottom: 1.25rem; background: rgba(6,182,212,0.08); border: 1px solid rgba(6,182,212,0.2);">
+            <svg width="16" height="16" fill="none" stroke="#06B6D4" stroke-width="2" viewBox="0 0 24 24"
+              style="flex-shrink:0; margin-top:2px;">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 16v-4M12 8h.01" />
+            </svg>
+            <span id="adjustInfoText" style="font-size: 0.8125rem; color: var(--color-navy); line-height: 1.5;">Las
+              prendas agregadas
+              aumentarán el stock disponible. El sistema descontará este stock al generar
+              cotizaciones.</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+            <div>
+              <label
+                style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Producto</label>
+              <select id="adjustProduct"
+                style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem; background: white; color: var(--color-navy); font-weight: 600;">
+                <option value="">Cargando prendas autorizadas...</option>
+              </select>
+              <!-- Stock indicator shown only in Remove mode -->
+              <div id="adjustStockIndicator"
+                style="display: none; margin-top: 0.5rem; padding: 0.5rem 0.75rem; background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 8px; font-size: 0.8125rem; color: #C2410C; font-weight: 600;">
+              </div>
+            </div>
+
+            <div>
+              <label
+                style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Talla</label>
+              <input type="text" id="adjustSize" placeholder="Ej. M, L, Unitalla"
+                style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem;">
+            </div>
+
+            <div style="display: flex; gap: 1rem;">
+              <div style="flex: 1;">
+                <label
+                  style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Estado</label>
+                <select id="adjustState"
+                  style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem;">
+                  <option value="nuevo">Nuevo</option>
+                  <option value="seminuevo">Seminuevo</option>
+                </select>
+              </div>
+              <div style="flex: 1;">
+                <label
+                  style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                  Cantidad
+                  <span id="adjustQtyHint"
+                    style="font-weight: 500; font-size: 0.75rem; color: var(--color-text-muted);"></span>
+                </label>
+                <input type="number" id="adjustQty" min="1" placeholder="0"
+                  style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem;">
+              </div>
+            </div>
+
+            <div>
+              <label
+                style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Motivo
+                del ajuste (opcional)</label>
+              <input type="text" id="adjustReason" placeholder="Ej. Inventario inicial, merma, pérdida..."
+                style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem;">
+            </div>
+          </div>
+
+          <div
+            style="display: flex; justify-content: flex-end; gap: 1rem; border-top: 1px solid var(--color-border); padding-top: 1.5rem;">
+            <button class="btn btn-outline" style="font-size: 0.875rem; padding: 0.6rem 1.25rem;"
+              onclick="closeAdjustModal()">Cancelar</button>
+            <button id="btnGuardarAjuste" class="btn btn-primary" style="font-size: 0.875rem; padding: 0.6rem 1.25rem;"
+              onclick="saveInventoryAdjustment()">Guardar Ajuste</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Minimos Modal -->
+      <div class="modal-overlay" id="minimosModal">
+        <div class="modal-content">
+          <button class="modal-close" onclick="closeMinimosModal()">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+
+          <h2
+            style="font-family: var(--font-family-heading); color: var(--color-navy); font-size: 1.5rem; margin-bottom: 0.5rem;">
+            Configuración de Stock Mínimo</h2>
+          <p style="color: var(--color-text-secondary); font-size: 0.875rem; margin-bottom: 1.5rem;">Establece la
+            cantidad mínima por producto para garantizar la operación continua.</p>
+
+          <div class="table-wrapper">
+            <table class="data-table" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Talla</th>
+                  <th>Stock Actual</th>
+                  <th>Stock Mínimo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight: 600; color: var(--color-navy);">Camisa Oxford</td>
+                  <td>M</td>
+                  <td><span class="bodega-badge badge-listo" style="font-size: 0.65rem;">12 unid.</span></td>
+                  <td><input type="number" value="10"
+                      style="width: 70px; padding: 0.4rem; border: 1px solid var(--color-border); border-radius: 6px; font-size: 0.875rem; text-align: center;">
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600; color: var(--color-navy);">Camisa Oxford</td>
+                  <td>L</td>
+                  <td><span class="bodega-badge badge-en-transito" style="font-size: 0.65rem;">8 unid.</span></td>
+                  <td><input type="number" value="10"
+                      style="width: 70px; padding: 0.4rem; border: 1px solid var(--color-border); border-radius: 6px; font-size: 0.875rem; text-align: center;">
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600; color: var(--color-navy);">Mandil Barista</td>
+                  <td>Unitalla</td>
+                  <td><span class="bodega-badge badge-en-transito" style="font-size: 0.65rem;">5 unid.</span></td>
+                  <td><input type="number" value="15"
+                      style="width: 70px; padding: 0.4rem; border: 1px solid var(--color-border); border-radius: 6px; font-size: 0.875rem; text-align: center;">
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600; color: var(--color-navy);">Pantalón Cargo</td>
+                  <td>32</td>
+                  <td><span class="bodega-badge badge-listo" style="font-size: 0.65rem;">6 unid.</span></td>
+                  <td><input type="number" value="5"
+                      style="width: 70px; padding: 0.4rem; border: 1px solid var(--color-border); border-radius: 6px; font-size: 0.875rem; text-align: center;">
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div
+            style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center;">
+            <div style="color: var(--color-text-muted); font-size: 0.75rem;">
+              * Recibirás notificaciones cuando el stock alcance este límite.
+            </div>
+            <div style="display: flex; gap: 1rem;">
+              <button class="btn btn-outline" style="font-size: 0.875rem; padding: 0.6rem 1.25rem;"
+                onclick="closeMinimosModal()">Cancelar</button>
+              <button class="btn btn-primary" style="font-size: 0.875rem; padding: 0.6rem 1.25rem;"
+                onclick="saveMinimos()">Guardar Configuración</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ── Alerts Panel ──────────────────────────────────── -->
+  <div class="alerts-backdrop" id="alertsBackdrop" onclick="closeAlertsPanel()"></div>
+  <div class="alerts-panel" id="alertsPanel">
+    <div class="alerts-panel-header">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div
+          style="width: 36px; height: 36px; border-radius: 10px; background: #FFF7ED; color: #D97706; display: flex; align-items: center; justify-content: center;">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+          </svg>
+        </div>
+        <div>
+          <h3
+            style="font-family: var(--font-family-heading); font-size: 1.125rem; color: var(--color-navy); margin: 0; line-height: 1.2;">
+            Alertas
+            <span id="alertsTotalBadge" class="alert-badge" style="display:none;">0</span>
+          </h3>
+          <p id="alertsSubtitle" style="font-size: 0.75rem; color: var(--color-text-muted); margin: 0;">Cargando...</p>
+        </div>
+      </div>
+      <button onclick="closeAlertsPanel()"
+        style="background: none; border: none; cursor: pointer; padding: 0.5rem; color: var(--color-text-muted); border-radius: 8px; transition: all 0.15s;"
+        onmouseover="this.style.background='var(--color-smoke)'" onmouseout="this.style.background='none'">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Scrollable content -->
+    <div style="overflow-y: auto; flex: 1; padding: 0 1.25rem 2rem;">
+
+      <!-- Renovations section -->
+      <div class="alerts-section-title">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"
+          style="vertical-align: -1px;">
+          <rect width="18" height="18" x="3" y="4" rx="2" />
+          <path d="M16 2v4M8 2v4M3 10h18" />
+        </svg>
+        Renovaciones Próximas
+      </div>
+      <div id="renewalAlertsList">
+        <div style="text-align: center; padding: 2rem 1rem; color: var(--color-text-muted); font-size: 0.875rem;">
+          Cargando...
+        </div>
+      </div>
+
+      <!-- Damage requests section -->
+      <div class="alerts-section-title" style="margin-top: 1.5rem;">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"
+          style="vertical-align: -1px;">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+        Solicitudes de Reposición por Daño
+      </div>
+      <div id="damageAlertsList">
+        <div style="text-align: center; padding: 2rem 1rem; color: var(--color-text-muted); font-size: 0.875rem;">
+          Cargando...
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/js/utils.js?v=4"></script>
+  <script>
+    if (typeof window._supabase === 'undefined') {
+      window.SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+      window.SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+      window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token', multiTab: false } });
+    }
+
+    let inventoryData = [];
+    let currentCompanyId = null;
+
+    async function initBodega() {
+      try {
+        const { data: sessionData } = await _supabase.auth.getSession();
+        if (!sessionData?.session?.user) {
+          window.location.href = '/login.html';
+          return;
+        }
+        currentCompanyId = sessionData.session.user.id;
+
+        // Asegurarnos de que el email aparezca
+        if (document.getElementById('pop-user-email')) {
+          document.getElementById('pop-user-email').textContent = sessionData.session.user.email;
+        }
+
+        await loadInventory();
+      } catch (err) {
+        console.error('Error inicializando Bodega:', err);
+      }
+    }
+
+    async function loadInventory() {
+      if (!currentCompanyId) return;
+
+      const { data, error } = await _supabase
+        .from('company_storage')
+        .select('*')
+        .eq('company_id', currentCompanyId);
+
+      if (error) {
+        console.error('Error cargando storage:', error);
+        return;
+      }
+
+      // Fetch prices from catalog, POs, and quotes to compute real value
+      const priceMap = {};
+
+      // 1. Fallback / Standard Prices
+      const fallbackPrices = {
+        'camisa oxford ejecutiva': 450,
+        'camisa oxford': 450,
+        'pantalón cocina pro': 350,
+        'pantalón de cocina': 350,
+        'filipina chef classic': 490,
+        'filipina chef': 490,
+        'filipina chef stretch': 550,
+        'mandil barista premium': 280,
+        'mandil barista': 280,
+        'polo piqué classic': 220,
+        'polo piqué': 220,
+        'conjunto antifluido': 650,
+        'overol industrial': 750,
+        'botas de seguridad': 850,
+        'bota de seguridad': 850,
+        'zapatos de seguridad': 850,
+        'tenis antiderrapantes': 490,
+        'zapato antiderrapante': 490
+      };
+
+      // 2. Query seller_catalog base_price
+      try {
+        const { data: catalogData } = await _supabase
+          .from('seller_catalog')
+          .select('name, base_price');
+        if (catalogData) {
+          catalogData.forEach(item => {
+            if (item.name) {
+              priceMap[item.name.trim().toLowerCase()] = item.base_price || 0;
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('Error loading catalog prices:', err);
+      }
+
+      // 3. Query company_purchase_orders items prices
+      try {
+        const { data: poData } = await _supabase
+          .from('company_purchase_orders')
+          .select('items')
+          .eq('company_id', currentCompanyId);
+        if (poData) {
+          poData.forEach(po => {
+            const itemsList = Array.isArray(po.items) ? po.items : [];
+            itemsList.forEach(it => {
+              if (it.product_name && it.unit_price) {
+                priceMap[it.product_name.trim().toLowerCase()] = it.unit_price;
+              }
+            });
+          });
+        }
+      } catch (err) {
+        console.warn('Error loading PO prices:', err);
+      }
+
+      // 4. Query company_quotes_requests unit_price
+      try {
+        const { data: qData } = await _supabase
+          .from('company_quotes_requests')
+          .select('product_name, unit_price')
+          .eq('company_id', currentCompanyId);
+        if (qData) {
+          qData.forEach(q => {
+            if (q.product_name && q.unit_price) {
+              priceMap[q.product_name.trim().toLowerCase()] = q.unit_price;
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('Error loading quote prices:', err);
+      }
+
+      window.inventoryPriceMap = { ...fallbackPrices, ...priceMap };
+
+      // Group items by product_name, size
+      const grouped = {};
+      data.forEach(item => {
+        const product = item.product_name || 'Desconocido';
+        const size = item.size || 'N/A';
+        const isUsed = item.status === 'seminuevo' || item.category === 'seminuevo'; // or any criteria for used
+
+        const key = `${product}_${size}`;
+        if (!grouped[key]) {
+          grouped[key] = { prenda: product, talla: size, nuevos: 0, seminuevos: 0 };
+        }
+
+        // Sum quantity. By default, assume 'nuevo' unless specified.
+        if (isUsed) {
+          grouped[key].seminuevos += (item.quantity || 0);
+        } else {
+          grouped[key].nuevos += (item.quantity || 0);
+        }
+      });
+
+      inventoryData = Object.values(grouped).filter(g => g.nuevos > 0 || g.seminuevos > 0);
+
+      calculateTotals();
+      renderPieChart();
+
+      window.rawInventoryData = data;
+      updateHistoricalChart('month');
+
+      // Update modal if open
+      if (document.getElementById('inventoryModal').classList.contains('active')) {
+        renderInventoryTable();
+      }
+    }
+
+    function calculateTotals() {
+      const totalPrendas = inventoryData.reduce((sum, item) => sum + item.nuevos + item.seminuevos, 0);
+      document.getElementById('kpiTotalPrendas').textContent = totalPrendas;
+
+      let totalValue = 0;
+      const priceMap = window.inventoryPriceMap || {};
+
+      inventoryData.forEach(item => {
+        const prodKey = (item.prenda || '').trim().toLowerCase();
+        const unitPrice = priceMap[prodKey] || 450; // fallback if not in map
+        const qty = (item.nuevos || 0) + (item.seminuevos || 0);
+        totalValue += qty * unitPrice;
+      });
+
+      document.getElementById('kpiValorBodega').textContent = formatCurrency(totalValue);
+    }
+
+    function renderInventoryTable(query = '') {
+      const tbody = document.getElementById('inventoryTableBody');
+      const q = query.toLowerCase().trim();
+      tbody.innerHTML = '';
+
+      let totalNuevos = 0;
+      let totalSeminuevos = 0;
+
+      inventoryData.forEach(item => {
+        if (q && !item.prenda.toLowerCase().includes(q) && !item.talla.toLowerCase().includes(q)) return;
+
+        totalNuevos += item.nuevos;
+        totalSeminuevos += item.seminuevos;
+
+        // Row for New stock
+        if (item.nuevos > 0) {
+          const trNew = document.createElement('tr');
+          trNew.innerHTML = `
+            <td><span style="font-weight: 600; color: var(--color-navy);">${item.prenda}</span></td>
+            <td>${item.talla}</td>
+            <td><span class="bodega-badge badge-listo" style="font-size: 0.65rem;">Nuevo</span></td>
+            <td><span style="font-weight: 700; color: var(--color-navy);">${item.nuevos}</span></td>
+          `;
+          tbody.appendChild(trNew);
+        }
+
+        // Row for Pre-owned stock
+        if (item.seminuevos > 0) {
+          const trUsed = document.createElement('tr');
+          trUsed.innerHTML = `
+            <td><span style="font-weight: 600; color: var(--color-navy);">${item.prenda}</span></td>
+            <td>${item.talla}</td>
+            <td><span class="bodega-badge" style="font-size: 0.65rem; background: var(--color-cyan-dim); color: var(--color-cyan);">Seminuevo</span></td>
+            <td><span style="font-weight: 700; color: var(--color-navy);">${item.seminuevos}</span></td>
+          `;
+          tbody.appendChild(trUsed);
+        }
+      });
+
+      document.getElementById('newStockCount').textContent = totalNuevos;
+      document.getElementById('usedStockCount').textContent = totalSeminuevos;
+    }
+
+    function openInventoryModal() {
+      renderInventoryTable();
+      document.getElementById('inventoryModal').classList.add('active');
+    }
+
+    function closeInventoryModal() {
+      document.getElementById('inventoryModal').classList.remove('active');
+      document.getElementById('inventorySearch').value = '';
+    }
+
+    function downloadInventoryExcel() {
+      const q = (document.getElementById('inventorySearch').value || '').toLowerCase().trim();
+      const exportData = [];
+
+      inventoryData.forEach(item => {
+        if (q && !item.prenda.toLowerCase().includes(q) && !item.talla.toLowerCase().includes(q)) return;
+
+        if (item.nuevos > 0) {
+          exportData.push({ Producto: item.prenda, Talla: item.talla, Estado: 'Nuevo', Cantidad: item.nuevos });
+        }
+        if (item.seminuevos > 0) {
+          exportData.push({ Producto: item.prenda, Talla: item.talla, Estado: 'Seminuevo', Cantidad: item.seminuevos });
+        }
+      });
+
+      if (exportData.length === 0) {
+        showNotification("No hay datos para exportar.");
+        return;
+      }
+
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Inventario");
+
+      const dateStr = new Date().toLocaleDateString('es-MX').replace(/\//g, '-');
+      XLSX.writeFile(wb, `Stock_Disponible_${dateStr}.xlsx`);
+    }
+
+    function downloadInventoryPDF() {
+      const q = (document.getElementById('inventorySearch').value || '').toLowerCase().trim();
+
+      let rowsHtml = '';
+      inventoryData.forEach(item => {
+        if (q && !item.prenda.toLowerCase().includes(q) && !item.talla.toLowerCase().includes(q)) return;
+
+        if (item.nuevos > 0) {
+          rowsHtml += `<tr><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.prenda}</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.talla}</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">Nuevo</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.nuevos}</td></tr>`;
+        }
+        if (item.seminuevos > 0) {
+          rowsHtml += `<tr><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.prenda}</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.talla}</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">Seminuevo</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.seminuevos}</td></tr>`;
+        }
+      });
+
+      if (!rowsHtml) {
+        showNotification("No hay datos para exportar.");
+        return;
+      }
+
+      const dateStrObj = new Date();
+      const dateStr = dateStrObj.toLocaleDateString('es-MX');
+
+      const printFrame = document.createElement('iframe');
+      printFrame.style.position = 'absolute';
+      printFrame.style.top = '-10000px';
+      printFrame.style.left = '-10000px';
+      document.body.appendChild(printFrame);
+
+      const frameDoc = printFrame.contentWindow ? printFrame.contentWindow.document : printFrame.contentDocument;
+      frameDoc.open();
+      frameDoc.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Stock_Disponible_${dateStr.replace(/\//g, '-')}</title>
+            <style>
+              body { font-family: 'Helvetica Neue', Arial, sans-serif; padding: 20px; color: #1e293b; background: #fff; }
+              table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 20px; }
+              th { padding: 10px 8px; border-bottom: 2px solid #cbd5e1; font-size: 0.875rem; text-transform: uppercase; color: #475569; }
+            </style>
+          </head>
+          <body>
+            <h2 style="margin-bottom: 5px;">Desglose de Inventario</h2>
+            <p style="color: #64748b; margin-top: 0;">Fecha de descarga: ${dateStr}</p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Talla</th>
+                  <th>Estado</th>
+                  <th>Cantidad</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rowsHtml}
+              </tbody>
+            </table>
+            <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+  <script src="/assets/js/dot-widget.js"></script>
+</body>
+        </html>
+      `);
+      frameDoc.close();
+
+      printFrame.onload = function () {
+        printFrame.contentWindow.focus();
+        printFrame.contentWindow.print();
+        setTimeout(() => { document.body.removeChild(printFrame); }, 1000);
+      };
+    }
+
+    function openMinimosModal() {
+      document.getElementById('minimosModal').classList.add('active');
+    }
+
+    function closeMinimosModal() {
+      document.getElementById('minimosModal').classList.remove('active');
+    }
+
+    function saveMinimos() {
+      alert('Se han guardado los mínimos de operación con éxito.');
+      closeMinimosModal();
+    }
+
+    // Close modals when clicking outside
+    document.getElementById('inventoryModal').addEventListener('click', function (e) {
+      if (e.target === this) closeInventoryModal();
+    });
+
+    document.getElementById('minimosModal').addEventListener('click', function (e) {
+      if (e.target === this) closeMinimosModal();
+    });
+
+    function exportBodega() {
+      alert('Exportando inventario de bodega a CSV...');
+    }
+
+    let pieChartInstance = null;
+    function renderPieChart() {
+      const productCounts = {};
+      inventoryData.forEach(item => {
+        if (!productCounts[item.prenda]) productCounts[item.prenda] = 0;
+        productCounts[item.prenda] += item.nuevos + item.seminuevos;
+      });
+
+      const labels = Object.keys(productCounts);
+      const data = Object.values(productCounts);
+
+      const ctx = document.getElementById('bodegaPieChart').getContext('2d');
+
+      if (pieChartInstance) {
+        pieChartInstance.destroy();
+      }
+
+      pieChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: [
+              '#06b6d4', '#1d4ed8', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#64748b'
+            ],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: {
+                boxWidth: 10,
+                font: { size: 10 }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  let value = context.parsed;
+                  let percentage = ((value / total) * 100).toFixed(1) + '%';
+                  return ' ' + percentage + ' (' + value + ' unid.)';
+                }
+              }
+            }
+          },
+          cutout: '65%'
+        }
+      });
+    }
+
+    function updateHistoricalChart(mode) {
+      const data = window.rawInventoryData || [];
+      const now = new Date();
+      const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+      const timeLabels = [];
+      const timeStock = [];
+
+      document.querySelectorAll('.time-filter-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`btnTime${mode.charAt(0).toUpperCase() + mode.slice(1)}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      if (mode === 'day') {
+        for (let i = 14; i >= 0; i--) {
+          const targetDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+          timeLabels.push(`${targetDate.getDate()} ${monthNames[targetDate.getMonth()]}`);
+          const endOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 23, 59, 59);
+
+          let stockAtTime = 0;
+          data.forEach(item => {
+            const itemDate = new Date(item.created_at || now);
+            if (itemDate <= endOfDay) stockAtTime += (item.quantity || 0);
+          });
+          timeStock.push(stockAtTime);
+        }
+      } else if (mode === 'month') {
+        for (let i = 5; i >= 0; i--) {
+          const targetDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          timeLabels.push(monthNames[targetDate.getMonth()]);
+          const endOfMonth = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59);
+
+          let stockAtTime = 0;
+          data.forEach(item => {
+            const itemDate = new Date(item.created_at || now);
+            if (itemDate <= endOfMonth) stockAtTime += (item.quantity || 0);
+          });
+          timeStock.push(stockAtTime);
+        }
+      } else if (mode === 'year') {
+        for (let i = 4; i >= 0; i--) {
+          const targetYear = now.getFullYear() - i;
+          timeLabels.push(targetYear.toString());
+          const endOfYear = new Date(targetYear, 11, 31, 23, 59, 59);
+
+          let stockAtTime = 0;
+          data.forEach(item => {
+            const itemDate = new Date(item.created_at || now);
+            if (itemDate <= endOfYear) stockAtTime += (item.quantity || 0);
+          });
+          timeStock.push(stockAtTime);
+        }
+      }
+
+      renderTimeChart(timeLabels, timeStock);
+    }
+
+    let timeChartInstance = null;
+    function renderTimeChart(labels = [], stockLevels = []) {
+      const ctx = document.getElementById('bodegaTimeChart').getContext('2d');
+
+      if (timeChartInstance) {
+        timeChartInstance.destroy();
+      }
+
+      // Fallback if no data provided
+      if (labels.length === 0) {
+        labels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'];
+        stockLevels = [0, 0, 0, 0, 0, 0];
+      }
+
+      timeChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Prendas Totales en Bodega',
+            data: stockLevels,
+            borderColor: '#06b6d4',
+            backgroundColor: 'rgba(6, 182, 212, 0.15)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#ffffff',
+            pointBorderColor: '#06b6d4',
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  return ' ' + context.parsed.y + ' prendas en stock';
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(0, 0, 0, 0.04)', drawBorder: false },
+              ticks: { font: { size: 11 }, color: '#64748b' }
+            },
+            x: {
+              grid: { display: false, drawBorder: false },
+              ticks: { font: { size: 11 }, color: '#64748b' }
+            }
+          }
+        }
+      });
+    }
+
+    // ── Adjust Modal Mode ─────────────────────────────────────
+    let adjustMode = 'add'; // 'add' | 'remove'
+    let currentStockSnapshot = {}; // product_name(lower) -> total available qty
+
+    function setAdjustMode(mode) {
+      adjustMode = mode;
+      const btnAdd = document.getElementById('btnModeAdd');
+      const btnRemove = document.getElementById('btnModeRemove');
+      const banner = document.getElementById('adjustInfoBanner');
+      const infoText = document.getElementById('adjustInfoText');
+      const qtyHint = document.getElementById('adjustQtyHint');
+      const stockIndicator = document.getElementById('adjustStockIndicator');
+      const btnGuardar = document.getElementById('btnGuardarAjuste');
+      const productSelect = document.getElementById('adjustProduct');
+
+      if (mode === 'add') {
+        btnAdd.style.background = 'var(--color-cyan)';
+        btnAdd.style.color = 'var(--color-navy)';
+        btnRemove.style.background = 'transparent';
+        btnRemove.style.color = 'var(--color-text-secondary)';
+        banner.style.background = 'rgba(6,182,212,0.08)';
+        banner.style.border = '1px solid rgba(6,182,212,0.2)';
+        banner.querySelector('svg').setAttribute('stroke', '#06B6D4');
+        infoText.textContent = 'Las prendas agregadas aumentarán el stock disponible. El sistema descontará este stock al generar cotizaciones.';
+        qtyHint.textContent = '';
+        stockIndicator.style.display = 'none';
+        btnGuardar.style.background = '';
+        // Restore full garments list for add mode
+        repopulateProductSelectForAdd(productSelect);
+      } else {
+        btnRemove.style.background = '#EF4444';
+        btnRemove.style.color = 'white';
+        btnAdd.style.background = 'transparent';
+        btnAdd.style.color = 'var(--color-text-secondary)';
+        banner.style.background = 'rgba(239,68,68,0.07)';
+        banner.style.border = '1px solid rgba(239,68,68,0.2)';
+        banner.querySelector('svg').setAttribute('stroke', '#EF4444');
+        infoText.textContent = 'Las prendas quitadas reducirán el stock en bodega y se descontarán del próximo cálculo de cotización automático.';
+        stockIndicator.style.display = 'none';
+        btnGuardar.style.background = '#EF4444';
+
+        // Rebuild snapshot keyed by "product:::size" for accurate per-size validation
+        currentStockSnapshot = {};
+        inventoryData.forEach(item => {
+          const key = `${item.prenda}:::${item.talla}`;
+          const available = (item.nuevos || 0) + (item.seminuevos || 0);
+          if (available > 0) {
+            currentStockSnapshot[key] = (currentStockSnapshot[key] || 0) + available;
+          }
+        });
+
+        // Populate only items that have stock
+        repopulateProductSelectForRemove(productSelect);
+      }
+    }
+
+    function repopulateProductSelectForAdd(select) {
+      // Reuse the garments already loaded (window._adjustGarments)
+      const garments = window._adjustGarments || [];
+      select.innerHTML = '';
+      if (garments.length === 0) {
+        select.innerHTML = '<option value="">Sin prendas configuradas en los roles activos</option>';
+        return;
+      }
+      const def = document.createElement('option');
+      def.value = '';
+      def.textContent = 'Selecciona una prenda autorizada...';
+      select.appendChild(def);
+      garments.forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g;
+        opt.textContent = g;
+        select.appendChild(opt);
+      });
+    }
+
+    function repopulateProductSelectForRemove(select) {
+      select.innerHTML = '';
+      // stockItems keyed as "product:::size"
+      const stockItems = Object.entries(currentStockSnapshot).filter(([, qty]) => qty > 0);
+      if (stockItems.length === 0) {
+        select.innerHTML = '<option value="">No hay prendas con stock disponible</option>';
+        return;
+      }
+      const def = document.createElement('option');
+      def.value = '';
+      def.textContent = 'Selecciona una prenda a quitar...';
+      select.appendChild(def);
+      stockItems.sort((a, b) => a[0].localeCompare(b[0])).forEach(([key, qty]) => {
+        const [productName, talla] = key.split(':::');
+        const opt = document.createElement('option');
+        opt.value = key; // "product:::size"
+        opt.textContent = `${productName} — Talla ${talla} (${qty} en stock)`;
+        select.appendChild(opt);
+      });
+      // On selection: auto-fill size field and show stock indicator
+      select.onchange = () => {
+        const selectedKey = select.value;
+        if (selectedKey) {
+          const [, talla] = selectedKey.split(':::');
+          document.getElementById('adjustSize').value = talla;
+        }
+        updateStockIndicator(selectedKey);
+      };
+    }
+
+    function updateStockIndicator(key) {
+      const indicator = document.getElementById('adjustStockIndicator');
+      const qtyHint = document.getElementById('adjustQtyHint');
+      if (adjustMode !== 'remove' || !key) {
+        indicator.style.display = 'none';
+        qtyHint.textContent = '';
+        return;
+      }
+      const available = currentStockSnapshot[key] || 0;
+      const [productName, talla] = key.split(':::');
+      indicator.style.display = 'block';
+      indicator.textContent = `⚠ Stock disponible de ${productName} talla ${talla}: ${available} unidad${available !== 1 ? 'es' : ''}`;
+      qtyHint.textContent = `máx. ${available}`;
+    }
+
+    async function openAdjustModal() {
+      adjustMode = 'add';
+      const productSelect = document.getElementById('adjustProduct');
+      productSelect.innerHTML = '<option value="">Cargando prendas autorizadas...</option>';
+      productSelect.onchange = null;
+      document.getElementById('adjustSize').value = '';
+      document.getElementById('adjustQty').value = '';
+      document.getElementById('adjustReason').value = '';
+      document.getElementById('adjustStockIndicator').style.display = 'none';
+      document.getElementById('adjustQtyHint').textContent = '';
+
+      // Reset toggle to "add" visuals
+      document.getElementById('btnModeAdd').style.background = 'var(--color-cyan)';
+      document.getElementById('btnModeAdd').style.color = 'var(--color-navy)';
+      document.getElementById('btnModeRemove').style.background = 'transparent';
+      document.getElementById('btnModeRemove').style.color = 'var(--color-text-secondary)';
+      document.getElementById('btnGuardarAjuste').style.background = '';
+      document.getElementById('adjustInfoBanner').style.background = 'rgba(6,182,212,0.08)';
+      document.getElementById('adjustInfoBanner').style.border = '1px solid rgba(6,182,212,0.2)';
+      document.getElementById('adjustInfoBanner').querySelector('svg').setAttribute('stroke', '#06B6D4');
+      document.getElementById('adjustInfoText').textContent = 'Las prendas agregadas aumentarán el stock disponible. El sistema descontará este stock al generar cotizaciones.';
+
+      document.getElementById('adjustModal').classList.add('active');
+
+      if (!currentCompanyId) return;
+
+      try {
+        // Build stock snapshot from current inventoryData
+        currentStockSnapshot = {};
+        inventoryData.forEach(item => {
+          const key = item.prenda;
+          currentStockSnapshot[key] = (currentStockSnapshot[key] || 0) + item.nuevos;
+        });
+
+        // Fetch authorized garments from active roles
+        const { data: activeRolesData, error: roleErr } = await _supabase
+          .from('company_roles')
+          .select('role_name')
+          .eq('company_id', currentCompanyId);
+
+        if (roleErr) throw roleErr;
+        const activeRoleNames = (activeRolesData || []).map(r => r.role_name.toLowerCase().trim());
+
+        const { data: roleDefs, error: defErr } = await _supabase
+          .from('role_definition')
+          .select('role_name, items')
+          .eq('company_id', currentCompanyId);
+
+        if (defErr) throw defErr;
+
+        const garmentsSet = new Set();
+        (roleDefs || []).forEach(rd => {
+          if (activeRoleNames.includes(rd.role_name.toLowerCase().trim())) {
+            const items = rd.items || [];
+            items.forEach(it => { if (it.name) garmentsSet.add(it.name.trim()); });
+          }
+        });
+
+        window._adjustGarments = Array.from(garmentsSet).sort();
+        repopulateProductSelectForAdd(productSelect);
+
+      } catch (err) {
+        console.error('Error loading authorized garments:', err);
+        productSelect.innerHTML = '<option value="">Error al cargar prendas</option>';
+      }
+    }
+
+    function closeAdjustModal() {
+      document.getElementById('adjustModal').classList.remove('active');
+    }
+
+    async function saveInventoryAdjustment() {
+      if (!currentCompanyId) return;
+
+      // In remove mode the select value is "product:::size"; in add mode it's just the product name
+      let product, size;
+      if (adjustMode === 'remove') {
+        const selectedKey = document.getElementById('adjustProduct').value;
+        if (!selectedKey || !selectedKey.includes(':::')) {
+          if (window.showToast) showToast('Error', 'Selecciona una prenda para quitar.', 'error');
+          else alert('Selecciona una prenda para quitar.');
+          return;
+        }
+        [product, size] = selectedKey.split(':::');
+      } else {
+        product = document.getElementById('adjustProduct').value.trim();
+        size = document.getElementById('adjustSize').value.trim() || 'Unitalla';
+      }
+
+      const state = document.getElementById('adjustState').value;
+      const rawQty = parseInt(document.getElementById('adjustQty').value, 10);
+
+      if (!product || isNaN(rawQty) || rawQty <= 0) {
+        if (window.showToast) showToast('Error', 'Debe especificar producto y una cantidad mayor a 0.', 'error');
+        else alert('Debe especificar producto y una cantidad mayor a 0.');
+        return;
+      }
+
+      // For remove mode: validate against the specific product+size stock
+      let qty = rawQty;
+      if (adjustMode === 'remove') {
+        const stockKey = `${product}:::${size}`;
+        const available = currentStockSnapshot[stockKey] || 0;
+        if (rawQty > available) {
+          if (window.showToast) showToast('Error', `Solo hay ${available} unidad${available !== 1 ? 'es' : ''} de "${product}" talla ${size} en bodega.`, 'error');
+          else alert(`Solo hay ${available} unidades de "${product}" talla ${size} en bodega.`);
+          return;
+        }
+        qty = -rawQty; // Negative quantity signals a removal
+      }
+
+      try {
+        const { error } = await _supabase.from('company_storage').insert({
+          company_id: currentCompanyId,
+          sku: adjustMode === 'remove' ? 'REMOVAL' : 'ADJUSTMENT',
+          product_name: product,
+          category: adjustMode === 'remove' ? 'Baja Manual' : 'Ajuste Manual',
+          size: size,
+          quantity: qty,
+          status: state === 'seminuevo' ? 'seminuevo' : 'available'
+        });
+
+        if (error) throw error;
+
+        closeAdjustModal();
+        const msg = adjustMode === 'remove'
+          ? `${rawQty} unidad(es) de "${product}" quitadas del inventario.`
+          : 'Ajuste de inventario guardado correctamente.';
+        if (window.showToast) showToast('Éxito', msg);
+        await loadInventory();
+      } catch (err) {
+        console.error('Error guardando ajuste:', err);
+        if (window.showToast) showToast('Error', 'No se pudo guardar el ajuste.', 'error');
+      }
+    }
+
+    // ── Alerts Panel ────────────────────────────────────────────
+    function closePopover() {
+      const popover = document.getElementById('user-popover');
+      if (popover) popover.classList.remove('active');
+    }
+
+    function openAlertsPanel() {
+      document.getElementById('alertsPanel').classList.add('open');
+      document.getElementById('alertsBackdrop').classList.add('open');
+      loadAlertsData();
+    }
+
+    function closeAlertsPanel() {
+      document.getElementById('alertsPanel').classList.remove('open');
+      document.getElementById('alertsBackdrop').classList.remove('open');
+    }
+
+    function updateAlertsBadges(count) {
+      const navBadge = document.getElementById('alertsNavBadge');
+      const totalBadge = document.getElementById('alertsTotalBadge');
+      if (count > 0) {
+        navBadge.textContent = count;
+        navBadge.style.display = 'inline-flex';
+        totalBadge.textContent = count;
+        totalBadge.style.display = 'inline-flex';
+      } else {
+        navBadge.style.display = 'none';
+        totalBadge.style.display = 'none';
+      }
+    }
+
+    async function loadAlertsData() {
+      const renewalList = document.getElementById('renewalAlertsList');
+      const damageList = document.getElementById('damageAlertsList');
+      const subtitle = document.getElementById('alertsSubtitle');
+
+      renewalList.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--color-text-muted);font-size:0.875rem;">Cargando...</div>';
+      damageList.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--color-text-muted);font-size:0.875rem;">Cargando...</div>';
+
+      if (!currentCompanyId) return;
+
+      try {
+        // ── 1. Renewal Alerts ────────────────────────────────────
+        const [{ data: employees }, { data: roleDefs }, { data: deliveries }] = await Promise.all([
+          _supabase.from('company_employees')
+            .select('id, name, role, id_document')
+            .eq('company_id', currentCompanyId),
+          _supabase.from('role_definition')
+            .select('role_name, renewal_frequency')
+            .eq('company_id', currentCompanyId),
+          _supabase.from('uniform_deliveries')
+            .select('employee_id, signed_at, created_at')
+            .eq('status', 'signed')
+        ]);
+
+        // Build renewal frequency map
+        const roleRenewalMap = {};
+        (roleDefs || []).forEach(rd => {
+          roleRenewalMap[rd.role_name.toLowerCase().trim()] = rd.renewal_frequency || 6;
+        });
+
+        // Build last delivery map by employee id
+        const lastDeliveryMap = {};
+        (deliveries || []).forEach(d => {
+          const date = new Date(d.signed_at || d.created_at);
+          if (!lastDeliveryMap[d.employee_id] || date > lastDeliveryMap[d.employee_id]) {
+            lastDeliveryMap[d.employee_id] = date;
+          }
+        });
+
+        const now = new Date();
+        const thirtyDaysFromNow = new Date();
+        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+
+        const renewalAlerts = [];
+        (employees || []).forEach(emp => {
+          const role = (emp.role || '').toLowerCase().trim();
+          const frequency = roleRenewalMap[role] || 6;
+          const lastDelivery = lastDeliveryMap[emp.id];
+
+          let daysLeft, nextRenewalDate, label, urgency;
+          if (!lastDelivery) {
+            daysLeft = -1;
+            label = 'Sin dotación previa';
+            urgency = 'urgent';
+          } else {
+            const nextRenewal = new Date(lastDelivery);
+            nextRenewal.setMonth(nextRenewal.getMonth() + frequency);
+            daysLeft = Math.ceil((nextRenewal - now) / (1000 * 60 * 60 * 24));
+            nextRenewalDate = nextRenewal;
+            if (daysLeft > 30) return; // Not within 30 days
+            urgency = daysLeft <= 7 ? 'urgent' : 'warning';
+          }
+
+          renewalAlerts.push({ emp, role: emp.role, daysLeft, nextRenewalDate, label, urgency });
+        });
+
+        // Render renewal alerts
+        if (renewalAlerts.length === 0) {
+          renewalList.innerHTML = `
+            <div style="display:flex;align-items:center;gap:0.75rem;padding:1rem;background:#F0FDF4;border-radius:12px;border:1px solid #BBF7D0;">
+              <svg width="18" height="18" fill="none" stroke="#16A34A" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <span style="font-size:0.8125rem;color:#15803D;font-weight:600;">Al día — ningún empleado vence en los próximos 30 días.</span>
+            </div>`;
+        } else {
+          renewalList.innerHTML = '';
+          renewalAlerts.sort((a, b) => a.daysLeft - b.daysLeft).forEach(alert => {
+            const isUrgent = alert.urgency === 'urgent';
+            const daysText = alert.daysLeft < 0
+              ? 'Sin historial de entrega'
+              : alert.daysLeft === 0
+                ? 'Vence hoy'
+                : `Vence en ${alert.daysLeft} día${alert.daysLeft !== 1 ? 's' : ''}`;
+            const dateText = alert.nextRenewalDate
+              ? alert.nextRenewalDate.toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })
+              : '—';
+
+            const item = document.createElement('div');
+            item.className = `alert-item ${isUrgent ? 'alert-danger' : 'alert-warning'}`;
+            item.innerHTML = `
+              <div class="alert-item-icon" style="background:${isUrgent ? '#FEE2E2' : '#FEF3C7'};color:${isUrgent ? '#DC2626' : '#D97706'};">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+                </svg>
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:0.875rem;font-weight:700;color:var(--color-navy);margin-bottom:2px;">${alert.emp.name || 'Empleado'}</div>
+                <div style="font-size:0.75rem;color:var(--color-text-secondary);">${alert.emp.role || 'Sin rol'}</div>
+                <div style="font-size:0.75rem;margin-top:4px;display:flex;align-items:center;gap:4px;">
+                  <span style="font-weight:700;color:${isUrgent ? '#DC2626' : '#D97706'};">${daysText}</span>
+                  ${alert.nextRenewalDate ? `<span style="color:var(--color-text-muted);">· ${dateText}</span>` : ''}
+                </div>
+              </div>
+              <a href="/cotizaciones.html" style="flex-shrink:0;font-size:0.7rem;font-weight:700;color:var(--color-cyan);text-decoration:none;padding:0.3rem 0.6rem;border:1px solid var(--color-cyan);border-radius:6px;white-space:nowrap;">Cotizar</a>`;
+            renewalList.appendChild(item);
+          });
+        }
+
+        // ── 2. Damage Alerts ─────────────────────────────────────
+        const { data: damageData } = await _supabase
+          .from('uniform_deliveries')
+          .select('id, employee_id, status, created_at, notes, items')
+          .in('status', ['damaged', 'damage_request', 'reposicion', 'reponer', 'dañado'])
+          .limit(30);
+
+        if (!damageData || damageData.length === 0) {
+          damageList.innerHTML = `
+            <div style="display:flex;align-items:center;gap:0.75rem;padding:1rem;background:#F0FDF4;border-radius:12px;border:1px solid #BBF7D0;">
+              <svg width="18" height="18" fill="none" stroke="#16A34A" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <span style="font-size:0.8125rem;color:#15803D;font-weight:600;">Sin solicitudes de reposición por daño activas.</span>
+            </div>`;
+        } else {
+          damageList.innerHTML = '';
+          damageData.forEach(req => {
+            const date = new Date(req.created_at).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
+            const item = document.createElement('div');
+            item.className = 'alert-item alert-danger';
+            item.innerHTML = `
+              <div class="alert-item-icon" style="background:#FEE2E2;color:#DC2626;">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:0.875rem;font-weight:700;color:var(--color-navy);margin-bottom:2px;">Solicitud de Reposición</div>
+                <div style="font-size:0.75rem;color:var(--color-text-secondary);">${req.notes || 'Sin descripción'}</div>
+                <div style="font-size:0.75rem;margin-top:4px;color:var(--color-text-muted);">${date}</div>
+              </div>
+              <a href="/cotizaciones.html" style="flex-shrink:0;font-size:0.7rem;font-weight:700;color:var(--color-cyan);text-decoration:none;padding:0.3rem 0.6rem;border:1px solid var(--color-cyan);border-radius:6px;white-space:nowrap;">Cotizar</a>`;
+            damageList.appendChild(item);
+          });
+        }
+
+        // Update badges
+        const totalCount = renewalAlerts.length + (damageData ? damageData.length : 0);
+        updateAlertsBadges(totalCount);
+        subtitle.textContent = totalCount > 0
+          ? `${totalCount} alerta${totalCount !== 1 ? 's' : ''} activa${totalCount !== 1 ? 's' : ''}`
+          : 'Todo en orden';
+
+      } catch (err) {
+        console.error('Error loading alerts:', err);
+        subtitle.textContent = 'Error al cargar alertas';
+        renewalList.innerHTML = '<div style="color:#EF4444;font-size:0.875rem;padding:1rem;">No se pudieron cargar las alertas.</div>';
+        damageList.innerHTML = '';
+      }
+    }
+
+    // ── Initialize totals and charts on load
+    // Initialize totals and charts on load
+    document.addEventListener('DOMContentLoaded', () => {
+      initBodega();
+    });
+
+    function toggleSidebar() {
+      const layout = document.getElementById('app-layout-wrapper');
+      if (layout) {
+        layout.classList.toggle('sidebar-open');
+      }
+    }
+  </script>
+</body>
+
+</html>

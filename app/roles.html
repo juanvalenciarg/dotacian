@@ -2,7 +2,7 @@
 <html lang="es">
 
 <head>
-  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
+  <link rel="icon" type="image/svg+xml" href="/assets/logos/favicon.svg">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dotacian | Configuración de Roles</title>
@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/styles.css">
   <style>
     /* Main Content Refinement */
     .main-content {
@@ -336,25 +336,25 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-header" style="position: relative; display: flex; justify-content: center; padding: 1.5rem 0 1rem 0 !important; overflow: visible;">
-        <a href="dot.html" class="nav-item dot-brand" style="display: flex; align-items: center; justify-content: center; text-decoration: none; border-radius: 50%; padding: 0; background: transparent; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';">
-          <img src="assets/logos/favicon.svg" alt="dot AI" style="width: 42px; height: 42px; object-fit: contain;">
+        <a href="/dot.html" class="nav-item dot-brand" style="display: flex; align-items: center; justify-content: center; text-decoration: none; border-radius: 50%; padding: 0; background: transparent; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';">
+          <img src="/assets/logos/favicon.svg" alt="dot AI" style="width: 42px; height: 42px; object-fit: contain;">
         </a>
       </div>
 
       <nav class="sidebar-nav">
-        <a href="app.html" class="nav-item">
+        <a href="/app/dashboard" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
           <span class="nav-label">Dashboard</span>
         </a>
-        <a href="roles.html" class="nav-item active">
+        <a href="/app/roles" class="nav-item active">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
           <span class="nav-label">Roles</span>
         </a>
-        <a href="empleados.html" class="nav-item">
+        <a href="/app/empleados" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
           <span class="nav-label">Empleados</span>
         </a>
-        <a href="bodega.html" class="nav-item">
+        <a href="/app/bodega" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg></span>
           <span class="nav-label">Bodega</span>
         </a>
@@ -388,7 +388,7 @@
               </svg>
               Alertas
             </a>
-            <a href="configuracion.html"
+            <a href="/configuracion.html"
               style="color: var(--color-navy); font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; margin-bottom: 0.5rem; transition: color 0.2s;"
               onmouseover="this.style.color='var(--color-cyan)'" onmouseout="this.style.color='var(--color-navy)'">
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -398,7 +398,7 @@
               </svg>
               Configuración
             </a>
-            <a href="login.html"
+            <a href="/login.html"
               style="color: #EF4444; font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; transition: color 0.2s;"
               onmouseover="this.style.color='#DC2626'" onmouseout="this.style.color='#EF4444'">
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -1423,7 +1423,7 @@
       window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token', multiTab: false } });
     }
   </script>
-  <script src="assets/js/utils.js?v=4"></script>
+  <script src="/assets/js/utils.js?v=4"></script>
 </body>
 
 </html>

@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/app", "destination": "/app/dashboard.html" },
+    { "source": "/app/dashboard", "destination": "/app/dashboard.html" },
+    { "source": "/app/roles", "destination": "/app/roles.html" },
+    { "source": "/app/empleados", "destination": "/app/empleados.html" },
+    { "source": "/app/bodega", "destination": "/app/bodega.html" }
+  ]
+}
