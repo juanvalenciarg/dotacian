@@ -152,7 +152,7 @@ function initUtils() {
     
     if (sb) {
       populateHeaderProfile(sb);
-      setupAutoLogout();
+      // setupAutoLogout(); // Desactivado temporalmente
     }
   }, 500);
 }
