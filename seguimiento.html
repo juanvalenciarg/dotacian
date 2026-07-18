@@ -2,6 +2,7 @@
 <html lang="es">
 
 <head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>dotacian app | Seguimiento de Producción</title>
@@ -15,108 +16,87 @@
 <body>
   <div class="app-layout">
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-brand">
-        <img src="assets/logos/logo_dotacian.png" alt="dotacian logo" style="width: 130px; height: auto;">
+                    <!-- Sidebar -->
+    <aside class="sidebar" style="display: flex; flex-direction: column;">
+      <!-- TOP: dot AI -->
+      <div class="sidebar-header" style="position: relative; display: flex; justify-content: center; padding: 1.5rem 0 1rem 0 !important; overflow: visible;">
+        <a href="dot.html" class="nav-item dot-brand" style="display: flex; align-items: center; justify-content: center; text-decoration: none; border-radius: 50%; padding: 0; background: transparent; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';">
+          <img src="assets/logos/favicon.svg" alt="dot AI" style="width: 42px; height: 42px; object-fit: contain;">
+        </a>
       </div>
-      <nav class="sidebar-nav">
+      
+      <!-- MIDDLE: Navigation -->
+      <nav class="sidebar-nav" style="flex: 1; display: flex; flex-direction: column; overflow-y: auto;">
         <a href="app.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <rect width="7" height="9" x="3" y="3" rx="1" />
-              <rect width="7" height="5" x="14" y="3" rx="1" />
-              <rect width="7" height="9" x="14" y="12" rx="1" />
-              <rect width="7" height="5" x="3" y="16" rx="1" />
-            </svg></span>
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
           <span class="nav-label">Dashboard</span>
         </a>
         <a href="roles.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            </svg></span>
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
           <span class="nav-label">Roles</span>
         </a>
-        <div class="nav-group">
-          <a href="#" class="nav-item">
-            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
-            </svg></span>
-            <span class="nav-label">Uniformes</span>
-            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
-          </a>
-          <div class="nav-sub-items">
-            <a href="uniformes.html" class="nav-sub-item">Marketplace</a>
-            <a href="mi_dotacion.html" class="nav-sub-item">Mi dotación</a>
-          </div>
-        </div>
-        <a href="sucursales.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
-              <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
-              <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
-              <path d="M10 6h4" />
-              <path d="M10 10h4" />
-              <path d="M10 14h4" />
-              <path d="M10 18h4" />
-            </svg></span>
-          <span class="nav-label">Sucursales</span>
-        </a>
         <a href="empleados.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg></span>
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
           <span class="nav-label">Empleados</span>
         </a>
-        <div class="nav-group active">
-          <a href="produccion.html" class="nav-item active">
-            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="m7.5 4.27 9 5.15" />
-                <path
-                  d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-                <path d="m3.3 7 8.7 5 8.7-5" />
-                <path d="M12 22V12" />
-              </svg></span>
-            <span class="nav-label">Producción</span>
-            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
-          </a>
-          <div class="nav-sub-items">
-            <a href="cotizaciones.html" class="nav-sub-item">Cotizaciones</a>
-            <a href="muestras.html" class="nav-sub-item">Solicitud de Muestras</a>
-            <a href="ordenes.html" class="nav-sub-item">Órdenes de Compra</a>
-            <a href="seguimiento.html" class="nav-sub-item active">Seguimiento</a>
-          </div>
-        </div>
         <a href="bodega.html" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg></span>
           <span class="nav-label">Bodega</span>
         </a>
-        <a href="#" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-            </svg></span>
-          <span class="nav-label">Alertas</span>
-        </a>
-        <div class="sidebar-spacer"></div>
-        <a href="index.html" class="nav-item nav-item-secondary">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" x2="9" y1="12" y2="12" />
-            </svg></span>
-          <span class="nav-label">Cerrar Sesión</span>
-        </a>
-      <div id="version-tag"></div></nav>
+      </nav>
+
+      <!-- BOTTOM: Secondary Menu -->
+      <div class="sidebar-footer" style="padding: 1.5rem 0; display: flex; justify-content: center; position: relative;">
+        <div class="header-right" style="position: relative; display: flex; justify-content: center; width: 100%; padding: 0;">
+          <div id="header-company-badge" onclick="toggleUserPopover(event)"
+            style="width: 36px; height: 36px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; box-shadow: var(--shadow-sm); transition: transform 0.2s, background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';" onmouseout="this.style.background='rgba(255,255,255,0.05)';">
+            <div id="badge-industry-icon" style="display: none;"></div>
+            <span id="company-name-display" style="display: none;"></span>
+            <span id="dash-industry-val" style="display: none;"></span>
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0-2.73.73l.15-.08a2 2 0 0 1-2 0l.43.25a2 2 0 0 1-1-1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1-1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>
+          </div>
+
+          <!-- Popover (Abriendo hacia arriba y a la derecha) -->
+          <div id="user-popover" class="user-popover" style="left: 60px; bottom: 0; top: auto; right: auto; min-width: 250px;">
+            <div class="popover-label">Usuario</div>
+            <div id="pop-user-name" class="popover-value">Cargando...</div>
+            <div class="popover-label">Correo Electrónico</div>
+            <div id="pop-user-email" class="popover-value" style="margin-bottom: 0;">Cargando...</div>
+            <div class="popover-label" style="margin-top: 1rem;">País</div>
+            <div id="version-tag" style="margin-top: 0.25rem; display: flex;"></div>
+            <hr style="margin: 1rem 0; border: none; border-top: 1px solid var(--color-smoke-mid);">
+            <a href="#"
+              style="color: var(--color-navy); font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; margin-bottom: 0.5rem; transition: color 0.2s;"
+              onmouseover="this.style.color='var(--color-cyan)'" onmouseout="this.style.color='var(--color-navy)'">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+              </svg>
+              Alertas
+            </a>
+            <a href="configuracion.html"
+              style="color: var(--color-navy); font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; margin-bottom: 0.5rem; transition: color 0.2s;"
+              onmouseover="this.style.color='var(--color-cyan)'" onmouseout="this.style.color='var(--color-navy)'">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path
+                  d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0-2.73.73l.15-.08a2 2 0 0 1-2 0l.43.25a2 2 0 0 1-1-1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1-1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              Configuración
+            </a>
+            <a href="login.html"
+              style="color: #EF4444; font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; transition: color 0.2s;"
+              onmouseover="this.style.color='#DC2626'" onmouseout="this.style.color='#EF4444'">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              Cerrar Sesión
+            </a>
+          </div>
+        </div>
+      </div>
     </aside>
 
     <!-- Main Content -->
@@ -134,38 +114,46 @@
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
             <div>
               <h2 style="font-size: 1.25rem; color: var(--color-navy); margin-bottom: 0.25rem;">Órdenes Activas</h2>
-              <p style="font-size: 0.8125rem; color: var(--color-text-muted);">Pedidos confirmados en proceso de fabricación</p>
+              <p style="font-size: 0.8125rem; color: var(--color-text-muted);">Pedidos confirmados en proceso de
+                fabricación</p>
             </div>
           </div>
 
 
           <div style="display: grid; gap: 1.5rem;">
-            
+
             <!-- Order #ORD-8820 -->
-            <div style="padding: 1.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: white;">
+            <div
+              style="padding: 1.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: white;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
                 <div style="display: flex; align-items: center; gap: 1rem;">
                   <div style="font-weight: 700; color: var(--color-navy); font-size: 1.125rem;">#ORD-8820</div>
                   <div style="display: flex; gap: 0.5rem;">
-                    <span style="font-size: 0.65rem; background: #EEF2FF; color: #4338CA; padding: 2px 8px; border-radius: 4px; font-weight: 700;">REFORMA</span>
-                    <span style="font-size: 0.65rem; background: rgba(6, 182, 212, 0.1); color: var(--color-cyan); padding: 2px 8px; border-radius: 4px; font-weight: 700;">PRODUCCIÓN</span>
+                    <span
+                      style="font-size: 0.65rem; background: #EEF2FF; color: #4338CA; padding: 2px 8px; border-radius: 4px; font-weight: 700;">REFORMA</span>
+                    <span
+                      style="font-size: 0.65rem; background: rgba(6, 182, 212, 0.1); color: var(--color-cyan); padding: 2px 8px; border-radius: 4px; font-weight: 700;">PRODUCCIÓN</span>
                   </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 1.5rem;">
                   <div style="text-align: right;">
                     <div style="font-size: 1.25rem; font-weight: 800; color: var(--color-cyan);">75%</div>
                   </div>
-                  <button class="btn btn-outline" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;" onclick="openReport('#ORD-8820')">Ver Detalle</button>
+                  <button class="btn btn-outline" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;"
+                    onclick="openReport('#ORD-8820')">Ver Detalle</button>
                 </div>
               </div>
-              
-              <div class="progress-track" style="height: 12px; background: #f1f5f9; border-radius: 100px; margin-bottom: 1.5rem;">
-                <div class="progress-fill" style="width: 75%; background: var(--color-cyan); border-radius: 100px;"></div>
+
+              <div class="progress-track"
+                style="height: 12px; background: #f1f5f9; border-radius: 100px; margin-bottom: 1.5rem;">
+                <div class="progress-fill" style="width: 75%; background: var(--color-cyan); border-radius: 100px;">
+                </div>
               </div>
 
               <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem; text-align: center;">
                 <div>
-                  <div style="font-size: 0.6rem; font-weight: 700; color: #10B981; margin-bottom: 0.25rem;">CONFIRMACIÓN</div>
+                  <div style="font-size: 0.6rem; font-weight: 700; color: #10B981; margin-bottom: 0.25rem;">CONFIRMACIÓN
+                  </div>
                   <div style="height: 4px; background: #10B981; border-radius: 2px;"></div>
                 </div>
                 <div>
@@ -173,69 +161,92 @@
                   <div style="height: 4px; background: #10B981; border-radius: 2px;"></div>
                 </div>
                 <div>
-                  <div style="font-size: 0.6rem; font-weight: 700; color: var(--color-cyan); margin-bottom: 0.25rem;">PRODUCCIÓN</div>
+                  <div style="font-size: 0.6rem; font-weight: 700; color: var(--color-cyan); margin-bottom: 0.25rem;">
+                    PRODUCCIÓN</div>
                   <div style="height: 4px; background: var(--color-cyan); border-radius: 2px;"></div>
                 </div>
                 <div>
-                  <div style="font-size: 0.6rem; font-weight: 700; color: var(--color-text-muted); margin-bottom: 0.25rem;">CALIDAD</div>
+                  <div
+                    style="font-size: 0.6rem; font-weight: 700; color: var(--color-text-muted); margin-bottom: 0.25rem;">
+                    CALIDAD</div>
                   <div style="height: 4px; background: var(--color-border); border-radius: 2px;"></div>
                 </div>
                 <div>
-                  <div style="font-size: 0.6rem; font-weight: 700; color: var(--color-text-muted); margin-bottom: 0.25rem;">ENTREGA</div>
+                  <div
+                    style="font-size: 0.6rem; font-weight: 700; color: var(--color-text-muted); margin-bottom: 0.25rem;">
+                    ENTREGA</div>
                   <div style="height: 4px; background: var(--color-border); border-radius: 2px;"></div>
                 </div>
                 <div>
-                  <div style="font-size: 0.6rem; font-weight: 700; color: var(--color-text-muted); margin-bottom: 0.25rem;">COMPLETADA</div>
+                  <div
+                    style="font-size: 0.6rem; font-weight: 700; color: var(--color-text-muted); margin-bottom: 0.25rem;">
+                    COMPLETADA</div>
                   <div style="height: 4px; background: var(--color-border); border-radius: 2px;"></div>
                 </div>
               </div>
             </div>
 
             <!-- Order #ORD-8791 -->
-            <div style="padding: 1.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: white;">
+            <div
+              style="padding: 1.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: white;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
                 <div style="display: flex; align-items: center; gap: 1rem;">
                   <div style="font-weight: 700; color: var(--color-navy); font-size: 1.125rem;">#ORD-8791</div>
                   <div style="display: flex; gap: 0.5rem;">
-                    <span style="font-size: 0.65rem; background: #EEF2FF; color: #4338CA; padding: 2px 8px; border-radius: 4px; font-weight: 700;">POLANCO</span>
-                    <span style="font-size: 0.65rem; background: #F3F4F6; color: #374151; padding: 2px 8px; border-radius: 4px; font-weight: 700;">CORTE</span>
+                    <span
+                      style="font-size: 0.65rem; background: #EEF2FF; color: #4338CA; padding: 2px 8px; border-radius: 4px; font-weight: 700;">POLANCO</span>
+                    <span
+                      style="font-size: 0.65rem; background: #F3F4F6; color: #374151; padding: 2px 8px; border-radius: 4px; font-weight: 700;">CORTE</span>
                   </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 1.5rem;">
                   <div style="text-align: right;">
                     <div style="font-size: 1.25rem; font-weight: 800; color: var(--color-navy);">30%</div>
                   </div>
-                  <button class="btn btn-outline" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;" onclick="openReport('#ORD-8791')">Ver Detalle</button>
+                  <button class="btn btn-outline" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;"
+                    onclick="openReport('#ORD-8791')">Ver Detalle</button>
                 </div>
               </div>
-              
-              <div class="progress-track" style="height: 12px; background: #f1f5f9; border-radius: 100px; margin-bottom: 1.5rem;">
-                <div class="progress-fill" style="width: 30%; background: var(--color-navy); border-radius: 100px;"></div>
+
+              <div class="progress-track"
+                style="height: 12px; background: #f1f5f9; border-radius: 100px; margin-bottom: 1.5rem;">
+                <div class="progress-fill" style="width: 30%; background: var(--color-navy); border-radius: 100px;">
+                </div>
               </div>
 
               <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem; text-align: center;">
                 <div>
-                  <div style="font-size: 0.6rem; font-weight: 700; color: #10B981; margin-bottom: 0.25rem;">CONFIRMACIÓN</div>
+                  <div style="font-size: 0.6rem; font-weight: 700; color: #10B981; margin-bottom: 0.25rem;">CONFIRMACIÓN
+                  </div>
                   <div style="height: 4px; background: #10B981; border-radius: 2px;"></div>
                 </div>
                 <div>
-                  <div style="font-size: 0.6rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.25rem;">CORTE</div>
+                  <div style="font-size: 0.6rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.25rem;">
+                    CORTE</div>
                   <div style="height: 4px; background: var(--color-navy); border-radius: 2px;"></div>
                 </div>
                 <div>
-                  <div style="font-size: 0.6rem; font-weight: 700; color: var(--color-text-muted); margin-bottom: 0.25rem;">PRODUCCIÓN</div>
+                  <div
+                    style="font-size: 0.6rem; font-weight: 700; color: var(--color-text-muted); margin-bottom: 0.25rem;">
+                    PRODUCCIÓN</div>
                   <div style="height: 4px; background: var(--color-border); border-radius: 2px;"></div>
                 </div>
                 <div>
-                  <div style="font-size: 0.6rem; font-weight: 700; color: var(--color-text-muted); margin-bottom: 0.25rem;">CALIDAD</div>
+                  <div
+                    style="font-size: 0.6rem; font-weight: 700; color: var(--color-text-muted); margin-bottom: 0.25rem;">
+                    CALIDAD</div>
                   <div style="height: 4px; background: var(--color-border); border-radius: 2px;"></div>
                 </div>
                 <div>
-                  <div style="font-size: 0.6rem; font-weight: 700; color: var(--color-text-muted); margin-bottom: 0.25rem;">ENTREGA</div>
+                  <div
+                    style="font-size: 0.6rem; font-weight: 700; color: var(--color-text-muted); margin-bottom: 0.25rem;">
+                    ENTREGA</div>
                   <div style="height: 4px; background: var(--color-border); border-radius: 2px;"></div>
                 </div>
                 <div>
-                  <div style="font-size: 0.6rem; font-weight: 700; color: var(--color-text-muted); margin-bottom: 0.25rem;">COMPLETADA</div>
+                  <div
+                    style="font-size: 0.6rem; font-weight: 700; color: var(--color-text-muted); margin-bottom: 0.25rem;">
+                    COMPLETADA</div>
                   <div style="height: 4px; background: var(--color-border); border-radius: 2px;"></div>
                 </div>
               </div>
@@ -252,8 +263,10 @@
     <div class="modal-content-lg" style="max-width: 800px;">
       <div class="modal-header">
         <div>
-          <h2 style="margin-bottom: 0.25rem;">Reporte de Producción <span id="reportOrderId" style="color: var(--color-cyan);">#ORD-0000</span></h2>
-          <p style="font-size: 0.8125rem; color: var(--color-text-muted);">Productos en taller y asignación de personal</p>
+          <h2 style="margin-bottom: 0.25rem;">Reporte de Producción <span id="reportOrderId"
+              style="color: var(--color-cyan);">#ORD-0000</span></h2>
+          <p style="font-size: 0.8125rem; color: var(--color-text-muted);">Productos en taller y asignación de personal
+          </p>
         </div>
         <button class="btn-close" onclick="closeReport()">✕</button>
       </div>
@@ -272,10 +285,11 @@
             <!-- Dynamically populated -->
           </tbody>
         </table>
-        
+
         <div style="margin-top: 2rem; display: flex; justify-content: flex-end; gap: 1rem;">
           <button class="btn btn-outline" onclick="closeReport()">Cerrar</button>
-          <button class="btn btn-primary" onclick="showToast('Exportando', 'Exportando reporte a Excel...')">Exportar a Excel</button>
+          <button class="btn btn-primary" onclick="showToast('Exportando', 'Exportando reporte a Excel...')">Exportar a
+            Excel</button>
         </div>
       </div>
     </div>
@@ -285,7 +299,7 @@
     function openReport(orderId) {
       document.getElementById('reportOrderId').textContent = orderId;
       const tbody = document.getElementById('reportTableBody');
-      
+
       // Sample data based on orderId
       if (orderId === '#ORD-8820') {
         tbody.innerHTML = `
@@ -324,7 +338,7 @@
           </tr>
         `;
       }
-      
+
       document.getElementById('reportModal').classList.add('active');
     }
 
@@ -332,7 +346,15 @@
       document.getElementById('reportModal').classList.remove('active');
     }
   </script>
-<script src="assets/js/utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    if (typeof window._supabase === 'undefined') {
+      window.SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+      window.SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+      window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token', multiTab: false } });
+    }
+  </script>
+  <script src="assets/js/utils.js?v=4"></script>
 </body>
 
 </html>

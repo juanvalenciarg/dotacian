@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="styles.css">
   <style>
     :root {
-      --sidebar-width: 280px;
+      --sidebar-width: 80px;
     }
 
     .app-layout {
@@ -49,8 +49,7 @@
       padding: 0 3rem 4rem;
       position: relative;
       z-index: 10;
-      max-width: 1200px;
-      margin: 0 auto;
+      width: 100%;
     }
 
     .app-card {
@@ -178,164 +177,118 @@
         padding: 0 1.5rem 4rem;
       }
     }
+
+    /* Sidebar Refinement */
+    .nav-label, .nav-sub-items, .nav-item span:last-child {
+      display: none !important;
+    }
+    .nav-item {
+      justify-content: center !important;
+      padding: 0.875rem 0 !important;
+      margin-bottom: 0.8rem !important;
+    }
+    .nav-icon {
+      margin: 0 !important;
+      font-size: 1.4rem !important;
+    }
+    .sidebar-header {
+      padding: 1.5rem 0 !important;
+      display: flex !important;
+      justify-content: center !important;
+    }
   </style>
 </head>
 
 <body>
   <div class="app-layout" id="app-layout-wrapper">
     <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
-    <aside class="sidebar">
-      <div class="sidebar-header" style="padding: 1.5rem 1rem 0 1rem; display: flex; justify-content: center;">
-        <a href="app.html" style="display: block; width: 100%; text-align: center;">
-          <img src="assets/logos/logo_dotacian.png" alt="dotacian logo"
-            style="width: 180px; max-width: 100%; height: auto; display: inline-block;">
+        <aside class="sidebar" style="display: flex; flex-direction: column;">
+      <!-- TOP: dot AI -->
+      <div class="sidebar-header" style="position: relative; display: flex; justify-content: center; padding: 1.5rem 0 1rem 0 !important; overflow: visible;">
+        <a href="dot.html" class="nav-item dot-brand" style="display: flex; align-items: center; justify-content: center; text-decoration: none; border-radius: 50%; padding: 0; background: transparent; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';">
+          <img src="assets/logos/favicon.svg" alt="dot AI" style="width: 42px; height: 42px; object-fit: contain;">
         </a>
       </div>
-      <!-- El sidebar será inyectado por update_client_nav.py -->
-      <nav class="sidebar-nav">
+      
+      <!-- MIDDLE: Navigation -->
+      <nav class="sidebar-nav" style="flex: 1; display: flex; flex-direction: column; overflow-y: auto;">
         <a href="app.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <rect width="7" height="9" x="3" y="3" rx="1" />
-              <rect width="7" height="5" x="14" y="3" rx="1" />
-              <rect width="7" height="9" x="14" y="12" rx="1" />
-              <rect width="7" height="5" x="3" y="16" rx="1" />
-            </svg></span>
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
           <span class="nav-label">Dashboard</span>
         </a>
         <a href="roles.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            </svg></span>
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
           <span class="nav-label">Roles</span>
         </a>
-        <a href="marketplace.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path
-                d="M20.38 3.46L16 2a8 8 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
-            </svg></span>
-          <span class="nav-label">Marketplace</span>
-        </a>
         <a href="empleados.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg></span>
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
           <span class="nav-label">Empleados</span>
         </a>
-        <div class="nav-group">
-          <a href="cotizaciones.html" class="nav-item">
-            <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="m7.5 4.27 9 5.15" />
-                <path
-                  d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-                <path d="m3.3 7 8.7 5 8.7-5" />
-                <path d="M12 22V12" />
-              </svg></span>
-            <span class="nav-label">Producción</span>
-            <span style="margin-left: auto;"><svg width="12" height="12" fill="none" stroke="currentColor"
-                stroke-width="2" viewBox="0 0 24 24">
-                <path d="m6 9 6 6 6-6" />
-              </svg></span>
-          </a>
-          <div class="nav-sub-items">
-            <a href="cotizaciones.html" class="nav-sub-item">Cotizaciones</a>
-            <a href="ordenes.html" class="nav-sub-item">Órdenes de Compra</a>
-          </div>
-        </div>
         <a href="bodega.html" class="nav-item">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <polyline points="21 8 21 21 3 21 3 8"></polyline>
-              <rect x="1" y="3" width="22" height="5"></rect>
-              <line x1="10" y1="12" x2="14" y2="12"></line>
-            </svg></span>
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg></span>
           <span class="nav-label">Bodega</span>
         </a>
-        <a href="facturas.html" class="nav-item active">
-          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-              <polyline points="14 2 14 8 20 8" />
-              <line x1="16" y1="13" x2="8" y2="13" />
-              <line x1="16" y1="17" x2="8" y2="17" />
-              <polyline points="10 9 9 9 8 9" />
-            </svg></span>
-          <span class="nav-label">Facturas</span>
-        </a>
-        <div id="version-tag"></div>
       </nav>
+
+      <!-- BOTTOM: Secondary Menu -->
+      <div class="sidebar-footer" style="padding: 1.5rem 0; display: flex; justify-content: center; position: relative;">
+        <div class="header-right" style="position: relative; display: flex; justify-content: center; width: 100%; padding: 0;">
+          <div id="header-company-badge" onclick="toggleUserPopover(event)"
+            style="width: 36px; height: 36px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; box-shadow: var(--shadow-sm); transition: transform 0.2s, background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';" onmouseout="this.style.background='rgba(255,255,255,0.05)';">
+            <div id="badge-industry-icon" style="display: none;"></div>
+            <span id="company-name-display" style="display: none;"></span>
+            <span id="dash-industry-val" style="display: none;"></span>
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0-2.73.73l.15-.08a2 2 0 0 1-2 0l.43.25a2 2 0 0 1-1-1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1-1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>
+          </div>
+
+          <!-- Popover (Abriendo hacia arriba y a la derecha) -->
+          <div id="user-popover" class="user-popover" style="left: 60px; bottom: 0; top: auto; right: auto; min-width: 250px;">
+            <div class="popover-label">Usuario</div>
+            <div id="pop-user-name" class="popover-value">Cargando...</div>
+            <div class="popover-label">Correo Electrónico</div>
+            <div id="pop-user-email" class="popover-value" style="margin-bottom: 0;">Cargando...</div>
+            <div class="popover-label" style="margin-top: 1rem;">País</div>
+            <div id="version-tag" style="margin-top: 0.25rem; display: flex;"></div>
+            <hr style="margin: 1rem 0; border: none; border-top: 1px solid var(--color-smoke-mid);">
+            <a href="#"
+              style="color: var(--color-navy); font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; margin-bottom: 0.5rem; transition: color 0.2s;"
+              onmouseover="this.style.color='var(--color-cyan)'" onmouseout="this.style.color='var(--color-navy)'">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+              </svg>
+              Alertas
+            </a>
+            <a href="configuracion.html"
+              style="color: var(--color-navy); font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; margin-bottom: 0.5rem; transition: color 0.2s;"
+              onmouseover="this.style.color='var(--color-cyan)'" onmouseout="this.style.color='var(--color-navy)'">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path
+                  d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0-2.73.73l.15-.08a2 2 0 0 1-2 0l.43.25a2 2 0 0 1-1-1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1-1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              Configuración
+            </a>
+            <a href="login.html"
+              style="color: #EF4444; font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; transition: color 0.2s;"
+              onmouseover="this.style.color='#DC2626'" onmouseout="this.style.color='#EF4444'">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              Cerrar Sesión
+            </a>
+          </div>
+        </div>
+      </div>
     </aside>
 
     <main class="main-content">
       <header class="app-header">
-        <div class="header-left"></div>
-        <div class="header-right" style="display: flex; align-items: center; gap: 1.5rem; padding-right: 1rem;">
-          <div class="user-menu-container" onclick="togglePopover(event)"
-            style="background: white; padding: 0.5rem 1rem; border-radius: 1.25rem; border: 1px solid #E2E8F0; display: flex; align-items: center; cursor: pointer; position: relative;">
-            <div style="display: flex; flex-direction: column; text-align: right;">
-              <span id="company-name-display"
-                style="font-weight: 700; color: var(--color-navy); font-size: 0.95rem;">Cargando...</span>
-              <span
-                style="font-size: 0.65rem; color: var(--color-text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Sector</span>
-            </div>
-            <div style="margin-left: 0.5rem; color: var(--color-text-muted);">
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path d="m6 9 6 6 6-6" />
-              </svg>
-            </div>
-
-            <!-- Popover -->
-            <div id="user-popover" class="user-popover">
-              <div class="popover-label">Usuario</div>
-              <div id="pop-user-name" class="popover-value">Cargando...</div>
-              <div class="popover-label">Correo Electrónico</div>
-              <div id="pop-user-email" class="popover-value" style="margin-bottom: 0;">Cargando...</div>
-              <hr style="margin: 1rem 0; border: none; border-top: 1px solid var(--color-smoke-mid);">
-              <a href="#"
-                style="color: var(--color-navy); font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; margin-bottom: 0.5rem; transition: color 0.2s;"
-                onmouseover="this.style.color='var(--color-cyan)'" onmouseout="this.style.color='var(--color-navy)'">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                  <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                  <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                </svg>
-                Alertas
-              </a>
-              <a href="configuracion.html"
-                style="color: var(--color-navy); font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; margin-bottom: 0.5rem; transition: color 0.2s;"
-                onmouseover="this.style.color='var(--color-cyan)'" onmouseout="this.style.color='var(--color-navy)'">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                  <path
-                    d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1-1-1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1-1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-                  <circle cx="12" cy="12" r="3" />
-                </svg>
-                Configuración
-              </a>
-              <a href="javascript:void(0)" onclick="logoutUser()"
-                style="color: #EF4444; font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; transition: color 0.2s;"
-                onmouseover="this.style.color='#DC2626'" onmouseout="this.style.color='#EF4444'">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                  <polyline points="16 17 21 12 16 7"></polyline>
-                  <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
-                Cerrar Sesión
-              </a>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div class="welcome-banner">
-        <div style="display: flex; align-items: center; gap: 1rem;">
+        <div class="header-left" style="display: flex; align-items: center;">
           <button class="mobile-menu-toggle" onclick="toggleSidebar()"
-            style="color: white; border: none; background: transparent; cursor: pointer;">
+            style="color: var(--color-navy); border: none; background: transparent; cursor: pointer;">
             <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round" viewBox="0 0 24 24">
               <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -343,12 +296,16 @@
               <line x1="3" y1="18" x2="21" y2="18"></line>
             </svg>
           </button>
-          <div class="welcome-content">
-            <h1 class="welcome-title">Tus Facturas</h1>
-            <p class="welcome-subtitle">Descarga las facturas electrónicas emitidas por dotacian.</p>
+        </div>
+      </header>
+
+      <div class="dashboard-content-wrapper" style="padding-top: 5rem;">
+        <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 3rem;">
+          <div>
+            <h1 class="dot-greeting" style="text-align: left; margin-bottom: 0.5rem; font-size: 3rem; background: linear-gradient(90deg, #94A3B8 0%, #1E293B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Tus Facturas</h1>
+            <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;">Descarga las facturas electrónicas emitidas por dotacian.</p>
           </div>
         </div>
-      </div>
 
       <div class="content-wrapper">
         <div
@@ -863,6 +820,9 @@
       // await _supabase.from('invoice_requests').insert({ po_id: poId, company_id: session.user.id });
     }
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+  <script src="assets/js/dot-widget.js"></script>
 </body>
 
 </html>

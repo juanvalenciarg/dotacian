@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dotacian Studio | dotacian</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .studio-container {
+      display: flex;
+      height: 100vh;
+      width: 100%;
+      overflow: hidden;
+      padding-top: 0;
+      background: #F8FAFC;
+    }
+    
+    .studio-chat-sidebar {
+      width: 350px;
+      background: white;
+      border-right: 1px solid #E2E8F0;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.02);
+      z-index: 5;
+    }
+    
+    .studio-chat-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid #F1F5F9;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .studio-chat-history {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .studio-chat-input-area {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid #F1F5F9;
+      background: white;
+    }
+    
+    .studio-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 99px;
+      padding: 0.5rem 1rem;
+    }
+    
+    .studio-input-wrapper input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+    
+    .studio-btn-send {
+      background: var(--color-cyan);
+      color: white;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    
+    .studio-main-canvas {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      position: relative;
+    }
+    
+    .canvas-header {
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: transparent;
+    }
+    
+    .canvas-workspace {
+      flex: 1;
+      padding: 2rem 3rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+      overflow-y: auto;
+      align-content: start;
+    }
+    
+    .design-card {
+      background: white;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      border: 1px solid #E2E8F0;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .design-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+      border-color: var(--color-cyan);
+    }
+    
+    .design-img-placeholder {
+      width: 100%;
+      height: 250px;
+      background: #E2E8F0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94A3B8;
+      position: relative;
+    }
+    
+    .design-img-placeholder::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.3) 100%);
+    }
+    
+    .design-info {
+      padding: 1.25rem;
+    }
+    
+    .design-info h4 {
+      margin: 0 0 0.25rem 0;
+      color: var(--color-navy);
+      font-size: 1rem;
+    }
+    
+    .design-info p {
+      margin: 0;
+      color: #64748B;
+      font-size: 0.8rem;
+    }
+    
+    .loading-state {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      opacity: 0.6;
+    }
+    
+    /* Hide floating dot widget here since we have embedded chat */
+    .dot-widget-container {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout" id="app-layout-wrapper">
+                <!-- Sidebar -->
+    <aside class="sidebar" style="display: flex; flex-direction: column;">
+      <!-- TOP: dot AI -->
+      <div class="sidebar-header" style="position: relative; display: flex; justify-content: center; padding: 1.5rem 0 1rem 0 !important; overflow: visible;">
+        <a href="dot.html" class="nav-item dot-brand" style="display: flex; align-items: center; justify-content: center; text-decoration: none; border-radius: 50%; padding: 0; background: transparent; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';">
+          <img src="assets/logos/favicon.svg" alt="dot AI" style="width: 42px; height: 42px; object-fit: contain;">
+        </a>
+      </div>
+      
+      <!-- MIDDLE: Navigation -->
+      <nav class="sidebar-nav" style="flex: 1; display: flex; flex-direction: column; overflow-y: auto;">
+        <a href="app.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="roles.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+          <span class="nav-label">Roles</span>
+        </a>
+        <a href="empleados.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          <span class="nav-label">Empleados</span>
+        </a>
+        <a href="bodega.html" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg></span>
+          <span class="nav-label">Bodega</span>
+        </a>
+      </nav>
+
+      <!-- BOTTOM: Secondary Menu -->
+      <div class="sidebar-footer" style="padding: 1.5rem 0; display: flex; justify-content: center; position: relative;">
+        <div class="header-right" style="position: relative; display: flex; justify-content: center; width: 100%; padding: 0;">
+          <div id="header-company-badge" onclick="toggleUserPopover(event)"
+            style="width: 36px; height: 36px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; box-shadow: var(--shadow-sm); transition: transform 0.2s, background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';" onmouseout="this.style.background='rgba(255,255,255,0.05)';">
+            <div id="badge-industry-icon" style="display: none;"></div>
+            <span id="company-name-display" style="display: none;"></span>
+            <span id="dash-industry-val" style="display: none;"></span>
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0-2.73.73l.15-.08a2 2 0 0 1-2 0l.43.25a2 2 0 0 1-1-1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1-1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>
+          </div>
+
+          <!-- Popover (Abriendo hacia arriba y a la derecha) -->
+          <div id="user-popover" class="user-popover" style="left: 60px; bottom: 0; top: auto; right: auto; min-width: 250px;">
+            <div class="popover-label">Usuario</div>
+            <div id="pop-user-name" class="popover-value">Cargando...</div>
+            <div class="popover-label">Correo Electrónico</div>
+            <div id="pop-user-email" class="popover-value" style="margin-bottom: 0;">Cargando...</div>
+            <div class="popover-label" style="margin-top: 1rem;">País</div>
+            <div id="version-tag" style="margin-top: 0.25rem; display: flex;"></div>
+            <hr style="margin: 1rem 0; border: none; border-top: 1px solid var(--color-smoke-mid);">
+            <a href="#"
+              style="color: var(--color-navy); font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; margin-bottom: 0.5rem; transition: color 0.2s;"
+              onmouseover="this.style.color='var(--color-cyan)'" onmouseout="this.style.color='var(--color-navy)'">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+              </svg>
+              Alertas
+            </a>
+            <a href="configuracion.html"
+              style="color: var(--color-navy); font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; margin-bottom: 0.5rem; transition: color 0.2s;"
+              onmouseover="this.style.color='var(--color-cyan)'" onmouseout="this.style.color='var(--color-navy)'">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path
+                  d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0-2.73.73l.15-.08a2 2 0 0 1-2 0l.43.25a2 2 0 0 1-1-1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1-1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              Configuración
+            </a>
+            <a href="login.html"
+              style="color: #EF4444; font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; transition: color 0.2s;"
+              onmouseover="this.style.color='#DC2626'" onmouseout="this.style.color='#EF4444'">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              Cerrar Sesión
+            </a>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content: Studio -->
+    <main class="main-content" style="padding: 0; margin-left: var(--sidebar-width); height: 100vh;">
+      <div class="studio-container">
+        
+        <!-- Studio Chat Sidebar -->
+        <div class="studio-chat-sidebar">
+          <div class="studio-chat-header">
+            <div style="width:36px;height:36px;background:var(--color-cyan);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:1.2rem;">d</div>
+            <div>
+              <h3 style="margin:0;font-size:1.1rem;color:var(--color-navy);font-family:var(--font-family-heading);">Dotacian Studio</h3>
+              <p style="margin:0;font-size:0.75rem;color:#64748B;">Asistente de Diseño AI</p>
+            </div>
+          </div>
+          
+          <div class="studio-chat-history" id="studioChatHistory">
+            <div class="dot-bubble assistant">
+              ¡Hola! Bienvenido a <strong>Dotacian Studio</strong> 🎨.<br><br>Cuéntame, ¿qué tipo de uniforme o prenda tienes en mente para diseñar? Puedes darme referencias de estilo, colores corporativos o necesidades operativas.
+            </div>
+          </div>
+          
+          <div class="studio-chat-input-area">
+            <div class="studio-input-wrapper">
+              <input type="text" id="studioChatInput" placeholder="Ej: Camisa oxford azul con logo bordado...">
+              <button class="studio-btn-send" id="btnStudioSend">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 2L11 13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Studio Main Canvas -->
+        <div class="studio-main-canvas">
+          <div class="canvas-header">
+            <h1 style="font-family: var(--font-family-heading); font-size: 1.75rem; color: var(--color-navy); margin: 0;">Lienzo de Diseño</h1>
+            <div style="display: flex; gap: 1rem;">
+              <button class="btn btn-outline">Limpiar</button>
+              <button class="btn btn-primary" onclick="window.location.href='roles.html'">Guardar en Rol</button>
+            </div>
+          </div>
+          
+          <div class="canvas-workspace" id="canvasWorkspace">
+            <div class="loading-state" id="studioEmptyState">
+              <svg width="48" height="48" fill="none" stroke="#CBD5E1" stroke-width="1.5" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+              <span style="color: #94A3B8; font-weight: 500;">Describe tu diseño en el chat para generar propuestas visuales.</span>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/dot-widget.js"></script>
+  <script>
+    // Studio Chat Logic
+    const chatHistory = document.getElementById('studioChatHistory');
+    const chatInput = document.getElementById('studioChatInput');
+    const btnSend = document.getElementById('btnStudioSend');
+    const canvas = document.getElementById('canvasWorkspace');
+    const emptyState = document.getElementById('studioEmptyState');
+    
+    let designCount = 0;
+
+    function handleSend() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+      
+      // User bubble
+      const uBubble = document.createElement('div');
+      uBubble.className = 'dot-bubble user';
+      uBubble.textContent = text;
+      chatHistory.appendChild(uBubble);
+      
+      chatInput.value = '';
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+      
+      // Typing
+      const tBubble = document.createElement('div');
+      tBubble.className = 'dot-bubble assistant';
+      tBubble.id = 'studioTyping';
+      tBubble.innerHTML = '<span style="font-size: 0.8rem; color: #94A3B8;">dot está diseñando... 🎨</span>';
+      chatHistory.appendChild(tBubble);
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+      
+      // Simulate design generation
+      setTimeout(() => {
+        document.getElementById('studioTyping').remove();
+        
+        const aBubble = document.createElement('div');
+        aBubble.className = 'dot-bubble assistant';
+        aBubble.innerHTML = "¡Listo! He generado una propuesta visual en el lienzo basándome en tus indicaciones. ¿Qué te parece?";
+        chatHistory.appendChild(aBubble);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+        
+        generateDesignMockup(text);
+      }, 2000);
+    }
+    
+    function generateDesignMockup(prompt) {
+      if (emptyState) emptyState.style.display = 'none';
+      designCount++;
+      
+      const card = document.createElement('div');
+      card.className = 'design-card';
+      // In a real app we would use an AI image generator here
+      card.innerHTML = `
+        <div class="design-img-placeholder" style="background: url('https://source.unsplash.com/random/400x300/?clothing,uniform,${encodeURIComponent(prompt.split(' ')[0])}') center/cover;">
+          <span style="background: rgba(0,0,0,0.5); padding: 0.25rem 0.75rem; border-radius: 99px; color: white; font-size: 0.7rem; font-weight: bold; position: absolute; top: 1rem; right: 1rem;">Propuesta #${designCount}</span>
+        </div>
+        <div class="design-info">
+          <h4>Diseño Generado</h4>
+          <p>${prompt}</p>
+        </div>
+      `;
+      canvas.appendChild(card);
+    }
+
+    btnSend.addEventListener('click', handleSend);
+    chatInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleSend();
+    });
+  </script>
+</body>
+</html>
