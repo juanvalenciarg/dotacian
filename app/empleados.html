@@ -2286,8 +2286,8 @@
           console.warn("Audit log insert error (non-critical):", linkErr);
         }
 
-        // 3. Construct signing link in an adaptive way (retains protocol, port, path, and domain)
-        const absoluteLink = window.location.href.replace('empleados.html', 'mi_dotacion.html').split('?')[0] + `?delivery_id=${deliveryId}`;
+        // 3. Construct signing link (mi_dotacion.html lives at the site root, not under /app/)
+        const absoluteLink = `${window.location.origin}/mi_dotacion.html?delivery_id=${deliveryId}`;
 
         // 4. Expose link & generate QR Code
         document.getElementById('deliveryLinkInput').value = absoluteLink;
@@ -2734,9 +2734,7 @@
 
     function copySizeLink() {
       if (!currentDetailEmployeeId) return;
-      let loc = window.location.href;
-      let basePath = loc.substring(0, loc.lastIndexOf('/'));
-      const url = `${basePath}/mi_dotacion.html?mode=tallas&emp_id=${currentDetailEmployeeId}`;
+      const url = `${window.location.origin}/mi_dotacion.html?mode=tallas&emp_id=${currentDetailEmployeeId}`;
       generateAndShowSizeLink(url, currentDetailEmployeeId);
     }
 
@@ -3056,9 +3054,7 @@
         }
 
         if (requestSizes) {
-          let loc = window.location.href;
-          let basePath = loc.substring(0, loc.lastIndexOf('/'));
-          const url = `${basePath}/mi_dotacion.html?mode=tallas&emp_id=${newEmp.id}`;
+          const url = `${window.location.origin}/mi_dotacion.html?mode=tallas&emp_id=${newEmp.id}`;
 
           showToast("Empleado Agregado", `Se ha registrado a ${name} exitosamente.`);
           generateAndShowSizeLink(url, newEmp.id);
