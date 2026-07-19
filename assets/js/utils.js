@@ -347,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
           let localSupa = window._supabase;
           if (!localSupa) {
-            localSupa = supabase.createClient('https://awuhvewotmwelurmjvmu.supabase.co', 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq', { auth: { storageKey: 'dotacian-client-token', multiTab: false } });
+            localSupa = supabase.createClient('https://awuhvewotmwelurmjvmu.supabase.co', 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq', { auth: { storageKey: 'dotacian-admin-token', multiTab: false } });
           }
           
           const { count, error } = await localSupa
