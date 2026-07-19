@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <link rel="stylesheet" href="/styles.css">
   <style>
     /* Calendario (Flatpickr) - Fecha de Nacimiento */
@@ -469,6 +470,7 @@
                     <th style="cursor: pointer;" onclick="sortTable(2)">Rol / Puesto ↕</th>
                     <th style="cursor: pointer;" onclick="sortTable(3)">Alerta Renovación ↕</th>
                     <th style="cursor: pointer;" onclick="sortTable(4)">Estado ↕</th>
+                    <th>Tallas</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -1124,8 +1126,9 @@
       <h3
         style="color: var(--color-navy); margin-bottom: 0.5rem; font-family: var(--font-family-heading); font-size: 1.5rem; font-weight: 800;">
         Enlace de Captura</h3>
-      <p style="color: var(--color-text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem;">Pídele al empleado que
+      <p style="color: var(--color-text-secondary); margin-bottom: 0.5rem; font-size: 0.9rem;">Pídele al empleado que
         escanee el código QR o copia el link para enviárselo por WhatsApp o correo.</p>
+      <p style="color: #D97706; margin-bottom: 1.5rem; font-size: 0.8125rem; font-weight: 600;">⏱ Este enlace vence en 24 horas.</p>
 
       <div
         style="background: white; padding: 1rem; border-radius: 12px; border: 1px solid var(--color-border); display: inline-block; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);">
@@ -2704,9 +2707,28 @@
       }
     }
 
-    function generateAndShowSizeLink(url) {
+    async function generateAndShowSizeLink(url, empId) {
+      if (empId) {
+        try {
+          const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+          await _supabase.from('company_employees')
+            .update({ sizes_request_expires_at: expiresAt, sizes_confirmed_at: null })
+            .eq('id', empId);
+          fetchEmployees();
+        } catch (err) {
+          console.error('Error al fijar la expiración del enlace de tallas:', err);
+        }
+      }
+
       document.getElementById('sizeLinkInput').value = url;
-      document.getElementById('sizeLinkQRCode').src = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + encodeURIComponent(url);
+      const qrImg = document.getElementById('sizeLinkQRCode');
+      if (typeof QRCode !== 'undefined') {
+        QRCode.toDataURL(url, { width: 180, margin: 1, color: { dark: '#0F172A', light: '#FFFFFF' } }, (err, dataUrl) => {
+          if (!err) qrImg.src = dataUrl;
+        });
+      } else {
+        qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + encodeURIComponent(url);
+      }
       document.getElementById('sizeLinkModal').classList.add('active');
     }
 
@@ -2715,7 +2737,7 @@
       let loc = window.location.href;
       let basePath = loc.substring(0, loc.lastIndexOf('/'));
       const url = `${basePath}/mi_dotacion.html?mode=tallas&emp_id=${currentDetailEmployeeId}`;
-      generateAndShowSizeLink(url);
+      generateAndShowSizeLink(url, currentDetailEmployeeId);
     }
 
     function enableSizeEditing() {
@@ -3039,7 +3061,7 @@
           const url = `${basePath}/mi_dotacion.html?mode=tallas&emp_id=${newEmp.id}`;
 
           showToast("Empleado Agregado", `Se ha registrado a ${name} exitosamente.`);
-          generateAndShowSizeLink(url);
+          generateAndShowSizeLink(url, newEmp.id);
         } else {
           showToast("Empleado Agregado", `Se ha registrado a ${name} exitosamente.`);
         }
@@ -3097,6 +3119,11 @@
         const statusTextColor = isActive ? '#059669' : '#EF4444';
         const statusText = isActive ? 'ACTIVO' : 'INACTIVO';
 
+        const sizesConfirmed = !!emp.sizes_confirmed_at;
+        const sizesBadgeColor = sizesConfirmed ? '#ECFDF5' : '#FFFBEB';
+        const sizesTextColor = sizesConfirmed ? '#059669' : '#D97706';
+        const sizesBadgeText = sizesConfirmed ? 'Confirmada' : 'Pendiente';
+
         const row = document.createElement('tr');
         row.innerHTML = `
           <td><input type="checkbox" class="emp-checkbox" data-db-id="${emp.db_id}" onclick="updateSelection()"></td>
@@ -3110,6 +3137,9 @@
           <td><span class="status-badge status-${emp.status}">${emp.status === 'success' || emp.status === 'none' ? '' : '⚠️ '}${emp.statusText}</span></td>
           <td>
             <span class="status-badge" style="background: ${statusBadgeColor}; color: ${statusTextColor}; font-weight: 700;">${statusText}</span>
+          </td>
+          <td>
+            <span class="status-badge" style="background: ${sizesBadgeColor}; color: ${sizesTextColor}; font-weight: 700;">${sizesBadgeText}</span>
           </td>
           <td>
             <div style="display: flex; gap: 0.5rem; justify-content: flex-start; align-items: center;">
@@ -3221,7 +3251,9 @@
             shirt_size: emp.shirt_size || '',
             pants_size: emp.pants_size || '',
             shoe_size: emp.shoe_size || '',
-            id_document: emp.id_document || ''
+            id_document: emp.id_document || '',
+            sizes_confirmed_at: emp.sizes_confirmed_at || null,
+            sizes_request_expires_at: emp.sizes_request_expires_at || null
           };
         });
 
