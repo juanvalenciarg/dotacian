@@ -482,6 +482,14 @@
 
           if (error || !emp) throw error || new Error("Empleado no encontrado");
 
+          const expiresAt = emp.sizes_request_expires_at ? new Date(emp.sizes_request_expires_at) : null;
+          if (!expiresAt || expiresAt.getTime() < Date.now()) {
+            heroName.textContent = "Enlace vencido";
+            heroRole.textContent = "Pide a tu empleador que te comparta un enlace nuevo.";
+            document.querySelector('.mi-cards').style.display = 'none';
+            return;
+          }
+
           heroName.textContent = `${emp.first_name} ${emp.last_name}`;
           heroRole.textContent = emp.role || 'Empleado';
 
@@ -532,14 +540,19 @@
           btn.innerHTML = '<span>💾</span> Guardar Tallas';
           btn.disabled = false;
           btn.onclick = async () => {
+            if (expiresAt.getTime() < Date.now()) {
+              alert('Este enlace ya venció. Pide a tu empleador que te comparta uno nuevo.');
+              return;
+            }
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner" style="width:16px; height:16px; margin:0; display:inline-block; border-top-color:white; vertical-align:middle;"></span> Guardando...';
             try {
               const { data: updatedData, error: updateErr } = await _supabase.from('company_employees')
-                .update({ 
+                .update({
                   shirt_size: document.getElementById('emp-size-camisa').value,
                   pants_size: document.getElementById('emp-size-pantalon').value,
-                  shoe_size: document.getElementById('emp-size-calzado').value
+                  shoe_size: document.getElementById('emp-size-calzado').value,
+                  sizes_confirmed_at: new Date().toISOString()
                 })
                 .eq('id', empId)
                 .select();
