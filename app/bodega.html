@@ -13,10 +13,6 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="/styles.css">
   <style>
-    :root {
-      --sidebar-width: 80px;
-    }
-
     .bodega-badge {
       display: inline-flex;
       align-items: center;
@@ -454,7 +450,7 @@
     /* Main Content Refinement */
     .main-content {
       flex: 1;
-      margin-left: 80px;
+      margin-left: var(--sidebar-width);
       padding: 0;
       background: #F8FAFC;
     }
@@ -468,29 +464,11 @@
       border: none;
       position: absolute;
       top: 0;
-      left: 80px;
+      left: var(--sidebar-width);
       right: 0;
       z-index: 10;
     }
 
-    .nav-label, .nav-sub-items, .nav-item span:last-child {
-      display: none !important;
-    }
-    .nav-item {
-      justify-content: center !important;
-      padding: 0.875rem 0 !important;
-      margin-bottom: 0.8rem !important;
-    }
-    .nav-icon {
-      margin: 0 !important;
-      font-size: 1.4rem !important;
-    }
-    .sidebar-header {
-      padding: 1.5rem 0 !important;
-      display: flex !important;
-      justify-content: center !important;
-    }
-    
     @media (max-width: 992px) {
       .app-header {
         left: 0;
@@ -1447,9 +1425,9 @@
                 ${rowsHtml}
               </tbody>
             </table>
-            <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
-  <script src="/assets/js/dot-widget.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"><\/script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"><\/script>
+  <script src="/assets/js/dot-widget.js"><\/script>
 </body>
         </html>
       `);
