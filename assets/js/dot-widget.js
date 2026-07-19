@@ -1,5 +1,5 @@
 (function () {
-  const isClosed = localStorage.getItem('dotacian_widget_closed') === 'true';
+  const isClosed = localStorage.getItem('dotacian_widget_closed') !== 'false';
 
   // 1. Inyectar HTML del widget
   const widgetHTML = `
