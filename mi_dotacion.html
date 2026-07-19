@@ -311,7 +311,7 @@
           dotación ha sido recibida y firmada correctamente.</p>
         <p style="font-size: 0.8125rem; color: #64748B; font-style: italic; margin-bottom: 1.5rem;">Ya puedes cerrar
           esta pestaña de forma segura.</p>
-        <button onclick="window.close()"
+        <button onclick="window.close(); document.getElementById('successModal').classList.remove('active');"
           style="width: 100%; padding: 1rem; background: var(--color-cyan); color: var(--color-navy); border: none; border-radius: 1rem; font-family: var(--font-family-heading); font-weight: 700; cursor: pointer;">Entendido</button>
       </div>
     </div>
