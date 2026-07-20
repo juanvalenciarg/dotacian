@@ -48,26 +48,10 @@
       justify-content: space-between;
     }
 
-    .mi-topbar .logo-text {
-      font-family: var(--font-family-heading);
-      font-size: 1.25rem;
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      color: white;
-    }
-
-    .mi-topbar .logo-text span {
-      color: var(--color-cyan);
-    }
-
-    .mi-topbar .logout-btn {
-      font-size: 0.75rem;
-      color: rgba(255, 255, 255, 0.5);
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-family: var(--font-family-primary);
-      text-decoration: none;
+    .mi-topbar .logo-img {
+      height: 26px;
+      width: auto;
+      display: block;
     }
 
     /* --- Hero / Greeting --- */
@@ -327,15 +311,14 @@
           dotación ha sido recibida y firmada correctamente.</p>
         <p style="font-size: 0.8125rem; color: #64748B; font-style: italic; margin-bottom: 1.5rem;">Ya puedes cerrar
           esta pestaña de forma segura.</p>
-        <button onclick="window.close()"
+        <button onclick="window.close(); document.getElementById('successModal').classList.remove('active');"
           style="width: 100%; padding: 1rem; background: var(--color-cyan); color: var(--color-navy); border: none; border-radius: 1rem; font-family: var(--font-family-heading); font-weight: 700; cursor: pointer;">Entendido</button>
       </div>
     </div>
 
     <!-- Top Bar -->
     <div class="mi-topbar">
-      <div class="logo-text">mi <span>dotacian</span></div>
-      <a href="mi-login.html" class="logout-btn">Cerrar sesión</a>
+      <img src="/assets/logos/mi.dotacian.png" alt="mi dotacian" class="logo-img">
     </div>
 
     <!-- Hero Greeting -->
@@ -397,29 +380,30 @@
 
       let currentDeliveryId = null;
       let currentDelivery = null;
+      let currentMode = null;
       const canvas = document.getElementById('signaturePad');
       const ctx = canvas.getContext('2d');
       let drawing = false;
 
+      function getParameterByName(name, url = window.location.href) {
+        name = name.replace(/[\[\]]/g, '\\$&');
+        const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+        const results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+      }
+
       // Initialize
       document.addEventListener('DOMContentLoaded', () => {
-        function getParameterByName(name, url = window.location.href) {
-          name = name.replace(/[\[\]]/g, '\\$&');
-          const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
-          const results = regex.exec(url);
-          if (!results) return null;
-          if (!results[2]) return '';
-          return decodeURIComponent(results[2].replace(/\+/g, ' '));
-        }
-
         const rawId = getParameterByName('delivery_id');
-        const mode = getParameterByName('mode');
-        
+        currentMode = getParameterByName('mode');
+
         currentDeliveryId = rawId ? rawId.trim() : null;
 
         console.log("Full URL:", window.location.href);
 
-        if (mode === 'tallas') {
+        if (currentMode === 'tallas') {
           const empId = getParameterByName('emp_id');
           if (empId) {
             loadSizesForm(empId);
@@ -546,8 +530,21 @@
             }
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner" style="width:16px; height:16px; margin:0; display:inline-block; border-top-color:white; vertical-align:middle;"></span> Guardando...';
+
+            const showSavedSuccess = () => {
+              document.getElementById('successModal').classList.add('active');
+              const modalTitle = document.querySelector('#successModal h3');
+              if (modalTitle) modalTitle.textContent = '¡Tallas Guardadas!';
+              const modalDesc = document.querySelector('#successModal p');
+              if (modalDesc) modalDesc.textContent = 'Tus tallas han sido confirmadas. Ya puedes cerrar esta ventana.';
+            };
+            const resetButton = () => {
+              btn.disabled = false;
+              btn.innerHTML = '<span>💾</span> Guardar Tallas';
+            };
+
             try {
-              const { data: updatedData, error: updateErr } = await _supabase.from('company_employees')
+              const updatePromise = _supabase.from('company_employees')
                 .update({
                   shirt_size: document.getElementById('emp-size-camisa').value,
                   pants_size: document.getElementById('emp-size-pantalon').value,
@@ -556,22 +553,39 @@
                 })
                 .eq('id', empId)
                 .select();
+              const TIMED_OUT = Symbol('timeout');
+              const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(TIMED_OUT), 12000));
 
+              const result = await Promise.race([updatePromise, timeoutPromise]);
+
+              if (result === TIMED_OUT) {
+                // No respondió a tiempo: en vez de asumir que falló, confirmamos
+                // directo con la base si el guardado de todas formas se aplicó.
+                const { data: check } = await _supabase.from('company_employees')
+                  .select('sizes_confirmed_at')
+                  .eq('id', empId)
+                  .maybeSingle();
+
+                if (check && check.sizes_confirmed_at) {
+                  showSavedSuccess();
+                } else {
+                  alert("La conexión está tardando demasiado. Revisa tu internet e intenta de nuevo.");
+                  resetButton();
+                }
+                return;
+              }
+
+              const { data: updatedData, error: updateErr } = result;
               if (updateErr) throw updateErr;
               if (!updatedData || updatedData.length === 0) {
                 throw new Error("Supabase RLS bloqueó la actualización (El usuario es anónimo).");
               }
 
-              document.getElementById('successModal').classList.add('active');
-              const modalTitle = document.querySelector('#successModal h3');
-              if(modalTitle) modalTitle.textContent = '¡Tallas Guardadas!';
-              const modalDesc = document.querySelector('#successModal p');
-              if(modalDesc) modalDesc.textContent = 'Tus tallas han sido confirmadas. Ya puedes cerrar esta ventana.';
+              showSavedSuccess();
             } catch (err) {
               console.error("Error saving sizes:", err);
               alert("Hubo un error al guardar tus tallas.");
-              btn.disabled = false;
-              btn.innerHTML = '<span>💾</span> Guardar Tallas';
+              resetButton();
             }
           };
 
@@ -674,8 +688,7 @@
       }
 
       function checkItems() {
-        const mode = getParameterByName('mode');
-        if (mode === 'tallas') return;
+        if (currentMode === 'tallas') return;
 
         const checkboxes = document.querySelectorAll('#delivery-checklist input[type="checkbox"]');
         const allChecked = Array.from(checkboxes).every(cb => cb.checked);
