@@ -531,7 +531,7 @@
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner" style="width:16px; height:16px; margin:0; display:inline-block; border-top-color:white; vertical-align:middle;"></span> Guardando...';
             try {
-              const { data: updatedData, error: updateErr } = await _supabase.from('company_employees')
+              const updatePromise = _supabase.from('company_employees')
                 .update({
                   shirt_size: document.getElementById('emp-size-camisa').value,
                   pants_size: document.getElementById('emp-size-pantalon').value,
@@ -540,6 +540,9 @@
                 })
                 .eq('id', empId)
                 .select();
+              const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 15000));
+
+              const { data: updatedData, error: updateErr } = await Promise.race([updatePromise, timeoutPromise]);
 
               if (updateErr) throw updateErr;
               if (!updatedData || updatedData.length === 0) {
@@ -553,7 +556,11 @@
               if(modalDesc) modalDesc.textContent = 'Tus tallas han sido confirmadas. Ya puedes cerrar esta ventana.';
             } catch (err) {
               console.error("Error saving sizes:", err);
-              alert("Hubo un error al guardar tus tallas.");
+              if (err.message === 'TIMEOUT') {
+                alert("La conexión está tardando demasiado. Revisa tu internet e intenta de nuevo; si el problema sigue, tus tallas podrían haberse guardado igual.");
+              } else {
+                alert("Hubo un error al guardar tus tallas.");
+              }
               btn.disabled = false;
               btn.innerHTML = '<span>💾</span> Guardar Tallas';
             }
