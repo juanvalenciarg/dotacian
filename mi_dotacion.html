@@ -530,6 +530,19 @@
             }
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner" style="width:16px; height:16px; margin:0; display:inline-block; border-top-color:white; vertical-align:middle;"></span> Guardando...';
+
+            const showSavedSuccess = () => {
+              document.getElementById('successModal').classList.add('active');
+              const modalTitle = document.querySelector('#successModal h3');
+              if (modalTitle) modalTitle.textContent = '¡Tallas Guardadas!';
+              const modalDesc = document.querySelector('#successModal p');
+              if (modalDesc) modalDesc.textContent = 'Tus tallas han sido confirmadas. Ya puedes cerrar esta ventana.';
+            };
+            const resetButton = () => {
+              btn.disabled = false;
+              btn.innerHTML = '<span>💾</span> Guardar Tallas';
+            };
+
             try {
               const updatePromise = _supabase.from('company_employees')
                 .update({
@@ -540,29 +553,39 @@
                 })
                 .eq('id', empId)
                 .select();
-              const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 15000));
+              const TIMED_OUT = Symbol('timeout');
+              const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(TIMED_OUT), 12000));
 
-              const { data: updatedData, error: updateErr } = await Promise.race([updatePromise, timeoutPromise]);
+              const result = await Promise.race([updatePromise, timeoutPromise]);
 
+              if (result === TIMED_OUT) {
+                // No respondió a tiempo: en vez de asumir que falló, confirmamos
+                // directo con la base si el guardado de todas formas se aplicó.
+                const { data: check } = await _supabase.from('company_employees')
+                  .select('sizes_confirmed_at')
+                  .eq('id', empId)
+                  .maybeSingle();
+
+                if (check && check.sizes_confirmed_at) {
+                  showSavedSuccess();
+                } else {
+                  alert("La conexión está tardando demasiado. Revisa tu internet e intenta de nuevo.");
+                  resetButton();
+                }
+                return;
+              }
+
+              const { data: updatedData, error: updateErr } = result;
               if (updateErr) throw updateErr;
               if (!updatedData || updatedData.length === 0) {
                 throw new Error("Supabase RLS bloqueó la actualización (El usuario es anónimo).");
               }
 
-              document.getElementById('successModal').classList.add('active');
-              const modalTitle = document.querySelector('#successModal h3');
-              if(modalTitle) modalTitle.textContent = '¡Tallas Guardadas!';
-              const modalDesc = document.querySelector('#successModal p');
-              if(modalDesc) modalDesc.textContent = 'Tus tallas han sido confirmadas. Ya puedes cerrar esta ventana.';
+              showSavedSuccess();
             } catch (err) {
               console.error("Error saving sizes:", err);
-              if (err.message === 'TIMEOUT') {
-                alert("La conexión está tardando demasiado. Revisa tu internet e intenta de nuevo; si el problema sigue, tus tallas podrían haberse guardado igual.");
-              } else {
-                alert("Hubo un error al guardar tus tallas.");
-              }
-              btn.disabled = false;
-              btn.innerHTML = '<span>💾</span> Guardar Tallas';
+              alert("Hubo un error al guardar tus tallas.");
+              resetButton();
             }
           };
 
