@@ -492,46 +492,12 @@
       <div class="dashboard-content-wrapper" style="padding-top: 5rem;">
         <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end;">
           <div>
-            <h1 class="dot-greeting" style="text-align: left; margin-bottom: 0.5rem; font-size: 3rem; background: linear-gradient(90deg, #94A3B8 0%, #1E293B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Configuración de Roles por Industria</h1>
-            <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;">Habilita roles predeterminados para tu operación.</p>
+            <h1 class="dot-greeting" style="text-align: left; margin-bottom: 0.5rem; font-size: 3rem; background: linear-gradient(90deg, #94A3B8 0%, #1E293B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Configuración de Roles</h1>
+            <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;">Crea y administra los roles de tu empresa.</p>
           </div>
         </div>
         <div class="app-container" style="padding: 0; background: transparent; box-shadow: none;">
-          <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Roles disponibles para tu empresa</h2>
-
-          <!-- Industry Selection Modal -->
-          <div class="modal-overlay" id="industryModal">
-            <div class="modal-content-lg" style="max-width: 500px;">
-              <div class="modal-header">
-                <h2>Seleccionar Industria</h2>
-                <button class="btn-close" onclick="closeIndustryModal()">✕</button>
-              </div>
-              <div style="padding: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
-                <p style="font-size: 0.875rem; color: var(--color-text-secondary); margin-bottom: 0.5rem;">Selecciona tu
-                  industria para habilitar los roles predeterminados:</p>
-                <button class="btn btn-outline" style="text-align: left; justify-content: flex-start;"
-                  onclick="selectIndustry('Restaurantes')">Restaurantes</button>
-                <button class="btn btn-outline" style="text-align: left; justify-content: flex-start;"
-                  onclick="selectIndustry('Limpieza')">Limpieza</button>
-                <button class="btn btn-outline" style="text-align: left; justify-content: flex-start;"
-                  onclick="selectIndustry('Industrial')">Industrial</button>
-                <button class="btn btn-outline" style="text-align: left; justify-content: flex-start;"
-                  onclick="selectIndustry('Corporativo')">Corporativo</button>
-                <button class="btn btn-outline" style="text-align: left; justify-content: flex-start;"
-                  onclick="selectIndustry('Seguridad')">Seguridad</button>
-                <button class="btn btn-outline" style="text-align: left; justify-content: flex-start;"
-                  onclick="selectIndustry('Hotelería')">Hotelería</button>
-                <button class="btn btn-outline" style="text-align: left; justify-content: flex-start;"
-                  onclick="selectIndustry('Retail')">Retail</button>
-                <button class="btn btn-outline" style="text-align: left; justify-content: flex-start;"
-                  onclick="selectIndustry('Salud')">Salud</button>
-                <button class="btn btn-outline" style="text-align: left; justify-content: flex-start;"
-                  onclick="selectIndustry('Construcción')">Construcción</button>
-                <button class="btn btn-outline" style="text-align: left; justify-content: flex-start;"
-                  onclick="selectIndustry('Logística')">Logística</button>
-              </div>
-            </div>
-          </div>
+          <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Roles de tu empresa</h2>
 
           <div class="roles-grid" id="rolesGrid">
             <!-- Roles will be rendered dynamically here -->
@@ -550,31 +516,74 @@
               <button class="btn-close" onclick="closeRoleConfig()">✕</button>
             </div>
             <div style="padding: 1.5rem;">
-              <div id="roleAreaBlock" style="margin-bottom: 1.5rem;">
-                <label
-                  style="display: block; font-size: 0.8125rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.5rem;">Área</label>
-                <select id="roleAreaSelect" onchange="handleAreaSelectChange()"
-                  style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); font-family: var(--font-family-primary); background: white; color: var(--color-navy);">
-                  <option value="">Selecciona un área...</option>
-                  <option value="Dirección / Gerencia">Dirección / Gerencia</option>
-                  <option value="Administración">Administración</option>
-                  <option value="Operaciones">Operaciones</option>
-                  <option value="Ventas">Ventas</option>
-                  <option value="Producción / Cocina">Producción / Cocina</option>
-                  <option value="Logística">Logística</option>
-                  <option value="Seguridad">Seguridad</option>
-                  <option value="Limpieza">Limpieza</option>
-                  <option value="Atención al Cliente">Atención al Cliente</option>
-                  <option value="TI">TI</option>
-                  <option value="RRHH">RRHH</option>
-                  <option value="otra">Otra (especificar)</option>
-                </select>
-                <input type="text" id="roleAreaCustom" placeholder="Escribe el área..."
-                  style="display: none; margin-top: 0.5rem; width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); font-family: var(--font-family-primary);">
+              <div id="roleAreaBlock" style="margin-bottom: 1.5rem; display: flex; gap: 1rem;">
+                <div style="flex: 1;">
+                  <label
+                    style="display: block; font-size: 0.8125rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.5rem;">Área</label>
+                  <select id="roleAreaSelect" onchange="handleAreaSelectChange()"
+                    style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); font-family: var(--font-family-primary); background: white; color: var(--color-navy);">
+                    <option value="">Selecciona un área...</option>
+                    <option value="Dirección / Gerencia">Dirección / Gerencia</option>
+                    <option value="Administración">Administración</option>
+                    <option value="Operaciones">Operaciones</option>
+                    <option value="Ventas">Ventas</option>
+                    <option value="Producción / Cocina">Producción / Cocina</option>
+                    <option value="Logística">Logística</option>
+                    <option value="Seguridad">Seguridad</option>
+                    <option value="Limpieza">Limpieza</option>
+                    <option value="Atención al Cliente">Atención al Cliente</option>
+                    <option value="TI">TI</option>
+                    <option value="RRHH">RRHH</option>
+                    <option value="otra">Otra (especificar)</option>
+                  </select>
+                  <input type="text" id="roleAreaCustom" placeholder="Escribe el área..."
+                    style="display: none; margin-top: 0.5rem; width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); font-family: var(--font-family-primary);">
+                </div>
+                <div style="flex: 1;">
+                  <label
+                    style="display: block; font-size: 0.8125rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.5rem;">Subárea (opcional)</label>
+                  <input type="text" id="roleSubareaInput" placeholder="Ej. Cocina"
+                    style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); font-family: var(--font-family-primary);">
+                </div>
               </div>
 
               <div id="roleAssetList" style="display: flex; flex-direction: column; gap: 0.75rem;">
                 <!-- Asset items rendered here -->
+              </div>
+
+              <button type="button" class="btn btn-outline" id="showAddAssetBtn" onclick="toggleAddAssetForm(true)"
+                style="width: 100%; margin-top: 0.5rem; font-size: 0.8rem; padding: 0.6rem;">+ Agregar Activo</button>
+
+              <div id="addAssetForm" style="display: none; margin-top: 1rem; padding: 1rem; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; flex-direction: column; gap: 0.75rem;">
+                <div class="form-row">
+                  <label>Nombre del Activo</label>
+                  <input type="text" id="newAssetName" placeholder="Ej. Impresora, Silla ergonómica...">
+                </div>
+                <div style="display: flex; gap: 0.75rem;">
+                  <div class="form-row" style="flex: 1;">
+                    <label>Categoría</label>
+                    <select id="newAssetCategory" onchange="updateAssetTypeOptions()"
+                      style="width: 100%; padding: 0.65rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); background: white;">
+                      <option value="fisico">Físico</option>
+                      <option value="digital">Digital</option>
+                    </select>
+                  </div>
+                  <div class="form-row" style="flex: 1;">
+                    <label>Tipo</label>
+                    <select id="newAssetType"
+                      style="width: 100%; padding: 0.65rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); background: white;">
+                    </select>
+                  </div>
+                  <div class="form-row" style="width: 80px;">
+                    <label>Cant.</label>
+                    <input type="number" id="newAssetQty" value="1" min="1"
+                      style="width: 100%; padding: 0.65rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md);">
+                  </div>
+                </div>
+                <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+                  <button type="button" class="btn btn-outline" style="font-size: 0.8rem;" onclick="toggleAddAssetForm(false)">Cancelar</button>
+                  <button type="button" class="btn btn-primary" style="font-size: 0.8rem;" onclick="addCustomAssetRow()">Agregar</button>
+                </div>
               </div>
 
               <div class="modal-footer" id="roleConfigFooter"
@@ -588,7 +597,7 @@
 
         <!-- New Role Modal -->
         <div class="modal-overlay" id="newRoleModal">
-          <div class="modal-content-lg" style="max-width: 450px;">
+          <div class="modal-content-lg" style="max-width: 560px; max-height: 88vh; display: flex; flex-direction: column;">
             <div class="modal-header">
               <div>
                 <h2>Crear Nuevo Rol</h2>
@@ -597,7 +606,7 @@
               </div>
               <button class="btn-close" onclick="closeNewRoleModal()">✕</button>
             </div>
-            <div style="padding: 1.5rem;">
+            <div style="padding: 1.5rem; overflow-y: auto;">
               <div class="modal-form" style="display: flex; flex-direction: column; gap: 1.25rem;">
                 <div class="form-row">
                   <label>Nombre del Rol</label>
@@ -610,58 +619,63 @@
                 </div>
                 <div style="display: flex; gap: 1rem;">
                   <div class="form-row" style="flex: 1;">
-                    <label>Prendas Base</label>
-                    <input type="number" value="3"
-                      style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md);">
+                    <label>Área</label>
+                    <select id="newRoleArea"
+                      style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); font-family: var(--font-family-primary); background: white; color: var(--color-navy);">
+                      <option value="">Selecciona un área...</option>
+                      <option value="Dirección / Gerencia">Dirección / Gerencia</option>
+                      <option value="Administración">Administración</option>
+                      <option value="Operaciones">Operaciones</option>
+                      <option value="Ventas">Ventas</option>
+                      <option value="Producción / Cocina">Producción / Cocina</option>
+                      <option value="Logística">Logística</option>
+                      <option value="Seguridad">Seguridad</option>
+                      <option value="Limpieza">Limpieza</option>
+                      <option value="Atención al Cliente">Atención al Cliente</option>
+                      <option value="TI">TI</option>
+                      <option value="RRHH">RRHH</option>
+                    </select>
                   </div>
                   <div class="form-row" style="flex: 1;">
-                    <label>Frecuencia (Meses)</label>
-                    <input type="number" value="6"
-                      style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md);">
+                    <label>Subárea (opcional)</label>
+                    <input type="text" id="newRoleSubarea" placeholder="Ej. Cocina">
                   </div>
                 </div>
-              </div>
 
-              <div class="modal-footer"
-                style="margin-top: 2rem; display: flex; justify-content: flex-end; gap: 1rem; border-top: 1px solid var(--color-smoke); padding-top: 1.5rem;">
-                <button class="btn btn-outline" onclick="closeNewRoleModal()">Cancelar</button>
-                <button class="btn btn-primary" onclick="createNewRole()">Habilitar Rol</button>
+                <div style="border-top: 1px solid var(--color-smoke); padding-top: 1.25rem;">
+                  <label style="display: block; font-weight: 700; font-size: 0.875rem; color: var(--color-navy); margin-bottom: 0.6rem;">Tipo de activos a entregar</label>
+                  <div style="display: flex; gap: 1.5rem; margin-bottom: 1rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.875rem; font-weight: 600; color: var(--color-navy);">
+                      <input type="checkbox" id="newRoleCatFisico" onchange="toggleNewRoleCategory('fisico')" style="width: 18px; height: 18px; accent-color: var(--color-cyan); cursor: pointer;">
+                      Físico
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.875rem; font-weight: 600; color: var(--color-navy);">
+                      <input type="checkbox" id="newRoleCatDigital" onchange="toggleNewRoleCategory('digital')" style="width: 18px; height: 18px; accent-color: var(--color-cyan); cursor: pointer;">
+                      Digital
+                    </label>
+                  </div>
+                  <div id="newRoleFisicoSubcats" style="display: none; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem;"></div>
+                  <div id="newRoleDigitalSubcats" style="display: none; flex-direction: column; gap: 0.75rem;"></div>
+                </div>
               </div>
+            </div>
+
+            <div class="modal-footer"
+              style="margin: 0; display: flex; justify-content: flex-end; gap: 1rem; border-top: 1px solid var(--color-smoke); padding: 1.5rem;">
+              <button class="btn btn-outline" onclick="closeNewRoleModal()">Cancelar</button>
+              <button class="btn btn-primary" onclick="createNewRole()">Crear Rol</button>
             </div>
           </div>
         </div>
-
-        <!--
-        <div style="margin-top: 3rem; text-align: center;">
-          <button class="btn btn-primary" style="padding: 1rem 3rem;" onclick="saveRoles()">Guardar Configuración de
-            Roles</button>
-        </div>
-        -->
       </div>
   </div>
   </main>
   </div>
 
   <script>
-    function openIndustryModal() {
-      document.getElementById('industryModal').classList.add('active');
-    }
-
-    function closeIndustryModal() {
-      document.getElementById('industryModal').classList.remove('active');
-    }
-
-    function selectIndustry(industry) {
-      activeIndustry = industry;
-
-      const industryDisplay = document.getElementById('dash-industry-val');
-      if (industryDisplay) industryDisplay.textContent = industry;
-
-      closeIndustryModal();
-      renderRoles(industry);
-      showToast('Industria Actualizada', 'Se han cargado los roles para: ' + industry);
-    }
-
+    // Catálogo de roles por industria: ya no impulsa la grilla principal (cada
+    // empresa crea sus propios roles), pero sigue disponible como plantilla
+    // sugerida opcional al crear un rol nuevo.
     const rolesByIndustry = {
       'Restaurantes': [
         { title: 'Mesero Hombre', desc: 'Atención directa a mesa, manejo de comandas y estándares de servicio.', base: 3, freq: 6, enabled: true },
@@ -759,392 +773,49 @@
       ]
     };
 
-    // Catálogo de prendas seleccionables por rol. Cada opción puede marcarse o no;
-    // "def: true" son las prendas típicas que vienen pre-marcadas la primera vez
-    // que se configura el rol (antes de que exista una selección guardada).
-    const U = { category: 'fisico', tipo: 'uniforme', renovacion_meses: 6 };
 
-    const ASSET_SETS = {
-      mesero: [
-        { name: 'Camisa Oxford Ejecutiva', ...U, qty: 2, def: true },
-        { name: 'Pantalón Gabardina Premium', ...U, qty: 2, def: true },
-        { name: 'Delantal de Servicio', ...U, qty: 1, def: false },
-        { name: 'Corbata o Moño', ...U, qty: 1, def: false }
-      ],
-      chef: [
-        { name: 'Filipina Blanca Classic', ...U, qty: 2, def: true },
-        { name: 'Gorro de Cocina', ...U, qty: 2, def: true },
-        { name: 'Pantalón de Cocina', ...U, qty: 2, def: true },
-        { name: 'Guantes Térmicos', ...U, qty: 1, def: true },
-        { name: 'Tapabocas Desechable', ...U, qty: 5, def: true },
-        { name: 'Calzado Antideslizante', ...U, qty: 1, def: false },
-        { name: 'Mandil de Pecho', ...U, qty: 1, def: false }
-      ],
-      barista: [
-        { name: 'Mandil Barista Premium', ...U, qty: 1, def: true },
-        { name: 'Polo Shirt Premium', ...U, qty: 2, def: true },
-        { name: 'Gorra o Visera', ...U, qty: 1, def: false },
-        { name: 'Guantes de Servicio', ...U, qty: 1, def: false }
-      ],
-      limpiezaSteward: [
-        { name: 'Conjunto Operativo Anti-fluidos', ...U, qty: 2, def: true },
-        { name: 'Guantes de Protección', ...U, qty: 2, def: true },
-        { name: 'Calzado Antiderrapante', ...U, qty: 1, def: false },
-        { name: 'Cofia', ...U, qty: 1, def: false }
-      ],
-      seguridadValet: [
-        { name: 'Chaqueta de Seguridad Térmica', ...U, qty: 1, def: true },
-        { name: 'Camisa Uniforme Seguridad', ...U, qty: 2, def: true },
-        { name: 'Pantalón Táctico', ...U, qty: 1, def: true },
-        { name: 'Gorra Táctica', ...U, qty: 1, def: false },
-        { name: 'Funda para Radio', category: 'fisico', tipo: 'equipo', qty: 1, def: false }
-      ],
-      hostess: [
-        { name: 'Vestido o Traje Corporativo', ...U, qty: 2, def: true },
-        { name: 'Pañoleta o Accesorio', ...U, qty: 1, def: true },
-        { name: 'Zapatos Formales', ...U, qty: 1, def: false }
-      ],
-      operarioLimpieza: [
-        { name: 'Filipina o Camisola de Limpieza', ...U, qty: 2, def: true },
-        { name: 'Pantalón con Elástico', ...U, qty: 2, def: true },
-        { name: 'Calzado Antiderrapante', ...U, qty: 1, def: true },
-        { name: 'Guantes de Látex', ...U, qty: 1, def: false },
-        { name: 'Cubrebocas', ...U, qty: 1, def: false }
-      ],
-      supervisorZona: [
-        { name: 'Chaleco Distintivo Reflectante', ...U, qty: 1, def: true },
-        { name: 'Calzado de Seguridad Ligero', ...U, qty: 1, def: true },
-        { name: 'Camisa Polo Supervisor', ...U, qty: 2, def: false },
-        { name: 'Radio de Comunicación', category: 'fisico', tipo: 'equipo', qty: 1, def: false }
-      ],
-      limpiezaAlturas: [
-        { name: 'Overol Técnico Reforzado', ...U, qty: 1, def: true },
-        { name: 'Calzado con Agarre Especial', ...U, qty: 1, def: true },
-        { name: 'Arnés de Seguridad', category: 'fisico', tipo: 'equipo', qty: 1, def: true },
-        { name: 'Casco', ...U, qty: 1, def: false }
-      ],
-      mantenimientoGeneral: [
-        { name: 'Pantalón Tipo Cargo Industrial', ...U, qty: 2, def: true },
-        { name: 'Camisola Reforzada de Trabajo', ...U, qty: 2, def: true },
-        { name: 'Cinturón Porta-herramientas', category: 'fisico', tipo: 'equipo', qty: 1, def: false },
-        { name: 'Botas de Trabajo', ...U, qty: 1, def: false }
-      ],
-      quimicos: [
-        { name: 'Bata Resistente a Ácidos/Cloro', ...U, qty: 2, def: true },
-        { name: 'Guantes de Nitrilo Especializados', ...U, qty: 2, def: true },
-        { name: 'Careta de Protección Facial', category: 'fisico', tipo: 'equipo', qty: 1, def: true },
-        { name: 'Botas de Hule', ...U, qty: 1, def: false }
-      ],
-      operarioProduccion: [
-        { name: 'Overol de Algodón Industrial', ...U, qty: 2, def: true },
-        { name: 'Camisola y Pantalón Reforzado', ...U, qty: 1, def: true },
-        { name: 'Calzado con Casquillo de Acero', ...U, qty: 1, def: true },
-        { name: 'Guantes Industriales', ...U, qty: 1, def: false },
-        { name: 'Lentes de Seguridad', category: 'fisico', tipo: 'equipo', qty: 1, def: false }
-      ],
-      operarioLogisticaInd: [
-        { name: 'Chaleco de Alta Visibilidad Clase 2', ...U, qty: 1, def: true },
-        { name: 'Faja Lumbar Ergonómica', ...U, qty: 1, def: true },
-        { name: 'Calzado Industrial de Seguridad', ...U, qty: 1, def: true },
-        { name: 'Guantes Anticorte', ...U, qty: 1, def: false }
-      ],
-      mantenimientoIndustrial: [
-        { name: 'Ropa Ignífuga (Flame Resistant)', ...U, qty: 2, def: true },
-        { name: 'Calzado Dieléctrico', ...U, qty: 1, def: true },
-        { name: 'Guantes Dieléctricos', ...U, qty: 1, def: false },
-        { name: 'Casco Aislante', ...U, qty: 1, def: false }
-      ],
-      calidad: [
-        { name: 'Bata de Laboratorio con Logo', ...U, qty: 2, def: true },
-        { name: 'Cofia', ...U, qty: 2, def: true },
-        { name: 'Guantes de Nitrilo', ...U, qty: 1, def: false },
-        { name: 'Lentes de Seguridad', category: 'fisico', tipo: 'equipo', qty: 1, def: false }
-      ],
-      supervisorIndustrial: [
-        { name: 'Chaleco Distintivo', ...U, qty: 1, def: true },
-        { name: 'Camisa Polo Supervisor', ...U, qty: 2, def: true },
-        { name: 'Casco Blanco', ...U, qty: 1, def: false }
-      ],
-      ejecutivoVentas: [
-        { name: 'Camisa Ejecutiva', ...U, qty: 2, def: true },
-        { name: 'Pantalón de Vestir', ...U, qty: 2, def: true },
-        { name: 'Blazer Corporativo', ...U, qty: 1, def: false },
-        { name: 'Gafete Corporativo', category: 'fisico', tipo: 'acceso', qty: 1, def: false },
-        { name: 'Laptop', category: 'fisico', tipo: 'equipo', qty: 1, def: true },
-        { name: 'Celular', category: 'fisico', tipo: 'equipo', qty: 1, def: true },
-        { name: 'Auto', category: 'fisico', tipo: 'vehiculo', qty: 1, def: false },
-        { name: 'Google Workspace', category: 'digital', tipo: 'licencia', qty: 1, def: true },
-        { name: 'CRM', category: 'digital', tipo: 'licencia', qty: 1, def: true }
-      ],
-      recepcionistaCorp: [
-        { name: 'Camisa Ejecutiva', ...U, qty: 2, def: true },
-        { name: 'Pantalón de Vestir', ...U, qty: 1, def: true },
-        { name: 'Blazer Corporativo', ...U, qty: 1, def: false },
-        { name: 'Computador de Escritorio', category: 'fisico', tipo: 'equipo', qty: 1, def: true },
-        { name: 'Tarjeta/Llave de Oficina', category: 'fisico', tipo: 'acceso', qty: 1, def: true },
-        { name: 'Google Workspace', category: 'digital', tipo: 'licencia', qty: 1, def: true }
-      ],
-      asistenteAdmin: [
-        { name: 'Camisa Ejecutiva', ...U, qty: 2, def: false },
-        { name: 'Computador', category: 'fisico', tipo: 'equipo', qty: 1, def: true },
-        { name: 'Monitor', category: 'fisico', tipo: 'equipo', qty: 1, def: true },
-        { name: 'Mouse', category: 'fisico', tipo: 'equipo', qty: 1, def: true },
-        { name: 'Audífonos', category: 'fisico', tipo: 'equipo', qty: 1, def: false },
-        { name: 'Tarjeta/Llave de Oficina', category: 'fisico', tipo: 'acceso', qty: 1, def: true },
-        { name: 'Google Workspace', category: 'digital', tipo: 'licencia', qty: 1, def: true },
-        { name: 'CRM', category: 'digital', tipo: 'licencia', qty: 1, def: false }
-      ],
-      guardiaSeguridad: [
-        { name: 'Camisa Uniforme Seguridad', ...U, qty: 2, def: true },
-        { name: 'Pantalón Táctico', ...U, qty: 1, def: true },
-        { name: 'Chaqueta de Seguridad', ...U, qty: 1, def: true },
-        { name: 'Botas Tácticas', ...U, qty: 1, def: false },
-        { name: 'Cinturón Porta-equipo', category: 'fisico', tipo: 'equipo', qty: 1, def: false }
-      ],
-      supervisorTurno: [
-        { name: 'Chaqueta de Seguridad', ...U, qty: 1, def: true },
-        { name: 'Camisa Uniforme Seguridad', ...U, qty: 2, def: true },
-        { name: 'Radio de Comunicación', category: 'fisico', tipo: 'equipo', qty: 1, def: false }
-      ],
-      recepcionistaHotel: [
-        { name: 'Traje Corporativo de Hotel', ...U, qty: 2, def: true },
-        { name: 'Pañoleta o Corbata', ...U, qty: 1, def: true },
-        { name: 'Zapatos Formales', ...U, qty: 1, def: false }
-      ],
-      botones: [
-        { name: 'Chaqueta de Botones', ...U, qty: 1, def: true },
-        { name: 'Pantalón de Uniforme', ...U, qty: 2, def: true },
-        { name: 'Guantes Blancos', ...U, qty: 1, def: false },
-        { name: 'Gorra de Botones', ...U, qty: 1, def: false }
-      ],
-      camarista: [
-        { name: 'Uniforme de Camarista', ...U, qty: 2, def: true },
-        { name: 'Delantal', ...U, qty: 1, def: true },
-        { name: 'Guantes de Limpieza', ...U, qty: 1, def: false },
-        { name: 'Calzado Antiderrapante', ...U, qty: 1, def: false }
-      ],
-      asesorVentas: [
-        { name: 'Polo o Camisa de Marca', ...U, qty: 2, def: true },
-        { name: 'Pantalón Casual Ejecutivo', ...U, qty: 1, def: true },
-        { name: 'Gafete de Identificación', category: 'fisico', tipo: 'acceso', qty: 1, def: false }
-      ],
-      gerenteTienda: [
-        { name: 'Camisa Ejecutiva', ...U, qty: 2, def: true },
-        { name: 'Pantalón de Vestir', ...U, qty: 1, def: true },
-        { name: 'Blazer de Tienda', ...U, qty: 1, def: false }
-      ],
-      personalCaja: [
-        { name: 'Polo o Camisa de Marca', ...U, qty: 2, def: true },
-        { name: 'Pantalón Casual Ejecutivo', ...U, qty: 1, def: true },
-        { name: 'Gafete de Identificación', category: 'fisico', tipo: 'acceso', qty: 1, def: false }
-      ],
-      personalBodegaRetail: [
-        { name: 'Camisola de Almacén', ...U, qty: 2, def: true },
-        { name: 'Pantalón Cargo', ...U, qty: 1, def: true },
-        { name: 'Calzado Industrial', ...U, qty: 1, def: true },
-        { name: 'Guantes de Manejo', ...U, qty: 1, def: false }
-      ],
-      enfermero: [
-        { name: 'Filipina o Scrub Médico', ...U, qty: 3, def: true },
-        { name: 'Pantalón Médico', ...U, qty: 3, def: true },
-        { name: 'Cubrebocas', ...U, qty: 5, def: true },
-        { name: 'Guantes de Nitrilo', ...U, qty: 5, def: false },
-        { name: 'Calzado Clínico', ...U, qty: 1, def: false }
-      ],
-      medico: [
-        { name: 'Bata Médica Blanca', ...U, qty: 2, def: true },
-        { name: 'Filipina o Scrub Médico', ...U, qty: 2, def: true },
-        { name: 'Gafete de Identificación', category: 'fisico', tipo: 'acceso', qty: 1, def: false }
-      ],
-      personalAdmin: [
-        { name: 'Camisa Ejecutiva', ...U, qty: 2, def: true },
-        { name: 'Pantalón de Vestir', ...U, qty: 1, def: true },
-        { name: 'Gafete de Identificación', category: 'fisico', tipo: 'acceso', qty: 1, def: false }
-      ],
-      obrero: [
-        { name: 'Overol de Trabajo', ...U, qty: 2, def: true },
-        { name: 'Casco de Seguridad', ...U, qty: 1, def: true },
-        { name: 'Botas con Casquillo', ...U, qty: 1, def: true },
-        { name: 'Chaleco Reflectante', ...U, qty: 1, def: true },
-        { name: 'Guantes de Carnaza', ...U, qty: 1, def: false }
-      ],
-      maestroObra: [
-        { name: 'Chaleco Reflectante', ...U, qty: 1, def: true },
-        { name: 'Casco de Seguridad', ...U, qty: 1, def: true },
-        { name: 'Botas con Casquillo', ...U, qty: 1, def: true },
-        { name: 'Camisa Polo Supervisor', ...U, qty: 2, def: false }
-      ],
-      ingenieroConstruccion: [
-        { name: 'Casco Blanco', ...U, qty: 1, def: true },
-        { name: 'Chaleco Reflectante', ...U, qty: 1, def: true },
-        { name: 'Botas de Seguridad Ejecutivas', ...U, qty: 1, def: true },
-        { name: 'Camisa Tipo Columbia Bordada', ...U, qty: 2, def: false }
-      ],
-      choferRepartidor: [
-        { name: 'Polo o Camisa de Marca', ...U, qty: 2, def: true },
-        { name: 'Pantalón Cargo', ...U, qty: 1, def: true },
-        { name: 'Chaleco Reflectante', ...U, qty: 1, def: false }
-      ],
-      auxiliarAlmacen: [
-        { name: 'Camisola de Almacén', ...U, qty: 2, def: true },
-        { name: 'Pantalón Cargo', ...U, qty: 1, def: true },
-        { name: 'Calzado Industrial', ...U, qty: 1, def: true },
-        { name: 'Guantes de Manejo', ...U, qty: 1, def: false }
-      ],
-      coordinadorRuta: [
-        { name: 'Polo o Camisa de Marca', ...U, qty: 2, def: true },
-        { name: 'Pantalón Casual Ejecutivo', ...U, qty: 1, def: true },
-        { name: 'Chaleco Reflectante', ...U, qty: 1, def: false }
-      ]
-    };
-
-    // El catálogo se indexa por industria + rol porque el mismo título de rol
-    // (ej. "Mantenimiento Hombre") puede existir en más de una industria con
-    // prendas distintas.
-    const ROLE_ASSET_CATALOG = {};
-    function assetCatalogKey(industry, roleTitle) { return industry + '::' + roleTitle; }
-    function assignAssets(set, industry, titles) {
-      titles.forEach(title => { ROLE_ASSET_CATALOG[assetCatalogKey(industry, title)] = set; });
+    // Fallback de descripción para roles habilitados antes de este cambio
+    // (creados desde el catálogo por industria), que todavía no tienen una
+    // descripción propia guardada en role_definition.
+    function findLegacyRoleDesc(title) {
+      const lower = title.toLowerCase();
+      for (const industry in rolesByIndustry) {
+        const match = rolesByIndustry[industry].find(r => r.title.toLowerCase() === lower);
+        if (match) return match.desc;
+      }
+      return '';
     }
 
-    assignAssets(ASSET_SETS.mesero, 'Restaurantes', ['Mesero Hombre', 'Mesera Mujer']);
-    assignAssets(ASSET_SETS.chef, 'Restaurantes', ['Chef / Cocina Hombre', 'Chef / Cocina Mujer']);
-    assignAssets(ASSET_SETS.barista, 'Restaurantes', ['Barista / Bartender Hombre', 'Barista / Bartender Mujer']);
-    assignAssets(ASSET_SETS.limpiezaSteward, 'Restaurantes', ['Limpieza / Steward Hombre', 'Limpieza / Steward Mujer']);
-    assignAssets(ASSET_SETS.seguridadValet, 'Restaurantes', ['Seguridad / Valet Hombre', 'Seguridad / Valet Mujer']);
-    assignAssets(ASSET_SETS.hostess, 'Restaurantes', ['Hostess Mujer', 'Hostess Hombre']);
-
-    assignAssets(ASSET_SETS.operarioLimpieza, 'Limpieza', ['Operario de Limpieza Hombre', 'Operaria de Limpieza Mujer']);
-    assignAssets(ASSET_SETS.supervisorZona, 'Limpieza', ['Supervisor de Zona Hombre', 'Supervisora de Zona Mujer']);
-    assignAssets(ASSET_SETS.limpiezaAlturas, 'Limpieza', ['Limpieza en Alturas Hombre', 'Limpieza en Alturas Mujer']);
-    assignAssets(ASSET_SETS.mantenimientoGeneral, 'Limpieza', ['Mantenimiento Hombre', 'Mantenimiento Mujer']);
-    assignAssets(ASSET_SETS.quimicos, 'Limpieza', ['Especialista en Químicos Hombre', 'Especialista en Químicos Mujer']);
-
-    assignAssets(ASSET_SETS.operarioProduccion, 'Industrial', ['Operario de Producción Hombre', 'Operaria de Producción Mujer']);
-    assignAssets(ASSET_SETS.operarioLogisticaInd, 'Industrial', ['Operario de Logística Hombre', 'Operaria de Logística Mujer']);
-    assignAssets(ASSET_SETS.mantenimientoIndustrial, 'Industrial', ['Mantenimiento Hombre', 'Mantenimiento Mujer']);
-    assignAssets(ASSET_SETS.calidad, 'Industrial', ['Personal de Calidad Hombre', 'Personal de Calidad Mujer']);
-    assignAssets(ASSET_SETS.supervisorIndustrial, 'Industrial', ['Supervisor Hombre', 'Supervisora Mujer']);
-
-    assignAssets(ASSET_SETS.ejecutivoVentas, 'Corporativo', ['Ejecutivo de Ventas Hombre', 'Ejecutiva de Ventas Mujer']);
-    assignAssets(ASSET_SETS.recepcionistaCorp, 'Corporativo', ['Recepcionista Hombre', 'Recepcionista Mujer']);
-    assignAssets(ASSET_SETS.asistenteAdmin, 'Corporativo', ['Asistente Administrativo Hombre', 'Asistente Administrativa Mujer']);
-
-    assignAssets(ASSET_SETS.guardiaSeguridad, 'Seguridad', ['Guardia de Seguridad Hombre', 'Guardia de Seguridad Mujer']);
-    assignAssets(ASSET_SETS.supervisorTurno, 'Seguridad', ['Supervisor de Turno Hombre', 'Supervisora de Turno Mujer']);
-
-    assignAssets(ASSET_SETS.recepcionistaHotel, 'Hotelería', ['Recepcionista de Hotel Hombre', 'Recepcionista de Hotel Mujer']);
-    assignAssets(ASSET_SETS.botones, 'Hotelería', ['Botones Hombre', 'Botones Mujer']);
-    assignAssets(ASSET_SETS.camarista, 'Hotelería', ['Camarista Hombre', 'Camarista Mujer']);
-
-    assignAssets(ASSET_SETS.asesorVentas, 'Retail', ['Asesor de Ventas Hombre', 'Asesora de Ventas Mujer']);
-    assignAssets(ASSET_SETS.gerenteTienda, 'Retail', ['Gerente de Tienda Hombre', 'Gerente de Tienda Mujer']);
-    assignAssets(ASSET_SETS.personalCaja, 'Retail', ['Personal de Caja Hombre', 'Personal de Caja Mujer']);
-    assignAssets(ASSET_SETS.personalBodegaRetail, 'Retail', ['Personal de Bodega Hombre', 'Personal de Bodega Mujer']);
-
-    assignAssets(ASSET_SETS.enfermero, 'Salud', ['Enfermero', 'Enfermera']);
-    assignAssets(ASSET_SETS.medico, 'Salud', ['Médico Hombre', 'Médica Mujer']);
-    assignAssets(ASSET_SETS.personalAdmin, 'Salud', ['Personal Administrativo Hombre', 'Personal Administrativo Mujer']);
-
-    assignAssets(ASSET_SETS.obrero, 'Construcción', ['Obrero Hombre', 'Obrera Mujer']);
-    assignAssets(ASSET_SETS.maestroObra, 'Construcción', ['Maestro de Obra Hombre', 'Maestra de Obra Mujer']);
-    assignAssets(ASSET_SETS.ingenieroConstruccion, 'Construcción', ['Ingeniero Hombre', 'Ingeniera Mujer']);
-
-    assignAssets(ASSET_SETS.choferRepartidor, 'Logística', ['Chofer Repartidor Hombre', 'Chofer Repartidor Mujer']);
-    assignAssets(ASSET_SETS.auxiliarAlmacen, 'Logística', ['Auxiliar de Almacén Hombre', 'Auxiliar de Almacén Mujer']);
-    assignAssets(ASSET_SETS.coordinadorRuta, 'Logística', ['Coordinador de Ruta Hombre', 'Coordinadora de Ruta Mujer']);
-
-    async function renderRoles(industry) {
+    async function renderRoles() {
       const grid = document.getElementById('rolesGrid');
-      grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--color-text-secondary); font-weight: 600;">Cargando perfiles...</div>';
+      grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--color-text-secondary); font-weight: 600;">Cargando roles...</div>';
 
-      const roles = rolesByIndustry[industry] || [];
-      let activeRolesList = [];
-
+      let companyRoles = [];
       let dbRolesMap = {};
       try {
         const { data: { session } } = await window._supabase.auth.getSession();
         if (session) {
           const { data: activeRolesData } = await window._supabase.from('company_roles')
-            .select('role_name')
+            .select('role_name, status')
             .eq('company_id', session.user.id);
+          if (activeRolesData) companyRoles = activeRolesData;
 
-          if (activeRolesData) {
-            activeRolesList = activeRolesData.map(r => r.role_name);
-          }
           const { data } = await window._supabase.from('role_definition')
-            .select('role_name, items, area')
+            .select('role_name, items, area, description')
             .eq('company_id', session.user.id);
           if (data) {
-            data.forEach(r => {
-              dbRolesMap[r.role_name.toLowerCase()] = r;
-            });
+            data.forEach(r => { dbRolesMap[r.role_name.toLowerCase()] = r; });
           }
         }
       } catch (err) {
         console.error('Error fetching role data:', err);
       }
 
+      companyRoles.sort((a, b) => a.role_name.localeCompare(b.role_name));
+
       grid.innerHTML = '';
 
-      // Initialize from activeRolesList
-      roles.forEach(role => {
-        role.enabled = activeRolesList.includes(role.title);
-      });
-
-      // Sort roles: active first
-      roles.sort((a, b) => (a.enabled === b.enabled ? 0 : a.enabled ? -1 : 1));
-
-      roles.forEach(role => {
-        const dbRole = dbRolesMap[role.title.toLowerCase()];
-        const itemsCount = dbRole && dbRole.items ? dbRole.items.length : 0;
-        const itemsText = itemsCount > 0 ? `${itemsCount} Activo${itemsCount === 1 ? '' : 's'}` : '—';
-        const itemsMuted = itemsCount === 0;
-
-        const area = dbRole && dbRole.area ? dbRole.area : null;
-        const areaText = area || 'Sin asignar';
-        const areaMuted = !area;
-
-        const card = document.createElement('div');
-        card.className = role.enabled ? 'role-card card-active' : 'role-card';
-
-        card.innerHTML = `
-          <div class="role-card-header">
-            <span class="role-title">${role.title}</span>
-            <label class="toggle-switch">
-              <input type="checkbox" ${role.enabled ? 'checked' : ''} onchange="updateRoleCount(); saveRoles();">
-              <span class="slider"></span>
-            </label>
-          </div>
-          <p class="role-desc">${role.desc}</p>
-
-          <div class="role-status-badge ${role.enabled ? 'active' : 'inactive'}">
-            <span class="dot"></span>
-            ${role.enabled ? 'Habilitado' : 'Inhabilitado'}
-          </div>
-
-          <div class="role-stats">
-            <div class="role-stat-pill">
-              <span class="role-stat-label">Activos asignados</span>
-              <span class="role-stat-value ${itemsMuted ? 'muted' : ''}">${itemsText}</span>
-            </div>
-            <div class="role-stat-pill">
-              <span class="role-stat-label">Área</span>
-              <span class="role-stat-value ${areaMuted ? 'muted' : ''}">${areaText}</span>
-            </div>
-          </div>
-
-          <div class="config-action-container" style="margin-top: 0.875rem; padding-top: 0.875rem; border-top: 1px solid #F1F5F9; display: ${role.enabled ? 'block' : 'none'};">
-            <button class="btn btn-outline" style="width: 100%; font-size: 0.8rem; padding: 0.6rem; border-radius: 10px; font-weight: 700; letter-spacing: 0.01em;" onclick="openRoleConfig('${role.title}')">
-              Configurar Activos
-            </button>
-          </div>
-        `;
-        grid.appendChild(card);
-      });
-
-      // Add "Create New Role" card (Temporarily disabled)
-      /*
+      // "Crear Nuevo Rol" siempre es la primera opción
       const addCard = document.createElement('div');
       addCard.className = 'role-card add-role-card';
       addCard.style = "border: 2px dashed #CBD5E1; border-radius: 1.25rem; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 220px; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: rgba(255, 255, 255, 0.5);";
@@ -1161,16 +832,109 @@
         </div>
       `;
       grid.appendChild(addCard);
-      */
 
-      updateRoleCount();
+      companyRoles.forEach(role => {
+        const enabled = role.status === 'active';
+        const dbRole = dbRolesMap[role.role_name.toLowerCase()];
+        const itemsCount = dbRole && dbRole.items ? dbRole.items.length : 0;
+        const itemsText = itemsCount > 0 ? `${itemsCount} Activo${itemsCount === 1 ? '' : 's'}` : '—';
+        const itemsMuted = itemsCount === 0;
+
+        const area = dbRole && dbRole.area ? dbRole.area : null;
+        const areaText = area || 'Sin asignar';
+        const areaMuted = !area;
+
+        const desc = (dbRole && dbRole.description) ? dbRole.description : findLegacyRoleDesc(role.role_name);
+        const safeName = role.role_name.replace(/'/g, "\\'");
+
+        const card = document.createElement('div');
+        card.className = enabled ? 'role-card card-active' : 'role-card';
+
+        card.innerHTML = `
+          <div class="role-card-header">
+            <span class="role-title">${role.role_name}</span>
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <button type="button" onclick="deleteRole('${safeName}')" title="Eliminar rol"
+                style="border: none; background: none; cursor: pointer; color: #CBD5E1; padding: 2px; display: flex; transition: color 0.2s;"
+                onmouseover="this.style.color='#EF4444'" onmouseout="this.style.color='#CBD5E1'">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              </button>
+              <label class="toggle-switch">
+                <input type="checkbox" ${enabled ? 'checked' : ''} onchange="toggleRoleStatus('${safeName}', this.checked)">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+          <p class="role-desc">${desc}</p>
+
+          <div class="role-status-badge ${enabled ? 'active' : 'inactive'}">
+            <span class="dot"></span>
+            ${enabled ? 'Habilitado' : 'Inhabilitado'}
+          </div>
+
+          <div class="role-stats">
+            <div class="role-stat-pill">
+              <span class="role-stat-label">Activos asignados</span>
+              <span class="role-stat-value ${itemsMuted ? 'muted' : ''}">${itemsText}</span>
+            </div>
+            <div class="role-stat-pill">
+              <span class="role-stat-label">Área</span>
+              <span class="role-stat-value ${areaMuted ? 'muted' : ''}">${areaText}</span>
+            </div>
+          </div>
+
+          <div class="config-action-container" style="margin-top: 0.875rem; padding-top: 0.875rem; border-top: 1px solid #F1F5F9; display: ${enabled ? 'block' : 'none'};">
+            <button class="btn btn-outline" style="width: 100%; font-size: 0.8rem; padding: 0.6rem; border-radius: 10px; font-weight: 700; letter-spacing: 0.01em;" onclick="openRoleConfig('${safeName}')">
+              Configurar Activos
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
     }
 
-    let activeIndustry = 'Restaurantes';
+    async function toggleRoleStatus(roleName, enabled) {
+      try {
+        const { data: { session } } = await window._supabase.auth.getSession();
+        if (!session) return;
 
-    // Initial render fallback
+        const { error } = await window._supabase
+          .from('company_roles')
+          .update({ status: enabled ? 'active' : 'inactive' })
+          .eq('company_id', session.user.id)
+          .eq('role_name', roleName);
+
+        if (error) throw error;
+        renderRoles();
+      } catch (err) {
+        console.error('Error updating role status:', err);
+        showToast('Error', 'Hubo un problema actualizando el rol.', 'error');
+      }
+    }
+
+    async function deleteRole(roleName) {
+      if (!confirm(`¿Eliminar el rol "${roleName}"? Esta acción no se puede deshacer.`)) return;
+
+      try {
+        const { data: { session } } = await window._supabase.auth.getSession();
+        if (!session) return;
+
+        await window._supabase.from('company_roles').delete()
+          .eq('company_id', session.user.id).eq('role_name', roleName);
+        await window._supabase.from('role_definition').delete()
+          .eq('company_id', session.user.id).eq('role_name', roleName);
+
+        showToast('Rol Eliminado', `El rol "${roleName}" fue eliminado.`);
+        renderRoles();
+      } catch (err) {
+        console.error('Error deleting role:', err);
+        showToast('Error', 'Hubo un problema eliminando el rol.', 'error');
+      }
+    }
+
+    // Initial render
     window.onload = () => {
-      renderRoles(activeIndustry);
+      renderRoles();
     };
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -1184,58 +948,11 @@
       }
     }
 
-    // Check si utils.js ya cargó la industria en el DOM
-    const dashIndustryVal = document.getElementById('dash-industry-val')?.textContent;
-    if (dashIndustryVal && dashIndustryVal !== 'Sector' && dashIndustryVal !== 'Cargando...') {
-      let mappedIndustry = dashIndustryVal;
-      const lower = dashIndustryVal.toLowerCase();
-      if (lower === 'restaurante' || lower === 'restaurantes') mappedIndustry = 'Restaurantes';
-      else if (lower === 'retail') mappedIndustry = 'Retail';
-      else if (lower === 'limpieza') mappedIndustry = 'Limpieza';
-      else if (lower === 'industrial') mappedIndustry = 'Industrial';
-      else if (lower === 'corporativo') mappedIndustry = 'Corporativo';
-      else if (lower === 'seguridad') mappedIndustry = 'Seguridad';
-      else if (lower === 'hotelería' || lower === 'hoteleria') mappedIndustry = 'Hotelería';
-      else if (lower === 'salud') mappedIndustry = 'Salud';
-      else if (lower === 'construcción' || lower === 'construccion') mappedIndustry = 'Construcción';
-      else if (lower === 'logística' || lower === 'logistica') mappedIndustry = 'Logística';
-
-      if (rolesByIndustry[mappedIndustry]) {
-        activeIndustry = mappedIndustry;
-        renderRoles(activeIndustry);
-      }
-    }
-
-    window.addEventListener('userProfileLoaded', (e) => {
-      const industry = e.detail.industry;
-      if (industry) {
-        let mappedIndustry = industry;
-        const lower = industry.toLowerCase();
-        if (lower === 'restaurante' || lower === 'restaurantes') mappedIndustry = 'Restaurantes';
-        else if (lower === 'retail') mappedIndustry = 'Retail';
-        else if (lower === 'limpieza') mappedIndustry = 'Limpieza';
-        else if (lower === 'industrial') mappedIndustry = 'Industrial';
-        else if (lower === 'corporativo') mappedIndustry = 'Corporativo';
-        else if (lower === 'seguridad') mappedIndustry = 'Seguridad';
-        else if (lower === 'hotelería' || lower === 'hoteleria') mappedIndustry = 'Hotelería';
-        else if (lower === 'salud') mappedIndustry = 'Salud';
-        else if (lower === 'construcción' || lower === 'construccion') mappedIndustry = 'Construcción';
-        else if (lower === 'logística' || lower === 'logistica') mappedIndustry = 'Logística';
-
-        if (rolesByIndustry[mappedIndustry]) {
-          activeIndustry = mappedIndustry;
-          const industryDisplay = document.getElementById('dash-industry-val');
-          if (industryDisplay) industryDisplay.textContent = mappedIndustry;
-          renderRoles(activeIndustry);
-        }
-      }
-    });
-
     let currentRoleAssets = [];
     let currentConfigRoleName = '';
 
     const ASSET_CATEGORY_LABELS = { fisico: 'Físico', digital: 'Digital' };
-    const ASSET_TYPE_LABELS = { uniforme: 'Uniforme', equipo: 'Equipo', acceso: 'Acceso', vehiculo: 'Vehículo', licencia: 'Licencia' };
+    const ASSET_TYPE_LABELS = { uniforme: 'Uniforme', computo: 'Cómputo', equipo: 'Herramientas/EPP', acceso: 'Acceso', vehiculo: 'Vehículo', licencia: 'Licencia', acceso_digital: 'Acceso Digital' };
 
     function handleAreaSelectChange() {
       const areaSelect = document.getElementById('roleAreaSelect');
@@ -1245,6 +962,171 @@
       if (areaSelect.value !== 'otra') areaCustom.value = '';
     }
 
+    function createAssetRowElement(item, checked) {
+      const showsRenewal = item.tipo === 'uniforme';
+      const renewalMonths = item.renovacion_meses || 6;
+
+      const div = document.createElement('div');
+      div.className = "role-asset-item";
+      div.dataset.name = item.name;
+      div.dataset.category = item.category || 'fisico';
+      div.dataset.tipo = item.tipo || 'uniforme';
+      div.style = "display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; padding: 0.85rem 1rem; background: var(--color-smoke); border-radius: 12px; border: 1px solid var(--color-smoke-mid); margin-bottom: 0.6rem;";
+      div.innerHTML = `
+        <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; flex: 1; min-width: 160px;">
+          <input type="checkbox" class="asset-check" ${checked ? 'checked' : ''} onchange="toggleAssetItem(this)" style="width: 18px; height: 18px; accent-color: var(--color-cyan); cursor: pointer;">
+          <span style="font-weight: 600; font-size: 0.9rem; color: var(--color-navy);">${item.name}</span>
+          <span class="asset-type-tag">${ASSET_TYPE_LABELS[item.tipo] || item.tipo || ''}</span>
+        </label>
+        <div class="asset-item-controls" style="display: ${checked ? 'flex' : 'none'}; align-items: center; gap: 0.75rem;">
+          ${showsRenewal ? `
+          <div class="asset-renewal-input">
+            cada <input type="number" class="renewal-months" min="1" max="24" value="${renewalMonths}"> meses
+          </div>` : ''}
+          <div class="qty-stepper" style="display: flex; align-items: center; gap: 0.75rem; background: white; padding: 0.35rem 0.75rem; border-radius: 8px; border: 1px solid var(--color-smoke-mid);">
+            <button type="button" onclick="changeQty(this, -1)" style="border: none; background: none; cursor: pointer; color: var(--color-text-secondary); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">-</button>
+            <span class="qty-val" style="min-width: 24px; text-align: center; font-weight: 700; color: var(--color-navy); font-size: 0.875rem;">${item.qty || 1}</span>
+            <button type="button" onclick="changeQty(this, 1)" style="border: none; background: none; cursor: pointer; color: var(--color-cyan); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">+</button>
+          </div>
+        </div>
+      `;
+      return div;
+    }
+
+    const ASSET_TYPES_BY_CATEGORY = {
+      fisico: [
+        { value: 'computo', label: 'Cómputo' },
+        { value: 'uniforme', label: 'Uniforme' },
+        { value: 'acceso', label: 'Acceso' },
+        { value: 'vehiculo', label: 'Vehículo' },
+        { value: 'equipo', label: 'Herramientas/EPP' }
+      ],
+      digital: [
+        { value: 'licencia', label: 'Licencia' },
+        { value: 'acceso_digital', label: 'Acceso Digital' }
+      ]
+    };
+
+    // Catálogo jerárquico usado para armar rápidamente los activos de un rol
+    // nuevo (Categoría → Subcategoría → Ítems sugeridos). Aplica a cualquier
+    // industria; cada subcategoría también permite un ítem "Otro" libre.
+    const ASSET_CATALOG_TREE = {
+      fisico: {
+        computo: { label: 'Cómputo', tipo: 'computo', items: ['Laptop', 'Monitor', 'Cargador de laptop', 'Mouse', 'Teclado', 'Audífonos'] },
+        uniforme: { label: 'Uniformes', tipo: 'uniforme', items: ['Camiseta/Camisa', 'Pantalón', 'Casco', 'Zapatos/Calzado', 'Chaqueta', 'Delantal'] },
+        acceso: { label: 'Acceso', tipo: 'acceso', items: ['Tarjeta de acceso', 'Llave de oficina', 'Gafete/Credencial'] },
+        vehiculo: { label: 'Vehículos', tipo: 'vehiculo', items: ['Auto', 'Moto', 'Bicicleta'] },
+        equipo: { label: 'Herramientas / EPP', tipo: 'equipo', items: ['Kit de herramientas', 'Radio de comunicación', 'Equipo de protección personal'] }
+      },
+      digital: {
+        licencia: { label: 'Licencias / Software', tipo: 'licencia', items: ['Google Workspace', 'Microsoft 365', 'CRM', 'ERP'] },
+        acceso_digital: { label: 'Accesos digitales', tipo: 'acceso_digital', items: ['VPN', 'Usuario de sistema interno', 'Correo corporativo'] }
+      }
+    };
+
+    function toggleNewRoleCategory(category) {
+      const checkboxId = category === 'fisico' ? 'newRoleCatFisico' : 'newRoleCatDigital';
+      const containerId = category === 'fisico' ? 'newRoleFisicoSubcats' : 'newRoleDigitalSubcats';
+      const checked = document.getElementById(checkboxId).checked;
+      const container = document.getElementById(containerId);
+      container.style.display = checked ? 'flex' : 'none';
+      if (checked && !container.dataset.rendered) {
+        renderSubcategoryPickers(category, container);
+        container.dataset.rendered = '1';
+      }
+    }
+
+    function renderSubcategoryPickers(category, container) {
+      const subcats = ASSET_CATALOG_TREE[category];
+      container.innerHTML = Object.keys(subcats).map(key => {
+        const sub = subcats[key];
+        const itemsHtml = sub.items.map(name => `
+          <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; padding: 0.3rem 0; cursor: pointer;">
+            <input type="checkbox" class="new-role-asset-check" data-category="${category}" data-tipo="${sub.tipo}" data-name="${name}" style="width: 16px; height: 16px; accent-color: var(--color-cyan); cursor: pointer;">
+            ${name}
+          </label>
+        `).join('');
+        return `
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.85rem 1rem;">
+            <div style="font-weight: 700; font-size: 0.8125rem; color: var(--color-navy); margin-bottom: 0.4rem;">${sub.label}</div>
+            <div style="display: flex; flex-direction: column;">${itemsHtml}</div>
+            <input type="text" class="new-role-other-input" data-category="${category}" data-tipo="${sub.tipo}" placeholder="Otro (opcional)"
+              style="margin-top: 0.5rem; width: 100%; padding: 0.5rem 0.65rem; border: 1px solid var(--color-smoke-mid); border-radius: 6px; font-size: 0.8rem;">
+          </div>
+        `;
+      }).join('');
+    }
+
+    function collectNewRoleAssets() {
+      const items = [];
+      document.querySelectorAll('.new-role-asset-check:checked').forEach(cb => {
+        const item = { name: cb.dataset.name, category: cb.dataset.category, tipo: cb.dataset.tipo, qty: 1 };
+        if (item.tipo === 'uniforme') { item.color = 'Predeterminado'; item.available_sizes = 'S-XL'; item.renovacion_meses = 6; }
+        items.push(item);
+      });
+      document.querySelectorAll('.new-role-other-input').forEach(input => {
+        const name = input.value.trim();
+        if (!name) return;
+        const item = { name, category: input.dataset.category, tipo: input.dataset.tipo, qty: 1 };
+        if (item.tipo === 'uniforme') { item.color = 'Predeterminado'; item.available_sizes = 'S-XL'; item.renovacion_meses = 6; }
+        items.push(item);
+      });
+      return items;
+    }
+
+    function updateAssetTypeOptions() {
+      const category = document.getElementById('newAssetCategory').value;
+      const typeSelect = document.getElementById('newAssetType');
+      const options = ASSET_TYPES_BY_CATEGORY[category] || [];
+      typeSelect.innerHTML = options.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
+    }
+
+    function toggleAddAssetForm(show) {
+      const form = document.getElementById('addAssetForm');
+      const btn = document.getElementById('showAddAssetBtn');
+      if (!form) return;
+      form.style.display = show ? 'flex' : 'none';
+      if (btn) btn.style.display = show ? 'none' : 'block';
+      if (show) {
+        document.getElementById('newAssetName').value = '';
+        document.getElementById('newAssetCategory').value = 'fisico';
+        updateAssetTypeOptions();
+        document.getElementById('newAssetQty').value = 1;
+      }
+    }
+
+    function addCustomAssetRow() {
+      const name = document.getElementById('newAssetName').value.trim();
+      if (!name) {
+        alert('Por favor ingresa el nombre del activo');
+        return;
+      }
+      const category = document.getElementById('newAssetCategory').value;
+      const tipo = document.getElementById('newAssetType').value;
+      const qty = parseInt(document.getElementById('newAssetQty').value) || 1;
+
+      const list = document.getElementById('roleAssetList');
+      if (list.querySelector('p')) list.innerHTML = '';
+
+      const catLabelText = ASSET_CATEGORY_LABELS[category];
+      const labelExists = Array.from(list.querySelectorAll('.asset-category-label')).some(l => l.textContent === catLabelText);
+      if (!labelExists) {
+        const label = document.createElement('div');
+        label.className = 'asset-category-label';
+        label.textContent = catLabelText;
+        list.appendChild(label);
+      }
+
+      const item = { name, category, tipo, qty };
+      if (tipo === 'uniforme') {
+        item.color = 'Predeterminado';
+        item.available_sizes = 'S-XL';
+        item.renovacion_meses = 6;
+      }
+      list.appendChild(createAssetRowElement(item, true));
+      toggleAddAssetForm(false);
+    }
+
     async function openRoleConfig(roleName) {
       currentConfigRoleName = roleName;
       document.getElementById('configRoleTitle').innerText = `Configurar: ${roleName}`;
@@ -1252,17 +1134,19 @@
       list.innerHTML = '<div style="padding: 3rem; text-align: center; color: var(--color-text-secondary); font-weight: 600;">Cargando configuración...</div>';
 
       document.getElementById('roleConfigModal').classList.add('active');
+      toggleAddAssetForm(false);
 
       const footerBlock = document.getElementById('roleConfigFooter');
 
       let savedItems = [];
       let savedArea = '';
+      let savedSubarea = '';
       try {
         const { data: { session } } = await window._supabase.auth.getSession();
         if (session) {
           const { data } = await window._supabase
             .from('role_definition')
-            .select('items, area')
+            .select('items, area, subarea')
             .eq('company_id', session.user.id)
             .ilike('role_name', roleName.trim())
             .maybeSingle();
@@ -1270,6 +1154,7 @@
           if (data) {
             if (data.items) savedItems = data.items;
             if (data.area) savedArea = data.area;
+            if (data.subarea) savedSubarea = data.subarea;
           }
         }
       } catch (err) {
@@ -1291,65 +1176,31 @@
           areaCustom.value = '';
         }
       }
-
-      const catalog = ROLE_ASSET_CATALOG[assetCatalogKey(activeIndustry, roleName)] || [];
-      const hasSavedConfig = savedItems.length > 0;
+      const subareaInput = document.getElementById('roleSubareaInput');
+      if (subareaInput) subareaInput.value = savedSubarea;
 
       list.innerHTML = '';
-
       if (footerBlock) footerBlock.style.display = 'flex';
 
-      if (catalog.length === 0) {
+      if (savedItems.length === 0) {
         list.innerHTML = `
           <p style="text-align: center; color: var(--color-text-secondary); font-size: 0.875rem; padding: 1rem 0 1.5rem;">
-            Todavía no hay un catálogo predefinido de activos para este rol.
+            Este rol todavía no tiene activos asignados. Usa "+ Agregar Activo" para empezar.
           </p>
         `;
         return;
       }
 
       ['fisico', 'digital'].forEach(cat => {
-        const optionsInCat = catalog.filter(o => (o.category || 'fisico') === cat);
-        if (optionsInCat.length === 0) return;
+        const itemsInCat = savedItems.filter(o => (o.category || 'fisico') === cat);
+        if (itemsInCat.length === 0) return;
 
         const label = document.createElement('div');
         label.className = 'asset-category-label';
         label.textContent = ASSET_CATEGORY_LABELS[cat] || cat;
         list.appendChild(label);
 
-        optionsInCat.forEach(option => {
-          const savedMatch = savedItems.find(u => u.name === option.name);
-          const checked = hasSavedConfig ? !!savedMatch : !!option.def;
-          const qty = savedMatch ? (savedMatch.qty || 1) : option.qty;
-          const showsRenewal = option.tipo === 'uniforme';
-          const renewalMonths = (savedMatch && savedMatch.renovacion_meses) || option.renovacion_meses || 6;
-
-          const div = document.createElement('div');
-          div.className = "role-asset-item";
-          div.dataset.name = option.name;
-          div.dataset.category = option.category || 'fisico';
-          div.dataset.tipo = option.tipo || 'uniforme';
-          div.style = "display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; padding: 0.85rem 1rem; background: var(--color-smoke); border-radius: 12px; border: 1px solid var(--color-smoke-mid); margin-bottom: 0.6rem;";
-          div.innerHTML = `
-            <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; flex: 1; min-width: 160px;">
-              <input type="checkbox" class="asset-check" ${checked ? 'checked' : ''} onchange="toggleAssetItem(this)" style="width: 18px; height: 18px; accent-color: var(--color-cyan); cursor: pointer;">
-              <span style="font-weight: 600; font-size: 0.9rem; color: var(--color-navy);">${option.name}</span>
-              <span class="asset-type-tag">${ASSET_TYPE_LABELS[option.tipo] || option.tipo || ''}</span>
-            </label>
-            <div class="asset-item-controls" style="display: ${checked ? 'flex' : 'none'}; align-items: center; gap: 0.75rem;">
-              ${showsRenewal ? `
-              <div class="asset-renewal-input">
-                cada <input type="number" class="renewal-months" min="1" max="24" value="${renewalMonths}"> meses
-              </div>` : ''}
-              <div class="qty-stepper" style="display: flex; align-items: center; gap: 0.75rem; background: white; padding: 0.35rem 0.75rem; border-radius: 8px; border: 1px solid var(--color-smoke-mid);">
-                <button type="button" onclick="changeQty(this, -1)" style="border: none; background: none; cursor: pointer; color: var(--color-text-secondary); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">-</button>
-                <span class="qty-val" style="min-width: 24px; text-align: center; font-weight: 700; color: var(--color-navy); font-size: 0.875rem;">${qty}</span>
-                <button type="button" onclick="changeQty(this, 1)" style="border: none; background: none; cursor: pointer; color: var(--color-cyan); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">+</button>
-              </div>
-            </div>
-          `;
-          list.appendChild(div);
-        });
+        itemsInCat.forEach(item => list.appendChild(createAssetRowElement(item, true)));
       });
     }
 
@@ -1400,6 +1251,7 @@
       const areaCustom = document.getElementById('roleAreaCustom');
       let areaValue = areaSelect ? areaSelect.value : '';
       if (areaValue === 'otra') areaValue = areaCustom ? areaCustom.value.trim() : '';
+      const subareaValue = document.getElementById('roleSubareaInput')?.value.trim() || '';
 
       try {
         const { data: { session } } = await window._supabase.auth.getSession();
@@ -1416,7 +1268,7 @@
         if (existing) {
           const { error } = await window._supabase
             .from('role_definition')
-            .update({ items: updatedItems, area: areaValue })
+            .update({ items: updatedItems, area: areaValue, subarea: subareaValue })
             .eq('id', existing.id);
           if (error) throw error;
         } else {
@@ -1426,7 +1278,8 @@
               company_id: session.user.id,
               role_name: currentConfigRoleName,
               items: updatedItems,
-              area: areaValue
+              area: areaValue,
+              subarea: subareaValue
             });
           if (error) throw error;
         }
@@ -1434,7 +1287,7 @@
         showToast("Configuración Guardada", "La plantilla de activos para este rol ha sido actualizada.");
         closeRoleConfig();
         // Refresh the UI to show the updated item count
-        renderRoles(activeIndustry);
+        renderRoles();
       } catch (err) {
         console.error("Error saving role:", err);
         showToast("Error", "Hubo un problema guardando la configuración.", "error");
@@ -1442,6 +1295,22 @@
     }
 
     function openNewRoleModal() {
+      document.getElementById('newRoleName').value = '';
+      document.getElementById('newRoleDesc').value = '';
+      document.getElementById('newRoleArea').value = '';
+      document.getElementById('newRoleSubarea').value = '';
+      document.getElementById('newRoleCatFisico').checked = false;
+      document.getElementById('newRoleCatDigital').checked = false;
+
+      const fisicoContainer = document.getElementById('newRoleFisicoSubcats');
+      const digitalContainer = document.getElementById('newRoleDigitalSubcats');
+      fisicoContainer.style.display = 'none';
+      digitalContainer.style.display = 'none';
+      fisicoContainer.innerHTML = '';
+      digitalContainer.innerHTML = '';
+      delete fisicoContainer.dataset.rendered;
+      delete digitalContainer.dataset.rendered;
+
       document.getElementById('newRoleModal').classList.add('active');
     }
 
@@ -1449,91 +1318,38 @@
       document.getElementById('newRoleModal').classList.remove('active');
     }
 
-    function createNewRole() {
-      const name = document.getElementById('newRoleName').value;
+    async function createNewRole() {
+      const name = document.getElementById('newRoleName').value.trim();
       if (!name) {
         alert("Por favor ingresa el nombre del rol");
         return;
       }
-      showToast("Rol Creado", `El rol "${name}" ha sido habilitado exitosamente.`);
-      closeNewRoleModal();
-    }
 
-    function setPeriod(months, btn) {
-      document.querySelectorAll('.period-chip').forEach(b => {
-        b.style.background = 'white';
-        b.style.borderColor = '#e2e8f0';
-        b.style.color = 'var(--color-text-secondary)';
-        b.style.fontWeight = '400';
-      });
-
-      btn.style.background = 'var(--color-cyan-dim)';
-      btn.style.borderColor = 'var(--color-cyan)';
-      btn.style.color = 'var(--color-cyan)';
-      btn.style.fontWeight = '600';
-    }
-
-    function updateRoleCount() {
-      const cards = document.querySelectorAll('.role-card');
-      cards.forEach(card => {
-        const checkbox = card.querySelector('input[type="checkbox"]');
-        if (!checkbox) return; // Ignore cards without checkboxes (e.g. add new role card)
-
-        const statusBadge = card.querySelector('.role-status-badge');
-        const configAction = card.querySelector('.config-action-container');
-
-        if (checkbox.checked) {
-          card.classList.add('card-active');
-          if (statusBadge) {
-            statusBadge.className = 'role-status-badge active';
-            statusBadge.innerHTML = '<span class="dot"></span> Habilitado';
-          }
-          if (configAction) configAction.style.display = 'block';
-        } else {
-          card.classList.remove('card-active');
-          if (statusBadge) {
-            statusBadge.className = 'role-status-badge inactive';
-            statusBadge.innerHTML = '<span class="dot"></span> Inhabilitado';
-          }
-          if (configAction) configAction.style.display = 'none';
-        }
-      });
-    }
-
-    async function saveRoles() {
-      const enabledRoles = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
-        .map(input => input.closest('.role-card').querySelector('.role-title').textContent.trim());
+      const description = document.getElementById('newRoleDesc').value.trim();
+      const area = document.getElementById('newRoleArea').value;
+      const subarea = document.getElementById('newRoleSubarea').value.trim();
+      const items = collectNewRoleAssets();
 
       try {
         const { data: { session } } = await window._supabase.auth.getSession();
-        if (!session) return;
+        if (!session) throw new Error("No autenticado");
 
-        // Delete existing active roles for this company to replace with new set
-        const { error: deleteErr } = await window._supabase
+        const { error: roleErr } = await window._supabase
           .from('company_roles')
-          .delete()
-          .eq('company_id', session.user.id);
+          .insert({ company_id: session.user.id, role_name: name, status: 'active' });
+        if (roleErr) throw roleErr;
 
-        if (deleteErr) throw deleteErr;
+        const { error: defErr } = await window._supabase
+          .from('role_definition')
+          .insert({ company_id: session.user.id, role_name: name, items, area, subarea, description });
+        if (defErr) throw defErr;
 
-        // Insert new active roles
-        if (enabledRoles.length > 0) {
-          const inserts = enabledRoles.map(roleName => ({
-            company_id: session.user.id,
-            role_name: roleName,
-            status: 'active'
-          }));
-          const { error: insertErr } = await window._supabase
-            .from('company_roles')
-            .insert(inserts);
-
-          if (insertErr) throw insertErr;
-        }
-
-        showToast('Configuración Guardada', 'Roles actualizados: ' + (enabledRoles.join(', ') || 'Ninguno'));
+        showToast("Rol Creado", `El rol "${name}" fue creado exitosamente.`);
+        closeNewRoleModal();
+        renderRoles();
       } catch (err) {
-        console.error("Error saving roles to Supabase:", err);
-        showToast('Error', 'Hubo un problema actualizando los roles.', 'error');
+        console.error("Error creating role:", err);
+        showToast("Error", "Hubo un problema creando el rol.", "error");
       }
     }
   </script>
