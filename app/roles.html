@@ -318,6 +318,63 @@
       border-radius: 4px;
     }
 
+    /* ── Area badge ─────────────────────────────────────────── */
+    .area-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.2rem 0.55rem;
+      background: #EEF2FF;
+      color: #4338CA;
+      border-radius: 4px;
+      margin-left: 0.4rem;
+    }
+
+    /* ── Asset category grouping (config modal) ──────────────── */
+    .asset-category-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94A3B8;
+      margin: 1rem 0 0.5rem;
+    }
+
+    .asset-category-label:first-child {
+      margin-top: 0;
+    }
+
+    .asset-type-tag {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      background: white;
+      border: 1px solid var(--color-smoke-mid);
+      border-radius: 4px;
+      padding: 0.1rem 0.4rem;
+      margin-left: 0.5rem;
+      text-transform: capitalize;
+    }
+
+    .asset-renewal-input {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+      white-space: nowrap;
+    }
+
+    .asset-renewal-input input {
+      width: 42px;
+      padding: 0.25rem 0.35rem;
+      border: 1px solid var(--color-smoke-mid);
+      border-radius: 6px;
+      text-align: center;
+      font-size: 0.8rem;
+    }
+
     /* Legacy (keep for backward compat) */
     .status-active {
       color: #10B981;
@@ -486,50 +543,38 @@
           <div class="modal-content-lg" style="max-width: 550px;">
             <div class="modal-header">
               <div>
-                <h2 id="configRoleTitle">Configurar Uniformes</h2>
-                <p style="font-size: 0.8125rem; color: var(--color-text-secondary); margin: 0;">Define las prendas que
-                  componen la plantilla base de este rol.</p>
+                <h2 id="configRoleTitle">Configurar Activos</h2>
+                <p style="font-size: 0.8125rem; color: var(--color-text-secondary); margin: 0;">Define los activos
+                  físicos y digitales que componen la plantilla base de este rol.</p>
               </div>
               <button class="btn-close" onclick="closeRoleConfig()">✕</button>
             </div>
             <div style="padding: 1.5rem;">
-              <div id="roleUniformList" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                <!-- Uniform items rendered here -->
+              <div id="roleAreaBlock" style="margin-bottom: 1.5rem;">
+                <label
+                  style="display: block; font-size: 0.8125rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.5rem;">Área</label>
+                <select id="roleAreaSelect" onchange="handleAreaSelectChange()"
+                  style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); font-family: var(--font-family-primary); background: white; color: var(--color-navy);">
+                  <option value="">Selecciona un área...</option>
+                  <option value="Dirección / Gerencia">Dirección / Gerencia</option>
+                  <option value="Administración">Administración</option>
+                  <option value="Operaciones">Operaciones</option>
+                  <option value="Ventas">Ventas</option>
+                  <option value="Producción / Cocina">Producción / Cocina</option>
+                  <option value="Logística">Logística</option>
+                  <option value="Seguridad">Seguridad</option>
+                  <option value="Limpieza">Limpieza</option>
+                  <option value="Atención al Cliente">Atención al Cliente</option>
+                  <option value="TI">TI</option>
+                  <option value="RRHH">RRHH</option>
+                  <option value="otra">Otra (especificar)</option>
+                </select>
+                <input type="text" id="roleAreaCustom" placeholder="Escribe el área..."
+                  style="display: none; margin-top: 0.5rem; width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); font-family: var(--font-family-primary);">
               </div>
 
-              <div id="roleConfigDetails"
-                style="margin-top: 2rem; padding: 1.25rem; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
-                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
-                  <div
-                    style="width: 32px; height: 32px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--color-cyan); border: 1px solid #e2e8f0;">
-                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                      <path
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <div style="font-weight: 700; font-size: 0.875rem; color: var(--color-navy);">Periodo de Renovación
-                    </div>
-                    <div style="font-size: 0.75rem; color: var(--color-text-secondary);">Frecuencia de entrega de
-                      dotación
-                    </div>
-                  </div>
-                </div>
-
-                <div style="margin-top: 1rem;">
-                  <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.5rem;">
-                    <span id="renovacion-val" style="font-size: 1.25rem; font-weight: 800; color: var(--color-cyan);">6
-                      Meses</span>
-                  </div>
-                  <input type="range" id="renovacion-slider" min="1" max="12" value="6"
-                    oninput="document.getElementById('renovacion-val').textContent = this.value + (this.value == 1 ? ' Mes' : ' Meses')"
-                    style="width: 100%; accent-color: var(--color-cyan); cursor: pointer; height: 6px; border-radius: 4px; background: #E2E8F0; -webkit-appearance: none; appearance: none; outline: none;">
-                  <div
-                    style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.75rem; color: #94A3B8; font-weight: 600;">
-                    <span>1</span>
-                    <span>12</span>
-                  </div>
-                </div>
+              <div id="roleAssetList" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <!-- Asset items rendered here -->
               </div>
 
               <div class="modal-footer" id="roleConfigFooter"
@@ -660,7 +705,9 @@
         { title: 'Ejecutivo de Ventas Hombre', desc: 'Atención a clientes corporativos y gestión de cuentas.', base: 3, freq: 6, enabled: false },
         { title: 'Ejecutiva de Ventas Mujer', desc: 'Atención a clientes corporativos y gestión de cuentas.', base: 3, freq: 6, enabled: false },
         { title: 'Recepcionista Hombre', desc: 'Primera línea de atención en corporativo.', base: 2, freq: 6, enabled: false },
-        { title: 'Recepcionista Mujer', desc: 'Primera línea de atención en corporativo.', base: 2, freq: 6, enabled: false }
+        { title: 'Recepcionista Mujer', desc: 'Primera línea de atención en corporativo.', base: 2, freq: 6, enabled: false },
+        { title: 'Asistente Administrativo Hombre', desc: 'Soporte administrativo, gestión documental y coordinación de agenda.', base: 3, freq: 6, enabled: false },
+        { title: 'Asistente Administrativa Mujer', desc: 'Soporte administrativo, gestión documental y coordinación de agenda.', base: 3, freq: 6, enabled: false }
       ],
       'Seguridad': [
         { title: 'Guardia de Seguridad Hombre', desc: 'Personal de vigilancia y control de accesos.', base: 3, freq: 6, enabled: false },
@@ -715,276 +762,297 @@
     // Catálogo de prendas seleccionables por rol. Cada opción puede marcarse o no;
     // "def: true" son las prendas típicas que vienen pre-marcadas la primera vez
     // que se configura el rol (antes de que exista una selección guardada).
-    const GARMENT_SETS = {
+    const U = { category: 'fisico', tipo: 'uniforme', renovacion_meses: 6 };
+
+    const ASSET_SETS = {
       mesero: [
-        { name: 'Camisa Oxford Ejecutiva', qty: 2, def: true },
-        { name: 'Pantalón Gabardina Premium', qty: 2, def: true },
-        { name: 'Delantal de Servicio', qty: 1, def: false },
-        { name: 'Corbata o Moño', qty: 1, def: false }
+        { name: 'Camisa Oxford Ejecutiva', ...U, qty: 2, def: true },
+        { name: 'Pantalón Gabardina Premium', ...U, qty: 2, def: true },
+        { name: 'Delantal de Servicio', ...U, qty: 1, def: false },
+        { name: 'Corbata o Moño', ...U, qty: 1, def: false }
       ],
       chef: [
-        { name: 'Filipina Blanca Classic', qty: 2, def: true },
-        { name: 'Gorro de Cocina', qty: 2, def: true },
-        { name: 'Pantalón de Cocina', qty: 2, def: true },
-        { name: 'Guantes Térmicos', qty: 1, def: true },
-        { name: 'Tapabocas Desechable', qty: 5, def: true },
-        { name: 'Calzado Antideslizante', qty: 1, def: false },
-        { name: 'Mandil de Pecho', qty: 1, def: false }
+        { name: 'Filipina Blanca Classic', ...U, qty: 2, def: true },
+        { name: 'Gorro de Cocina', ...U, qty: 2, def: true },
+        { name: 'Pantalón de Cocina', ...U, qty: 2, def: true },
+        { name: 'Guantes Térmicos', ...U, qty: 1, def: true },
+        { name: 'Tapabocas Desechable', ...U, qty: 5, def: true },
+        { name: 'Calzado Antideslizante', ...U, qty: 1, def: false },
+        { name: 'Mandil de Pecho', ...U, qty: 1, def: false }
       ],
       barista: [
-        { name: 'Mandil Barista Premium', qty: 1, def: true },
-        { name: 'Polo Shirt Premium', qty: 2, def: true },
-        { name: 'Gorra o Visera', qty: 1, def: false },
-        { name: 'Guantes de Servicio', qty: 1, def: false }
+        { name: 'Mandil Barista Premium', ...U, qty: 1, def: true },
+        { name: 'Polo Shirt Premium', ...U, qty: 2, def: true },
+        { name: 'Gorra o Visera', ...U, qty: 1, def: false },
+        { name: 'Guantes de Servicio', ...U, qty: 1, def: false }
       ],
       limpiezaSteward: [
-        { name: 'Conjunto Operativo Anti-fluidos', qty: 2, def: true },
-        { name: 'Guantes de Protección', qty: 2, def: true },
-        { name: 'Calzado Antiderrapante', qty: 1, def: false },
-        { name: 'Cofia', qty: 1, def: false }
+        { name: 'Conjunto Operativo Anti-fluidos', ...U, qty: 2, def: true },
+        { name: 'Guantes de Protección', ...U, qty: 2, def: true },
+        { name: 'Calzado Antiderrapante', ...U, qty: 1, def: false },
+        { name: 'Cofia', ...U, qty: 1, def: false }
       ],
       seguridadValet: [
-        { name: 'Chaqueta de Seguridad Térmica', qty: 1, def: true },
-        { name: 'Camisa Uniforme Seguridad', qty: 2, def: true },
-        { name: 'Pantalón Táctico', qty: 1, def: true },
-        { name: 'Gorra Táctica', qty: 1, def: false },
-        { name: 'Funda para Radio', qty: 1, def: false }
+        { name: 'Chaqueta de Seguridad Térmica', ...U, qty: 1, def: true },
+        { name: 'Camisa Uniforme Seguridad', ...U, qty: 2, def: true },
+        { name: 'Pantalón Táctico', ...U, qty: 1, def: true },
+        { name: 'Gorra Táctica', ...U, qty: 1, def: false },
+        { name: 'Funda para Radio', category: 'fisico', tipo: 'equipo', qty: 1, def: false }
       ],
       hostess: [
-        { name: 'Vestido o Traje Corporativo', qty: 2, def: true },
-        { name: 'Pañoleta o Accesorio', qty: 1, def: true },
-        { name: 'Zapatos Formales', qty: 1, def: false }
+        { name: 'Vestido o Traje Corporativo', ...U, qty: 2, def: true },
+        { name: 'Pañoleta o Accesorio', ...U, qty: 1, def: true },
+        { name: 'Zapatos Formales', ...U, qty: 1, def: false }
       ],
       operarioLimpieza: [
-        { name: 'Filipina o Camisola de Limpieza', qty: 2, def: true },
-        { name: 'Pantalón con Elástico', qty: 2, def: true },
-        { name: 'Calzado Antiderrapante', qty: 1, def: true },
-        { name: 'Guantes de Látex', qty: 1, def: false },
-        { name: 'Cubrebocas', qty: 1, def: false }
+        { name: 'Filipina o Camisola de Limpieza', ...U, qty: 2, def: true },
+        { name: 'Pantalón con Elástico', ...U, qty: 2, def: true },
+        { name: 'Calzado Antiderrapante', ...U, qty: 1, def: true },
+        { name: 'Guantes de Látex', ...U, qty: 1, def: false },
+        { name: 'Cubrebocas', ...U, qty: 1, def: false }
       ],
       supervisorZona: [
-        { name: 'Chaleco Distintivo Reflectante', qty: 1, def: true },
-        { name: 'Calzado de Seguridad Ligero', qty: 1, def: true },
-        { name: 'Camisa Polo Supervisor', qty: 2, def: false },
-        { name: 'Radio de Comunicación', qty: 1, def: false }
+        { name: 'Chaleco Distintivo Reflectante', ...U, qty: 1, def: true },
+        { name: 'Calzado de Seguridad Ligero', ...U, qty: 1, def: true },
+        { name: 'Camisa Polo Supervisor', ...U, qty: 2, def: false },
+        { name: 'Radio de Comunicación', category: 'fisico', tipo: 'equipo', qty: 1, def: false }
       ],
       limpiezaAlturas: [
-        { name: 'Overol Técnico Reforzado', qty: 1, def: true },
-        { name: 'Calzado con Agarre Especial', qty: 1, def: true },
-        { name: 'Arnés de Seguridad', qty: 1, def: true },
-        { name: 'Casco', qty: 1, def: false }
+        { name: 'Overol Técnico Reforzado', ...U, qty: 1, def: true },
+        { name: 'Calzado con Agarre Especial', ...U, qty: 1, def: true },
+        { name: 'Arnés de Seguridad', category: 'fisico', tipo: 'equipo', qty: 1, def: true },
+        { name: 'Casco', ...U, qty: 1, def: false }
       ],
       mantenimientoGeneral: [
-        { name: 'Pantalón Tipo Cargo Industrial', qty: 2, def: true },
-        { name: 'Camisola Reforzada de Trabajo', qty: 2, def: true },
-        { name: 'Cinturón Porta-herramientas', qty: 1, def: false },
-        { name: 'Botas de Trabajo', qty: 1, def: false }
+        { name: 'Pantalón Tipo Cargo Industrial', ...U, qty: 2, def: true },
+        { name: 'Camisola Reforzada de Trabajo', ...U, qty: 2, def: true },
+        { name: 'Cinturón Porta-herramientas', category: 'fisico', tipo: 'equipo', qty: 1, def: false },
+        { name: 'Botas de Trabajo', ...U, qty: 1, def: false }
       ],
       quimicos: [
-        { name: 'Bata Resistente a Ácidos/Cloro', qty: 2, def: true },
-        { name: 'Guantes de Nitrilo Especializados', qty: 2, def: true },
-        { name: 'Careta de Protección Facial', qty: 1, def: true },
-        { name: 'Botas de Hule', qty: 1, def: false }
+        { name: 'Bata Resistente a Ácidos/Cloro', ...U, qty: 2, def: true },
+        { name: 'Guantes de Nitrilo Especializados', ...U, qty: 2, def: true },
+        { name: 'Careta de Protección Facial', category: 'fisico', tipo: 'equipo', qty: 1, def: true },
+        { name: 'Botas de Hule', ...U, qty: 1, def: false }
       ],
       operarioProduccion: [
-        { name: 'Overol de Algodón Industrial', qty: 2, def: true },
-        { name: 'Camisola y Pantalón Reforzado', qty: 1, def: true },
-        { name: 'Calzado con Casquillo de Acero', qty: 1, def: true },
-        { name: 'Guantes Industriales', qty: 1, def: false },
-        { name: 'Lentes de Seguridad', qty: 1, def: false }
+        { name: 'Overol de Algodón Industrial', ...U, qty: 2, def: true },
+        { name: 'Camisola y Pantalón Reforzado', ...U, qty: 1, def: true },
+        { name: 'Calzado con Casquillo de Acero', ...U, qty: 1, def: true },
+        { name: 'Guantes Industriales', ...U, qty: 1, def: false },
+        { name: 'Lentes de Seguridad', category: 'fisico', tipo: 'equipo', qty: 1, def: false }
       ],
       operarioLogisticaInd: [
-        { name: 'Chaleco de Alta Visibilidad Clase 2', qty: 1, def: true },
-        { name: 'Faja Lumbar Ergonómica', qty: 1, def: true },
-        { name: 'Calzado Industrial de Seguridad', qty: 1, def: true },
-        { name: 'Guantes Anticorte', qty: 1, def: false }
+        { name: 'Chaleco de Alta Visibilidad Clase 2', ...U, qty: 1, def: true },
+        { name: 'Faja Lumbar Ergonómica', ...U, qty: 1, def: true },
+        { name: 'Calzado Industrial de Seguridad', ...U, qty: 1, def: true },
+        { name: 'Guantes Anticorte', ...U, qty: 1, def: false }
       ],
       mantenimientoIndustrial: [
-        { name: 'Ropa Ignífuga (Flame Resistant)', qty: 2, def: true },
-        { name: 'Calzado Dieléctrico', qty: 1, def: true },
-        { name: 'Guantes Dieléctricos', qty: 1, def: false },
-        { name: 'Casco Aislante', qty: 1, def: false }
+        { name: 'Ropa Ignífuga (Flame Resistant)', ...U, qty: 2, def: true },
+        { name: 'Calzado Dieléctrico', ...U, qty: 1, def: true },
+        { name: 'Guantes Dieléctricos', ...U, qty: 1, def: false },
+        { name: 'Casco Aislante', ...U, qty: 1, def: false }
       ],
       calidad: [
-        { name: 'Bata de Laboratorio con Logo', qty: 2, def: true },
-        { name: 'Cofia', qty: 2, def: true },
-        { name: 'Guantes de Nitrilo', qty: 1, def: false },
-        { name: 'Lentes de Seguridad', qty: 1, def: false }
+        { name: 'Bata de Laboratorio con Logo', ...U, qty: 2, def: true },
+        { name: 'Cofia', ...U, qty: 2, def: true },
+        { name: 'Guantes de Nitrilo', ...U, qty: 1, def: false },
+        { name: 'Lentes de Seguridad', category: 'fisico', tipo: 'equipo', qty: 1, def: false }
       ],
       supervisorIndustrial: [
-        { name: 'Chaleco Distintivo', qty: 1, def: true },
-        { name: 'Camisa Polo Supervisor', qty: 2, def: true },
-        { name: 'Casco Blanco', qty: 1, def: false }
+        { name: 'Chaleco Distintivo', ...U, qty: 1, def: true },
+        { name: 'Camisa Polo Supervisor', ...U, qty: 2, def: true },
+        { name: 'Casco Blanco', ...U, qty: 1, def: false }
       ],
       ejecutivoVentas: [
-        { name: 'Camisa Ejecutiva', qty: 2, def: true },
-        { name: 'Pantalón de Vestir', qty: 2, def: true },
-        { name: 'Blazer Corporativo', qty: 1, def: false },
-        { name: 'Gafete Corporativo', qty: 1, def: false }
+        { name: 'Camisa Ejecutiva', ...U, qty: 2, def: true },
+        { name: 'Pantalón de Vestir', ...U, qty: 2, def: true },
+        { name: 'Blazer Corporativo', ...U, qty: 1, def: false },
+        { name: 'Gafete Corporativo', category: 'fisico', tipo: 'acceso', qty: 1, def: false },
+        { name: 'Laptop', category: 'fisico', tipo: 'equipo', qty: 1, def: true },
+        { name: 'Celular', category: 'fisico', tipo: 'equipo', qty: 1, def: true },
+        { name: 'Auto', category: 'fisico', tipo: 'vehiculo', qty: 1, def: false },
+        { name: 'Google Workspace', category: 'digital', tipo: 'licencia', qty: 1, def: true },
+        { name: 'CRM', category: 'digital', tipo: 'licencia', qty: 1, def: true }
       ],
       recepcionistaCorp: [
-        { name: 'Camisa Ejecutiva', qty: 2, def: true },
-        { name: 'Pantalón de Vestir', qty: 1, def: true },
-        { name: 'Blazer Corporativo', qty: 1, def: false }
+        { name: 'Camisa Ejecutiva', ...U, qty: 2, def: true },
+        { name: 'Pantalón de Vestir', ...U, qty: 1, def: true },
+        { name: 'Blazer Corporativo', ...U, qty: 1, def: false },
+        { name: 'Computador de Escritorio', category: 'fisico', tipo: 'equipo', qty: 1, def: true },
+        { name: 'Tarjeta/Llave de Oficina', category: 'fisico', tipo: 'acceso', qty: 1, def: true },
+        { name: 'Google Workspace', category: 'digital', tipo: 'licencia', qty: 1, def: true }
+      ],
+      asistenteAdmin: [
+        { name: 'Camisa Ejecutiva', ...U, qty: 2, def: false },
+        { name: 'Computador', category: 'fisico', tipo: 'equipo', qty: 1, def: true },
+        { name: 'Monitor', category: 'fisico', tipo: 'equipo', qty: 1, def: true },
+        { name: 'Mouse', category: 'fisico', tipo: 'equipo', qty: 1, def: true },
+        { name: 'Audífonos', category: 'fisico', tipo: 'equipo', qty: 1, def: false },
+        { name: 'Tarjeta/Llave de Oficina', category: 'fisico', tipo: 'acceso', qty: 1, def: true },
+        { name: 'Google Workspace', category: 'digital', tipo: 'licencia', qty: 1, def: true },
+        { name: 'CRM', category: 'digital', tipo: 'licencia', qty: 1, def: false }
       ],
       guardiaSeguridad: [
-        { name: 'Camisa Uniforme Seguridad', qty: 2, def: true },
-        { name: 'Pantalón Táctico', qty: 1, def: true },
-        { name: 'Chaqueta de Seguridad', qty: 1, def: true },
-        { name: 'Botas Tácticas', qty: 1, def: false },
-        { name: 'Cinturón Porta-equipo', qty: 1, def: false }
+        { name: 'Camisa Uniforme Seguridad', ...U, qty: 2, def: true },
+        { name: 'Pantalón Táctico', ...U, qty: 1, def: true },
+        { name: 'Chaqueta de Seguridad', ...U, qty: 1, def: true },
+        { name: 'Botas Tácticas', ...U, qty: 1, def: false },
+        { name: 'Cinturón Porta-equipo', category: 'fisico', tipo: 'equipo', qty: 1, def: false }
       ],
       supervisorTurno: [
-        { name: 'Chaqueta de Seguridad', qty: 1, def: true },
-        { name: 'Camisa Uniforme Seguridad', qty: 2, def: true },
-        { name: 'Radio de Comunicación', qty: 1, def: false }
+        { name: 'Chaqueta de Seguridad', ...U, qty: 1, def: true },
+        { name: 'Camisa Uniforme Seguridad', ...U, qty: 2, def: true },
+        { name: 'Radio de Comunicación', category: 'fisico', tipo: 'equipo', qty: 1, def: false }
       ],
       recepcionistaHotel: [
-        { name: 'Traje Corporativo de Hotel', qty: 2, def: true },
-        { name: 'Pañoleta o Corbata', qty: 1, def: true },
-        { name: 'Zapatos Formales', qty: 1, def: false }
+        { name: 'Traje Corporativo de Hotel', ...U, qty: 2, def: true },
+        { name: 'Pañoleta o Corbata', ...U, qty: 1, def: true },
+        { name: 'Zapatos Formales', ...U, qty: 1, def: false }
       ],
       botones: [
-        { name: 'Chaqueta de Botones', qty: 1, def: true },
-        { name: 'Pantalón de Uniforme', qty: 2, def: true },
-        { name: 'Guantes Blancos', qty: 1, def: false },
-        { name: 'Gorra de Botones', qty: 1, def: false }
+        { name: 'Chaqueta de Botones', ...U, qty: 1, def: true },
+        { name: 'Pantalón de Uniforme', ...U, qty: 2, def: true },
+        { name: 'Guantes Blancos', ...U, qty: 1, def: false },
+        { name: 'Gorra de Botones', ...U, qty: 1, def: false }
       ],
       camarista: [
-        { name: 'Uniforme de Camarista', qty: 2, def: true },
-        { name: 'Delantal', qty: 1, def: true },
-        { name: 'Guantes de Limpieza', qty: 1, def: false },
-        { name: 'Calzado Antiderrapante', qty: 1, def: false }
+        { name: 'Uniforme de Camarista', ...U, qty: 2, def: true },
+        { name: 'Delantal', ...U, qty: 1, def: true },
+        { name: 'Guantes de Limpieza', ...U, qty: 1, def: false },
+        { name: 'Calzado Antiderrapante', ...U, qty: 1, def: false }
       ],
       asesorVentas: [
-        { name: 'Polo o Camisa de Marca', qty: 2, def: true },
-        { name: 'Pantalón Casual Ejecutivo', qty: 1, def: true },
-        { name: 'Gafete de Identificación', qty: 1, def: false }
+        { name: 'Polo o Camisa de Marca', ...U, qty: 2, def: true },
+        { name: 'Pantalón Casual Ejecutivo', ...U, qty: 1, def: true },
+        { name: 'Gafete de Identificación', category: 'fisico', tipo: 'acceso', qty: 1, def: false }
       ],
       gerenteTienda: [
-        { name: 'Camisa Ejecutiva', qty: 2, def: true },
-        { name: 'Pantalón de Vestir', qty: 1, def: true },
-        { name: 'Blazer de Tienda', qty: 1, def: false }
+        { name: 'Camisa Ejecutiva', ...U, qty: 2, def: true },
+        { name: 'Pantalón de Vestir', ...U, qty: 1, def: true },
+        { name: 'Blazer de Tienda', ...U, qty: 1, def: false }
       ],
       personalCaja: [
-        { name: 'Polo o Camisa de Marca', qty: 2, def: true },
-        { name: 'Pantalón Casual Ejecutivo', qty: 1, def: true },
-        { name: 'Gafete de Identificación', qty: 1, def: false }
+        { name: 'Polo o Camisa de Marca', ...U, qty: 2, def: true },
+        { name: 'Pantalón Casual Ejecutivo', ...U, qty: 1, def: true },
+        { name: 'Gafete de Identificación', category: 'fisico', tipo: 'acceso', qty: 1, def: false }
       ],
       personalBodegaRetail: [
-        { name: 'Camisola de Almacén', qty: 2, def: true },
-        { name: 'Pantalón Cargo', qty: 1, def: true },
-        { name: 'Calzado Industrial', qty: 1, def: true },
-        { name: 'Guantes de Manejo', qty: 1, def: false }
+        { name: 'Camisola de Almacén', ...U, qty: 2, def: true },
+        { name: 'Pantalón Cargo', ...U, qty: 1, def: true },
+        { name: 'Calzado Industrial', ...U, qty: 1, def: true },
+        { name: 'Guantes de Manejo', ...U, qty: 1, def: false }
       ],
       enfermero: [
-        { name: 'Filipina o Scrub Médico', qty: 3, def: true },
-        { name: 'Pantalón Médico', qty: 3, def: true },
-        { name: 'Cubrebocas', qty: 5, def: true },
-        { name: 'Guantes de Nitrilo', qty: 5, def: false },
-        { name: 'Calzado Clínico', qty: 1, def: false }
+        { name: 'Filipina o Scrub Médico', ...U, qty: 3, def: true },
+        { name: 'Pantalón Médico', ...U, qty: 3, def: true },
+        { name: 'Cubrebocas', ...U, qty: 5, def: true },
+        { name: 'Guantes de Nitrilo', ...U, qty: 5, def: false },
+        { name: 'Calzado Clínico', ...U, qty: 1, def: false }
       ],
       medico: [
-        { name: 'Bata Médica Blanca', qty: 2, def: true },
-        { name: 'Filipina o Scrub Médico', qty: 2, def: true },
-        { name: 'Gafete de Identificación', qty: 1, def: false }
+        { name: 'Bata Médica Blanca', ...U, qty: 2, def: true },
+        { name: 'Filipina o Scrub Médico', ...U, qty: 2, def: true },
+        { name: 'Gafete de Identificación', category: 'fisico', tipo: 'acceso', qty: 1, def: false }
       ],
       personalAdmin: [
-        { name: 'Camisa Ejecutiva', qty: 2, def: true },
-        { name: 'Pantalón de Vestir', qty: 1, def: true },
-        { name: 'Gafete de Identificación', qty: 1, def: false }
+        { name: 'Camisa Ejecutiva', ...U, qty: 2, def: true },
+        { name: 'Pantalón de Vestir', ...U, qty: 1, def: true },
+        { name: 'Gafete de Identificación', category: 'fisico', tipo: 'acceso', qty: 1, def: false }
       ],
       obrero: [
-        { name: 'Overol de Trabajo', qty: 2, def: true },
-        { name: 'Casco de Seguridad', qty: 1, def: true },
-        { name: 'Botas con Casquillo', qty: 1, def: true },
-        { name: 'Chaleco Reflectante', qty: 1, def: true },
-        { name: 'Guantes de Carnaza', qty: 1, def: false }
+        { name: 'Overol de Trabajo', ...U, qty: 2, def: true },
+        { name: 'Casco de Seguridad', ...U, qty: 1, def: true },
+        { name: 'Botas con Casquillo', ...U, qty: 1, def: true },
+        { name: 'Chaleco Reflectante', ...U, qty: 1, def: true },
+        { name: 'Guantes de Carnaza', ...U, qty: 1, def: false }
       ],
       maestroObra: [
-        { name: 'Chaleco Reflectante', qty: 1, def: true },
-        { name: 'Casco de Seguridad', qty: 1, def: true },
-        { name: 'Botas con Casquillo', qty: 1, def: true },
-        { name: 'Camisa Polo Supervisor', qty: 2, def: false }
+        { name: 'Chaleco Reflectante', ...U, qty: 1, def: true },
+        { name: 'Casco de Seguridad', ...U, qty: 1, def: true },
+        { name: 'Botas con Casquillo', ...U, qty: 1, def: true },
+        { name: 'Camisa Polo Supervisor', ...U, qty: 2, def: false }
       ],
       ingenieroConstruccion: [
-        { name: 'Casco Blanco', qty: 1, def: true },
-        { name: 'Chaleco Reflectante', qty: 1, def: true },
-        { name: 'Botas de Seguridad Ejecutivas', qty: 1, def: true },
-        { name: 'Camisa Tipo Columbia Bordada', qty: 2, def: false }
+        { name: 'Casco Blanco', ...U, qty: 1, def: true },
+        { name: 'Chaleco Reflectante', ...U, qty: 1, def: true },
+        { name: 'Botas de Seguridad Ejecutivas', ...U, qty: 1, def: true },
+        { name: 'Camisa Tipo Columbia Bordada', ...U, qty: 2, def: false }
       ],
       choferRepartidor: [
-        { name: 'Polo o Camisa de Marca', qty: 2, def: true },
-        { name: 'Pantalón Cargo', qty: 1, def: true },
-        { name: 'Chaleco Reflectante', qty: 1, def: false }
+        { name: 'Polo o Camisa de Marca', ...U, qty: 2, def: true },
+        { name: 'Pantalón Cargo', ...U, qty: 1, def: true },
+        { name: 'Chaleco Reflectante', ...U, qty: 1, def: false }
       ],
       auxiliarAlmacen: [
-        { name: 'Camisola de Almacén', qty: 2, def: true },
-        { name: 'Pantalón Cargo', qty: 1, def: true },
-        { name: 'Calzado Industrial', qty: 1, def: true },
-        { name: 'Guantes de Manejo', qty: 1, def: false }
+        { name: 'Camisola de Almacén', ...U, qty: 2, def: true },
+        { name: 'Pantalón Cargo', ...U, qty: 1, def: true },
+        { name: 'Calzado Industrial', ...U, qty: 1, def: true },
+        { name: 'Guantes de Manejo', ...U, qty: 1, def: false }
       ],
       coordinadorRuta: [
-        { name: 'Polo o Camisa de Marca', qty: 2, def: true },
-        { name: 'Pantalón Casual Ejecutivo', qty: 1, def: true },
-        { name: 'Chaleco Reflectante', qty: 1, def: false }
+        { name: 'Polo o Camisa de Marca', ...U, qty: 2, def: true },
+        { name: 'Pantalón Casual Ejecutivo', ...U, qty: 1, def: true },
+        { name: 'Chaleco Reflectante', ...U, qty: 1, def: false }
       ]
     };
 
     // El catálogo se indexa por industria + rol porque el mismo título de rol
     // (ej. "Mantenimiento Hombre") puede existir en más de una industria con
     // prendas distintas.
-    const ROLE_GARMENT_CATALOG = {};
-    function garmentCatalogKey(industry, roleTitle) { return industry + '::' + roleTitle; }
-    function assignGarments(set, industry, titles) {
-      titles.forEach(title => { ROLE_GARMENT_CATALOG[garmentCatalogKey(industry, title)] = set; });
+    const ROLE_ASSET_CATALOG = {};
+    function assetCatalogKey(industry, roleTitle) { return industry + '::' + roleTitle; }
+    function assignAssets(set, industry, titles) {
+      titles.forEach(title => { ROLE_ASSET_CATALOG[assetCatalogKey(industry, title)] = set; });
     }
 
-    assignGarments(GARMENT_SETS.mesero, 'Restaurantes', ['Mesero Hombre', 'Mesera Mujer']);
-    assignGarments(GARMENT_SETS.chef, 'Restaurantes', ['Chef / Cocina Hombre', 'Chef / Cocina Mujer']);
-    assignGarments(GARMENT_SETS.barista, 'Restaurantes', ['Barista / Bartender Hombre', 'Barista / Bartender Mujer']);
-    assignGarments(GARMENT_SETS.limpiezaSteward, 'Restaurantes', ['Limpieza / Steward Hombre', 'Limpieza / Steward Mujer']);
-    assignGarments(GARMENT_SETS.seguridadValet, 'Restaurantes', ['Seguridad / Valet Hombre', 'Seguridad / Valet Mujer']);
-    assignGarments(GARMENT_SETS.hostess, 'Restaurantes', ['Hostess Mujer', 'Hostess Hombre']);
+    assignAssets(ASSET_SETS.mesero, 'Restaurantes', ['Mesero Hombre', 'Mesera Mujer']);
+    assignAssets(ASSET_SETS.chef, 'Restaurantes', ['Chef / Cocina Hombre', 'Chef / Cocina Mujer']);
+    assignAssets(ASSET_SETS.barista, 'Restaurantes', ['Barista / Bartender Hombre', 'Barista / Bartender Mujer']);
+    assignAssets(ASSET_SETS.limpiezaSteward, 'Restaurantes', ['Limpieza / Steward Hombre', 'Limpieza / Steward Mujer']);
+    assignAssets(ASSET_SETS.seguridadValet, 'Restaurantes', ['Seguridad / Valet Hombre', 'Seguridad / Valet Mujer']);
+    assignAssets(ASSET_SETS.hostess, 'Restaurantes', ['Hostess Mujer', 'Hostess Hombre']);
 
-    assignGarments(GARMENT_SETS.operarioLimpieza, 'Limpieza', ['Operario de Limpieza Hombre', 'Operaria de Limpieza Mujer']);
-    assignGarments(GARMENT_SETS.supervisorZona, 'Limpieza', ['Supervisor de Zona Hombre', 'Supervisora de Zona Mujer']);
-    assignGarments(GARMENT_SETS.limpiezaAlturas, 'Limpieza', ['Limpieza en Alturas Hombre', 'Limpieza en Alturas Mujer']);
-    assignGarments(GARMENT_SETS.mantenimientoGeneral, 'Limpieza', ['Mantenimiento Hombre', 'Mantenimiento Mujer']);
-    assignGarments(GARMENT_SETS.quimicos, 'Limpieza', ['Especialista en Químicos Hombre', 'Especialista en Químicos Mujer']);
+    assignAssets(ASSET_SETS.operarioLimpieza, 'Limpieza', ['Operario de Limpieza Hombre', 'Operaria de Limpieza Mujer']);
+    assignAssets(ASSET_SETS.supervisorZona, 'Limpieza', ['Supervisor de Zona Hombre', 'Supervisora de Zona Mujer']);
+    assignAssets(ASSET_SETS.limpiezaAlturas, 'Limpieza', ['Limpieza en Alturas Hombre', 'Limpieza en Alturas Mujer']);
+    assignAssets(ASSET_SETS.mantenimientoGeneral, 'Limpieza', ['Mantenimiento Hombre', 'Mantenimiento Mujer']);
+    assignAssets(ASSET_SETS.quimicos, 'Limpieza', ['Especialista en Químicos Hombre', 'Especialista en Químicos Mujer']);
 
-    assignGarments(GARMENT_SETS.operarioProduccion, 'Industrial', ['Operario de Producción Hombre', 'Operaria de Producción Mujer']);
-    assignGarments(GARMENT_SETS.operarioLogisticaInd, 'Industrial', ['Operario de Logística Hombre', 'Operaria de Logística Mujer']);
-    assignGarments(GARMENT_SETS.mantenimientoIndustrial, 'Industrial', ['Mantenimiento Hombre', 'Mantenimiento Mujer']);
-    assignGarments(GARMENT_SETS.calidad, 'Industrial', ['Personal de Calidad Hombre', 'Personal de Calidad Mujer']);
-    assignGarments(GARMENT_SETS.supervisorIndustrial, 'Industrial', ['Supervisor Hombre', 'Supervisora Mujer']);
+    assignAssets(ASSET_SETS.operarioProduccion, 'Industrial', ['Operario de Producción Hombre', 'Operaria de Producción Mujer']);
+    assignAssets(ASSET_SETS.operarioLogisticaInd, 'Industrial', ['Operario de Logística Hombre', 'Operaria de Logística Mujer']);
+    assignAssets(ASSET_SETS.mantenimientoIndustrial, 'Industrial', ['Mantenimiento Hombre', 'Mantenimiento Mujer']);
+    assignAssets(ASSET_SETS.calidad, 'Industrial', ['Personal de Calidad Hombre', 'Personal de Calidad Mujer']);
+    assignAssets(ASSET_SETS.supervisorIndustrial, 'Industrial', ['Supervisor Hombre', 'Supervisora Mujer']);
 
-    assignGarments(GARMENT_SETS.ejecutivoVentas, 'Corporativo', ['Ejecutivo de Ventas Hombre', 'Ejecutiva de Ventas Mujer']);
-    assignGarments(GARMENT_SETS.recepcionistaCorp, 'Corporativo', ['Recepcionista Hombre', 'Recepcionista Mujer']);
+    assignAssets(ASSET_SETS.ejecutivoVentas, 'Corporativo', ['Ejecutivo de Ventas Hombre', 'Ejecutiva de Ventas Mujer']);
+    assignAssets(ASSET_SETS.recepcionistaCorp, 'Corporativo', ['Recepcionista Hombre', 'Recepcionista Mujer']);
+    assignAssets(ASSET_SETS.asistenteAdmin, 'Corporativo', ['Asistente Administrativo Hombre', 'Asistente Administrativa Mujer']);
 
-    assignGarments(GARMENT_SETS.guardiaSeguridad, 'Seguridad', ['Guardia de Seguridad Hombre', 'Guardia de Seguridad Mujer']);
-    assignGarments(GARMENT_SETS.supervisorTurno, 'Seguridad', ['Supervisor de Turno Hombre', 'Supervisora de Turno Mujer']);
+    assignAssets(ASSET_SETS.guardiaSeguridad, 'Seguridad', ['Guardia de Seguridad Hombre', 'Guardia de Seguridad Mujer']);
+    assignAssets(ASSET_SETS.supervisorTurno, 'Seguridad', ['Supervisor de Turno Hombre', 'Supervisora de Turno Mujer']);
 
-    assignGarments(GARMENT_SETS.recepcionistaHotel, 'Hotelería', ['Recepcionista de Hotel Hombre', 'Recepcionista de Hotel Mujer']);
-    assignGarments(GARMENT_SETS.botones, 'Hotelería', ['Botones Hombre', 'Botones Mujer']);
-    assignGarments(GARMENT_SETS.camarista, 'Hotelería', ['Camarista Hombre', 'Camarista Mujer']);
+    assignAssets(ASSET_SETS.recepcionistaHotel, 'Hotelería', ['Recepcionista de Hotel Hombre', 'Recepcionista de Hotel Mujer']);
+    assignAssets(ASSET_SETS.botones, 'Hotelería', ['Botones Hombre', 'Botones Mujer']);
+    assignAssets(ASSET_SETS.camarista, 'Hotelería', ['Camarista Hombre', 'Camarista Mujer']);
 
-    assignGarments(GARMENT_SETS.asesorVentas, 'Retail', ['Asesor de Ventas Hombre', 'Asesora de Ventas Mujer']);
-    assignGarments(GARMENT_SETS.gerenteTienda, 'Retail', ['Gerente de Tienda Hombre', 'Gerente de Tienda Mujer']);
-    assignGarments(GARMENT_SETS.personalCaja, 'Retail', ['Personal de Caja Hombre', 'Personal de Caja Mujer']);
-    assignGarments(GARMENT_SETS.personalBodegaRetail, 'Retail', ['Personal de Bodega Hombre', 'Personal de Bodega Mujer']);
+    assignAssets(ASSET_SETS.asesorVentas, 'Retail', ['Asesor de Ventas Hombre', 'Asesora de Ventas Mujer']);
+    assignAssets(ASSET_SETS.gerenteTienda, 'Retail', ['Gerente de Tienda Hombre', 'Gerente de Tienda Mujer']);
+    assignAssets(ASSET_SETS.personalCaja, 'Retail', ['Personal de Caja Hombre', 'Personal de Caja Mujer']);
+    assignAssets(ASSET_SETS.personalBodegaRetail, 'Retail', ['Personal de Bodega Hombre', 'Personal de Bodega Mujer']);
 
-    assignGarments(GARMENT_SETS.enfermero, 'Salud', ['Enfermero', 'Enfermera']);
-    assignGarments(GARMENT_SETS.medico, 'Salud', ['Médico Hombre', 'Médica Mujer']);
-    assignGarments(GARMENT_SETS.personalAdmin, 'Salud', ['Personal Administrativo Hombre', 'Personal Administrativo Mujer']);
+    assignAssets(ASSET_SETS.enfermero, 'Salud', ['Enfermero', 'Enfermera']);
+    assignAssets(ASSET_SETS.medico, 'Salud', ['Médico Hombre', 'Médica Mujer']);
+    assignAssets(ASSET_SETS.personalAdmin, 'Salud', ['Personal Administrativo Hombre', 'Personal Administrativo Mujer']);
 
-    assignGarments(GARMENT_SETS.obrero, 'Construcción', ['Obrero Hombre', 'Obrera Mujer']);
-    assignGarments(GARMENT_SETS.maestroObra, 'Construcción', ['Maestro de Obra Hombre', 'Maestra de Obra Mujer']);
-    assignGarments(GARMENT_SETS.ingenieroConstruccion, 'Construcción', ['Ingeniero Hombre', 'Ingeniera Mujer']);
+    assignAssets(ASSET_SETS.obrero, 'Construcción', ['Obrero Hombre', 'Obrera Mujer']);
+    assignAssets(ASSET_SETS.maestroObra, 'Construcción', ['Maestro de Obra Hombre', 'Maestra de Obra Mujer']);
+    assignAssets(ASSET_SETS.ingenieroConstruccion, 'Construcción', ['Ingeniero Hombre', 'Ingeniera Mujer']);
 
-    assignGarments(GARMENT_SETS.choferRepartidor, 'Logística', ['Chofer Repartidor Hombre', 'Chofer Repartidor Mujer']);
-    assignGarments(GARMENT_SETS.auxiliarAlmacen, 'Logística', ['Auxiliar de Almacén Hombre', 'Auxiliar de Almacén Mujer']);
-    assignGarments(GARMENT_SETS.coordinadorRuta, 'Logística', ['Coordinador de Ruta Hombre', 'Coordinadora de Ruta Mujer']);
+    assignAssets(ASSET_SETS.choferRepartidor, 'Logística', ['Chofer Repartidor Hombre', 'Chofer Repartidor Mujer']);
+    assignAssets(ASSET_SETS.auxiliarAlmacen, 'Logística', ['Auxiliar de Almacén Hombre', 'Auxiliar de Almacén Mujer']);
+    assignAssets(ASSET_SETS.coordinadorRuta, 'Logística', ['Coordinador de Ruta Hombre', 'Coordinadora de Ruta Mujer']);
 
     async function renderRoles(industry) {
       const grid = document.getElementById('rolesGrid');
@@ -1005,7 +1073,7 @@
             activeRolesList = activeRolesData.map(r => r.role_name);
           }
           const { data } = await window._supabase.from('role_definition')
-            .select('role_name, items, renewal_frequency')
+            .select('role_name, items, area')
             .eq('company_id', session.user.id);
           if (data) {
             data.forEach(r => {
@@ -1030,12 +1098,12 @@
       roles.forEach(role => {
         const dbRole = dbRolesMap[role.title.toLowerCase()];
         const itemsCount = dbRole && dbRole.items ? dbRole.items.length : 0;
-        const itemsText = itemsCount > 0 ? `${itemsCount} Prendas` : '—';
+        const itemsText = itemsCount > 0 ? `${itemsCount} Activo${itemsCount === 1 ? '' : 's'}` : '—';
         const itemsMuted = itemsCount === 0;
 
-        const renewalFreq = dbRole && dbRole.renewal_frequency ? dbRole.renewal_frequency : null;
-        const renewalText = renewalFreq ? `${renewalFreq} ${renewalFreq === 1 ? 'Mes' : 'Meses'}` : '—';
-        const renewalMuted = !renewalFreq;
+        const area = dbRole && dbRole.area ? dbRole.area : null;
+        const areaText = area || 'Sin asignar';
+        const areaMuted = !area;
 
         const card = document.createElement('div');
         card.className = role.enabled ? 'role-card card-active' : 'role-card';
@@ -1057,18 +1125,18 @@
 
           <div class="role-stats">
             <div class="role-stat-pill">
-              <span class="role-stat-label">Plantilla base</span>
+              <span class="role-stat-label">Activos asignados</span>
               <span class="role-stat-value ${itemsMuted ? 'muted' : ''}">${itemsText}</span>
             </div>
             <div class="role-stat-pill">
-              <span class="role-stat-label">Renovación</span>
-              <span class="role-stat-value ${renewalMuted ? 'muted' : ''}">${renewalText}</span>
+              <span class="role-stat-label">Área</span>
+              <span class="role-stat-value ${areaMuted ? 'muted' : ''}">${areaText}</span>
             </div>
           </div>
 
           <div class="config-action-container" style="margin-top: 0.875rem; padding-top: 0.875rem; border-top: 1px solid #F1F5F9; display: ${role.enabled ? 'block' : 'none'};">
             <button class="btn btn-outline" style="width: 100%; font-size: 0.8rem; padding: 0.6rem; border-radius: 10px; font-weight: 700; letter-spacing: 0.01em;" onclick="openRoleConfig('${role.title}')">
-              Configurar Uniformes
+              Configurar Activos
             </button>
           </div>
         `;
@@ -1163,92 +1231,132 @@
       }
     });
 
-    let currentRoleUniforms = [];
+    let currentRoleAssets = [];
     let currentConfigRoleName = '';
+
+    const ASSET_CATEGORY_LABELS = { fisico: 'Físico', digital: 'Digital' };
+    const ASSET_TYPE_LABELS = { uniforme: 'Uniforme', equipo: 'Equipo', acceso: 'Acceso', vehiculo: 'Vehículo', licencia: 'Licencia' };
+
+    function handleAreaSelectChange() {
+      const areaSelect = document.getElementById('roleAreaSelect');
+      const areaCustom = document.getElementById('roleAreaCustom');
+      if (!areaSelect || !areaCustom) return;
+      areaCustom.style.display = areaSelect.value === 'otra' ? 'block' : 'none';
+      if (areaSelect.value !== 'otra') areaCustom.value = '';
+    }
 
     async function openRoleConfig(roleName) {
       currentConfigRoleName = roleName;
       document.getElementById('configRoleTitle').innerText = `Configurar: ${roleName}`;
-      const list = document.getElementById('roleUniformList');
+      const list = document.getElementById('roleAssetList');
       list.innerHTML = '<div style="padding: 3rem; text-align: center; color: var(--color-text-secondary); font-weight: 600;">Cargando configuración...</div>';
 
       document.getElementById('roleConfigModal').classList.add('active');
 
-      const detailsBlock = document.getElementById('roleConfigDetails');
       const footerBlock = document.getElementById('roleConfigFooter');
 
-      let uniforms = [];
+      let savedItems = [];
+      let savedArea = '';
       try {
         const { data: { session } } = await window._supabase.auth.getSession();
         if (session) {
           const { data } = await window._supabase
             .from('role_definition')
-            .select('items, renewal_frequency')
+            .select('items, area')
             .eq('company_id', session.user.id)
             .ilike('role_name', roleName.trim())
             .maybeSingle();
 
           if (data) {
-            if (data.items) uniforms = data.items;
-            if (data.renewal_frequency) {
-              const slider = document.getElementById('renovacion-slider');
-              const valText = document.getElementById('renovacion-val');
-              if (slider && valText) {
-                slider.value = data.renewal_frequency;
-                valText.textContent = data.renewal_frequency + (data.renewal_frequency === 1 ? ' Mes' : ' Meses');
-              }
-            }
+            if (data.items) savedItems = data.items;
+            if (data.area) savedArea = data.area;
           }
         }
       } catch (err) {
         console.error('Error fetching role configuration:', err);
       }
-      currentRoleUniforms = uniforms;
+      currentRoleAssets = savedItems;
 
-      const catalog = ROLE_GARMENT_CATALOG[garmentCatalogKey(activeIndustry, roleName)] || [];
-      const hasSavedConfig = uniforms.length > 0;
+      const areaSelect = document.getElementById('roleAreaSelect');
+      const areaCustom = document.getElementById('roleAreaCustom');
+      if (areaSelect && areaCustom) {
+        const presetValues = Array.from(areaSelect.options).map(o => o.value);
+        if (savedArea && !presetValues.includes(savedArea)) {
+          areaSelect.value = 'otra';
+          areaCustom.style.display = 'block';
+          areaCustom.value = savedArea;
+        } else {
+          areaSelect.value = savedArea || '';
+          areaCustom.style.display = 'none';
+          areaCustom.value = '';
+        }
+      }
+
+      const catalog = ROLE_ASSET_CATALOG[assetCatalogKey(activeIndustry, roleName)] || [];
+      const hasSavedConfig = savedItems.length > 0;
 
       list.innerHTML = '';
 
-      if (detailsBlock) detailsBlock.style.display = 'block';
       if (footerBlock) footerBlock.style.display = 'flex';
 
       if (catalog.length === 0) {
         list.innerHTML = `
           <p style="text-align: center; color: var(--color-text-secondary); font-size: 0.875rem; padding: 1rem 0 1.5rem;">
-            Todavía no hay un catálogo predefinido de prendas para este rol.
+            Todavía no hay un catálogo predefinido de activos para este rol.
           </p>
         `;
-      } else {
-        catalog.forEach(option => {
-          const savedMatch = uniforms.find(u => u.name === option.name);
+        return;
+      }
+
+      ['fisico', 'digital'].forEach(cat => {
+        const optionsInCat = catalog.filter(o => (o.category || 'fisico') === cat);
+        if (optionsInCat.length === 0) return;
+
+        const label = document.createElement('div');
+        label.className = 'asset-category-label';
+        label.textContent = ASSET_CATEGORY_LABELS[cat] || cat;
+        list.appendChild(label);
+
+        optionsInCat.forEach(option => {
+          const savedMatch = savedItems.find(u => u.name === option.name);
           const checked = hasSavedConfig ? !!savedMatch : !!option.def;
           const qty = savedMatch ? (savedMatch.qty || 1) : option.qty;
+          const showsRenewal = option.tipo === 'uniforme';
+          const renewalMonths = (savedMatch && savedMatch.renovacion_meses) || option.renovacion_meses || 6;
 
           const div = document.createElement('div');
-          div.className = "role-uniform-item";
+          div.className = "role-asset-item";
           div.dataset.name = option.name;
-          div.style = "display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1rem; background: var(--color-smoke); border-radius: 12px; border: 1px solid var(--color-smoke-mid); margin-bottom: 0.6rem;";
+          div.dataset.category = option.category || 'fisico';
+          div.dataset.tipo = option.tipo || 'uniforme';
+          div.style = "display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; padding: 0.85rem 1rem; background: var(--color-smoke); border-radius: 12px; border: 1px solid var(--color-smoke-mid); margin-bottom: 0.6rem;";
           div.innerHTML = `
-            <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; flex: 1;">
-              <input type="checkbox" class="garment-check" ${checked ? 'checked' : ''} onchange="toggleGarmentItem(this)" style="width: 18px; height: 18px; accent-color: var(--color-cyan); cursor: pointer;">
+            <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; flex: 1; min-width: 160px;">
+              <input type="checkbox" class="asset-check" ${checked ? 'checked' : ''} onchange="toggleAssetItem(this)" style="width: 18px; height: 18px; accent-color: var(--color-cyan); cursor: pointer;">
               <span style="font-weight: 600; font-size: 0.9rem; color: var(--color-navy);">${option.name}</span>
+              <span class="asset-type-tag">${ASSET_TYPE_LABELS[option.tipo] || option.tipo || ''}</span>
             </label>
-            <div class="qty-stepper" style="display: ${checked ? 'flex' : 'none'}; align-items: center; gap: 0.75rem; background: white; padding: 0.35rem 0.75rem; border-radius: 8px; border: 1px solid var(--color-smoke-mid);">
-              <button type="button" onclick="changeQty(this, -1)" style="border: none; background: none; cursor: pointer; color: var(--color-text-secondary); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">-</button>
-              <span class="qty-val" style="min-width: 24px; text-align: center; font-weight: 700; color: var(--color-navy); font-size: 0.875rem;">${qty}</span>
-              <button type="button" onclick="changeQty(this, 1)" style="border: none; background: none; cursor: pointer; color: var(--color-cyan); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">+</button>
+            <div class="asset-item-controls" style="display: ${checked ? 'flex' : 'none'}; align-items: center; gap: 0.75rem;">
+              ${showsRenewal ? `
+              <div class="asset-renewal-input">
+                cada <input type="number" class="renewal-months" min="1" max="24" value="${renewalMonths}"> meses
+              </div>` : ''}
+              <div class="qty-stepper" style="display: flex; align-items: center; gap: 0.75rem; background: white; padding: 0.35rem 0.75rem; border-radius: 8px; border: 1px solid var(--color-smoke-mid);">
+                <button type="button" onclick="changeQty(this, -1)" style="border: none; background: none; cursor: pointer; color: var(--color-text-secondary); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">-</button>
+                <span class="qty-val" style="min-width: 24px; text-align: center; font-weight: 700; color: var(--color-navy); font-size: 0.875rem;">${qty}</span>
+                <button type="button" onclick="changeQty(this, 1)" style="border: none; background: none; cursor: pointer; color: var(--color-cyan); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">+</button>
+              </div>
             </div>
           `;
           list.appendChild(div);
         });
-      }
+      });
     }
 
-    function toggleGarmentItem(checkbox) {
-      const row = checkbox.closest('.role-uniform-item');
-      const stepper = row ? row.querySelector('.qty-stepper') : null;
-      if (stepper) stepper.style.display = checkbox.checked ? 'flex' : 'none';
+    function toggleAssetItem(checkbox) {
+      const row = checkbox.closest('.role-asset-item');
+      const controls = row ? row.querySelector('.asset-item-controls') : null;
+      if (controls) controls.style.display = checkbox.checked ? 'flex' : 'none';
     }
 
     function changeQty(btn, delta) {
@@ -1263,30 +1371,39 @@
     }
 
     async function saveRoleConfig() {
-      const itemsElements = document.querySelectorAll('#roleUniformList .role-uniform-item');
+      const itemsElements = document.querySelectorAll('#roleAssetList .role-asset-item');
 
-      const updatedUniforms = [];
+      const updatedItems = [];
       itemsElements.forEach(el => {
-        const checkbox = el.querySelector('.garment-check');
+        const checkbox = el.querySelector('.asset-check');
         if (!checkbox || !checkbox.checked) return;
 
         const qtySpan = el.querySelector('.qty-val');
         const qty = qtySpan ? parseInt(qtySpan.innerText) || 1 : 1;
-        const existing = currentRoleUniforms.find(u => u.name === el.dataset.name);
-        updatedUniforms.push({
-          name: el.dataset.name,
-          qty,
-          color: existing ? existing.color : 'Predeterminado',
-          available_sizes: existing ? existing.available_sizes : 'S-XL'
-        });
+        const existing = currentRoleAssets.find(u => u.name === el.dataset.name);
+        const category = el.dataset.category || 'fisico';
+        const tipo = el.dataset.tipo || 'uniforme';
+
+        const item = { name: el.dataset.name, qty, category, tipo };
+
+        if (tipo === 'uniforme') {
+          item.color = existing ? existing.color : 'Predeterminado';
+          item.available_sizes = existing ? existing.available_sizes : 'S-XL';
+          const renewalInput = el.querySelector('.renewal-months');
+          if (renewalInput) item.renovacion_meses = parseInt(renewalInput.value) || 6;
+        }
+
+        updatedItems.push(item);
       });
+
+      const areaSelect = document.getElementById('roleAreaSelect');
+      const areaCustom = document.getElementById('roleAreaCustom');
+      let areaValue = areaSelect ? areaSelect.value : '';
+      if (areaValue === 'otra') areaValue = areaCustom ? areaCustom.value.trim() : '';
 
       try {
         const { data: { session } } = await window._supabase.auth.getSession();
         if (!session) throw new Error("No autenticado");
-
-        const renewalSlider = document.getElementById('renovacion-slider');
-        const renewalFreq = renewalSlider ? parseInt(renewalSlider.value) : 6;
 
         // Use UPSERT or check if it exists
         const { data: existing } = await window._supabase
@@ -1299,7 +1416,7 @@
         if (existing) {
           const { error } = await window._supabase
             .from('role_definition')
-            .update({ items: updatedUniforms, renewal_frequency: renewalFreq })
+            .update({ items: updatedItems, area: areaValue })
             .eq('id', existing.id);
           if (error) throw error;
         } else {
@@ -1308,13 +1425,13 @@
             .insert({
               company_id: session.user.id,
               role_name: currentConfigRoleName,
-              items: updatedUniforms,
-              renewal_frequency: renewalFreq
+              items: updatedItems,
+              area: areaValue
             });
           if (error) throw error;
         }
 
-        showToast("Configuración Guardada", "La plantilla de uniformes para este rol ha sido actualizada.");
+        showToast("Configuración Guardada", "La plantilla de activos para este rol ha sido actualizada.");
         closeRoleConfig();
         // Refresh the UI to show the updated item count
         renderRoles(activeIndustry);
