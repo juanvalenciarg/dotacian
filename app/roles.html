@@ -796,6 +796,24 @@
             </div>
           </div>
         </div>
+
+        <!-- Confirm Modal (reusable, replaces native confirm()) -->
+        <div class="modal-overlay" id="confirmModal">
+          <div class="modal-content-lg" style="max-width: 400px;">
+            <div style="padding: 1.75rem;">
+              <h2 id="confirmModalTitle" style="font-size: 1.125rem; color: var(--color-navy); margin: 0 0 0.75rem;">
+                Confirmar acción</h2>
+              <p id="confirmModalMessage"
+                style="font-size: 0.9rem; color: var(--color-text-secondary); line-height: 1.5; margin: 0 0 1.75rem;">
+              </p>
+              <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+                <button class="btn btn-outline" onclick="closeConfirmModal()">Cancelar</button>
+                <button class="btn" id="confirmModalAcceptBtn" onclick="handleConfirmModalAccept()"
+                  style="background: #EF4444; color: white; border: none;">Aceptar</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
   </div>
   </main>
@@ -1041,24 +1059,52 @@
       }
     }
 
-    async function deleteRole(roleName) {
-      if (!confirm(`¿Eliminar el rol "${roleName}"? Esta acción no se puede deshacer.`)) return;
+    // Modal de confirmación propio (reemplaza confirm(), cuyo diálogo lo
+    // dibuja el navegador y no se puede restylear).
+    let confirmModalCallback = null;
 
-      try {
-        const { data: { session } } = await window._supabase.auth.getSession();
-        if (!session) return;
+    function showConfirmModal(message, onAccept, opts = {}) {
+      document.getElementById('confirmModalTitle').textContent = opts.title || 'Confirmar acción';
+      document.getElementById('confirmModalMessage').textContent = message;
+      const acceptBtn = document.getElementById('confirmModalAcceptBtn');
+      acceptBtn.textContent = opts.acceptLabel || 'Aceptar';
+      confirmModalCallback = onAccept;
+      document.getElementById('confirmModal').classList.add('active');
+    }
 
-        await window._supabase.from('company_roles').delete()
-          .eq('company_id', session.user.id).eq('role_name', roleName);
-        await window._supabase.from('role_definition').delete()
-          .eq('company_id', session.user.id).eq('role_name', roleName);
+    function closeConfirmModal() {
+      document.getElementById('confirmModal').classList.remove('active');
+      confirmModalCallback = null;
+    }
 
-        showToast('Rol Eliminado', `El rol "${roleName}" fue eliminado.`);
-        renderRoles();
-      } catch (err) {
-        console.error('Error deleting role:', err);
-        showToast('Error', 'Hubo un problema eliminando el rol.', 'error');
-      }
+    function handleConfirmModalAccept() {
+      const callback = confirmModalCallback;
+      closeConfirmModal();
+      if (callback) callback();
+    }
+
+    function deleteRole(roleName) {
+      showConfirmModal(
+        `¿Eliminar el rol "${roleName}"? Esta acción no se puede deshacer.`,
+        async () => {
+          try {
+            const { data: { session } } = await window._supabase.auth.getSession();
+            if (!session) return;
+
+            await window._supabase.from('company_roles').delete()
+              .eq('company_id', session.user.id).eq('role_name', roleName);
+            await window._supabase.from('role_definition').delete()
+              .eq('company_id', session.user.id).eq('role_name', roleName);
+
+            showToast('Rol Eliminado', `El rol "${roleName}" fue eliminado.`);
+            renderRoles();
+          } catch (err) {
+            console.error('Error deleting role:', err);
+            showToast('Error', 'Hubo un problema eliminando el rol.', 'error');
+          }
+        },
+        { title: 'Eliminar rol', acceptLabel: 'Eliminar' }
+      );
     }
 
     // Initial render
