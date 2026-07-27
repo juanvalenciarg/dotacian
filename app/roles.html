@@ -384,6 +384,107 @@
     .status-inactive {
       color: var(--color-text-muted);
     }
+
+    /* ── Custom Select (replaces native <select> popups, which the OS
+       renders and CSS cannot restyle) ─────────────────────────────── */
+    .custom-select-wrapper {
+      position: relative;
+    }
+
+    .custom-select-wrapper select {
+      display: none;
+    }
+
+    .custom-select-trigger {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--color-smoke-mid);
+      border-radius: var(--radius-md);
+      background: white;
+      color: var(--color-navy);
+      font-family: var(--font-family-primary);
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      text-align: left;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .custom-select-trigger:hover {
+      border-color: var(--color-cyan);
+    }
+
+    .custom-select-wrapper.open .custom-select-trigger {
+      border-color: var(--color-cyan);
+      box-shadow: 0 0 0 4px var(--color-cyan-dim);
+    }
+
+    .custom-select-trigger .cs-label.placeholder {
+      color: var(--color-text-muted);
+    }
+
+    .custom-select-trigger svg {
+      flex-shrink: 0;
+      color: #94A3B8;
+      transition: transform 0.2s;
+    }
+
+    .custom-select-wrapper.open .custom-select-trigger svg {
+      transform: rotate(180deg);
+    }
+
+    .custom-select-panel {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #E2E8F0;
+      border-radius: 0.75rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      max-height: 260px;
+      overflow-y: auto;
+      padding: 0.4rem;
+      animation: slideDownIn 0.15s ease-out;
+    }
+
+    .custom-select-wrapper.open .custom-select-panel {
+      display: block;
+    }
+
+    .custom-select-option {
+      padding: 0.6rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: var(--color-navy);
+      cursor: pointer;
+    }
+
+    .custom-select-option:hover {
+      background: var(--color-smoke);
+    }
+
+    .custom-select-option.selected {
+      background: var(--color-cyan-dim);
+      font-weight: 700;
+    }
+
+    @keyframes slideDownIn {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
 </head>
 
@@ -937,8 +1038,98 @@
       renderRoles();
     };
 
+    // Reemplaza un <select> nativo por un trigger + panel con el estilo del
+    // sitio (el popup nativo del select lo dibuja el sistema operativo y no
+    // se puede restylear con CSS). El <select> original se mantiene oculto
+    // como fuente de verdad, así el resto del código (onchange, .value) no
+    // cambia.
+    function initCustomSelect(select) {
+      if (!select || select.dataset.customized) return;
+      select.dataset.customized = '1';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'custom-select-wrapper';
+      select.parentNode.insertBefore(wrapper, select);
+      wrapper.appendChild(select);
+
+      const trigger = document.createElement('button');
+      trigger.type = 'button';
+      trigger.className = 'custom-select-trigger';
+      trigger.innerHTML = `<span class="cs-label"></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+      wrapper.appendChild(trigger);
+
+      const panel = document.createElement('div');
+      panel.className = 'custom-select-panel';
+      wrapper.appendChild(panel);
+
+      function updateLabel() {
+        const selectedOption = select.options[select.selectedIndex];
+        const label = trigger.querySelector('.cs-label');
+        label.textContent = selectedOption ? selectedOption.textContent : '';
+        label.classList.toggle('placeholder', !select.value);
+      }
+
+      function renderPanel() {
+        panel.innerHTML = '';
+        Array.from(select.options).forEach(opt => {
+          const item = document.createElement('div');
+          item.className = 'custom-select-option' + (opt.value === select.value ? ' selected' : '');
+          item.textContent = opt.textContent;
+          item.onclick = (e) => {
+            e.stopPropagation();
+            select.value = opt.value;
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            updateLabel();
+            closePanel();
+          };
+          panel.appendChild(item);
+        });
+      }
+
+      function openPanel() {
+        document.querySelectorAll('.custom-select-wrapper.open').forEach(w => { if (w !== wrapper) w.classList.remove('open'); });
+        renderPanel();
+        wrapper.classList.add('open');
+      }
+
+      function closePanel() {
+        wrapper.classList.remove('open');
+      }
+
+      trigger.onclick = (e) => {
+        e.stopPropagation();
+        wrapper.classList.contains('open') ? closePanel() : openPanel();
+      };
+
+      document.addEventListener('click', (e) => {
+        if (!wrapper.contains(e.target)) closePanel();
+      });
+
+      // Si el código de la página cambia las <option> disponibles
+      // dinámicamente (ej. Tipo según Categoría), refresca la etiqueta.
+      new MutationObserver(updateLabel).observe(select, { childList: true });
+
+      wrapper.updateCustomLabel = updateLabel;
+      updateLabel();
+    }
+
+    // Cuando el código asigna select.value directamente (sin pasar por el
+    // trigger), esto sincroniza la etiqueta visible del dropdown.
+    function refreshCustomSelectLabel(select) {
+      const wrapper = select && select.closest('.custom-select-wrapper');
+      if (wrapper && wrapper.updateCustomLabel) wrapper.updateCustomLabel();
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       initPortal();
+    });
+
+    // Listener independiente: si initPortal() falla, no debe impedir que los
+    // dropdowns se inicialicen.
+    document.addEventListener('DOMContentLoaded', () => {
+      ['newRoleArea', 'roleAreaSelect', 'newAssetCategory', 'newAssetType'].forEach(id => {
+        initCustomSelect(document.getElementById(id));
+      });
     });
 
     function toggleSidebar() {
@@ -963,8 +1154,8 @@
     }
 
     function createAssetRowElement(item, checked) {
-      const showsRenewal = item.tipo === 'uniforme';
-      const renewalMonths = item.renovacion_meses || 6;
+      const requiereReposicion = !!item.requiere_reposicion;
+      const reposicionMeses = item.reposicion_meses || 6;
 
       const div = document.createElement('div');
       div.className = "role-asset-item";
@@ -978,11 +1169,14 @@
           <span style="font-weight: 600; font-size: 0.9rem; color: var(--color-navy);">${item.name}</span>
           <span class="asset-type-tag">${ASSET_TYPE_LABELS[item.tipo] || item.tipo || ''}</span>
         </label>
-        <div class="asset-item-controls" style="display: ${checked ? 'flex' : 'none'}; align-items: center; gap: 0.75rem;">
-          ${showsRenewal ? `
-          <div class="asset-renewal-input">
-            cada <input type="number" class="renewal-months" min="1" max="24" value="${renewalMonths}"> meses
-          </div>` : ''}
+        <div class="asset-item-controls" style="display: ${checked ? 'flex' : 'none'}; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <label class="reposicion-toggle" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--color-text-secondary); cursor: pointer; white-space: nowrap;">
+            <input type="checkbox" class="requiere-reposicion" ${requiereReposicion ? 'checked' : ''} onchange="toggleReposicionInput(this)" style="width: 15px; height: 15px; accent-color: var(--color-cyan); cursor: pointer;">
+            ¿Requiere reposición?
+          </label>
+          <div class="asset-renewal-input" style="display: ${requiereReposicion ? 'flex' : 'none'};">
+            cada <input type="number" class="renewal-months" min="1" max="24" value="${reposicionMeses}"> meses
+          </div>
           <div class="qty-stepper" style="display: flex; align-items: center; gap: 0.75rem; background: white; padding: 0.35rem 0.75rem; border-radius: 8px; border: 1px solid var(--color-smoke-mid);">
             <button type="button" onclick="changeQty(this, -1)" style="border: none; background: none; cursor: pointer; color: var(--color-text-secondary); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">-</button>
             <span class="qty-val" style="min-width: 24px; text-align: center; font-weight: 700; color: var(--color-navy); font-size: 0.875rem;">${item.qty || 1}</span>
@@ -1036,22 +1230,39 @@
       }
     }
 
+    function toggleNewRoleAssetQty(checkbox) {
+      const row = checkbox.closest('.new-role-asset-row');
+      const stepper = row ? row.querySelector('.qty-stepper') : null;
+      if (stepper) stepper.style.display = checkbox.checked ? 'flex' : 'none';
+    }
+
     function renderSubcategoryPickers(category, container) {
       const subcats = ASSET_CATALOG_TREE[category];
       container.innerHTML = Object.keys(subcats).map(key => {
         const sub = subcats[key];
         const itemsHtml = sub.items.map(name => `
-          <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; padding: 0.3rem 0; cursor: pointer;">
-            <input type="checkbox" class="new-role-asset-check" data-category="${category}" data-tipo="${sub.tipo}" data-name="${name}" style="width: 16px; height: 16px; accent-color: var(--color-cyan); cursor: pointer;">
-            ${name}
-          </label>
+          <div class="new-role-asset-row" style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.3rem 0;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer; flex: 1;">
+              <input type="checkbox" class="new-role-asset-check" data-category="${category}" data-tipo="${sub.tipo}" data-name="${name}" onchange="toggleNewRoleAssetQty(this)" style="width: 16px; height: 16px; accent-color: var(--color-cyan); cursor: pointer;">
+              ${name}
+            </label>
+            <div class="qty-stepper" style="display: none; align-items: center; gap: 0.5rem; background: white; padding: 0.25rem 0.5rem; border-radius: 6px; border: 1px solid var(--color-smoke-mid);">
+              <button type="button" onclick="changeQty(this, -1)" style="border: none; background: none; cursor: pointer; color: var(--color-text-secondary); font-size: 1rem; font-weight: bold; width: 20px; height: 20px;">-</button>
+              <span class="qty-val" style="min-width: 18px; text-align: center; font-weight: 700; color: var(--color-navy); font-size: 0.8rem;">1</span>
+              <button type="button" onclick="changeQty(this, 1)" style="border: none; background: none; cursor: pointer; color: var(--color-cyan); font-size: 1rem; font-weight: bold; width: 20px; height: 20px;">+</button>
+            </div>
+          </div>
         `).join('');
         return `
           <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.85rem 1rem;">
             <div style="font-weight: 700; font-size: 0.8125rem; color: var(--color-navy); margin-bottom: 0.4rem;">${sub.label}</div>
             <div style="display: flex; flex-direction: column;">${itemsHtml}</div>
-            <input type="text" class="new-role-other-input" data-category="${category}" data-tipo="${sub.tipo}" placeholder="Otro (opcional)"
-              style="margin-top: 0.5rem; width: 100%; padding: 0.5rem 0.65rem; border: 1px solid var(--color-smoke-mid); border-radius: 6px; font-size: 0.8rem;">
+            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+              <input type="text" class="new-role-other-input" data-category="${category}" data-tipo="${sub.tipo}" placeholder="Otro (opcional)"
+                style="flex: 1; width: 100%; padding: 0.5rem 0.65rem; border: 1px solid var(--color-smoke-mid); border-radius: 6px; font-size: 0.8rem;">
+              <input type="number" class="new-role-other-qty" min="1" value="1" title="Cantidad"
+                style="width: 60px; padding: 0.5rem 0.4rem; border: 1px solid var(--color-smoke-mid); border-radius: 6px; font-size: 0.8rem; text-align: center;">
+            </div>
           </div>
         `;
       }).join('');
@@ -1060,15 +1271,24 @@
     function collectNewRoleAssets() {
       const items = [];
       document.querySelectorAll('.new-role-asset-check:checked').forEach(cb => {
-        const item = { name: cb.dataset.name, category: cb.dataset.category, tipo: cb.dataset.tipo, qty: 1 };
-        if (item.tipo === 'uniforme') { item.color = 'Predeterminado'; item.available_sizes = 'S-XL'; item.renovacion_meses = 6; }
+        const row = cb.closest('.new-role-asset-row');
+        const qtyVal = row ? row.querySelector('.qty-val') : null;
+        const qty = qtyVal ? parseInt(qtyVal.textContent) || 1 : 1;
+        const item = { name: cb.dataset.name, category: cb.dataset.category, tipo: cb.dataset.tipo, qty };
+        if (item.tipo === 'uniforme') { item.color = 'Predeterminado'; item.available_sizes = 'S-XL'; }
+        item.requiere_reposicion = item.tipo === 'uniforme';
+        if (item.requiere_reposicion) item.reposicion_meses = 6;
         items.push(item);
       });
       document.querySelectorAll('.new-role-other-input').forEach(input => {
         const name = input.value.trim();
         if (!name) return;
-        const item = { name, category: input.dataset.category, tipo: input.dataset.tipo, qty: 1 };
-        if (item.tipo === 'uniforme') { item.color = 'Predeterminado'; item.available_sizes = 'S-XL'; item.renovacion_meses = 6; }
+        const qtyInput = input.parentElement.querySelector('.new-role-other-qty');
+        const qty = qtyInput ? parseInt(qtyInput.value) || 1 : 1;
+        const item = { name, category: input.dataset.category, tipo: input.dataset.tipo, qty };
+        if (item.tipo === 'uniforme') { item.color = 'Predeterminado'; item.available_sizes = 'S-XL'; }
+        item.requiere_reposicion = item.tipo === 'uniforme';
+        if (item.requiere_reposicion) item.reposicion_meses = 6;
         items.push(item);
       });
       return items;
@@ -1090,6 +1310,7 @@
       if (show) {
         document.getElementById('newAssetName').value = '';
         document.getElementById('newAssetCategory').value = 'fisico';
+        refreshCustomSelectLabel(document.getElementById('newAssetCategory'));
         updateAssetTypeOptions();
         document.getElementById('newAssetQty').value = 1;
       }
@@ -1121,8 +1342,9 @@
       if (tipo === 'uniforme') {
         item.color = 'Predeterminado';
         item.available_sizes = 'S-XL';
-        item.renovacion_meses = 6;
       }
+      item.requiere_reposicion = tipo === 'uniforme';
+      if (item.requiere_reposicion) item.reposicion_meses = 6;
       list.appendChild(createAssetRowElement(item, true));
       toggleAddAssetForm(false);
     }
@@ -1175,6 +1397,7 @@
           areaCustom.style.display = 'none';
           areaCustom.value = '';
         }
+        refreshCustomSelectLabel(areaSelect);
       }
       const subareaInput = document.getElementById('roleSubareaInput');
       if (subareaInput) subareaInput.value = savedSubarea;
@@ -1210,6 +1433,12 @@
       if (controls) controls.style.display = checkbox.checked ? 'flex' : 'none';
     }
 
+    function toggleReposicionInput(checkbox) {
+      const controls = checkbox.closest('.asset-item-controls');
+      const input = controls ? controls.querySelector('.asset-renewal-input') : null;
+      if (input) input.style.display = checkbox.checked ? 'flex' : 'none';
+    }
+
     function changeQty(btn, delta) {
       const span = btn.parentElement.querySelector('.qty-val');
       let current = parseInt(span.innerText);
@@ -1240,8 +1469,13 @@
         if (tipo === 'uniforme') {
           item.color = existing ? existing.color : 'Predeterminado';
           item.available_sizes = existing ? existing.available_sizes : 'S-XL';
+        }
+
+        const requiereReposicion = el.querySelector('.requiere-reposicion')?.checked || false;
+        item.requiere_reposicion = requiereReposicion;
+        if (requiereReposicion) {
           const renewalInput = el.querySelector('.renewal-months');
-          if (renewalInput) item.renovacion_meses = parseInt(renewalInput.value) || 6;
+          item.reposicion_meses = parseInt(renewalInput?.value) || 6;
         }
 
         updatedItems.push(item);
@@ -1298,6 +1532,7 @@
       document.getElementById('newRoleName').value = '';
       document.getElementById('newRoleDesc').value = '';
       document.getElementById('newRoleArea').value = '';
+      refreshCustomSelectLabel(document.getElementById('newRoleArea'));
       document.getElementById('newRoleSubarea').value = '';
       document.getElementById('newRoleCatFisico').checked = false;
       document.getElementById('newRoleCatDigital').checked = false;
