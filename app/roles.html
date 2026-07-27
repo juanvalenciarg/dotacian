@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
+  <script src="/assets/js/i18n.js?v=1"></script>
   <style>
     /* Main Content Refinement */
     .main-content {
@@ -530,23 +531,23 @@
       <nav class="sidebar-nav">
         <a href="/app/dashboard" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
-          <span class="nav-label">Dashboard</span>
+          <span class="nav-label" data-i18n="nav.dashboard">Dashboard</span>
         </a>
         <a href="/app/roles" class="nav-item active">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
-          <span class="nav-label">Roles</span>
+          <span class="nav-label" data-i18n="nav.roles">Roles</span>
         </a>
         <a href="/app/empleados" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
-          <span class="nav-label">Empleados</span>
+          <span class="nav-label" data-i18n="nav.empleados">Empleados</span>
         </a>
         <a href="/app/uniformes" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg></span>
-          <span class="nav-label">Uniformes</span>
+          <span class="nav-label" data-i18n="nav.uniformes">Uniformes</span>
         </a>
         <a href="/app/bodega" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg></span>
-          <span class="nav-label">Bodega</span>
+          <span class="nav-label" data-i18n="nav.bodega">Bodega</span>
         </a>
       </nav>
 
@@ -562,12 +563,19 @@
 
           <!-- Popover (Abriendo hacia arriba y a la derecha) -->
           <div id="user-popover" class="user-popover" style="left: 60px; bottom: 0; top: auto; right: auto; min-width: 250px;">
-            <div class="popover-label">Usuario</div>
+            <div class="popover-label" data-i18n="popover.user">Usuario</div>
             <div id="pop-user-name" class="popover-value">Cargando...</div>
-            <div class="popover-label">Correo Electrónico</div>
+            <div class="popover-label" data-i18n="popover.email">Correo Electrónico</div>
             <div id="pop-user-email" class="popover-value" style="margin-bottom: 0;">Cargando...</div>
-            <div class="popover-label" style="margin-top: 1rem;">País</div>
+            <div class="popover-label" style="margin-top: 1rem;" data-i18n="popover.country">País</div>
             <div id="version-tag" style="margin-top: 0.25rem; display: flex;"></div>
+            <div class="popover-label" style="margin-top: 1rem;" data-i18n="popover.language">Idioma</div>
+            <div style="display: flex; gap: 0.5rem; margin-top: 0.35rem;">
+              <button type="button" id="langBtnEs" onclick="setLanguage('es')"
+                style="flex: 1; padding: 0.35rem 0; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; border: 1px solid var(--color-smoke-mid); background: white; color: var(--color-navy);">ES</button>
+              <button type="button" id="langBtnEn" onclick="setLanguage('en')"
+                style="flex: 1; padding: 0.35rem 0; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; border: 1px solid var(--color-smoke-mid); background: white; color: var(--color-navy);">EN</button>
+            </div>
             <hr style="margin: 1rem 0; border: none; border-top: 1px solid var(--color-smoke-mid);">
             <a href="#"
               style="color: var(--color-navy); font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; margin-bottom: 0.5rem; transition: color 0.2s;"
@@ -576,7 +584,7 @@
                 <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
                 <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
               </svg>
-              Alertas
+              <span data-i18n="popover.alerts">Alertas</span>
             </a>
             <a href="/configuracion.html"
               style="color: var(--color-navy); font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; margin-bottom: 0.5rem; transition: color 0.2s;"
@@ -586,7 +594,7 @@
                   d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0-2.73.73l.15-.08a2 2 0 0 1-2 0l.43.25a2 2 0 0 1-1-1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1-1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
                 <circle cx="12" cy="12" r="3" />
               </svg>
-              Configuración
+              <span data-i18n="popover.settings">Configuración</span>
             </a>
             <a href="/login.html"
               style="color: #EF4444; font-size: 0.8125rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; transition: color 0.2s;"
@@ -596,7 +604,7 @@
                 <polyline points="16 17 21 12 16 7"></polyline>
                 <line x1="21" y1="12" x2="9" y2="12"></line>
               </svg>
-              Cerrar Sesión
+              <span data-i18n="popover.logout">Cerrar Sesión</span>
             </a>
           </div>
         </div>
@@ -621,12 +629,12 @@
       <div class="dashboard-content-wrapper" style="padding-top: 5rem;">
         <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end;">
           <div>
-            <h1 class="dot-greeting" style="text-align: left; margin-bottom: 0.5rem; font-size: 3rem; background: linear-gradient(90deg, #94A3B8 0%, #1E293B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Configuración de Roles</h1>
-            <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;">Crea y administra los roles de tu empresa.</p>
+            <h1 class="dot-greeting" style="text-align: left; margin-bottom: 0.5rem; font-size: 3rem; background: linear-gradient(90deg, #94A3B8 0%, #1E293B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" data-i18n="page.rolesTitle">Configuración de Roles</h1>
+            <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;" data-i18n="page.rolesSubtitle">Crea y administra los roles de tu empresa.</p>
           </div>
         </div>
         <div class="app-container" style="padding: 0; background: transparent; box-shadow: none;">
-          <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Roles de tu empresa</h2>
+          <h2 style="font-size: 1.25rem; margin-bottom: 1rem;" data-i18n="page.rolesHeading">Roles de tu empresa</h2>
 
           <div class="roles-grid" id="rolesGrid">
             <!-- Roles will be rendered dynamically here -->
@@ -638,8 +646,8 @@
           <div class="modal-content-lg" style="max-width: 550px;">
             <div class="modal-header">
               <div>
-                <h2 id="configRoleTitle">Configurar Activos</h2>
-                <p style="font-size: 0.8125rem; color: var(--color-text-secondary); margin: 0;">Define los activos
+                <h2 id="configRoleTitle" data-i18n="roleConfig.titleDefault">Configurar Activos</h2>
+                <p style="font-size: 0.8125rem; color: var(--color-text-secondary); margin: 0;" data-i18n="roleConfig.desc">Define los activos
                   físicos y digitales que componen la plantilla base de este rol.</p>
               </div>
               <button class="btn-close" onclick="closeRoleConfig()">✕</button>
@@ -648,30 +656,30 @@
               <div id="roleAreaBlock" style="margin-bottom: 1.5rem; display: flex; gap: 1rem;">
                 <div style="flex: 1;">
                   <label
-                    style="display: block; font-size: 0.8125rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.5rem;">Área</label>
+                    style="display: block; font-size: 0.8125rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.5rem;" data-i18n="roleConfig.area">Área</label>
                   <select id="roleAreaSelect" onchange="handleAreaSelectChange()"
                     style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); font-family: var(--font-family-primary); background: white; color: var(--color-navy);">
-                    <option value="">Selecciona un área...</option>
-                    <option value="Dirección / Gerencia">Dirección / Gerencia</option>
-                    <option value="Administración">Administración</option>
-                    <option value="Operaciones">Operaciones</option>
-                    <option value="Ventas">Ventas</option>
-                    <option value="Producción / Cocina">Producción / Cocina</option>
-                    <option value="Logística">Logística</option>
-                    <option value="Seguridad">Seguridad</option>
-                    <option value="Limpieza">Limpieza</option>
-                    <option value="Atención al Cliente">Atención al Cliente</option>
-                    <option value="TI">TI</option>
-                    <option value="RRHH">RRHH</option>
-                    <option value="otra">Otra (especificar)</option>
+                    <option value="" data-i18n="roleConfig.selectArea">Selecciona un área...</option>
+                    <option value="Dirección / Gerencia" data-i18n="area.direccion">Dirección / Gerencia</option>
+                    <option value="Administración" data-i18n="area.administracion">Administración</option>
+                    <option value="Operaciones" data-i18n="area.operaciones">Operaciones</option>
+                    <option value="Ventas" data-i18n="area.ventas">Ventas</option>
+                    <option value="Producción / Cocina" data-i18n="area.produccion">Producción / Cocina</option>
+                    <option value="Logística" data-i18n="area.logistica">Logística</option>
+                    <option value="Seguridad" data-i18n="area.seguridad">Seguridad</option>
+                    <option value="Limpieza" data-i18n="area.limpieza">Limpieza</option>
+                    <option value="Atención al Cliente" data-i18n="area.atencion">Atención al Cliente</option>
+                    <option value="TI" data-i18n="area.ti">TI</option>
+                    <option value="RRHH" data-i18n="area.rrhh">RRHH</option>
+                    <option value="otra" data-i18n="area.otra">Otra (especificar)</option>
                   </select>
-                  <input type="text" id="roleAreaCustom" placeholder="Escribe el área..."
+                  <input type="text" id="roleAreaCustom" placeholder="Escribe el área..." data-i18n-placeholder="roleConfig.areaCustomPlaceholder"
                     style="display: none; margin-top: 0.5rem; width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); font-family: var(--font-family-primary);">
                 </div>
                 <div style="flex: 1;">
                   <label
-                    style="display: block; font-size: 0.8125rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.5rem;">Subárea (opcional)</label>
-                  <input type="text" id="roleSubareaInput" placeholder="Ej. Cocina"
+                    style="display: block; font-size: 0.8125rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.5rem;" data-i18n="roleConfig.subarea">Subárea (opcional)</label>
+                  <input type="text" id="roleSubareaInput" placeholder="Ej. Cocina" data-i18n-placeholder="roleConfig.subareaPlaceholder"
                     style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); font-family: var(--font-family-primary);">
                 </div>
               </div>
@@ -681,44 +689,44 @@
               </div>
 
               <button type="button" class="btn btn-outline" id="showAddAssetBtn" onclick="toggleAddAssetForm(true)"
-                style="width: 100%; margin-top: 0.5rem; font-size: 0.8rem; padding: 0.6rem;">+ Agregar Activo</button>
+                style="width: 100%; margin-top: 0.5rem; font-size: 0.8rem; padding: 0.6rem;" data-i18n="roleConfig.addAsset">+ Agregar Activo</button>
 
               <div id="addAssetForm" style="display: none; margin-top: 1rem; padding: 1rem; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; flex-direction: column; gap: 0.75rem;">
                 <div class="form-row">
-                  <label>Nombre del Activo</label>
-                  <input type="text" id="newAssetName" placeholder="Ej. Impresora, Silla ergonómica...">
+                  <label data-i18n="roleConfig.assetName">Nombre del Activo</label>
+                  <input type="text" id="newAssetName" placeholder="Ej. Impresora, Silla ergonómica..." data-i18n-placeholder="roleConfig.assetNamePlaceholder">
                 </div>
                 <div style="display: flex; gap: 0.75rem;">
                   <div class="form-row" style="flex: 1;">
-                    <label>Categoría</label>
+                    <label data-i18n="roleConfig.category">Categoría</label>
                     <select id="newAssetCategory" onchange="updateAssetTypeOptions()"
                       style="width: 100%; padding: 0.65rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); background: white;">
-                      <option value="fisico">Físico</option>
-                      <option value="digital">Digital</option>
+                      <option value="fisico" data-i18n="category.fisico">Físico</option>
+                      <option value="digital" data-i18n="category.digital">Digital</option>
                     </select>
                   </div>
                   <div class="form-row" style="flex: 1;">
-                    <label>Tipo</label>
+                    <label data-i18n="roleConfig.type">Tipo</label>
                     <select id="newAssetType"
                       style="width: 100%; padding: 0.65rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); background: white;">
                     </select>
                   </div>
                   <div class="form-row" style="width: 80px;">
-                    <label>Cant.</label>
+                    <label data-i18n="roleConfig.qty">Cant.</label>
                     <input type="number" id="newAssetQty" value="1" min="1"
                       style="width: 100%; padding: 0.65rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md);">
                   </div>
                 </div>
                 <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
-                  <button type="button" class="btn btn-outline" style="font-size: 0.8rem;" onclick="toggleAddAssetForm(false)">Cancelar</button>
-                  <button type="button" class="btn btn-primary" style="font-size: 0.8rem;" onclick="addCustomAssetRow()">Agregar</button>
+                  <button type="button" class="btn btn-outline" style="font-size: 0.8rem;" onclick="toggleAddAssetForm(false)" data-i18n="roleConfig.cancel">Cancelar</button>
+                  <button type="button" class="btn btn-primary" style="font-size: 0.8rem;" onclick="addCustomAssetRow()" data-i18n="roleConfig.add">Agregar</button>
                 </div>
               </div>
 
               <div class="modal-footer" id="roleConfigFooter"
                 style="margin-top: 2rem; display: flex; justify-content: flex-end; gap: 1rem; border-top: 1px solid var(--color-smoke); padding-top: 1.5rem;">
-                <button class="btn btn-outline" onclick="closeRoleConfig()">Cancelar</button>
-                <button class="btn btn-primary" onclick="saveRoleConfig()">Guardar Cambios</button>
+                <button class="btn btn-outline" onclick="closeRoleConfig()" data-i18n="roleConfig.cancel">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveRoleConfig()" data-i18n="roleConfig.saveChanges">Guardar Cambios</button>
               </div>
             </div>
           </div>
@@ -729,8 +737,8 @@
           <div class="modal-content-lg" style="max-width: 560px; max-height: 88vh; display: flex; flex-direction: column;">
             <div class="modal-header">
               <div>
-                <h2>Crear Nuevo Rol</h2>
-                <p style="font-size: 0.8125rem; color: var(--color-text-secondary); margin: 0;">Define un nuevo perfil
+                <h2 data-i18n="newRole.title">Crear Nuevo Rol</h2>
+                <p style="font-size: 0.8125rem; color: var(--color-text-secondary); margin: 0;" data-i18n="newRole.desc">Define un nuevo perfil
                   operativo para tu empresa.</p>
               </div>
               <button class="btn-close" onclick="closeNewRoleModal()">✕</button>
@@ -738,49 +746,49 @@
             <div style="padding: 1.5rem; overflow-y: auto;">
               <div class="modal-form" style="display: flex; flex-direction: column; gap: 1.25rem;">
                 <div class="form-row">
-                  <label>Nombre del Rol</label>
-                  <input type="text" id="newRoleName" placeholder="Ej. Supervisor de Piso">
+                  <label data-i18n="newRole.roleName">Nombre del Rol</label>
+                  <input type="text" id="newRoleName" placeholder="Ej. Supervisor de Piso" data-i18n-placeholder="newRole.roleNamePlaceholder">
                 </div>
                 <div class="form-row">
-                  <label>Descripción</label>
-                  <textarea id="newRoleDesc" placeholder="Describe brevemente las funciones de este rol..."
+                  <label data-i18n="newRole.description">Descripción</label>
+                  <textarea id="newRoleDesc" placeholder="Describe brevemente las funciones de este rol..." data-i18n-placeholder="newRole.descriptionPlaceholder"
                     style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); font-family: var(--font-family-primary); height: 80px; resize: none;"></textarea>
                 </div>
                 <div style="display: flex; gap: 1rem;">
                   <div class="form-row" style="flex: 1;">
-                    <label>Área</label>
+                    <label data-i18n="roleConfig.area">Área</label>
                     <select id="newRoleArea"
                       style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); font-family: var(--font-family-primary); background: white; color: var(--color-navy);">
-                      <option value="">Selecciona un área...</option>
-                      <option value="Dirección / Gerencia">Dirección / Gerencia</option>
-                      <option value="Administración">Administración</option>
-                      <option value="Operaciones">Operaciones</option>
-                      <option value="Ventas">Ventas</option>
-                      <option value="Producción / Cocina">Producción / Cocina</option>
-                      <option value="Logística">Logística</option>
-                      <option value="Seguridad">Seguridad</option>
-                      <option value="Limpieza">Limpieza</option>
-                      <option value="Atención al Cliente">Atención al Cliente</option>
-                      <option value="TI">TI</option>
-                      <option value="RRHH">RRHH</option>
+                      <option value="" data-i18n="roleConfig.selectArea">Selecciona un área...</option>
+                      <option value="Dirección / Gerencia" data-i18n="area.direccion">Dirección / Gerencia</option>
+                      <option value="Administración" data-i18n="area.administracion">Administración</option>
+                      <option value="Operaciones" data-i18n="area.operaciones">Operaciones</option>
+                      <option value="Ventas" data-i18n="area.ventas">Ventas</option>
+                      <option value="Producción / Cocina" data-i18n="area.produccion">Producción / Cocina</option>
+                      <option value="Logística" data-i18n="area.logistica">Logística</option>
+                      <option value="Seguridad" data-i18n="area.seguridad">Seguridad</option>
+                      <option value="Limpieza" data-i18n="area.limpieza">Limpieza</option>
+                      <option value="Atención al Cliente" data-i18n="area.atencion">Atención al Cliente</option>
+                      <option value="TI" data-i18n="area.ti">TI</option>
+                      <option value="RRHH" data-i18n="area.rrhh">RRHH</option>
                     </select>
                   </div>
                   <div class="form-row" style="flex: 1;">
-                    <label>Subárea (opcional)</label>
-                    <input type="text" id="newRoleSubarea" placeholder="Ej. Cocina">
+                    <label data-i18n="roleConfig.subarea">Subárea (opcional)</label>
+                    <input type="text" id="newRoleSubarea" placeholder="Ej. Cocina" data-i18n-placeholder="roleConfig.subareaPlaceholder">
                   </div>
                 </div>
 
                 <div style="border-top: 1px solid var(--color-smoke); padding-top: 1.25rem;">
-                  <label style="display: block; font-weight: 700; font-size: 0.875rem; color: var(--color-navy); margin-bottom: 0.6rem;">Tipo de activos a entregar</label>
+                  <label style="display: block; font-weight: 700; font-size: 0.875rem; color: var(--color-navy); margin-bottom: 0.6rem;" data-i18n="newRole.assetTypesLabel">Tipo de activos a entregar</label>
                   <div style="display: flex; gap: 1.5rem; margin-bottom: 1rem;">
                     <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.875rem; font-weight: 600; color: var(--color-navy);">
                       <input type="checkbox" id="newRoleCatFisico" onchange="toggleNewRoleCategory('fisico')" style="width: 18px; height: 18px; accent-color: var(--color-cyan); cursor: pointer;">
-                      Físico
+                      <span data-i18n="newRole.fisico">Físico</span>
                     </label>
                     <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.875rem; font-weight: 600; color: var(--color-navy);">
                       <input type="checkbox" id="newRoleCatDigital" onchange="toggleNewRoleCategory('digital')" style="width: 18px; height: 18px; accent-color: var(--color-cyan); cursor: pointer;">
-                      Digital
+                      <span data-i18n="newRole.digital">Digital</span>
                     </label>
                   </div>
                   <div id="newRoleFisicoSubcats" style="display: none; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem;"></div>
@@ -791,8 +799,8 @@
 
             <div class="modal-footer"
               style="margin: 0; display: flex; justify-content: flex-end; gap: 1rem; border-top: 1px solid var(--color-smoke); padding: 1.5rem;">
-              <button class="btn btn-outline" onclick="closeNewRoleModal()">Cancelar</button>
-              <button class="btn btn-primary" onclick="createNewRole()">Crear Rol</button>
+              <button class="btn btn-outline" onclick="closeNewRoleModal()" data-i18n="newRole.cancel">Cancelar</button>
+              <button class="btn btn-primary" onclick="createNewRole()" data-i18n="newRole.createBtn">Crear Rol</button>
             </div>
           </div>
         </div>
@@ -807,7 +815,7 @@
                 style="font-size: 0.9rem; color: var(--color-text-secondary); line-height: 1.5; margin: 0 0 1.75rem;">
               </p>
               <div style="display: flex; justify-content: flex-end; gap: 1rem;">
-                <button class="btn btn-outline" onclick="closeConfirmModal()">Cancelar</button>
+                <button class="btn btn-outline" onclick="closeConfirmModal()" data-i18n="confirm.cancel">Cancelar</button>
                 <button class="btn" id="confirmModalAcceptBtn" onclick="handleConfirmModalAccept()"
                   style="background: #EF4444; color: white; border: none;">Aceptar</button>
               </div>
@@ -935,7 +943,7 @@
 
     async function renderRoles() {
       const grid = document.getElementById('rolesGrid');
-      grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--color-text-secondary); font-weight: 600;">Cargando roles...</div>';
+      grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--color-text-secondary); font-weight: 600;">${t('loading.roles')}</div>`;
 
       let companyRoles = [];
       let dbRolesMap = {};
@@ -974,8 +982,8 @@
           <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
         </div>
         <div style="text-align: center;">
-          <span style="font-weight: 600; color: var(--color-navy); display: block; margin-bottom: 0.25rem;">Crear Nuevo Rol</span>
-          <span style="font-size: 0.75rem; color: var(--color-text-secondary);">Personaliza la estructura de tu equipo</span>
+          <span style="font-weight: 600; color: var(--color-navy); display: block; margin-bottom: 0.25rem;">${t('card.createNew')}</span>
+          <span style="font-size: 0.75rem; color: var(--color-text-secondary);">${t('card.createNewDesc')}</span>
         </div>
       `;
       grid.appendChild(addCard);
@@ -984,11 +992,11 @@
         const enabled = role.status === 'active';
         const dbRole = dbRolesMap[role.role_name.toLowerCase()];
         const itemsCount = dbRole && dbRole.items ? dbRole.items.length : 0;
-        const itemsText = itemsCount > 0 ? `${itemsCount} Activo${itemsCount === 1 ? '' : 's'}` : '—';
+        const itemsText = itemsCount > 0 ? `${itemsCount} ${itemsCount === 1 ? t('card.asset') : t('card.assets')}` : '—';
         const itemsMuted = itemsCount === 0;
 
         const area = dbRole && dbRole.area ? dbRole.area : null;
-        const areaText = area || 'Sin asignar';
+        const areaText = area || t('card.unassigned');
         const areaMuted = !area;
 
         const desc = (dbRole && dbRole.description) ? dbRole.description : findLegacyRoleDesc(role.role_name);
@@ -1001,7 +1009,7 @@
           <div class="role-card-header">
             <span class="role-title">${role.role_name}</span>
             <div style="display: flex; align-items: center; gap: 0.6rem;">
-              <button type="button" onclick="deleteRole('${safeName}')" title="Eliminar rol"
+              <button type="button" onclick="deleteRole('${safeName}')" title="${t('card.deleteRole')}"
                 style="border: none; background: none; cursor: pointer; color: #CBD5E1; padding: 2px; display: flex; transition: color 0.2s;"
                 onmouseover="this.style.color='#EF4444'" onmouseout="this.style.color='#CBD5E1'">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
@@ -1016,23 +1024,23 @@
 
           <div class="role-status-badge ${enabled ? 'active' : 'inactive'}">
             <span class="dot"></span>
-            ${enabled ? 'Habilitado' : 'Inhabilitado'}
+            ${enabled ? t('card.enabled') : t('card.disabled')}
           </div>
 
           <div class="role-stats">
             <div class="role-stat-pill">
-              <span class="role-stat-label">Activos asignados</span>
+              <span class="role-stat-label">${t('card.assetsAssigned')}</span>
               <span class="role-stat-value ${itemsMuted ? 'muted' : ''}">${itemsText}</span>
             </div>
             <div class="role-stat-pill">
-              <span class="role-stat-label">Área</span>
+              <span class="role-stat-label">${t('card.area')}</span>
               <span class="role-stat-value ${areaMuted ? 'muted' : ''}">${areaText}</span>
             </div>
           </div>
 
           <div class="config-action-container" style="margin-top: 0.875rem; padding-top: 0.875rem; border-top: 1px solid #F1F5F9; display: ${enabled ? 'block' : 'none'};">
             <button class="btn btn-outline" style="width: 100%; font-size: 0.8rem; padding: 0.6rem; border-radius: 10px; font-weight: 700; letter-spacing: 0.01em;" onclick="openRoleConfig('${safeName}')">
-              Configurar Activos
+              ${t('card.configureAssets')}
             </button>
           </div>
         `;
@@ -1055,7 +1063,7 @@
         renderRoles();
       } catch (err) {
         console.error('Error updating role status:', err);
-        showToast('Error', 'Hubo un problema actualizando el rol.', 'error');
+        showToast(t('toast.errorTitle'), t('toast.errorUpdatingRole'), 'error');
       }
     }
 
@@ -1064,10 +1072,10 @@
     let confirmModalCallback = null;
 
     function showConfirmModal(message, onAccept, opts = {}) {
-      document.getElementById('confirmModalTitle').textContent = opts.title || 'Confirmar acción';
+      document.getElementById('confirmModalTitle').textContent = opts.title || t('confirm.defaultTitle');
       document.getElementById('confirmModalMessage').textContent = message;
       const acceptBtn = document.getElementById('confirmModalAcceptBtn');
-      acceptBtn.textContent = opts.acceptLabel || 'Aceptar';
+      acceptBtn.textContent = opts.acceptLabel || t('confirm.accept');
       confirmModalCallback = onAccept;
       document.getElementById('confirmModal').classList.add('active');
     }
@@ -1085,7 +1093,7 @@
 
     function deleteRole(roleName) {
       showConfirmModal(
-        `¿Eliminar el rol "${roleName}"? Esta acción no se puede deshacer.`,
+        t('confirm.deleteRoleMsg', { name: roleName }),
         async () => {
           try {
             const { data: { session } } = await window._supabase.auth.getSession();
@@ -1096,14 +1104,14 @@
             await window._supabase.from('role_definition').delete()
               .eq('company_id', session.user.id).eq('role_name', roleName);
 
-            showToast('Rol Eliminado', `El rol "${roleName}" fue eliminado.`);
+            showToast(t('toast.roleDeletedTitle'), t('toast.roleDeletedMsg', { name: roleName }));
             renderRoles();
           } catch (err) {
             console.error('Error deleting role:', err);
-            showToast('Error', 'Hubo un problema eliminando el rol.', 'error');
+            showToast(t('toast.errorTitle'), t('toast.errorDeletingRole'), 'error');
           }
         },
-        { title: 'Eliminar rol', acceptLabel: 'Eliminar' }
+        { title: t('confirm.deleteRoleTitle'), acceptLabel: t('confirm.delete') }
       );
     }
 
@@ -1216,8 +1224,8 @@
     let currentRoleAssets = [];
     let currentConfigRoleName = '';
 
-    const ASSET_CATEGORY_LABELS = { fisico: 'Físico', digital: 'Digital' };
-    const ASSET_TYPE_LABELS = { uniforme: 'Uniforme', computo: 'Cómputo', equipo: 'Herramientas/EPP', acceso: 'Acceso', vehiculo: 'Vehículo', licencia: 'Licencia', acceso_digital: 'Acceso Digital' };
+    function getCategoryLabel(cat) { return t('category.' + cat) || cat; }
+    function getTypeLabel(tipo) { return t('type.' + tipo) || tipo; }
 
     function handleAreaSelectChange() {
       const areaSelect = document.getElementById('roleAreaSelect');
@@ -1242,7 +1250,7 @@
           <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; flex: 1; min-width: 0;">
             <input type="checkbox" class="asset-check" ${checked ? 'checked' : ''} onchange="toggleAssetItem(this)" style="flex-shrink: 0; width: 18px; height: 18px; accent-color: var(--color-cyan); cursor: pointer;">
             <span style="font-weight: 600; font-size: 0.9rem; color: var(--color-navy); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.name}</span>
-            <span class="asset-type-tag" style="flex-shrink: 0;">${ASSET_TYPE_LABELS[item.tipo] || item.tipo || ''}</span>
+            <span class="asset-type-tag" style="flex-shrink: 0;">${getTypeLabel(item.tipo)}</span>
           </label>
           <div class="qty-stepper" style="flex-shrink: 0; display: flex; align-items: center; gap: 0.75rem; background: white; padding: 0.35rem 0.75rem; border-radius: 8px; border: 1px solid var(--color-smoke-mid);">
             <button type="button" onclick="changeQty(this, -1)" style="border: none; background: none; cursor: pointer; color: var(--color-text-secondary); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">-</button>
@@ -1253,52 +1261,58 @@
         <div class="asset-item-controls" style="display: ${checked ? 'flex' : 'none'}; align-items: center; flex-wrap: wrap; gap: 0.75rem; padding-left: 2rem; border-top: 1px solid var(--color-smoke-mid); padding-top: 0.6rem;">
           <label class="reposicion-toggle" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--color-text-secondary); cursor: pointer; white-space: nowrap;">
             <input type="checkbox" class="requiere-reposicion" ${requiereReposicion ? 'checked' : ''} onchange="toggleReposicionInput(this)" style="width: 15px; height: 15px; accent-color: var(--color-cyan); cursor: pointer;">
-            ¿Requiere reposición?
+            ${t('reposicion.question')}
           </label>
           <div class="asset-renewal-input" style="display: ${requiereReposicion ? 'flex' : 'none'};">
-            cada
+            ${t('reposicion.every')}
             <div class="months-stepper">
               <button type="button" onclick="changeMonths(this, -1)">-</button>
               <span class="months-val">${reposicionMeses}</span>
               <button type="button" class="increment" onclick="changeMonths(this, 1)">+</button>
             </div>
-            meses
+            ${t('reposicion.months')}
           </div>
         </div>
       `;
       return div;
     }
 
-    const ASSET_TYPES_BY_CATEGORY = {
-      fisico: [
-        { value: 'computo', label: 'Cómputo' },
-        { value: 'uniforme', label: 'Uniforme' },
-        { value: 'acceso', label: 'Acceso' },
-        { value: 'vehiculo', label: 'Vehículo' },
-        { value: 'equipo', label: 'Herramientas/EPP' }
-      ],
-      digital: [
-        { value: 'licencia', label: 'Licencia' },
-        { value: 'acceso_digital', label: 'Acceso Digital' }
-      ]
-    };
+    function getAssetTypesByCategory() {
+      return {
+        fisico: [
+          { value: 'computo', label: t('type.computo') },
+          { value: 'uniforme', label: t('type.uniforme') },
+          { value: 'acceso', label: t('type.acceso') },
+          { value: 'vehiculo', label: t('type.vehiculo') },
+          { value: 'equipo', label: t('type.equipo') }
+        ],
+        digital: [
+          { value: 'licencia', label: t('type.licencia') },
+          { value: 'acceso_digital', label: t('type.acceso_digital') }
+        ]
+      };
+    }
 
     // Catálogo jerárquico usado para armar rápidamente los activos de un rol
     // nuevo (Categoría → Subcategoría → Ítems sugeridos). Aplica a cualquier
-    // industria; cada subcategoría también permite un ítem "Otro" libre.
-    const ASSET_CATALOG_TREE = {
-      fisico: {
-        computo: { label: 'Cómputo', tipo: 'computo', items: ['Laptop', 'Monitor', 'Cargador de laptop', 'Mouse', 'Teclado', 'Audífonos'] },
-        uniforme: { label: 'Uniformes', tipo: 'uniforme', items: ['Camiseta/Camisa', 'Pantalón', 'Casco', 'Zapatos/Calzado', 'Chaqueta', 'Delantal'] },
-        acceso: { label: 'Acceso', tipo: 'acceso', items: ['Tarjeta de acceso', 'Llave de oficina', 'Gafete/Credencial'] },
-        vehiculo: { label: 'Vehículos', tipo: 'vehiculo', items: ['Auto', 'Moto', 'Bicicleta'] },
-        equipo: { label: 'Herramientas / EPP', tipo: 'equipo', items: ['Kit de herramientas', 'Radio de comunicación', 'Equipo de protección personal'] }
-      },
-      digital: {
-        licencia: { label: 'Licencias / Software', tipo: 'licencia', items: ['Google Workspace', 'Microsoft 365', 'CRM', 'ERP'] },
-        acceso_digital: { label: 'Accesos digitales', tipo: 'acceso_digital', items: ['VPN', 'Usuario de sistema interno', 'Correo corporativo'] }
-      }
-    };
+    // industria; cada subcategoría también permite un ítem "Otro" libre. Es
+    // una función (no una constante) para que refleje el idioma activo cada
+    // vez que se dibuja.
+    function getAssetCatalogTree() {
+      return {
+        fisico: {
+          computo: { label: t('catalog.computo.label'), tipo: 'computo', items: [t('item.laptop'), t('item.monitor'), t('item.cargadorLaptop'), t('item.mouse'), t('item.teclado'), t('item.audifonos')] },
+          uniforme: { label: t('catalog.uniforme.label'), tipo: 'uniforme', items: [t('item.camiseta'), t('item.pantalon'), t('item.casco'), t('item.zapatos'), t('item.chaqueta'), t('item.delantal')] },
+          acceso: { label: t('catalog.acceso.label'), tipo: 'acceso', items: [t('item.tarjetaAcceso'), t('item.llaveOficina'), t('item.gafete')] },
+          vehiculo: { label: t('catalog.vehiculo.label'), tipo: 'vehiculo', items: [t('item.auto'), t('item.moto'), t('item.bicicleta')] },
+          equipo: { label: t('catalog.equipo.label'), tipo: 'equipo', items: [t('item.kitHerramientas'), t('item.radio'), t('item.epp')] }
+        },
+        digital: {
+          licencia: { label: t('catalog.licencia.label'), tipo: 'licencia', items: [t('item.googleWorkspace'), t('item.microsoft365'), t('item.crm'), t('item.erp')] },
+          acceso_digital: { label: t('catalog.acceso_digital.label'), tipo: 'acceso_digital', items: [t('item.vpn'), t('item.usuarioSistema'), t('item.correoCorp')] }
+        }
+      };
+    }
 
     function toggleNewRoleCategory(category) {
       const checkboxId = category === 'fisico' ? 'newRoleCatFisico' : 'newRoleCatDigital';
@@ -1319,7 +1333,7 @@
     }
 
     function renderSubcategoryPickers(category, container) {
-      const subcats = ASSET_CATALOG_TREE[category];
+      const subcats = getAssetCatalogTree()[category];
       container.innerHTML = Object.keys(subcats).map(key => {
         const sub = subcats[key];
         const itemsHtml = sub.items.map(name => `
@@ -1340,9 +1354,9 @@
             <div style="font-weight: 700; font-size: 0.8125rem; color: var(--color-navy); margin-bottom: 0.4rem;">${sub.label}</div>
             <div style="display: flex; flex-direction: column;">${itemsHtml}</div>
             <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
-              <input type="text" class="new-role-other-input" data-category="${category}" data-tipo="${sub.tipo}" placeholder="Otro (opcional)"
+              <input type="text" class="new-role-other-input" data-category="${category}" data-tipo="${sub.tipo}" placeholder="${t('item.otro')}"
                 style="flex: 1; width: 100%; padding: 0.5rem 0.65rem; border: 1px solid var(--color-smoke-mid); border-radius: 6px; font-size: 0.8rem;">
-              <input type="number" class="new-role-other-qty" min="1" value="1" title="Cantidad"
+              <input type="number" class="new-role-other-qty" min="1" value="1" title="${t('item.cantidad')}"
                 style="width: 60px; padding: 0.5rem 0.4rem; border: 1px solid var(--color-smoke-mid); border-radius: 6px; font-size: 0.8rem; text-align: center;">
             </div>
           </div>
@@ -1379,7 +1393,7 @@
     function updateAssetTypeOptions() {
       const category = document.getElementById('newAssetCategory').value;
       const typeSelect = document.getElementById('newAssetType');
-      const options = ASSET_TYPES_BY_CATEGORY[category] || [];
+      const options = getAssetTypesByCategory()[category] || [];
       typeSelect.innerHTML = options.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
     }
 
@@ -1401,7 +1415,7 @@
     function addCustomAssetRow() {
       const name = document.getElementById('newAssetName').value.trim();
       if (!name) {
-        alert('Por favor ingresa el nombre del activo');
+        alert(t('alert.enterAssetName'));
         return;
       }
       const category = document.getElementById('newAssetCategory').value;
@@ -1411,7 +1425,7 @@
       const list = document.getElementById('roleAssetList');
       if (list.querySelector('p')) list.innerHTML = '';
 
-      const catLabelText = ASSET_CATEGORY_LABELS[category];
+      const catLabelText = getCategoryLabel(category);
       const labelExists = Array.from(list.querySelectorAll('.asset-category-label')).some(l => l.textContent === catLabelText);
       if (!labelExists) {
         const label = document.createElement('div');
@@ -1433,9 +1447,9 @@
 
     async function openRoleConfig(roleName) {
       currentConfigRoleName = roleName;
-      document.getElementById('configRoleTitle').innerText = `Configurar: ${roleName}`;
+      document.getElementById('configRoleTitle').innerText = t('roleConfig.titleWithName', { name: roleName });
       const list = document.getElementById('roleAssetList');
-      list.innerHTML = '<div style="padding: 3rem; text-align: center; color: var(--color-text-secondary); font-weight: 600;">Cargando configuración...</div>';
+      list.innerHTML = `<div style="padding: 3rem; text-align: center; color: var(--color-text-secondary); font-weight: 600;">${t('roleConfig.loadingConfig')}</div>`;
 
       document.getElementById('roleConfigModal').classList.add('active');
       toggleAddAssetForm(false);
@@ -1490,7 +1504,7 @@
       if (savedItems.length === 0) {
         list.innerHTML = `
           <p style="text-align: center; color: var(--color-text-secondary); font-size: 0.875rem; padding: 1rem 0 1.5rem;">
-            Este rol todavía no tiene activos asignados. Usa "+ Agregar Activo" para empezar.
+            ${t('roleConfig.emptyState')}
           </p>
         `;
         return;
@@ -1502,7 +1516,7 @@
 
         const label = document.createElement('div');
         label.className = 'asset-category-label';
-        label.textContent = ASSET_CATEGORY_LABELS[cat] || cat;
+        label.textContent = getCategoryLabel(cat);
         list.appendChild(label);
 
         itemsInCat.forEach(item => list.appendChild(createAssetRowElement(item, true)));
@@ -1607,13 +1621,13 @@
           if (error) throw error;
         }
 
-        showToast("Configuración Guardada", "La plantilla de activos para este rol ha sido actualizada.");
+        showToast(t('toast.configSavedTitle'), t('toast.configSavedMsg'));
         closeRoleConfig();
         // Refresh the UI to show the updated item count
         renderRoles();
       } catch (err) {
         console.error("Error saving role:", err);
-        showToast("Error", "Hubo un problema guardando la configuración.", "error");
+        showToast(t('toast.errorTitle'), t('toast.errorSavingConfig'), 'error');
       }
     }
 
@@ -1645,7 +1659,7 @@
     async function createNewRole() {
       const name = document.getElementById('newRoleName').value.trim();
       if (!name) {
-        alert("Por favor ingresa el nombre del rol");
+        alert(t('alert.enterRoleName'));
         return;
       }
 
@@ -1668,14 +1682,54 @@
           .insert({ company_id: session.user.id, role_name: name, items, area, subarea, description });
         if (defErr) throw defErr;
 
-        showToast("Rol Creado", `El rol "${name}" fue creado exitosamente.`);
+        showToast(t('toast.roleCreatedTitle'), t('toast.roleCreatedMsg', { name }));
         closeNewRoleModal();
         renderRoles();
       } catch (err) {
         console.error("Error creating role:", err);
-        showToast("Error", "Hubo un problema creando el rol.", "error");
+        showToast(t('toast.errorTitle'), t('toast.errorCreatingRole'), 'error');
       }
     }
+
+    // Refresca el estado visual de los botones ES/EN del popover.
+    function updateLangButtons() {
+      const esBtn = document.getElementById('langBtnEs');
+      const enBtn = document.getElementById('langBtnEn');
+      if (!esBtn || !enBtn) return;
+      [esBtn, enBtn].forEach(btn => {
+        btn.style.background = 'white';
+        btn.style.color = 'var(--color-navy)';
+        btn.style.borderColor = 'var(--color-smoke-mid)';
+      });
+      const activeBtn = window.currentLang === 'en' ? enBtn : esBtn;
+      activeBtn.style.background = 'var(--color-cyan)';
+      activeBtn.style.color = 'var(--color-navy)';
+      activeBtn.style.borderColor = 'var(--color-cyan)';
+    }
+
+    // Se llama desde i18n.js cada vez que cambia el idioma (por el switcher
+    // o porque llegó el idioma guardado en company_profile). Refresca todo
+    // el contenido dinámico ya dibujado, que applyI18n() no puede tocar
+    // porque no vive en atributos data-i18n estáticos.
+    function onLanguageChanged() {
+      updateLangButtons();
+      document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+        if (w.updateCustomLabel) w.updateCustomLabel();
+      });
+      if (document.getElementById('newAssetType') && document.getElementById('addAssetForm').style.display === 'flex') {
+        updateAssetTypeOptions();
+      }
+      ['fisico', 'digital'].forEach(cat => {
+        const container = document.getElementById(cat === 'fisico' ? 'newRoleFisicoSubcats' : 'newRoleDigitalSubcats');
+        if (container && container.dataset.rendered) renderSubcategoryPickers(cat, container);
+      });
+      renderRoles();
+      if (document.getElementById('roleConfigModal').classList.contains('active') && currentConfigRoleName) {
+        openRoleConfig(currentConfigRoleName);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', updateLangButtons);
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>

@@ -173,7 +173,7 @@ async function populateHeaderProfile(supabaseClient) {
     if (!session) return;
     
     let { data: profileData } = await supabaseClient.from('company_user').select('first_name, last_name, country').eq('id', session.user.id).limit(1);
-    let { data: compData } = await supabaseClient.from('company_profile').select('company_name, industry, country').eq('id', session.user.id).limit(1);
+    let { data: compData } = await supabaseClient.from('company_profile').select('company_name, industry, country, language').eq('id', session.user.id).limit(1);
     
     let profile = profileData && profileData.length > 0 ? profileData[0] : null;
     let comp = compData && compData.length > 0 ? compData[0] : null;
@@ -228,7 +228,10 @@ async function populateHeaderProfile(supabaseClient) {
       iconDisplay.style.color = "var(--color-cyan)";
     }
 
-    window.dispatchEvent(new CustomEvent('userProfileLoaded', { detail: { industry, companyName, userCountry } }));
+    const userLanguage = (comp && comp.language) || null;
+    if (userLanguage) localStorage.setItem('dotacian_lang', userLanguage);
+
+    window.dispatchEvent(new CustomEvent('userProfileLoaded', { detail: { industry, companyName, userCountry, language: userLanguage } }));
   } catch (err) {
     console.error('Error populating header profile', err);
   }
