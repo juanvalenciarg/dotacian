@@ -360,18 +360,46 @@
     .asset-renewal-input {
       display: flex;
       align-items: center;
-      gap: 0.35rem;
+      gap: 0.5rem;
       font-size: 0.75rem;
       color: var(--color-text-secondary);
       white-space: nowrap;
     }
 
-    .asset-renewal-input input {
-      width: 42px;
-      padding: 0.25rem 0.35rem;
+    .months-stepper {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 8px;
       border: 1px solid var(--color-smoke-mid);
-      border-radius: 6px;
+    }
+
+    .months-stepper button {
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      width: 18px;
+      height: 18px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-secondary);
+    }
+
+    .months-stepper button.increment {
+      color: var(--color-cyan);
+    }
+
+    .months-val {
+      min-width: 16px;
       text-align: center;
+      font-weight: 700;
+      color: var(--color-navy);
       font-size: 0.8rem;
     }
 
@@ -1162,25 +1190,33 @@
       div.dataset.name = item.name;
       div.dataset.category = item.category || 'fisico';
       div.dataset.tipo = item.tipo || 'uniforme';
-      div.style = "display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; padding: 0.85rem 1rem; background: var(--color-smoke); border-radius: 12px; border: 1px solid var(--color-smoke-mid); margin-bottom: 0.6rem;";
+      div.style = "display: flex; flex-direction: column; gap: 0.65rem; padding: 0.85rem 1rem; background: var(--color-smoke); border-radius: 12px; border: 1px solid var(--color-smoke-mid); margin-bottom: 0.6rem;";
       div.innerHTML = `
-        <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; flex: 1; min-width: 160px;">
-          <input type="checkbox" class="asset-check" ${checked ? 'checked' : ''} onchange="toggleAssetItem(this)" style="width: 18px; height: 18px; accent-color: var(--color-cyan); cursor: pointer;">
-          <span style="font-weight: 600; font-size: 0.9rem; color: var(--color-navy);">${item.name}</span>
-          <span class="asset-type-tag">${ASSET_TYPE_LABELS[item.tipo] || item.tipo || ''}</span>
-        </label>
-        <div class="asset-item-controls" style="display: ${checked ? 'flex' : 'none'}; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-          <label class="reposicion-toggle" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--color-text-secondary); cursor: pointer; white-space: nowrap;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+          <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; flex: 1; min-width: 0;">
+            <input type="checkbox" class="asset-check" ${checked ? 'checked' : ''} onchange="toggleAssetItem(this)" style="flex-shrink: 0; width: 18px; height: 18px; accent-color: var(--color-cyan); cursor: pointer;">
+            <span style="font-weight: 600; font-size: 0.9rem; color: var(--color-navy); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.name}</span>
+            <span class="asset-type-tag" style="flex-shrink: 0;">${ASSET_TYPE_LABELS[item.tipo] || item.tipo || ''}</span>
+          </label>
+          <div class="qty-stepper" style="flex-shrink: 0; display: flex; align-items: center; gap: 0.75rem; background: white; padding: 0.35rem 0.75rem; border-radius: 8px; border: 1px solid var(--color-smoke-mid);">
+            <button type="button" onclick="changeQty(this, -1)" style="border: none; background: none; cursor: pointer; color: var(--color-text-secondary); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">-</button>
+            <span class="qty-val" style="min-width: 24px; text-align: center; font-weight: 700; color: var(--color-navy); font-size: 0.875rem;">${item.qty || 1}</span>
+            <button type="button" onclick="changeQty(this, 1)" style="border: none; background: none; cursor: pointer; color: var(--color-cyan); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">+</button>
+          </div>
+        </div>
+        <div class="asset-item-controls" style="display: ${checked ? 'flex' : 'none'}; align-items: center; flex-wrap: wrap; gap: 0.75rem; padding-left: 2rem; border-top: 1px solid var(--color-smoke-mid); padding-top: 0.6rem;">
+          <label class="reposicion-toggle" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--color-text-secondary); cursor: pointer; white-space: nowrap;">
             <input type="checkbox" class="requiere-reposicion" ${requiereReposicion ? 'checked' : ''} onchange="toggleReposicionInput(this)" style="width: 15px; height: 15px; accent-color: var(--color-cyan); cursor: pointer;">
             ¿Requiere reposición?
           </label>
           <div class="asset-renewal-input" style="display: ${requiereReposicion ? 'flex' : 'none'};">
-            cada <input type="number" class="renewal-months" min="1" max="24" value="${reposicionMeses}"> meses
-          </div>
-          <div class="qty-stepper" style="display: flex; align-items: center; gap: 0.75rem; background: white; padding: 0.35rem 0.75rem; border-radius: 8px; border: 1px solid var(--color-smoke-mid);">
-            <button type="button" onclick="changeQty(this, -1)" style="border: none; background: none; cursor: pointer; color: var(--color-text-secondary); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">-</button>
-            <span class="qty-val" style="min-width: 24px; text-align: center; font-weight: 700; color: var(--color-navy); font-size: 0.875rem;">${item.qty || 1}</span>
-            <button type="button" onclick="changeQty(this, 1)" style="border: none; background: none; cursor: pointer; color: var(--color-cyan); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">+</button>
+            cada
+            <div class="months-stepper">
+              <button type="button" onclick="changeMonths(this, -1)">-</button>
+              <span class="months-val">${reposicionMeses}</span>
+              <button type="button" class="increment" onclick="changeMonths(this, 1)">+</button>
+            </div>
+            meses
           </div>
         </div>
       `;
@@ -1446,6 +1482,13 @@
       span.innerText = current;
     }
 
+    function changeMonths(btn, delta) {
+      const span = btn.parentElement.querySelector('.months-val');
+      let current = parseInt(span.textContent);
+      current = Math.max(1, Math.min(24, current + delta));
+      span.textContent = current;
+    }
+
     function closeRoleConfig() {
       document.getElementById('roleConfigModal').classList.remove('active');
     }
@@ -1474,8 +1517,8 @@
         const requiereReposicion = el.querySelector('.requiere-reposicion')?.checked || false;
         item.requiere_reposicion = requiereReposicion;
         if (requiereReposicion) {
-          const renewalInput = el.querySelector('.renewal-months');
-          item.reposicion_meses = parseInt(renewalInput?.value) || 6;
+          const monthsVal = el.querySelector('.months-val');
+          item.reposicion_meses = parseInt(monthsVal?.textContent) || 6;
         }
 
         updatedItems.push(item);
