@@ -956,14 +956,15 @@
       try {
         const { data: { session } } = await window._supabase.auth.getSession();
         if (session) {
+          const companyId = await resolveCompanyId(window._supabase, session.user.id);
           const { data: activeRolesData } = await window._supabase.from('company_roles')
             .select('role_name, status')
-            .eq('company_id', session.user.id);
+            .eq('company_id', companyId);
           if (activeRolesData) companyRoles = activeRolesData;
 
           const { data } = await window._supabase.from('role_definition')
             .select('role_name, items, area, description')
-            .eq('company_id', session.user.id);
+            .eq('company_id', companyId);
           if (data) {
             data.forEach(r => { dbRolesMap[r.role_name.toLowerCase()] = r; });
           }
@@ -1058,11 +1059,12 @@
       try {
         const { data: { session } } = await window._supabase.auth.getSession();
         if (!session) return;
+        const companyId = await resolveCompanyId(window._supabase, session.user.id);
 
         const { error } = await window._supabase
           .from('company_roles')
           .update({ status: enabled ? 'active' : 'inactive' })
-          .eq('company_id', session.user.id)
+          .eq('company_id', companyId)
           .eq('role_name', roleName);
 
         if (error) throw error;
@@ -1104,11 +1106,12 @@
           try {
             const { data: { session } } = await window._supabase.auth.getSession();
             if (!session) return;
+            const companyId = await resolveCompanyId(window._supabase, session.user.id);
 
             await window._supabase.from('company_roles').delete()
-              .eq('company_id', session.user.id).eq('role_name', roleName);
+              .eq('company_id', companyId).eq('role_name', roleName);
             await window._supabase.from('role_definition').delete()
-              .eq('company_id', session.user.id).eq('role_name', roleName);
+              .eq('company_id', companyId).eq('role_name', roleName);
 
             showToast(t('toast.roleDeletedTitle'), t('toast.roleDeletedMsg', { name: roleName }));
             renderRoles();
@@ -1468,10 +1471,11 @@
       try {
         const { data: { session } } = await window._supabase.auth.getSession();
         if (session) {
+          const companyId = await resolveCompanyId(window._supabase, session.user.id);
           const { data } = await window._supabase
             .from('role_definition')
             .select('items, area, subarea')
-            .eq('company_id', session.user.id)
+            .eq('company_id', companyId)
             .ilike('role_name', roleName.trim())
             .maybeSingle();
 
@@ -1599,12 +1603,13 @@
       try {
         const { data: { session } } = await window._supabase.auth.getSession();
         if (!session) throw new Error("No autenticado");
+        const companyId = await resolveCompanyId(window._supabase, session.user.id);
 
         // Use UPSERT or check if it exists
         const { data: existing } = await window._supabase
           .from('role_definition')
           .select('id')
-          .eq('company_id', session.user.id)
+          .eq('company_id', companyId)
           .ilike('role_name', currentConfigRoleName)
           .maybeSingle();
 
@@ -1618,7 +1623,7 @@
           const { error } = await window._supabase
             .from('role_definition')
             .insert({
-              company_id: session.user.id,
+              company_id: companyId,
               role_name: currentConfigRoleName,
               items: updatedItems,
               area: areaValue,
@@ -1677,15 +1682,16 @@
       try {
         const { data: { session } } = await window._supabase.auth.getSession();
         if (!session) throw new Error("No autenticado");
+        const companyId = await resolveCompanyId(window._supabase, session.user.id);
 
         const { error: roleErr } = await window._supabase
           .from('company_roles')
-          .insert({ company_id: session.user.id, role_name: name, status: 'active' });
+          .insert({ company_id: companyId, role_name: name, status: 'active' });
         if (roleErr) throw roleErr;
 
         const { error: defErr } = await window._supabase
           .from('role_definition')
-          .insert({ company_id: session.user.id, role_name: name, items, area, subarea, description });
+          .insert({ company_id: companyId, role_name: name, items, area, subarea, description });
         if (defErr) throw defErr;
 
         showToast(t('toast.roleCreatedTitle'), t('toast.roleCreatedMsg', { name }));

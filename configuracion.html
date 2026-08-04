@@ -646,6 +646,7 @@
     window._supabase = _supabase;
 
     let session = null;
+    let companyId = null;
     let isEditing = false;
     let currentProfile = null;
 
@@ -766,6 +767,7 @@
         return;
       }
       session = data.session;
+      companyId = await resolveCompanyId(_supabase, session.user.id);
       await loadProfile();
     }
 
@@ -774,7 +776,7 @@
       const { data: profile } = await _supabase
         .from('company_profile')
         .select('*')
-        .eq('id', session.user.id)
+        .eq('id', companyId)
         .maybeSingle();
 
       // 2. Consultar el perfil del usuario para obtener el país original de registro
@@ -949,7 +951,7 @@
       });
 
       const updates = {
-        id: session.user.id,
+        id: companyId,
         company_name: document.getElementById('company_name').value,
         legal_name: document.getElementById('legal_name').value,
         industry: document.getElementById('industry').value,

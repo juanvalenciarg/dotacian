@@ -167,6 +167,16 @@ if (document.readyState === 'loading') {
   alignMobileHeader();
 }
 
+// Resuelve el id de la empresa (company_profile.id) a la que pertenece un usuario:
+// el dueño de la empresa usa su propio id; un miembro de equipo usa company_user.company_id.
+async function resolveCompanyId(supabaseClient, userId) {
+  if (!userId) return null;
+  const { data: ownProfile } = await supabaseClient.from('company_profile').select('id').eq('id', userId).maybeSingle();
+  if (ownProfile) return userId;
+  const { data: userRow } = await supabaseClient.from('company_user').select('company_id').eq('id', userId).maybeSingle();
+  return (userRow && userRow.company_id) || userId;
+}
+
 async function populateHeaderProfile(supabaseClient) {
   try {
     const { data: { session } } = await supabaseClient.auth.getSession();

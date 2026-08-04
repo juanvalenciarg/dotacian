@@ -1138,7 +1138,7 @@
           window.location.href = '/login.html';
           return;
         }
-        currentCompanyId = sessionData.session.user.id;
+        currentCompanyId = await resolveCompanyId(_supabase, sessionData.session.user.id);
 
         // Asegurarnos de que el email aparezca
         if (document.getElementById('pop-user-email')) {

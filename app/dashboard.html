@@ -927,8 +927,9 @@
           return;
         }
 
+        const companyId = await resolveCompanyId(_supabase, session.user.id);
         const { data: profile } = await _supabase.from('company_user').select('*').eq('id', session.user.id).maybeSingle();
-        const { data: company } = await _supabase.from('company_profile').select('*').eq('id', session.user.id).maybeSingle();
+        const { data: company } = await _supabase.from('company_profile').select('*').eq('id', companyId).maybeSingle();
 
         if (profile) {
           const welcomeEl = document.getElementById('client-welcome-msg');
@@ -948,7 +949,7 @@
           }
         }
 
-        updateSetupProgress(session.user.id, company);
+        updateSetupProgress(companyId, company);
       } catch (err) {
         console.error('Error init portal:', err);
       }

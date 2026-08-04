@@ -1714,7 +1714,7 @@
 
       try {
         const { data: sessionData } = await _supabase.auth.getSession();
-        const companyId = sessionData?.session?.user?.id;
+        const companyId = await resolveCompanyId(_supabase, sessionData?.session?.user?.id);
         if (!companyId) throw new Error("No session found");
 
         const inserts = [];
@@ -1910,7 +1910,7 @@
           kitList.innerHTML = '<span style="color: var(--color-text-muted); font-size: 0.875rem;">Cargando historial de entregas...</span>';
 
           const { data: sessionData } = await _supabase.auth.getSession();
-          const companyId = sessionData?.session?.user?.id;
+          const companyId = await resolveCompanyId(_supabase, sessionData?.session?.user?.id);
 
           const [deliveriesRes, storageRes] = await Promise.all([
             _supabase
@@ -2373,7 +2373,7 @@
 
       try {
         const { data: sessionData } = await _supabase.auth.getSession();
-        const companyId = sessionData?.session?.user?.id;
+        const companyId = await resolveCompanyId(_supabase, sessionData?.session?.user?.id);
         if (!companyId) throw new Error("No has iniciado sesión o la sesión ha expirado.");
 
         // 1. Insert into uniform_deliveries
@@ -2685,7 +2685,7 @@
     async function submitQuote(redirectUrl) {
       try {
         const { data: sessionData } = await _supabase.auth.getSession();
-        const companyId = sessionData?.session?.user?.id;
+        const companyId = await resolveCompanyId(_supabase, sessionData?.session?.user?.id);
         if (!companyId) throw new Error("No company id found.");
 
         const targetEmployee = document.getElementById('detailName').textContent.trim();
@@ -3176,7 +3176,7 @@
 
       try {
         const { data: sessionData } = await _supabase.auth.getSession();
-        const companyId = sessionData?.session?.user?.id;
+        const companyId = await resolveCompanyId(_supabase, sessionData?.session?.user?.id);
         if (!companyId) throw new Error("No session found");
 
         const { data: newEmp, error } = await _supabase.from('company_employees').insert([{
@@ -3321,7 +3321,7 @@
         if (sessionError) throw sessionError;
         if (!sessionData.session) return;
 
-        const companyId = sessionData.session.user.id;
+        const companyId = await resolveCompanyId(_supabase, sessionData.session.user.id);
 
         // Fetch employees, role definitions, and signed uniform deliveries in parallel
         const [empRes, rolesRes, deliveriesRes] = await Promise.all([
@@ -3468,7 +3468,7 @@
     async function loadRoleGarments() {
       try {
         const { data: sessionData } = await _supabase.auth.getSession();
-        const companyId = sessionData?.session?.user?.id;
+        const companyId = await resolveCompanyId(_supabase, sessionData?.session?.user?.id);
         if (!companyId) return;
 
         const { data, error } = await _supabase.from('role_definition')
@@ -3495,7 +3495,7 @@
       select.innerHTML = '<option value="">Selecciona un rol...</option>';
       try {
         const { data: sessionData } = await _supabase.auth.getSession();
-        const companyId = sessionData?.session?.user?.id;
+        const companyId = await resolveCompanyId(_supabase, sessionData?.session?.user?.id);
         if (!companyId) return;
 
         // Query active roles from company_roles (where roles.html saves them)

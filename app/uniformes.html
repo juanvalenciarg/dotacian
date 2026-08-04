@@ -415,7 +415,7 @@
         if (sessionError) throw sessionError;
         if (!sessionData.session) return;
 
-        currentCompanyId = sessionData.session.user.id;
+        currentCompanyId = await resolveCompanyId(_supabase, sessionData.session.user.id);
 
         const { data, error } = await _supabase
           .from('company_uniforms')
@@ -570,7 +570,7 @@
       try {
         if (!currentCompanyId) {
           const { data: sessionData } = await _supabase.auth.getSession();
-          currentCompanyId = sessionData?.session?.user?.id;
+          currentCompanyId = await resolveCompanyId(_supabase, sessionData?.session?.user?.id);
         }
         if (!currentCompanyId) throw new Error('No autenticado');
 
