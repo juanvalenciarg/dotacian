@@ -6,7 +6,7 @@
 const I18N = {
   es: {
     // Sidebar
-    'nav.dashboard': 'Inicio',
+    'nav.dashboard': 'Home',
     'nav.roles': 'Roles',
     'nav.empleados': 'Empleados',
     'nav.uniformes': 'Uniformes',

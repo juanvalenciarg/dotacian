@@ -650,16 +650,16 @@
     <aside class="sidebar" style="display: flex; flex-direction: column;">
       <!-- TOP: dot AI -->
       <div class="sidebar-header" style="position: relative; display: flex; justify-content: center; padding: 1.5rem 0.25rem 1rem 0.25rem !important; overflow: visible;">
-        <a href="/app/dashboard" style="display: flex; align-items: center; justify-content: center; text-decoration: none; width: 100%;">
+        <a href="/app/home" style="display: flex; align-items: center; justify-content: center; text-decoration: none; width: 100%;">
           <img src="/assets/logos/logo_dotacian.png" alt="dotacian" style="width: 100%; max-width: 72px; height: auto; object-fit: contain; filter: brightness(0) invert(1);">
         </a>
       </div>
       
       <!-- MIDDLE: Navigation -->
       <nav class="sidebar-nav" style="flex: 1; display: flex; flex-direction: column; overflow-y: auto;">
-        <a href="/app/dashboard" class="nav-item active">
+        <a href="/app/home" class="nav-item active">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
-          <span class="nav-label">Inicio</span>
+          <span class="nav-label">Home</span>
         </a>
         <a href="/app/roles" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
@@ -747,22 +747,6 @@
           </button>
         </div>
         <div class="header-right" style="display: flex; align-items: center; justify-content: flex-end; width: 100%;">
-          <div style="position: relative; display: inline-block;">
-            <button onclick="const dd = document.getElementById('add-card-dropdown'); dd.style.display = dd.style.display === 'block' ? 'none' : 'block';" style="background: white; color: var(--color-navy); border: 1px solid #E2E8F0; border-radius: 99px; display: flex; align-items: center; padding: 0.6rem 1.2rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.02); gap: 0.5rem; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--color-cyan)'; this.style.color='var(--color-cyan)';" onmouseout="this.style.borderColor='#E2E8F0'; this.style.color='var(--color-navy)';">
-              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-              Agregar Tarjeta
-            </button>
-            <div id="add-card-dropdown" style="display: none; position: absolute; top: 100%; right: 0; margin-top: 0.5rem; background: white; border: 1px solid #E2E8F0; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); width: 220px; z-index: 100; overflow: hidden;">
-              <div style="padding: 0.75rem 1rem; border-bottom: 1px solid #F1F5F9; font-size: 0.75rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em;">Tarjetas Disponibles</div>
-              <a href="#" style="display: flex; align-items: center; padding: 0.75rem 1rem; color: var(--color-navy); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.2s;" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='white'">Facturas Pendientes</a>
-              <a href="#" style="display: flex; align-items: center; padding: 0.75rem 1rem; color: var(--color-navy); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.2s;" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='white'">Cotizaciones Recientes</a>
-              <a href="#" style="display: flex; align-items: center; padding: 0.75rem 1rem; color: var(--color-navy); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.2s;" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='white'">Últimos Pedidos</a>
-              <a href="#" style="display: flex; align-items: center; padding: 0.75rem 1rem; color: var(--color-navy); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.2s;" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='white'">Alertas de Inventario</a>
-            </div>
-          </div>
         </div>
       </header>
 
