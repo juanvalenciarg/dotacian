@@ -561,15 +561,46 @@
         <button class="btn-close" onclick="closeModal()">✕</button>
       </div>
       <div style="padding: 2rem;">
+        <div
+          style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--color-border);">
+          <div id="empPreviewAvatar"
+            style="width: 56px; height: 56px; border-radius: 50%; background: var(--color-smoke-mid); display: flex; align-items: center; justify-content: center; font-size: 1.15rem; font-weight: 700; color: var(--color-navy); flex-shrink: 0;">
+            ?</div>
+          <div>
+            <div id="empPreviewName" style="font-weight: 700; color: var(--color-navy); font-size: 1.05rem;">Nombre
+              del empleado</div>
+            <div style="display: flex; gap: 0.5rem; margin-top: 0.4rem; flex-wrap: wrap;">
+              <span id="empPreviewCity"
+                style="background: #F1F5F9; color: #64748B; font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 999px;">Ciudad</span>
+              <span id="empPreviewArea"
+                style="background: #F1F5F9; color: #64748B; font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 999px;">Área</span>
+              <span id="empPreviewCargo"
+                style="background: #F1F5F9; color: #64748B; font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 999px;">Cargo</span>
+            </div>
+          </div>
+        </div>
+
         <form class="modal-form" onsubmit="saveEmployee(event)">
+          <h4 style="color: var(--color-navy); font-size: 0.95rem; margin: 0;">Información General</h4>
           <div style="display: flex; gap: 1rem; margin-bottom: 1.25rem;">
             <div style="flex: 1;">
               <label>Nombre</label>
-              <input type="text" id="empName" placeholder="ej. Juan" required>
+              <input type="text" id="empName" placeholder="ej. Juan" oninput="updateEmployeePreview()" required>
             </div>
             <div style="flex: 1;">
               <label>Apellido</label>
-              <input type="text" id="empLastName" placeholder="ej. Pérez" required>
+              <input type="text" id="empLastName" placeholder="ej. Pérez" oninput="updateEmployeePreview()" required>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 1rem; margin-bottom: 1.25rem;">
+            <div style="flex: 1;">
+              <label>Correo Corporativo (Opcional)</label>
+              <input type="email" id="empEmail" placeholder="correo@empresa.com">
+            </div>
+            <div style="flex: 1;">
+              <label>Celular</label>
+              <input type="text" id="empPhone" placeholder="55 0000 0000" required>
             </div>
           </div>
 
@@ -585,19 +616,68 @@
           </div>
 
           <div style="margin-bottom: 1.25rem;">
-            <label>Celular</label>
-            <input type="text" id="empPhone" placeholder="55 0000 0000" required>
-          </div>
-
-
-
-          <div style="margin-bottom: 1.25rem;">
             <label>Rol / Puesto</label>
             <select id="empRole" required>
               <option value="">Selecciona un rol...</option>
             </select>
           </div>
 
+          <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="flex: 1;">
+              <label>Área (Opcional)</label>
+              <input type="text" id="empArea" placeholder="ej. Operaciones" oninput="updateEmployeePreview()">
+            </div>
+            <div style="flex: 1;">
+              <label>Cargo (Opcional)</label>
+              <input type="text" id="empCargo" placeholder="ej. Supervisor" oninput="updateEmployeePreview()">
+            </div>
+          </div>
+
+          <button type="button" id="addressToggleBtn" onclick="toggleAddressSection()"
+            style="background: none; border: none; color: var(--color-cyan); font-weight: 700; font-size: 0.875rem; cursor: pointer; padding: 0; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.4rem;">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Agregar dirección (opcional)
+          </button>
+
+          <div id="addressSection" style="display: none;">
+            <div style="display: flex; gap: 1rem; margin-bottom: 1.25rem;">
+              <div style="flex: 1;">
+                <label>País</label>
+                <input type="text" id="empAddressCountry" placeholder="ej. México" oninput="updateEmployeePreview()">
+              </div>
+              <div style="flex: 1;">
+                <label>Ciudad</label>
+                <input type="text" id="empAddressCity" placeholder="ej. CDMX" oninput="updateEmployeePreview()">
+              </div>
+              <div style="flex: 1;">
+                <label>Código Postal</label>
+                <input type="text" id="empAddressPostalCode" placeholder="ej. 03100">
+              </div>
+            </div>
+
+            <div style="margin-bottom: 0.5rem; position: relative;">
+              <label>Dirección</label>
+              <input type="text" id="empAddressLine" placeholder="Busca la dirección escribiendo la ciudad y el país"
+                autocomplete="off" oninput="handleAddressInput(this.value)"
+                onblur="setTimeout(dismissAddressSuggestions, 150)">
+              <div id="addressSuggestions"
+                style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid var(--color-border); border-radius: 8px; box-shadow: var(--shadow-md); z-index: 20; max-height: 220px; overflow-y: auto; margin-top: 0.25rem;">
+              </div>
+            </div>
+            <button type="button" onclick="dismissAddressSuggestions()"
+              style="background: none; border: none; color: var(--color-text-muted); font-size: 0.75rem; text-decoration: underline; cursor: pointer; padding: 0; margin-bottom: 1.25rem;">No
+              encuentro la dirección</button>
+
+            <div style="margin-bottom: 1.5rem;">
+              <label>Indicaciones</label>
+              <input type="text" id="empAddressIndications" placeholder="Torre, Casa, Apartamento">
+            </div>
+          </div>
+
+          <h4 style="color: var(--color-navy); font-size: 0.95rem; margin: 0 0 0.25rem 0;">Tallas (Opcional)</h4>
           <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
             <div style="flex: 1;">
               <label>Talla Camisa</label>
@@ -1108,8 +1188,8 @@
           </button>
         </div>
 
-        <button type="button" disabled title="Próximamente" class="btn"
-          style="width: 100%; padding: 0.75rem; border-radius: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #25D366; color: white; border: none; opacity: 0.6; cursor: not-allowed;">
+        <button type="button" id="btnSendSizeLinkWhatsApp" onclick="sendSizeLinkWhatsApp()" class="btn"
+          style="width: 100%; padding: 0.75rem; border-radius: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #25D366; color: white; border: none; cursor: pointer;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
             <path
               d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
@@ -1441,11 +1521,101 @@
 
     function openModal() {
       document.getElementById('employeeModal').classList.add('active');
+      resetEmployeeModalUI();
     }
 
     function closeModal() {
       document.getElementById('employeeModal').classList.remove('active');
       if (window.empBirthDatePicker) window.empBirthDatePicker.clear();
+    }
+
+    function resetEmployeeModalUI() {
+      updateEmployeePreview();
+      document.getElementById('addressSection').style.display = 'none';
+      document.getElementById('addressToggleBtn').innerHTML = `
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        Agregar dirección (opcional)
+      `;
+      dismissAddressSuggestions();
+    }
+
+    function toggleAddressSection() {
+      const section = document.getElementById('addressSection');
+      const btn = document.getElementById('addressToggleBtn');
+      const isHidden = section.style.display === 'none';
+      section.style.display = isHidden ? 'block' : 'none';
+      btn.innerHTML = isHidden
+        ? `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12" /></svg> Quitar dirección`
+        : `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg> Agregar dirección (opcional)`;
+    }
+
+    function updateEmployeePreview() {
+      const fn = (document.getElementById('empName')?.value || '').trim();
+      const ln = (document.getElementById('empLastName')?.value || '').trim();
+      const city = (document.getElementById('empAddressCity')?.value || '').trim();
+      const area = (document.getElementById('empArea')?.value || '').trim();
+      const cargo = (document.getElementById('empCargo')?.value || '').trim();
+
+      document.getElementById('empPreviewName').textContent = (fn || ln) ? `${fn} ${ln}`.trim() : 'Nombre del empleado';
+      document.getElementById('empPreviewAvatar').textContent = (fn || ln) ? ((fn.charAt(0) || '') + (ln.charAt(0) || '')).toUpperCase() : '?';
+      document.getElementById('empPreviewCity').textContent = city || 'Ciudad';
+      document.getElementById('empPreviewArea').textContent = area || 'Área';
+      document.getElementById('empPreviewCargo').textContent = cargo || 'Cargo';
+    }
+
+    let addressSearchTimeout = null;
+    let lastAddressSuggestions = [];
+
+    function handleAddressInput(query) {
+      clearTimeout(addressSearchTimeout);
+      if (!query || query.trim().length < 3) {
+        dismissAddressSuggestions();
+        return;
+      }
+      addressSearchTimeout = setTimeout(() => fetchAddressSuggestions(query.trim()), 400);
+    }
+
+    async function fetchAddressSuggestions(query) {
+      const box = document.getElementById('addressSuggestions');
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&q=${encodeURIComponent(query)}`);
+        const results = await res.json();
+        if (!Array.isArray(results) || results.length === 0) {
+          dismissAddressSuggestions();
+          return;
+        }
+        lastAddressSuggestions = results;
+        box.innerHTML = results.map((r, i) => `
+          <div onclick="selectAddressSuggestion(${i})" style="padding: 0.65rem 0.85rem; font-size: 0.8125rem; color: var(--color-navy); cursor: pointer; border-bottom: 1px solid #F1F5F9;" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='white'">${r.display_name}</div>
+        `).join('');
+        box.style.display = 'block';
+      } catch (err) {
+        console.error('Error buscando dirección:', err);
+      }
+    }
+
+    function selectAddressSuggestion(idx) {
+      const r = lastAddressSuggestions[idx];
+      if (!r) return;
+      document.getElementById('empAddressLine').value = r.display_name;
+      const addr = r.address || {};
+      const cityEl = document.getElementById('empAddressCity');
+      const countryEl = document.getElementById('empAddressCountry');
+      const postalEl = document.getElementById('empAddressPostalCode');
+      if (cityEl && !cityEl.value) cityEl.value = addr.city || addr.town || addr.village || addr.municipality || '';
+      if (countryEl && !countryEl.value) countryEl.value = addr.country || '';
+      if (postalEl && !postalEl.value) postalEl.value = addr.postcode || '';
+      updateEmployeePreview();
+      dismissAddressSuggestions();
+    }
+
+    function dismissAddressSuggestions() {
+      const box = document.getElementById('addressSuggestions');
+      box.style.display = 'none';
+      box.innerHTML = '';
     }
 
     function openBulkModal() {
@@ -2657,7 +2827,7 @@
       }
     }
 
-    async function generateAndShowSizeLink(url, empId) {
+    async function generateAndShowSizeLink(url, empId, phone, employeeName) {
       if (empId) {
         try {
           const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
@@ -2669,6 +2839,9 @@
           console.error('Error al fijar la expiración del enlace de tallas:', err);
         }
       }
+
+      window._sizeLinkPhone = phone || '';
+      window._sizeLinkEmployeeName = employeeName || '';
 
       document.getElementById('sizeLinkInput').value = url;
       const qrImg = document.getElementById('sizeLinkQRCode');
@@ -2682,10 +2855,29 @@
       document.getElementById('sizeLinkModal').classList.add('active');
     }
 
+    function sendSizeLinkWhatsApp() {
+      const url = document.getElementById('sizeLinkInput').value;
+      const phone = window._sizeLinkPhone;
+      if (!phone) {
+        showToast('Falta el celular', 'Agrega un número de celular al empleado para enviar por WhatsApp.', 'error');
+        return;
+      }
+      const digits = phone.replace(/\D/g, '');
+      const dialCodes = { MX: '52', CO: '57' };
+      const country = (localStorage.getItem('dotacian_user_country') || 'MX').toUpperCase();
+      const dialCode = dialCodes[country] || '52';
+      const fullNumber = digits.length > 10 ? digits : `${dialCode}${digits}`;
+      const firstName = (window._sizeLinkEmployeeName || '').split(' ')[0];
+      const greeting = firstName ? `Hola ${firstName}, ` : 'Hola, ';
+      const message = `${greeting}confirma tus tallas de dotación aquí: ${url}`;
+      window.open(`https://wa.me/${fullNumber}?text=${encodeURIComponent(message)}`, '_blank');
+    }
+
     function copySizeLink() {
       if (!currentDetailEmployeeId) return;
+      const emp = allEmployees.find(e => e.db_id === currentDetailEmployeeId);
       const url = `${window.location.origin}/mi_dotacion.html?mode=tallas&emp_id=${currentDetailEmployeeId}`;
-      generateAndShowSizeLink(url, currentDetailEmployeeId);
+      generateAndShowSizeLink(url, currentDetailEmployeeId, emp?.phone, emp?.name);
     }
 
     function enableSizeEditing() {
@@ -2960,10 +3152,18 @@
 
       const name = document.getElementById('empName').value;
       const lastName = document.getElementById('empLastName').value;
+      const email = document.getElementById('empEmail').value.trim();
       const empDoc = document.getElementById('empDoc').value;
       const phone = document.getElementById('empPhone').value;
       const role = document.getElementById('empRole').value;
       const birthDate = document.getElementById('empBirthDate').value;
+      const area = document.getElementById('empArea').value.trim();
+      const cargo = document.getElementById('empCargo').value.trim();
+      const addressCountry = document.getElementById('empAddressCountry').value.trim();
+      const addressCity = document.getElementById('empAddressCity').value.trim();
+      const addressPostalCode = document.getElementById('empAddressPostalCode').value.trim();
+      const addressLine = document.getElementById('empAddressLine').value.trim();
+      const addressIndications = document.getElementById('empAddressIndications').value.trim();
       const shirtSize = document.getElementById('empShirtSize').value;
       const pantsSize = document.getElementById('empPantsSize').value;
       const shoeSize = document.getElementById('empShoeSize').value;
@@ -2978,10 +3178,18 @@
           company_id: companyId,
           first_name: name,
           last_name: lastName,
+          email: email || null,
           id_document: empDoc,
           phone: phone,
           role: role,
+          area: area || null,
+          cargo: cargo || null,
           birth_date: birthDate || null,
+          address_country: addressCountry || null,
+          address_city: addressCity || null,
+          address_postal_code: addressPostalCode || null,
+          address_line: addressLine || null,
+          address_indications: addressIndications || null,
           shirt_size: shirtSize,
           pants_size: pantsSize,
           shoe_size: shoeSize,
@@ -3001,13 +3209,14 @@
             const el = document.getElementById(id);
             if (el) el.disabled = false;
           });
+          resetEmployeeModalUI();
         }
 
         if (requestSizes) {
           const url = `${window.location.origin}/mi_dotacion.html?mode=tallas&emp_id=${newEmp.id}`;
 
           showToast("Empleado Agregado", `Se ha registrado a ${name} exitosamente.`);
-          generateAndShowSizeLink(url, newEmp.id);
+          generateAndShowSizeLink(url, newEmp.id, phone, `${name} ${lastName}`.trim());
         } else {
           showToast("Empleado Agregado", `Se ha registrado a ${name} exitosamente.`);
         }

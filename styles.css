@@ -3039,6 +3039,7 @@ ul {
 
 .modal-form input[type="text"],
 .modal-form input[type="date"],
+.modal-form input[type="email"],
 .modal-form select {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -3083,6 +3084,7 @@ ul {
 
 .modal-form input[type="text"]:focus,
 .modal-form input[type="date"]:focus,
+.modal-form input[type="email"]:focus,
 .modal-form select:focus {
   border-color: var(--color-cyan);
   box-shadow: 0 0 0 3px var(--color-cyan-dim);
