@@ -6,7 +6,7 @@
 const I18N = {
   es: {
     // Sidebar
-    'nav.dashboard': 'Dashboard',
+    'nav.dashboard': 'Inicio',
     'nav.roles': 'Roles',
     'nav.empleados': 'Empleados',
     'nav.uniformes': 'Uniformes',
@@ -169,7 +169,7 @@ const I18N = {
   },
 
   en: {
-    'nav.dashboard': 'Dashboard',
+    'nav.dashboard': 'Home',
     'nav.roles': 'Roles',
     'nav.empleados': 'Employees',
     'nav.uniformes': 'Uniforms',
