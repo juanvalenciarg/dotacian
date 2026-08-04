@@ -212,20 +212,13 @@ async function populateHeaderProfile(supabaseClient) {
       document.getElementById('dash-industry-val').textContent = industry;
     }
 
-    // Cambiar icono de industria
-    const iconDisplay = document.getElementById('badge-industry-icon');
-    if (iconDisplay) {
-      const industryLower = industry.toLowerCase();
-      let iconSvg = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M3 7v1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7M4 7l1-4h14l1 4"/></svg>';
-      if (industryLower === 'restaurantes') iconSvg = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v4M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7M12 15v7M15 15v7"/></svg>';
-      else if (industryLower === 'hospitalidad') iconSvg = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 22V4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v18M10 18h4M12 18v4M7 6h.01M7 10h.01M7 14h.01M17 6h.01M17 10h.01M17 14h.01"/></svg>';
-      else if (industryLower === 'industrial') iconSvg = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 20V10l10-4 10 4v10H2Z"/><path d="M17 11v9M7 11v9M12 6v14"/></svg>';
-      else if (industryLower === 'salud') iconSvg = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>';
-      else if (industryLower === 'educacion') iconSvg = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m22 10-10-5L2 10l10 5 10-5Z"/><path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/></svg>';
-      else if (industryLower === 'servicios') iconSvg = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a2 2 0 0 1-2.83-2.83l-3.94 3.6ZM9.14 14.86l2.83 2.83M5 19l2.83-2.83m1.41-5.66 2.12 2.12a2 2 0 0 0 2.83 0l3.54-3.54M3.5 13.5l3.54-3.54a2 2 0 0 1 2.83 0l2.12 2.12"/></svg>';
-      
-      iconDisplay.innerHTML = iconSvg;
-      iconDisplay.style.color = "var(--color-cyan)";
+    // Iniciales del usuario para el badge y el popover
+    const initials = ((firstName.charAt(0) || '') + (lastName.charAt(0) || '')).toUpperCase() || '?';
+    if (document.getElementById('header-badge-initials')) {
+      document.getElementById('header-badge-initials').textContent = initials;
+    }
+    if (document.getElementById('popover-avatar-initials')) {
+      document.getElementById('popover-avatar-initials').textContent = initials;
     }
 
     const userLanguage = (comp && comp.language) || null;
