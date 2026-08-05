@@ -503,6 +503,46 @@
       font-weight: 700;
     }
 
+    .new-role-modal-content {
+      max-width: 560px;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .role-form-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    @media (min-width: 993px) {
+      #newRoleModal {
+        /* El sidebar es fixed y queda por encima del overlay en su franja
+           izquierda (stacking context existente en toda la app). En vez de
+           pelear con eso, centramos el modal dentro del área visible a la
+           derecha del sidebar para que nunca se solape con él. */
+        padding-left: var(--sidebar-width);
+        box-sizing: border-box;
+      }
+
+      .new-role-modal-content {
+        max-width: min(840px, calc(100vw - var(--sidebar-width) - 4rem));
+      }
+
+      .role-form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 1.5rem;
+        row-gap: 1.25rem;
+        align-items: start;
+      }
+
+      .role-form-grid>.role-form-fullwidth {
+        grid-column: 1 / -1;
+      }
+    }
+
     @keyframes slideDownIn {
       from {
         opacity: 0;
@@ -666,17 +706,28 @@
                   <select id="roleAreaSelect" onchange="handleAreaSelectChange()"
                     style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); font-family: var(--font-family-primary); background: white; color: var(--color-navy);">
                     <option value="" data-i18n="roleConfig.selectArea">Selecciona un área...</option>
-                    <option value="Dirección / Gerencia" data-i18n="area.direccion">Dirección / Gerencia</option>
-                    <option value="Administración" data-i18n="area.administracion">Administración</option>
+                    <option value="Dirección / Gerencia General" data-i18n="area.direccion">Dirección / Gerencia General</option>
+                    <option value="Administración y Finanzas" data-i18n="area.administracion">Administración y Finanzas</option>
+                    <option value="Recursos Humanos" data-i18n="area.rrhh">Recursos Humanos</option>
+                    <option value="Legal / Cumplimiento" data-i18n="area.legal">Legal / Cumplimiento</option>
+                    <option value="Ventas / Comercial" data-i18n="area.ventas">Ventas / Comercial</option>
+                    <option value="Marketing" data-i18n="area.marketing">Marketing</option>
+                    <option value="Atención al Cliente / Servicio" data-i18n="area.atencion">Atención al Cliente / Servicio</option>
                     <option value="Operaciones" data-i18n="area.operaciones">Operaciones</option>
-                    <option value="Ventas" data-i18n="area.ventas">Ventas</option>
-                    <option value="Producción / Cocina" data-i18n="area.produccion">Producción / Cocina</option>
-                    <option value="Logística" data-i18n="area.logistica">Logística</option>
-                    <option value="Seguridad" data-i18n="area.seguridad">Seguridad</option>
-                    <option value="Limpieza" data-i18n="area.limpieza">Limpieza</option>
-                    <option value="Atención al Cliente" data-i18n="area.atencion">Atención al Cliente</option>
-                    <option value="TI" data-i18n="area.ti">TI</option>
-                    <option value="RRHH" data-i18n="area.rrhh">RRHH</option>
+                    <option value="Producción / Manufactura" data-i18n="area.produccion">Producción / Manufactura</option>
+                    <option value="Cocina / Alimentos y Bebidas" data-i18n="area.cocina">Cocina / Alimentos y Bebidas</option>
+                    <option value="Calidad" data-i18n="area.calidad">Calidad</option>
+                    <option value="Mantenimiento" data-i18n="area.mantenimiento">Mantenimiento</option>
+                    <option value="Logística y Distribución" data-i18n="area.logistica">Logística y Distribución</option>
+                    <option value="Compras / Abastecimiento" data-i18n="area.compras">Compras / Abastecimiento</option>
+                    <option value="Bodega / Almacén" data-i18n="area.bodega">Bodega / Almacén</option>
+                    <option value="Seguridad y Vigilancia" data-i18n="area.seguridad">Seguridad y Vigilancia</option>
+                    <option value="Salud y Seguridad Ocupacional" data-i18n="area.sst">Salud y Seguridad Ocupacional</option>
+                    <option value="Limpieza y Aseo" data-i18n="area.limpieza">Limpieza y Aseo</option>
+                    <option value="Recepción / Front Desk" data-i18n="area.recepcion">Recepción / Front Desk</option>
+                    <option value="Salud / Clínico" data-i18n="area.salud">Salud / Clínico</option>
+                    <option value="Construcción / Obra" data-i18n="area.construccion">Construcción / Obra</option>
+                    <option value="Tecnología / TI" data-i18n="area.ti">Tecnología / TI</option>
                     <option value="otra" data-i18n="area.otra">Otra (especificar)</option>
                   </select>
                   <input type="text" id="roleAreaCustom" placeholder="Escribe el área..." data-i18n-placeholder="roleConfig.areaCustomPlaceholder"
@@ -740,7 +791,7 @@
 
         <!-- New Role Modal -->
         <div class="modal-overlay" id="newRoleModal">
-          <div class="modal-content-lg" style="max-width: 560px; max-height: 88vh; display: flex; flex-direction: column;">
+          <div class="modal-content-lg new-role-modal-content">
             <div class="modal-header">
               <div>
                 <h2 data-i18n="newRole.title">Crear Nuevo Rol</h2>
@@ -750,7 +801,7 @@
               <button class="btn-close" onclick="closeNewRoleModal()">✕</button>
             </div>
             <div style="padding: 1.5rem; overflow-y: auto;">
-              <div class="modal-form" style="display: flex; flex-direction: column; gap: 1.25rem;">
+              <div class="modal-form role-form-grid">
                 <div class="form-row">
                   <label data-i18n="newRole.roleName">Nombre del Rol</label>
                   <input type="text" id="newRoleName" placeholder="Ej. Supervisor de Piso" data-i18n-placeholder="newRole.roleNamePlaceholder">
@@ -760,32 +811,41 @@
                   <textarea id="newRoleDesc" placeholder="Describe brevemente las funciones de este rol..." data-i18n-placeholder="newRole.descriptionPlaceholder"
                     style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); font-family: var(--font-family-primary); height: 80px; resize: none;"></textarea>
                 </div>
-                <div style="display: flex; gap: 1rem;">
-                  <div class="form-row" style="flex: 1;">
-                    <label data-i18n="roleConfig.area">Área</label>
-                    <select id="newRoleArea"
-                      style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); font-family: var(--font-family-primary); background: white; color: var(--color-navy);">
+                <div class="form-row">
+                  <label data-i18n="roleConfig.area">Área</label>
+                  <select id="newRoleArea"
+                    style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); font-family: var(--font-family-primary); background: white; color: var(--color-navy);">
                       <option value="" data-i18n="roleConfig.selectArea">Selecciona un área...</option>
-                      <option value="Dirección / Gerencia" data-i18n="area.direccion">Dirección / Gerencia</option>
-                      <option value="Administración" data-i18n="area.administracion">Administración</option>
+                      <option value="Dirección / Gerencia General" data-i18n="area.direccion">Dirección / Gerencia General</option>
+                      <option value="Administración y Finanzas" data-i18n="area.administracion">Administración y Finanzas</option>
+                      <option value="Recursos Humanos" data-i18n="area.rrhh">Recursos Humanos</option>
+                      <option value="Legal / Cumplimiento" data-i18n="area.legal">Legal / Cumplimiento</option>
+                      <option value="Ventas / Comercial" data-i18n="area.ventas">Ventas / Comercial</option>
+                      <option value="Marketing" data-i18n="area.marketing">Marketing</option>
+                      <option value="Atención al Cliente / Servicio" data-i18n="area.atencion">Atención al Cliente / Servicio</option>
                       <option value="Operaciones" data-i18n="area.operaciones">Operaciones</option>
-                      <option value="Ventas" data-i18n="area.ventas">Ventas</option>
-                      <option value="Producción / Cocina" data-i18n="area.produccion">Producción / Cocina</option>
-                      <option value="Logística" data-i18n="area.logistica">Logística</option>
-                      <option value="Seguridad" data-i18n="area.seguridad">Seguridad</option>
-                      <option value="Limpieza" data-i18n="area.limpieza">Limpieza</option>
-                      <option value="Atención al Cliente" data-i18n="area.atencion">Atención al Cliente</option>
-                      <option value="TI" data-i18n="area.ti">TI</option>
-                      <option value="RRHH" data-i18n="area.rrhh">RRHH</option>
-                    </select>
-                  </div>
-                  <div class="form-row" style="flex: 1;">
-                    <label data-i18n="roleConfig.subarea">Subárea (opcional)</label>
-                    <input type="text" id="newRoleSubarea" placeholder="Ej. Cocina" data-i18n-placeholder="roleConfig.subareaPlaceholder">
-                  </div>
+                      <option value="Producción / Manufactura" data-i18n="area.produccion">Producción / Manufactura</option>
+                      <option value="Cocina / Alimentos y Bebidas" data-i18n="area.cocina">Cocina / Alimentos y Bebidas</option>
+                      <option value="Calidad" data-i18n="area.calidad">Calidad</option>
+                      <option value="Mantenimiento" data-i18n="area.mantenimiento">Mantenimiento</option>
+                      <option value="Logística y Distribución" data-i18n="area.logistica">Logística y Distribución</option>
+                      <option value="Compras / Abastecimiento" data-i18n="area.compras">Compras / Abastecimiento</option>
+                      <option value="Bodega / Almacén" data-i18n="area.bodega">Bodega / Almacén</option>
+                      <option value="Seguridad y Vigilancia" data-i18n="area.seguridad">Seguridad y Vigilancia</option>
+                      <option value="Salud y Seguridad Ocupacional" data-i18n="area.sst">Salud y Seguridad Ocupacional</option>
+                      <option value="Limpieza y Aseo" data-i18n="area.limpieza">Limpieza y Aseo</option>
+                      <option value="Recepción / Front Desk" data-i18n="area.recepcion">Recepción / Front Desk</option>
+                      <option value="Salud / Clínico" data-i18n="area.salud">Salud / Clínico</option>
+                      <option value="Construcción / Obra" data-i18n="area.construccion">Construcción / Obra</option>
+                      <option value="Tecnología / TI" data-i18n="area.ti">Tecnología / TI</option>
+                  </select>
+                </div>
+                <div class="form-row">
+                  <label data-i18n="roleConfig.subarea">Subárea (opcional)</label>
+                  <input type="text" id="newRoleSubarea" placeholder="Ej. Cocina" data-i18n-placeholder="roleConfig.subareaPlaceholder">
                 </div>
 
-                <div style="border-top: 1px solid var(--color-smoke); padding-top: 1.25rem;">
+                <div class="role-form-fullwidth" style="border-top: 1px solid var(--color-smoke); padding-top: 1.25rem;">
                   <label style="display: block; font-weight: 700; font-size: 0.875rem; color: var(--color-navy); margin-bottom: 0.6rem;" data-i18n="newRole.assetTypesLabel">Tipo de activos a entregar</label>
                   <div style="display: flex; gap: 1.5rem; margin-bottom: 1rem;">
                     <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.875rem; font-weight: 600; color: var(--color-navy);">
