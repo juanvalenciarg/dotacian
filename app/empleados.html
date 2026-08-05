@@ -579,8 +579,6 @@
                 style="background: #F1F5F9; color: #64748B; font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 999px;">Ciudad</span>
               <span id="empPreviewArea"
                 style="background: #F1F5F9; color: #64748B; font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 999px;">Área</span>
-              <span id="empPreviewCargo"
-                style="background: #F1F5F9; color: #64748B; font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 999px;">Cargo</span>
             </div>
           </div>
         </div>
@@ -627,15 +625,9 @@
             </select>
           </div>
 
-          <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
-            <div style="flex: 1;">
-              <label>Área (Opcional)</label>
-              <input type="text" id="empArea" placeholder="ej. Operaciones" oninput="updateEmployeePreview()">
-            </div>
-            <div style="flex: 1;">
-              <label>Cargo (Opcional)</label>
-              <input type="text" id="empCargo" placeholder="ej. Supervisor" oninput="updateEmployeePreview()">
-            </div>
+          <div style="margin-bottom: 1.5rem;">
+            <label>Área (Opcional)</label>
+            <input type="text" id="empArea" placeholder="ej. Operaciones" oninput="updateEmployeePreview()">
           </div>
 
           <button type="button" id="addressToggleBtn" onclick="toggleAddressSection()"
@@ -1562,13 +1554,11 @@
       const ln = (document.getElementById('empLastName')?.value || '').trim();
       const city = (document.getElementById('empAddressCity')?.value || '').trim();
       const area = (document.getElementById('empArea')?.value || '').trim();
-      const cargo = (document.getElementById('empCargo')?.value || '').trim();
 
       document.getElementById('empPreviewName').textContent = (fn || ln) ? `${fn} ${ln}`.trim() : 'Nombre del empleado';
       document.getElementById('empPreviewAvatar').textContent = (fn || ln) ? ((fn.charAt(0) || '') + (ln.charAt(0) || '')).toUpperCase() : '?';
       document.getElementById('empPreviewCity').textContent = city || 'Ciudad';
       document.getElementById('empPreviewArea').textContent = area || 'Área';
-      document.getElementById('empPreviewCargo').textContent = cargo || 'Cargo';
     }
 
     let addressSearchTimeout = null;
@@ -3163,7 +3153,6 @@
       const role = document.getElementById('empRole').value;
       const birthDate = document.getElementById('empBirthDate').value;
       const area = document.getElementById('empArea').value.trim();
-      const cargo = document.getElementById('empCargo').value.trim();
       const addressCountry = document.getElementById('empAddressCountry').value.trim();
       const addressCity = document.getElementById('empAddressCity').value.trim();
       const addressPostalCode = document.getElementById('empAddressPostalCode').value.trim();
@@ -3188,7 +3177,6 @@
           phone: phone,
           role: role,
           area: area || null,
-          cargo: cargo || null,
           birth_date: birthDate || null,
           address_country: addressCountry || null,
           address_city: addressCity || null,

@@ -247,6 +247,7 @@
       background: #F8FAFC;
       border-radius: 10px;
       padding: 0.5rem 0.6rem;
+      min-width: 0;
     }
 
     .role-stat-label {
@@ -258,6 +259,7 @@
     }
 
     .role-stat-value {
+      display: block;
       font-size: 0.78rem;
       font-weight: 700;
       color: var(--color-navy);
@@ -1101,7 +1103,7 @@
             </div>
             <div class="role-stat-pill">
               <span class="role-stat-label">${t('card.area')}</span>
-              <span class="role-stat-value ${areaMuted ? 'muted' : ''}">${areaText}</span>
+              <span class="role-stat-value ${areaMuted ? 'muted' : ''}" title="${areaText}">${areaText}</span>
             </div>
           </div>
 
