@@ -9,7 +9,7 @@ const I18N = {
     'nav.dashboard': 'Home',
     'nav.roles': 'Roles',
     'nav.empleados': 'Empleados',
-    'nav.uniformes': 'Uniformes',
+    'nav.activos': 'Activos',
     'nav.bodega': 'Bodega',
 
     // User popover
@@ -183,7 +183,7 @@ const I18N = {
     'nav.dashboard': 'Home',
     'nav.roles': 'Roles',
     'nav.empleados': 'Employees',
-    'nav.uniformes': 'Uniforms',
+    'nav.activos': 'Assets',
     'nav.bodega': 'Warehouse',
 
     'popover.user': 'User',

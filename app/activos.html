@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <link rel="icon" type="image/svg+xml" href="/assets/logos/favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dotacian | Catálogo de Activos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 0.5rem;
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 1001;
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.5);
+      z-index: 900;
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .app-layout.sidebar-open .sidebar-overlay {
+      display: block;
+      opacity: 1;
+    }
+
+    @media (max-width: 992px) {
+      .main-content {
+        margin-left: 0;
+      }
+
+      .mobile-menu-toggle {
+        display: none;
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        padding: 0.5rem;
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        z-index: 1001;
+      }
+
+      .sidebar {
+        z-index: 1000;
+      }
+    }
+
+    /* Main Content Refinement */
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      padding: 0;
+      background: #F8FAFC;
+    }
+
+    .app-header {
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: transparent;
+      border: none;
+      position: absolute;
+      top: 0;
+      left: var(--sidebar-width);
+      right: 0;
+      z-index: 10;
+    }
+
+    @media (max-width: 992px) {
+      .app-header {
+        left: 0;
+        padding: 1rem 1.5rem;
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+    }
+
+    .asset-category-section {
+      margin-bottom: 2rem;
+    }
+
+    .asset-category-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--color-navy);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .asset-category-title .badge-count {
+      background: var(--color-cyan-dim);
+      color: var(--color-cyan);
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+    }
+
+    .asset-subcat-card {
+      background: white;
+      border-radius: 1.25rem;
+      border: 1px solid var(--color-border);
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+
+    .asset-subcat-header {
+      padding: 1rem 1.25rem;
+      font-weight: 700;
+      color: var(--color-navy);
+      font-size: 0.9rem;
+      background: #F8FAFC;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .asset-row {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid #F1F5F9;
+    }
+
+    .asset-row:last-child {
+      border-bottom: none;
+    }
+
+    .asset-row-main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .asset-row-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--color-navy);
+    }
+
+    .asset-row-summary {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      margin-top: 0.2rem;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 42px;
+      height: 23px;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-switch .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #CBD5E1;
+      transition: .35s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 24px;
+    }
+
+    .toggle-switch .slider:before {
+      position: absolute;
+      content: "";
+      height: 17px;
+      width: 17px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .35s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .toggle-switch input:checked+.slider {
+      background-color: var(--color-cyan);
+    }
+
+    .toggle-switch input:checked+.slider:before {
+      transform: translateX(19px);
+    }
+
+    .asset-detail-panel {
+      display: none;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px dashed var(--color-border);
+    }
+
+    .asset-detail-panel.open {
+      display: block;
+    }
+
+    .asset-detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      .asset-detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .asset-field label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-text-secondary);
+      margin-bottom: 0.4rem;
+    }
+
+    .asset-field input[type="text"],
+    .asset-field input[type="number"] {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 0.85rem;
+      box-sizing: border-box;
+    }
+
+    .asset-field-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-navy);
+      cursor: pointer;
+    }
+
+    .asset-field-checkbox input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--color-cyan);
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Custom Notification Container -->
+  <div id="notificationToast" class="notification-toast">
+    <div class="notification-icon">✓</div>
+    <div class="notification-text" id="notificationText">Mensaje guardado</div>
+  </div>
+
+  <div class="app-layout" id="app-layout-wrapper">
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" style="display: flex; flex-direction: column;">
+      <!-- TOP: dot AI -->
+      <div class="sidebar-header" style="position: relative; display: flex; justify-content: center; padding: 1.5rem 0.25rem 1rem 0.25rem !important; overflow: visible;">
+        <a href="/app/home" style="display: flex; align-items: center; justify-content: center; text-decoration: none; width: 100%;">
+          <img src="/assets/logos/logo_dotacian.png" alt="dotacian" style="width: 100%; max-width: 108px; height: auto; object-fit: contain; filter: brightness(0) invert(1);">
+        </a>
+      </div>
+
+      <!-- MIDDLE: Navigation -->
+      <nav class="sidebar-nav" style="flex: 1; display: flex; flex-direction: column; overflow-y: auto;">
+        <a href="/app/home" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
+          <span class="nav-label">Home</span>
+        </a>
+        <a href="/app/roles" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+          <span class="nav-label">Roles</span>
+        </a>
+        <a href="/app/empleados" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          <span class="nav-label">Empleados</span>
+        </a>
+        <a href="/app/activos" class="nav-item active">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /><path d="m3.3 7 8.7 5 8.7-5" /><path d="M12 22V12" /></svg></span>
+          <span class="nav-label">Activos</span>
+        </a>
+        <a href="/app/bodega" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg></span>
+          <span class="nav-label">Bodega</span>
+        </a>
+      </nav>
+
+      <!-- BOTTOM: Secondary Menu -->
+      <div class="sidebar-footer" style="padding: 1.5rem 0 1.5rem 1.75rem; display: flex; justify-content: flex-start; position: relative;">
+        <div class="header-right" style="position: relative; display: flex; justify-content: flex-start; width: 100%; padding: 0;">
+          <div id="header-company-badge" class="sidebar-avatar-badge" onclick="toggleUserPopover(event)">
+            <span id="header-badge-initials">?</span>
+            <span id="company-name-display" style="display: none;"></span>
+            <span id="dash-industry-val" style="display: none;"></span>
+          </div>
+
+          <!-- Popover (Abriendo hacia arriba y a la derecha) -->
+          <div id="user-popover" class="user-popover" style="left: 60px; bottom: 0; top: auto; right: auto; min-width: 260px;">
+            <div class="popover-profile-header">
+              <div class="popover-profile-avatar"><span id="popover-avatar-initials">?</span></div>
+              <div style="min-width: 0;">
+                <div id="pop-user-name" class="popover-profile-name">Cargando...</div>
+                <div id="pop-user-email" class="popover-profile-email">Cargando...</div>
+              </div>
+            </div>
+
+            <div class="popover-label">País</div>
+            <div id="version-tag" style="margin-top: 0.25rem; margin-bottom: 1rem; display: flex;"></div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.15rem;">
+              <a href="#" class="popover-menu-item">
+                <span class="popover-menu-icon">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                  </svg>
+                </span>
+                Alertas
+              </a>
+              <a href="/configuracion.html" class="popover-menu-item">
+                <span class="popover-menu-icon">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path
+                      d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0-2.73.73l.15-.08a2 2 0 0 1-2 0l.43.25a2 2 0 0 1-1-1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1-1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </span>
+                Configuración
+              </a>
+              <hr style="margin: 0.5rem 0; border: none; border-top: 1px solid var(--color-smoke-mid);">
+              <a href="/login.html" class="popover-menu-item popover-menu-item-danger">
+                <span class="popover-menu-icon">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                  </svg>
+                </span>
+                Cerrar Sesión
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="app-header">
+        <div class="header-left" style="display: flex; align-items: center;">
+          <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" viewBox="0 0 24 24">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="dashboard-content-wrapper" style="padding-top: 5rem;">
+        <div style="margin-bottom: 2rem;">
+          <h1 class="dot-greeting" style="text-align: left; margin-bottom: 0.5rem; font-size: 3rem; background: linear-gradient(90deg, #94A3B8 0%, #1E293B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Catálogo de Activos</h1>
+          <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;">Activa los tipos de activos que tu empresa puede asignar a los roles y, si quieres, define proveedor, costo y tiempos.</p>
+        </div>
+
+        <div class="app-container">
+          <!-- Search -->
+          <div class="app-card" style="margin-bottom: 1.5rem; padding: 1rem;">
+            <div style="flex: 1; position: relative;">
+              <input type="text" id="assetSearchInput" placeholder="Buscar tipo de activo..." onkeyup="filterAssets(this.value)"
+                style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-md);">
+              <span
+                style="position: absolute; left: 0.875rem; top: 50%; transform: translateY(-50%); color: var(--color-text-muted);">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <div id="assetCatalogRoot">
+            <div style="text-align: center; padding: 3rem; color: var(--color-text-secondary);">Cargando catálogo...</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Catálogo estándar de tipos de activo (categoría → subcategoría → ítems).
+    // Es el mismo listado que Roles usa como sugerencia; aquí la empresa
+    // decide cuáles tiene disponibles y, opcionalmente, los parametriza.
+    const ASSET_CATALOG = {
+      fisico: {
+        label: 'Físico',
+        subcats: {
+          computo: { label: 'Cómputo', items: ['Laptop', 'Monitor', 'Cargador de laptop', 'Mouse', 'Teclado', 'Audífonos'] },
+          uniforme: { label: 'Uniformes', items: ['Camiseta/Camisa', 'Pantalón', 'Casco', 'Zapatos/Calzado', 'Chaqueta', 'Delantal'] },
+          acceso: { label: 'Acceso', items: ['Tarjeta de acceso', 'Llave de oficina', 'Gafete/Credencial'] },
+          vehiculo: { label: 'Vehículos', items: ['Auto', 'Moto', 'Bicicleta'] },
+          equipo: { label: 'Herramientas / EPP', items: ['Kit de herramientas', 'Radio de comunicación', 'Equipo de protección personal'] }
+        }
+      },
+      digital: {
+        label: 'Digital',
+        subcats: {
+          licencia: { label: 'Licencias / Software', items: ['Google Workspace', 'Microsoft 365', 'CRM', 'ERP'] },
+          acceso_digital: { label: 'Accesos digitales', items: ['VPN', 'Usuario de sistema interno', 'Correo corporativo'] }
+        }
+      }
+    };
+
+    let currentCompanyId = null;
+    let assetRowsByKey = {}; // "tipo|nombre" -> row de company_assets
+
+    function assetKey(tipo, nombre) {
+      return `${tipo}|${nombre}`;
+    }
+
+    window.onload = () => {
+      setTimeout(loadAssets, 1000); // Esperar a que Supabase esté listo
+    };
+
+    async function loadAssets() {
+      try {
+        const { data: sessionData, error: sessionError } = await _supabase.auth.getSession();
+        if (sessionError) throw sessionError;
+        if (!sessionData.session) return;
+
+        currentCompanyId = await resolveCompanyId(_supabase, sessionData.session.user.id);
+
+        const { data, error } = await _supabase
+          .from('company_assets')
+          .select('*')
+          .eq('company_id', currentCompanyId);
+
+        if (error) throw error;
+
+        assetRowsByKey = {};
+        (data || []).forEach(row => {
+          assetRowsByKey[assetKey(row.tipo, row.nombre)] = row;
+        });
+
+        renderCatalog();
+      } catch (err) {
+        console.error('Error cargando catálogo de activos:', err);
+        const root = document.getElementById('assetCatalogRoot');
+        if (root) {
+          root.innerHTML = '<div style="text-align: center; padding: 3rem; color: #EF4444;">No se pudo cargar el catálogo de activos.</div>';
+        }
+      }
+    }
+
+    function renderCatalog() {
+      const root = document.getElementById('assetCatalogRoot');
+      root.innerHTML = '';
+
+      Object.keys(ASSET_CATALOG).forEach(catKey => {
+        const cat = ASSET_CATALOG[catKey];
+        const section = document.createElement('div');
+        section.className = 'asset-category-section';
+        section.dataset.category = catKey;
+
+        section.innerHTML = `<div class="asset-category-title">${cat.label} <span class="badge-count">0 activos</span></div>`;
+
+        Object.keys(cat.subcats).forEach(subKey => {
+          const sub = cat.subcats[subKey];
+          const card = document.createElement('div');
+          card.className = 'asset-subcat-card';
+          card.innerHTML = `<div class="asset-subcat-header">${sub.label}</div>`;
+
+          sub.items.forEach(name => {
+            card.appendChild(renderAssetRow(catKey, subKey, name));
+          });
+
+          section.appendChild(card);
+        });
+
+        root.appendChild(section);
+      });
+
+      updateCategoryCounts();
+    }
+
+    function renderAssetRow(category, tipo, nombre) {
+      const key = assetKey(tipo, nombre);
+      const row = assetRowsByKey[key] || null;
+      const isActive = !!(row && row.activo);
+
+      const wrap = document.createElement('div');
+      wrap.className = 'asset-row';
+      wrap.dataset.name = nombre.toLowerCase();
+
+      const summaryParts = [];
+      if (row && row.proveedor_nombre) summaryParts.push(row.proveedor_nombre);
+      if (row && row.precio_unitario) summaryParts.push(`$${Number(row.precio_unitario).toLocaleString('es-MX')}`);
+      const summaryText = summaryParts.length > 0 ? summaryParts.join(' · ') : 'Sin parametrizar todavía';
+
+      wrap.innerHTML = `
+        <div class="asset-row-main">
+          <div>
+            <div class="asset-row-name">${nombre}</div>
+            <div class="asset-row-summary">${isActive ? summaryText : 'Desactivado'}</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" ${isActive ? 'checked' : ''} onchange="toggleAsset(this, '${category}', '${tipo}', '${escapeAttr(nombre)}')">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="asset-detail-panel ${isActive ? 'open' : ''}" id="panel-${slug(key)}">
+          <div class="asset-detail-grid">
+            <div class="asset-field">
+              <label>Proveedor</label>
+              <input type="text" id="prov-${slug(key)}" placeholder="ej. Textiles del Norte S.A." value="${escapeAttr(row && row.proveedor_nombre || '')}">
+            </div>
+            <div class="asset-field">
+              <label>Contacto del proveedor</label>
+              <input type="text" id="cont-${slug(key)}" placeholder="Teléfono o correo" value="${escapeAttr(row && row.proveedor_contacto || '')}">
+            </div>
+            <div class="asset-field">
+              <label>Costo unitario</label>
+              <input type="number" id="costo-${slug(key)}" min="0" step="0.01" placeholder="0.00" value="${row && row.precio_unitario != null ? row.precio_unitario : ''}">
+            </div>
+            <div class="asset-field">
+              <label>Tiempo de entrega (días)</label>
+              <input type="number" id="entrega-${slug(key)}" min="0" step="1" placeholder="ej. 15" value="${row && row.tiempo_entrega_dias != null ? row.tiempo_entrega_dias : ''}">
+            </div>
+            <div class="asset-field">
+              <label>Renovación (meses)</label>
+              <input type="number" id="renov-${slug(key)}" min="0" step="1" placeholder="ej. 6" value="${row && row.tiempo_renovacion_meses != null ? row.tiempo_renovacion_meses : ''}">
+            </div>
+            ${tipo === 'uniforme' ? `
+            <div class="asset-field">
+              <label>Colores disponibles</label>
+              <input type="text" id="colores-${slug(key)}" placeholder="Azul marino, Blanco" value="${escapeAttr(row && Array.isArray(row.colores) ? row.colores.join(', ') : '')}">
+            </div>` : ''}
+          </div>
+          <label class="asset-field-checkbox" style="margin-bottom: 1rem;">
+            <input type="checkbox" id="reutiliza-${slug(key)}" ${!row || row.reutilizable ? 'checked' : ''}>
+            Se reutiliza con el siguiente empleado cuando el actual sale
+          </label>
+          <button type="button" class="btn btn-outline" style="padding: 0.5rem 1.25rem; font-size: 0.8125rem;" onclick="saveAssetDetails('${category}', '${tipo}', '${escapeAttr(nombre)}')">Guardar detalles</button>
+        </div>
+      `;
+
+      return wrap;
+    }
+
+    function slug(str) {
+      return str.replace(/[^a-zA-Z0-9]/g, '_');
+    }
+
+    function escapeAttr(str) {
+      return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function filterAssets(query) {
+      const q = query.trim().toLowerCase();
+      document.querySelectorAll('.asset-row').forEach(row => {
+        row.style.display = !q || row.dataset.name.includes(q) ? '' : 'none';
+      });
+      document.querySelectorAll('.asset-subcat-card').forEach(card => {
+        const visible = Array.from(card.querySelectorAll('.asset-row')).some(r => r.style.display !== 'none');
+        card.style.display = visible ? '' : 'none';
+      });
+    }
+
+    async function toggleAsset(checkbox, category, tipo, nombre) {
+      const key = assetKey(tipo, nombre);
+      const panel = document.getElementById(`panel-${slug(key)}`);
+      const activo = checkbox.checked;
+      const summaryEl = checkbox.closest('.asset-row').querySelector('.asset-row-summary');
+
+      checkbox.disabled = true;
+      try {
+        const existing = assetRowsByKey[key];
+        const payload = {
+          company_id: currentCompanyId,
+          category,
+          tipo,
+          nombre,
+          activo,
+          updated_at: new Date().toISOString()
+        };
+
+        let saved;
+        if (existing) {
+          const { data, error } = await _supabase.from('company_assets').update(payload).eq('id', existing.id).select().single();
+          if (error) throw error;
+          saved = data;
+        } else {
+          const { data, error } = await _supabase.from('company_assets').insert([payload]).select().single();
+          if (error) throw error;
+          saved = data;
+        }
+
+        assetRowsByKey[key] = saved;
+        if (panel) panel.classList.toggle('open', activo);
+        if (summaryEl) {
+          const parts = [];
+          if (saved.proveedor_nombre) parts.push(saved.proveedor_nombre);
+          if (saved.precio_unitario) parts.push(`$${Number(saved.precio_unitario).toLocaleString('es-MX')}`);
+          summaryEl.textContent = activo ? (parts.length ? parts.join(' · ') : 'Sin parametrizar todavía') : 'Desactivado';
+        }
+        updateCategoryCounts();
+      } catch (err) {
+        console.error('Error activando/desactivando activo:', err);
+        checkbox.checked = !activo;
+        if (window.showToast) showToast('Error', 'No se pudo actualizar el activo.', 'error');
+      } finally {
+        checkbox.disabled = false;
+      }
+    }
+
+    function updateCategoryCounts() {
+      document.querySelectorAll('.asset-category-section').forEach(section => {
+        const catKey = section.dataset.category;
+        const cat = ASSET_CATALOG[catKey];
+        let count = 0;
+        Object.keys(cat.subcats).forEach(subKey => {
+          cat.subcats[subKey].items.forEach(name => {
+            const row = assetRowsByKey[assetKey(subKey, name)];
+            if (row && row.activo) count++;
+          });
+        });
+        const badge = section.querySelector('.badge-count');
+        if (badge) badge.textContent = `${count} activos`;
+      });
+    }
+
+    async function saveAssetDetails(category, tipo, nombre) {
+      const key = assetKey(tipo, nombre);
+      const s = slug(key);
+
+      const proveedorNombre = document.getElementById(`prov-${s}`).value.trim();
+      const proveedorContacto = document.getElementById(`cont-${s}`).value.trim();
+      const costo = document.getElementById(`costo-${s}`).value;
+      const entrega = document.getElementById(`entrega-${s}`).value;
+      const renovacion = document.getElementById(`renov-${s}`).value;
+      const reutilizable = document.getElementById(`reutiliza-${s}`).checked;
+      const coloresInput = document.getElementById(`colores-${s}`);
+      const colores = coloresInput ? coloresInput.value.split(',').map(c => c.trim()).filter(Boolean) : [];
+
+      const existing = assetRowsByKey[key];
+      const payload = {
+        company_id: currentCompanyId,
+        category,
+        tipo,
+        nombre,
+        activo: true,
+        proveedor_nombre: proveedorNombre || null,
+        proveedor_contacto: proveedorContacto || null,
+        precio_unitario: costo ? parseFloat(costo) : null,
+        tiempo_entrega_dias: entrega ? parseInt(entrega) : null,
+        tiempo_renovacion_meses: renovacion ? parseInt(renovacion) : null,
+        reutilizable,
+        colores,
+        updated_at: new Date().toISOString()
+      };
+
+      try {
+        let saved;
+        if (existing) {
+          const { data, error } = await _supabase.from('company_assets').update(payload).eq('id', existing.id).select().single();
+          if (error) throw error;
+          saved = data;
+        } else {
+          const { data, error } = await _supabase.from('company_assets').insert([payload]).select().single();
+          if (error) throw error;
+          saved = data;
+        }
+        assetRowsByKey[key] = saved;
+
+        const panel = document.getElementById(`panel-${s}`);
+        const row = panel.closest('.asset-row');
+        const toggle = row.querySelector('.toggle-switch input');
+        toggle.checked = true;
+        panel.classList.add('open');
+        const summaryEl = row.querySelector('.asset-row-summary');
+        const parts = [];
+        if (saved.proveedor_nombre) parts.push(saved.proveedor_nombre);
+        if (saved.precio_unitario) parts.push(`$${Number(saved.precio_unitario).toLocaleString('es-MX')}`);
+        summaryEl.textContent = parts.length ? parts.join(' · ') : 'Sin parametrizar todavía';
+        updateCategoryCounts();
+
+        if (window.showToast) showToast('Éxito', 'Detalles guardados correctamente.');
+      } catch (err) {
+        console.error('Error guardando detalles del activo:', err);
+        if (window.showToast) showToast('Error', 'No se pudieron guardar los detalles.', 'error');
+      }
+    }
+
+    function toggleSidebar() {
+      const layout = document.getElementById('app-layout-wrapper');
+      if (layout) {
+        layout.classList.toggle('sidebar-open');
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    if (typeof window._supabase === 'undefined') {
+      window.SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+      window.SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+      window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token', multiTab: false } });
+    }
+  </script>
+  <script src="/assets/js/utils.js?v=4"></script>
+</body>
+
+</html>
