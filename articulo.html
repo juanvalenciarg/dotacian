@@ -149,6 +149,25 @@
       margin: 2rem 0;
       font-size: 1.25rem;
     }
+
+    .article-lang-switch {
+      position: absolute;
+      top: 8rem;
+      right: 2rem;
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+      z-index: 10;
+    }
+
+    .article-lang-switch:hover {
+      color: white;
+    }
   </style>
 </head>
 
@@ -157,18 +176,18 @@
   <header class="header">
     <div class="container">
       <div class="logo">
-        <a href="index.html">
+        <a href="index.html" id="logo-link">
           <img src="assets/logos/logo_dotacian.png" alt="dotacian logo"
             style="height: 50px; width: auto; display: block; filter: brightness(0) invert(1);">
         </a>
       </div>
       <div style="display: flex; align-items: center; gap: 2rem;">
         <nav class="nav-links" style="display: flex; gap: 1.5rem;">
-          <a href="index.html#como-funciona" style="color: white; font-weight: 600;">Producto</a>
-          <a href="blog.html" style="color: white; font-weight: 600;">Recursos</a>
+          <a href="index.html#como-funciona" id="nav-product" style="color: white; font-weight: 600;">Producto</a>
+          <a href="blog.html" id="nav-resources" style="color: white; font-weight: 600;">Recursos</a>
         </nav>
         <div class="header-actions">
-          <a href="index.html#agendar-demo" class="btn"
+          <a href="index.html#agendar-demo" id="nav-demo" class="btn"
             style="background-color: var(--color-cyan); color: var(--color-navy); border: none; font-weight: 700;">Agendar
             Demo</a>
           <button class="header-mobile-toggle" id="mobile-menu-toggle" aria-label="Abrir menú">
@@ -190,10 +209,10 @@
       <button class="drawer-close" id="drawer-close">&times;</button>
     </div>
     <nav class="drawer-nav">
-      <a href="index.html#como-funciona" style="font-weight: 600;">Producto</a>
-      <a href="blog.html" style="font-weight: 600;">Recursos</a>
+      <a href="index.html#como-funciona" id="drawer-product" style="font-weight: 600;">Producto</a>
+      <a href="blog.html" id="drawer-resources" style="font-weight: 600;">Recursos</a>
       <div class="drawer-divider"></div>
-      <a href="index.html#agendar-demo" class="btn"
+      <a href="index.html#agendar-demo" id="drawer-demo" class="btn"
         style="background-color: var(--color-cyan); color: var(--color-navy); border: none; font-weight: 700; text-align: center; margin-top: 1rem;">Agendar
         Demo</a>
     </nav>
@@ -240,6 +259,45 @@
       document.body.style.overflow = '';
     });
 
+    const STRINGS = {
+      es: {
+        product: 'Producto', resources: 'Recursos', demo: 'Agendar Demo',
+        indexHref: 'index.html', blogHref: 'blog.es.html',
+        back: 'Volver', by: 'Por', dateLocale: 'es-ES',
+        switchLangLabel: 'Read in English',
+        notFound: 'Artículo no encontrado.', backToBlog: 'Volver al blog',
+        loadError: 'El artículo no existe o hubo un error al cargarlo.',
+        titleSuffix: 'Blog Dotacian'
+      },
+      en: {
+        product: 'Product', resources: 'Resources', demo: 'Book a demo',
+        indexHref: 'index.html', blogHref: 'blog.html',
+        back: 'Back', by: 'By', dateLocale: 'en-US',
+        switchLangLabel: 'Leer en Español',
+        notFound: 'Article not found.', backToBlog: 'Back to blog',
+        loadError: "This article doesn't exist or there was an error loading it.",
+        titleSuffix: 'Dotacian Blog'
+      }
+    };
+
+    function applyHeaderLang(lang) {
+      const s = STRINGS[lang] || STRINGS.es;
+      document.documentElement.lang = lang;
+      document.getElementById('logo-link').href = s.indexHref;
+      document.getElementById('nav-product').href = `${s.indexHref}#como-funciona`;
+      document.getElementById('nav-product').textContent = s.product;
+      document.getElementById('nav-resources').href = s.blogHref;
+      document.getElementById('nav-resources').textContent = s.resources;
+      document.getElementById('nav-demo').href = `${s.indexHref}#agendar-demo`;
+      document.getElementById('nav-demo').textContent = s.demo;
+      document.getElementById('drawer-product').href = `${s.indexHref}#como-funciona`;
+      document.getElementById('drawer-product').textContent = s.product;
+      document.getElementById('drawer-resources').href = s.blogHref;
+      document.getElementById('drawer-resources').textContent = s.resources;
+      document.getElementById('drawer-demo').href = `${s.indexHref}#agendar-demo`;
+      document.getElementById('drawer-demo').textContent = s.demo;
+    }
+
     async function loadArticle() {
       const container = document.getElementById('article-container');
       const urlParams = new URLSearchParams(window.location.search);
@@ -265,6 +323,30 @@
           throw error || new Error("Not found");
         }
 
+        const lang = post.lang === 'en' ? 'en' : 'es';
+        const s = STRINGS[lang];
+        applyHeaderLang(lang);
+
+        let translationLink = '';
+        if (post.translation_group_id) {
+          const { data: sibling } = await _supabaseBlog
+            .from('blog_posts')
+            .select('slug, lang')
+            .eq('translation_group_id', post.translation_group_id)
+            .neq('id', post.id)
+            .maybeSingle();
+          if (sibling) {
+            const label = sibling.lang === 'en' ? STRINGS.es.switchLangLabel : STRINGS.en.switchLangLabel;
+            translationLink = `
+              <a href="articulo.html?slug=${sibling.slug}" class="article-lang-switch">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+                ${label}
+              </a>`;
+          }
+        }
+
         // --- View Tracking Logic ---
         const viewKey = `viewed_article_${post.id}`;
         const hasViewed = localStorage.getItem(viewKey);
@@ -287,21 +369,23 @@
         // ---------------------------
 
         const dateObj = new Date(post.created_at);
-        const dateString = dateObj.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+        const dateString = dateObj.toLocaleDateString(s.dateLocale, { year: 'numeric', month: 'long', day: 'numeric' });
         const imageSrc = post.image_url ? post.image_url : 'assets/images/hero_image.png';
+        const defaultAuthor = lang === 'en' ? 'Dotacian Team' : 'Equipo Dotacian';
 
-        document.title = `${post.title} | Blog Dotacian`;
+        document.title = `${post.title} | ${s.titleSuffix}`;
 
         container.innerHTML = `
           <section class="article-header">
-            <a href="blog.html" class="article-back">
+            <a href="${s.blogHref}" class="article-back">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M19 12H5M12 19l-7-7 7-7"/>
               </svg>
-              Volver
+              ${s.back}
             </a>
+            ${translationLink}
             <div class="article-meta">
-              <span>Por ${post.author || 'Equipo Dotacian'}</span>
+              <span>${s.by} ${post.author || defaultAuthor}</span>
             </div>
             <h1 class="article-title">${post.title}</h1>
           </section>
@@ -309,7 +393,7 @@
           <img src="${imageSrc}" alt="${post.title}" class="article-hero-image">
 
           <article class="article-content">
-            <!-- Para un MVP, renderizamos el HTML directamente si el admin lo escribió así, 
+            <!-- Para un MVP, renderizamos el HTML directamente si el admin lo escribió así,
                  o reemplazamos los saltos de línea por <br> si es texto plano -->
             ${post.content.includes('<') ? post.content : post.content.replace(/\\n/g, '<br><br>')}
           </article>

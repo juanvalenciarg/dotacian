@@ -274,6 +274,7 @@
           <thead>
             <tr>
               <th>Título</th>
+              <th>Idioma</th>
               <th>Autor</th>
               <th>Fecha de Publicación</th>
               <th>Vistas (Tot / Únicas)</th>
@@ -282,7 +283,7 @@
           </thead>
           <tbody id="blog-table-body">
             <tr>
-              <td colspan="5" style="text-align: center; color: #64748B;">Cargando artículos...</td>
+              <td colspan="6" style="text-align: center; color: #64748B;">Cargando artículos...</td>
             </tr>
           </tbody>
         </table>
@@ -299,6 +300,7 @@
       </div>
       <form id="postForm" onsubmit="savePost(event)">
         <input type="hidden" id="postId">
+        <input type="hidden" id="postTranslationGroup">
 
         <div class="form-group">
           <label>Título del artículo</label>
@@ -315,6 +317,16 @@
             <label>Autor</label>
             <input type="text" id="postAuthor" class="form-control" placeholder="Ej: Equipo Dotacian">
           </div>
+        </div>
+
+        <div class="form-group">
+          <label>Idioma del artículo</label>
+          <select id="postLang" class="form-control">
+            <option value="es">Español</option>
+            <option value="en">English</option>
+          </select>
+          <small style="color: #64748B; margin-top: 0.25rem;">Cada idioma es un artículo independiente. Usa el botón
+            "+ Traducción" en la tabla para crear la versión hermana enlazada a este mismo artículo.</small>
         </div>
 
         <div class="form-group">
@@ -431,7 +443,7 @@
 
     async function loadPosts() {
       const tbody = document.getElementById('blog-table-body');
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Cargando artículos...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Cargando artículos...</td></tr>';
 
       const { data, error } = await _supabase.from('blog_posts').select('*').order('created_at', { ascending: false });
 
@@ -441,20 +453,35 @@
       }
 
       if (!data || data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #64748B;">No hay artículos registrados.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748B;">No hay artículos registrados.</td></tr>';
         return;
       }
+
+      // Agrupar por translation_group_id para saber qué artículos ya tienen su traducción
+      const groups = {};
+      data.forEach(post => {
+        const key = post.translation_group_id || post.id;
+        (groups[key] = groups[key] || []).push(post);
+      });
 
       tbody.innerHTML = '';
       data.forEach(post => {
         const tr = document.createElement('tr');
         const date = new Date(post.created_at).toLocaleDateString('es-ES');
+        const lang = post.lang || 'es';
+        const groupKey = post.translation_group_id || post.id;
+        const sibling = (groups[groupKey] || []).find(p => p.id !== post.id);
 
-        // Guardar la data para el botón editar
+        // Guardar la data para los botones editar / traducir
         tr.dataset.post = JSON.stringify(post);
+
+        const translationCell = sibling
+          ? `<button class="action-btn preview" onclick="window.open('articulo.html?slug=${sibling.slug}', '_blank')" title="Ver versión ${sibling.lang === 'en' ? 'inglés' : 'español'}">✓ ${(sibling.lang || 'es').toUpperCase()}</button>`
+          : `<button class="action-btn" onclick="addTranslation(this)" title="Agregar versión en ${lang === 'en' ? 'español' : 'inglés'}">+ ${lang === 'en' ? 'ES' : 'EN'}</button>`;
 
         tr.innerHTML = `
           <td><strong>${post.title}</strong><br><small style="color:#64748B;">/${post.slug}</small></td>
+          <td><span style="font-weight: 700; color: var(--color-navy);">${lang.toUpperCase()}</span> ${translationCell}</td>
           <td>${post.author || '-'}</td>
           <td>${date}</td>
           <td><span style="font-weight: 700; color: var(--color-navy);">${post.views_total || 0}</span> / <span style="color: #64748B;">${post.views_unique || 0}</span></td>
@@ -471,6 +498,9 @@
     function openModal() {
       document.getElementById('postForm').reset();
       document.getElementById('postId').value = '';
+      document.getElementById('postTranslationGroup').value = '';
+      document.getElementById('postLang').value = 'es';
+      document.getElementById('postLang').disabled = false;
       quill.setContents([]);
       document.getElementById('modalTitle').innerText = 'Nuevo Artículo';
       document.getElementById('postModal').classList.add('active');
@@ -487,9 +517,36 @@
       document.getElementById('postSlug').value = post.slug;
       document.getElementById('postAuthor').value = post.author || '';
       document.getElementById('postImageUrl').value = post.image_url || '';
+      document.getElementById('postLang').value = post.lang || 'es';
+      document.getElementById('postLang').disabled = false;
+      document.getElementById('postTranslationGroup').value = post.translation_group_id || post.id;
       quill.clipboard.dangerouslyPasteHTML(post.content || '');
 
       document.getElementById('modalTitle').innerText = 'Editar Artículo';
+      document.getElementById('postModal').classList.add('active');
+    }
+
+    // Precarga un artículo nuevo, enlazado por translation_group_id, en el idioma
+    // que aún falta, para que el admin solo tenga que traducir el texto.
+    function addTranslation(btn) {
+      const post = JSON.parse(btn.closest('tr').dataset.post);
+      const targetLang = (post.lang || 'es') === 'en' ? 'es' : 'en';
+      const groupId = post.translation_group_id || post.id;
+
+      document.getElementById('postForm').reset();
+      document.getElementById('postId').value = '';
+      document.getElementById('postTranslationGroup').value = groupId;
+      document.getElementById('postTitle').value = post.title;
+      document.getElementById('postSlug').value = `${post.slug}-${targetLang}`;
+      document.getElementById('postAuthor').value = post.author || '';
+      document.getElementById('postImageUrl').value = post.image_url || '';
+      document.getElementById('postLang').value = targetLang;
+      document.getElementById('postLang').disabled = true;
+      quill.clipboard.dangerouslyPasteHTML(post.content || '');
+
+      document.getElementById('modalTitle').innerText = targetLang === 'en'
+        ? 'Agregar versión en inglés'
+        : 'Agregar versión en español';
       document.getElementById('postModal').classList.add('active');
     }
 
@@ -500,12 +557,15 @@
       btn.disabled = true;
 
       const id = document.getElementById('postId').value;
+      const translationGroup = document.getElementById('postTranslationGroup').value || crypto.randomUUID();
       const payload = {
         title: document.getElementById('postTitle').value,
         slug: document.getElementById('postSlug').value,
         author: document.getElementById('postAuthor').value,
         image_url: document.getElementById('postImageUrl').value,
-        content: quill.root.innerHTML
+        content: quill.root.innerHTML,
+        lang: document.getElementById('postLang').value,
+        translation_group_id: translationGroup
       };
 
       try {
