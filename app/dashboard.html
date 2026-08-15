@@ -812,8 +812,8 @@
 
             <div class="app-card" style="padding: 2rem; margin-top: 1.5rem;">
               <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.25rem;">
-                Uniformes comprados por mes</h3>
-              <p style="color: #64748B; font-size: 0.875rem; margin-bottom: 1.5rem;">Volumen de prendas adquiridas en
+                Activos comprados por mes</h3>
+              <p style="color: #64748B; font-size: 0.875rem; margin-bottom: 1.5rem;">Volumen de activos adquiridos en
                 los últimos 6 meses.</p>
               <div style="position: relative; height: 280px;">
                 <canvas id="monthlyPurchaseChart"></canvas>
@@ -871,7 +871,7 @@
                       <div class="check-circle"
                         style="width: 22px; height: 22px; border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s ease;">
                       </div>
-                      <span style="font-weight: 500;">Configura roles de uniformes</span>
+                      <span style="font-weight: 500;">Configura roles de activos</span>
                     </div>
                     <a href="/app/roles" class="setup-btn-mini">Ir <svg width="12" height="12" fill="none"
                         stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -1006,7 +1006,7 @@
         console.error("Error checking employees configuration progress:", e);
       }
 
-      // 4. No. de Activos: total de prendas en bodega
+      // 4. No. de Activos: total de activos en bodega
       let assetsCount = 0;
       try {
         const { data: storageData, error: storageErr } = await _supabase
@@ -1144,7 +1144,7 @@
         data: {
           labels: labels,
           datasets: [{
-            label: 'Prendas compradas',
+            label: 'Activos comprados',
             data: volumes,
             backgroundColor: '#06b6d4',
             borderRadius: 6,

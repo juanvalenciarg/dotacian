@@ -948,7 +948,7 @@
                 <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                 <path d="M3 3v5h5" />
               </svg>
-              Recuperar Uniforme
+              Recuperar Activo
             </button>
           </div>
           <div class="app-card"
@@ -976,7 +976,7 @@
         <!-- Usage Bar Section -->
         <div style="margin-bottom: 2rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-            <label style="font-weight: 600; color: var(--color-navy);">Consumo de Uniforme Anterior</label>
+            <label style="font-weight: 600; color: var(--color-navy);">Consumo de Activo Anterior</label>
             <span id="usageText" style="font-weight: 600; color: var(--color-coral);">85%</span>
           </div>
           <div class="usage-bar">
@@ -987,13 +987,13 @@
           </p>
         </div>
 
-        <!-- Section: Entregar Uniformes -->
+        <!-- Section: Entregar Activos -->
         <div
           style="border-top: 2px dashed var(--color-border); padding-top: 2rem; margin-top: 1rem; margin-bottom: 2rem;">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
             <div>
               <h4 style="color: var(--color-navy); font-size: 1.125rem; margin-bottom: 0.25rem; font-weight: 700;">
-                Entregar Uniformes</h4>
+                Entregar Activos</h4>
               <p style="font-size: 0.8125rem; color: var(--color-text-secondary);">Selecciona los artículos que vas a
                 entregar físicamente para generar el enlace de firma digital.</p>
             </div>
@@ -1016,7 +1016,7 @@
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            Agregar prenda para entrega
+            Agregar activo para entrega
           </button>
 
           <!-- Generate Link Button -->
@@ -1065,7 +1065,7 @@
             <div>
               <h4 style="color: var(--color-navy); font-size: 1.125rem; margin-bottom: 0.25rem;">Dotación a Cotizar</h4>
               <p style="font-size: 0.8125rem; color: var(--color-text-secondary);">Ítems pre-cargados según el rol
-                asignado. Edita, elimina o agrega prendas antes de enviar.</p>
+                asignado. Edita, elimina o agrega activos antes de enviar.</p>
             </div>
             <span id="kitRoleTag"
               style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: #e0f2fe; color: #0369a1; padding: 5px 12px; border-radius: 20px; white-space: nowrap;"></span>
@@ -1083,7 +1083,7 @@
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            Agregar prenda para cotizar
+            Agregar activo para cotizar
           </button>
 
 
@@ -1399,7 +1399,7 @@
           } else {
             itemsTableRows = `
               <tr>
-                <td colspan="3" style="padding: 12px; font-size: 0.875rem; color: #64748b; font-style: italic; text-align: center;">No hay prendas desglosadas en esta entrega.</td>
+                <td colspan="3" style="padding: 12px; font-size: 0.875rem; color: #64748b; font-style: italic; text-align: center;">No hay activos desglosados en esta entrega.</td>
               </tr>
             `;
           }
@@ -1432,7 +1432,7 @@
               <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; text-align: left;">
                 <thead>
                   <tr style="background: #f1f5f9;">
-                    <th style="padding: 10px 12px; font-size: 0.75rem; text-transform: uppercase; color: #475569; font-weight: 700;">Prenda / Artículo</th>
+                    <th style="padding: 10px 12px; font-size: 0.75rem; text-transform: uppercase; color: #475569; font-weight: 700;">Activo / Artículo</th>
                     <th style="padding: 10px 12px; font-size: 0.75rem; text-transform: uppercase; color: #475569; font-weight: 700; text-align: center; width: 80px;">Cant.</th>
                     <th style="padding: 10px 12px; font-size: 0.75rem; text-transform: uppercase; color: #475569; font-weight: 700; text-align: center; width: 80px;">Talla</th>
                   </tr>
@@ -1446,7 +1446,7 @@
               <div style="background: #fafafa; border: 1px solid #f1f5f9; border-radius: 8px; padding: 16px; display: flex; justify-content: space-between; align-items: center;">
                 <div style="max-width: 55%;">
                   <h6 style="margin: 0 0 4px 0; font-size: 0.8125rem; font-weight: 700; color: #334155;">Declaración de Conformidad</h6>
-                  <p style="margin: 0; font-size: 0.7rem; color: #64748b; line-height: 1.4;">El colaborador abajo firmante certifica haber recibido las prendas listadas a su entera satisfacción y de la talla adecuada para su operación.</p>
+                  <p style="margin: 0; font-size: 0.7rem; color: #64748b; line-height: 1.4;">El colaborador abajo firmante certifica haber recibido los activos listados a su entera satisfacción y de la talla adecuada para su operación.</p>
                 </div>
                 <div style="text-align: center; border-left: 1px solid #e2e8f0; padding-left: 24px; min-width: 180px;">
                   <div style="height: 80px; margin-bottom: 6px;">
@@ -1466,7 +1466,7 @@
         <!-- Report Footer -->
         <div style="margin-top: 60px; border-top: 1px solid #cbd5e1; padding-top: 20px; display: flex; justify-content: space-between; align-items: center;">
           <span style="font-size: 0.7rem; color: #94a3b8; font-weight: 600;">dotacian - Sistema Inteligente de Dotación</span>
-          <span style="font-size: 0.7rem; color: #94a3b8; font-weight: 600; text-transform: uppercase;">Soporte de Auditoría de Uniformes</span>
+          <span style="font-size: 0.7rem; color: #94a3b8; font-weight: 600; text-transform: uppercase;">Soporte de Auditoría de Activos</span>
         </div>
       `;
 
@@ -1880,7 +1880,7 @@
         Generar Enlace de Firma
       `;
 
-      // Prepopulate the "Entregar Uniformes" checklist
+      // Prepopulate the "Entregar Activos" checklist
       const deliveryItemsList = document.getElementById('deliveryItemsList');
       deliveryItemsList.innerHTML = '';
 
@@ -2104,7 +2104,7 @@
     }
 
     function updateRowStockBadge(row) {
-      const nameInput = row.querySelector('input[placeholder="Prenda"]');
+      const nameInput = row.querySelector('input[placeholder="Activo"]');
       const sizeInput = row.querySelector('input[placeholder="Talla"]');
       const badgeContainer = row.querySelector('.stock-badge-container');
       if (!nameInput || !sizeInput || !badgeContainer) return;
@@ -2129,7 +2129,7 @@
         const checked = checkbox ? checkbox.checked : false;
         if (!checked) return;
 
-        const nameInput = row.querySelector('input[placeholder="Prenda"]');
+        const nameInput = row.querySelector('input[placeholder="Activo"]');
         const sizeInput = row.querySelector('input[placeholder="Talla"]');
         const qtyInput = row.querySelector('input[type="number"]');
 
@@ -2207,7 +2207,7 @@
         <div style="flex:1; min-width:0;">
           <input type="text" value="${name}"
             style="width:100%; font-size:0.875rem; font-weight:600; color:#0f172a; border:none; background:transparent; outline:none; padding:0;"
-            placeholder="Prenda"
+            placeholder="Activo"
             oninput="updateRowStockBadge(this.closest('[data-delivery-item-id]'))"
             onfocus="this.style.background='#f0f9ff'; this.style.borderRadius='6px'; this.style.padding='2px 6px';"
             onblur="this.style.background='transparent'; this.style.padding='0';">
@@ -2273,7 +2273,7 @@
       const list = document.getElementById('deliveryItemsList');
       const row = buildDeliveryRow('', 1, 'M', '', _customDeliveryItemId++);
       list.appendChild(row);
-      const input = row.querySelector('input[placeholder="Prenda"]');
+      const input = row.querySelector('input[placeholder="Activo"]');
       if (input) {
         input.focus();
         input.style.background = '#f0f9ff';
@@ -2302,7 +2302,7 @@
           return;
         }
 
-        const nameInput = row.querySelector('input[placeholder="Prenda"]');
+        const nameInput = row.querySelector('input[placeholder="Activo"]');
         const sizeInput = row.querySelector('input[placeholder="Talla"]');
         const qtyInput = row.querySelector('input[type="number"]');
 
@@ -2324,7 +2324,7 @@
       });
 
       if (itemsToDeliver.length === 0) {
-        showNotification("Debes seleccionar o ingresar al menos una prenda válida para la entrega.", "error");
+        showNotification("Debes seleccionar o ingresar al menos un activo válido para la entrega.", "error");
         return;
       }
 
@@ -2347,7 +2347,7 @@
         const errMsg = `
           <div style="display: flex; flex-direction: column; gap: 0.5rem; text-align: left; width: 320px; font-family: 'Inter', sans-serif;">
             <div style="font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 2px;">Sin Stock Disponible</div>
-            <div style="font-size: 0.75rem; color: #64748b; line-height: 1.4; margin-bottom: 4px;">No se permite registrar la entrega de prendas sin existencias físicas en bodega. Ajusta las cantidades:</div>
+            <div style="font-size: 0.75rem; color: #64748b; line-height: 1.4; margin-bottom: 4px;">No se permite registrar la entrega de activos sin existencias físicas en bodega. Ajusta las cantidades:</div>
             <div style="display: flex; flex-direction: column; gap: 0.4rem; width: 100%;">
               ${listHtml}
             </div>
@@ -2474,7 +2474,7 @@
         <div style="flex:1; min-width:0;">
           <input type="text" value="${name}"
             style="width:100%; font-size:0.875rem; font-weight:600; color:#0f172a; border:none; background:transparent; outline:none; padding:0;"
-            placeholder="Nombre de la prenda"
+            placeholder="Nombre del activo"
             onfocus="this.style.background='#f0f9ff'; this.style.borderRadius='6px'; this.style.padding='2px 6px';"
             onblur="this.style.background='transparent'; this.style.padding='0';">
           <div style="font-size:0.7rem; color:#94a3b8; margin-top:1px;">${size ? `Talla a cotizar: <strong style="color:var(--color-navy);">${size}</strong> • ` : ''}Toca para editar</div>
@@ -2542,7 +2542,7 @@
         }
       });
       const txt = document.getElementById('kitSummaryText');
-      if (txt) txt.textContent = `${count} prenda${count !== 1 ? 's' : ''} · ${total} unidad${total !== 1 ? 'es' : ''} total`;
+      if (txt) txt.textContent = `${count} activo${count !== 1 ? 's' : ''} · ${total} unidad${total !== 1 ? 'es' : ''} total`;
 
       const btn = document.getElementById('confirmBtn');
       if (btn) {
@@ -2718,7 +2718,7 @@
         });
 
         if (items.length === 0) {
-          if (window.showToast) showToast('Error', 'Selecciona al menos una prenda para cotizar.', 'error');
+          if (window.showToast) showToast('Error', 'Selecciona al menos un activo para cotizar.', 'error');
           return;
         }
 
@@ -2778,7 +2778,7 @@
           if (qtyInput && nameInput) {
             const qty = parseInt(qtyInput.value) || 0;
             const moq = parseInt(row.dataset.moq) || 1;
-            const name = nameInput.value || 'Prenda sin nombre';
+            const name = nameInput.value || 'Activo sin nombre';
 
             if (qty < moq) {
               invalidItems.push(`• ${name} (Mínimo: ${moq} unidades)`);
