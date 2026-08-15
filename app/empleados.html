@@ -3479,11 +3479,12 @@
         if (!companyId) return;
 
         const { data, error } = await _supabase.from('role_definition')
-          .select('role_name, items, renewal_frequency')
+          .select('role_name, items, renewal_frequency, area')
           .eq('company_id', companyId);
 
         if (error) throw error;
 
+        window.roleAreaMap = window.roleAreaMap || {};
         data.forEach(row => {
           const roleLower = row.role_name.toLowerCase().trim();
           window.roleGarments[roleLower] = row.items || [];
@@ -3491,6 +3492,7 @@
             items: row.items || [],
             renewal_frequency: row.renewal_frequency || 6
           };
+          window.roleAreaMap[roleLower] = row.area || '';
         });
       } catch (err) {
         console.error("Error fetching role garments:", err);
@@ -3508,18 +3510,13 @@
         // Query active roles from company_roles (where roles.html saves them)
         const { data: activeRolesData, error } = await _supabase
           .from('company_roles')
-          .select('role_name, area')
+          .select('role_name')
           .eq('company_id', companyId);
 
         if (error) throw error;
 
         const activeRoles = (activeRolesData || []).map(r => r.role_name);
         window.activeRolesList = activeRoles;
-
-        window.roleAreaMap = {};
-        (activeRolesData || []).forEach(r => {
-          window.roleAreaMap[(r.role_name || '').toLowerCase().trim()] = r.area || '';
-        });
 
         activeRoles.forEach(roleName => {
           const opt = document.createElement('option');
