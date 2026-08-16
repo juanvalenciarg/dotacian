@@ -136,25 +136,14 @@
       margin-bottom: 1rem;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 0.5rem;
     }
 
-    .role-badge {
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.875rem;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-
-    .role-client {
-      background: #DBEAFE;
-      color: #1E40AF;
-    }
-
-    .role-seller {
-      background: #D1FAE5;
-      color: #065F46;
+    .form-section-title .title-left {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .form-grid {
@@ -193,8 +182,6 @@
       box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
     }
 
-
-
     .toast-container {
       position: fixed;
       top: 1rem;
@@ -208,91 +195,6 @@
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 1.5rem;
       margin-bottom: 2rem;
-    }
-
-    .metric-card {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 1rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .metric-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    }
-
-    .metric-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      color: #64748B;
-      font-size: 0.875rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .metric-value {
-      font-size: 2.25rem;
-      font-weight: 800;
-      color: #0F172A;
-      font-family: 'Outfit', sans-serif;
-    }
-
-    .metric-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 0.75rem;
-      background: #F1F5F9;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
-    }
-
-    .status-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      background: white;
-      padding: 1.5rem;
-      border-radius: 1rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
-
-    .status-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.75rem 1rem;
-      background: #F8FAFC;
-      border-radius: 0.5rem;
-      border-left: 4px solid #CBD5E1;
-    }
-
-    .status-item.pending {
-      border-left-color: #F59E0B;
-    }
-
-    .status-item.approved {
-      border-left-color: #3B82F6;
-    }
-
-    .status-item.production {
-      border-left-color: #8B5CF6;
-    }
-
-    .status-item.shipped {
-      border-left-color: #06B6D4;
-    }
-
-    .status-item.delivered {
-      border-left-color: #10B981;
     }
 
     .status-label {
@@ -365,9 +267,121 @@
       color: #64748B;
     }
 
-    .role-badge.role-admin {
-      background: #E0E7FF;
-      color: #4338CA;
+    /* Admins list inside company drawer */
+    .admin-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.85rem 1rem;
+      background: white;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      margin-bottom: 0.6rem;
+    }
+
+    .admin-row .admin-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      min-width: 0;
+    }
+
+    .admin-row .admin-name {
+      font-weight: 700;
+      color: #0F172A;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .admin-row .admin-email {
+      font-size: 0.78rem;
+      color: #64748B;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .badge-owner {
+      background: #FEF3C7;
+      color: #92400E;
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+    }
+
+    .admin-actions {
+      display: flex;
+      gap: 0.4rem;
+      flex-shrink: 0;
+    }
+
+    .admin-actions button {
+      background: none;
+      border: 1px solid #E2E8F0;
+      color: #475569;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.35rem 0.6rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .admin-actions button:hover {
+      background: #F1F5F9;
+    }
+
+    .admin-actions button.danger {
+      color: #EF4444;
+      border-color: #FECACA;
+    }
+
+    .admin-actions button.danger:hover {
+      background: #FEF2F2;
+    }
+
+    /* Add Admin modal tabs */
+    .tab-bar {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      background: #F1F5F9;
+      padding: 0.3rem;
+      border-radius: 10px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 0.6rem;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #64748B;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .tab-btn.active {
+      background: white;
+      color: var(--color-navy, #0f172a);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .link-result-card {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 10px;
+      border: 1px solid #E2E8F0;
+      background: #F8FAFC;
     }
   </style>
 </head>
@@ -443,115 +457,131 @@
 
       <div class="app-container">
 
-        <!-- Vista de Gestión de Usuarios -->
+        <!-- Vista de Gestión de Clientes -->
         <div id="userManagementView">
-          <!-- End Vista del Dashboard -->
           <!-- Buscador y Botón Nuevo -->
           <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
-            <button class="btn btn-glow" onclick="openNewClientModal()" style="background: var(--color-cyan); color: #080A10; border: none; padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);">
-              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-              Crear Nuevo Cliente
+            <button class="btn btn-glow" onclick="openNewCompanyModal()"
+              style="background: var(--color-cyan); color: #080A10; border: none; padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              Crear Empresa
             </button>
           </div>
           <div class="search-container">
             <div class="search-input-group">
-              <label for="searchEmail">Buscar usuario por correo electrónico</label>
+              <label for="searchEmail">Buscar administrador por correo electrónico</label>
               <input type="email" id="searchEmail" class="search-input" placeholder="ejemplo@correo.com">
             </div>
-            <button class="btn btn-primary" onclick="searchUser()" id="btnSearch">Buscar</button>
+            <button class="btn btn-primary" onclick="searchAdminByEmail()" id="btnSearch">Buscar</button>
           </div>
 
-          <!-- Tabla de todos los usuarios -->
-          <div class="table-container" id="usersTableContainer">
+          <!-- Tabla de empresas -->
+          <div class="table-container" id="companiesTableContainer">
             <table class="users-table">
               <thead>
                 <tr>
-                  <th>Usuario</th>
-                  <th>Rol</th>
-                  <th>País</th>
                   <th>Empresa</th>
                   <th>Industria</th>
-                  <th>Fecha de Registro</th>
-                  <th>Último Acceso</th>
+                  <th>País</th>
+                  <th># Administradores</th>
+                  <th>Fecha de Creación</th>
                 </tr>
               </thead>
-              <tbody id="usersTableBody">
+              <tbody id="companiesTableBody">
                 <tr>
-                  <td colspan="7" style="text-align: center; color: #64748B; padding: 2rem;">Cargando lista de
-                    usuarios...</td>
+                  <td colspan="5" style="text-align: center; color: #64748B; padding: 2rem;">Cargando empresas...
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <!-- Tarjeta de Resultados (Oculta, ahora Drawer) -->
+          <!-- Drawer de Empresa -->
           <div id="drawerOverlay" class="drawer-overlay" onclick="closeDrawer()"></div>
           <div id="userCard" class="user-card">
             <div class="drawer-header">
               <div>
                 <h2 id="cardTitle"
                   style="margin: 0; font-family: var(--font-family-heading); color: var(--color-navy); font-size: 1.25rem;">
-                  Datos del Usuario</h2>
+                  Datos de la Empresa</h2>
                 <p id="cardEmail"
                   style="margin: 0.25rem 0 0 0; color: var(--color-text-secondary); font-size: 0.875rem;">-</p>
               </div>
               <div style="display: flex; align-items: center; gap: 1rem;">
-                <span id="cardRole" class="role-badge role-client">Cliente</span>
                 <button onclick="closeDrawer()"
                   style="background: none; border: none; font-size: 1.5rem; color: #94A3B8; cursor: pointer; line-height: 1;">&times;</button>
               </div>
             </div>
 
             <div class="drawer-content">
-              <!-- Datos Personales -->
+              <!-- Datos de la Empresa -->
               <div class="form-section">
                 <div class="form-section-title">
-                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                  </svg>
-                  Datos Básicos
+                  <div class="title-left">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                      viewBox="0 0 24 24">
+                      <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+                      <path d="M9 9h6"></path>
+                      <path d="M9 13h6"></path>
+                      <path d="M9 17h6"></path>
+                    </svg>
+                    Datos de la Empresa
+                  </div>
                 </div>
                 <div class="form-grid">
                   <div class="form-group">
-                    <label>Nombre</label>
-                    <input type="text" id="editFirstName" class="form-control">
-                  </div>
-                  <div class="form-group">
-                    <label>Apellido</label>
-                    <input type="text" id="editLastName" class="form-control">
-                  </div>
-                  <div class="form-group" id="nicknameGroup">
-                    <label>Apodo / Nickname</label>
-                    <input type="text" id="editNickname" class="form-control">
-                  </div>
-                  <div class="form-group">
-                    <label>País</label>
-                    <input type="text" id="editCountry" class="form-control" placeholder="MX o CO">
-                  </div>
-                </div>
-              </div>
-
-              <!-- Empresa y Transacciones -->
-              <div class="form-section">
-                <div class="form-section-title">
-                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
-                    <path d="M9 9h6"></path>
-                    <path d="M9 13h6"></path>
-                    <path d="M9 17h6"></path>
-                  </svg>
-                  Empresa y Actividad
-                </div>
-                <div class="form-grid">
-                  <div class="form-group">
-                    <label>Empresa Asociada</label>
+                    <label>Nombre de la Empresa</label>
                     <input type="text" id="editCompany" class="form-control" placeholder="Nombre de la empresa">
                   </div>
                   <div class="form-group">
                     <label>Sector / Industria</label>
                     <input type="text" id="editIndustry" class="form-control" placeholder="Ej. Restaurantes">
                   </div>
+                  <div class="form-group">
+                    <label>País</label>
+                    <input type="text" id="editCountry" class="form-control" placeholder="MX o CO">
+                  </div>
+                </div>
+                <div style="display: flex; justify-content: flex-end;">
+                  <button class="btn btn-primary" onclick="saveCompany()">Guardar Cambios de Empresa</button>
+                </div>
+              </div>
+
+              <!-- Administradores -->
+              <div class="form-section">
+                <div class="form-section-title">
+                  <div class="title-left">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                      viewBox="0 0 24 24">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    Administradores
+                  </div>
+                  <button onclick="openAddAdminModal()"
+                    style="background: var(--color-navy, #0f172a); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">+
+                    Agregar Administrador</button>
+                </div>
+                <div id="companyAdminsList">
+                  <p style="color: #94A3B8; font-size: 0.85rem;">Cargando...</p>
+                </div>
+              </div>
+
+              <!-- Actividad -->
+              <div class="form-section">
+                <div class="form-section-title">
+                  <div class="title-left">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                      viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    Actividad
+                  </div>
+                </div>
+                <div class="form-grid">
                   <div class="form-group">
                     <label>Cotizaciones Realizadas</label>
                     <div id="viewQuotesCount" onclick="openDetailsModal('quotes')"
@@ -578,40 +608,6 @@
                   </div>
                 </div>
               </div>
-
-              <!-- Registro y Tiempos -->
-              <div class="form-section">
-                <div class="form-section-title">
-                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                  </svg>
-                  Registro y Tiempos
-                </div>
-                <div class="form-grid">
-                  <div class="form-group">
-                    <label>Fecha de Registro</label>
-                    <div id="viewCreatedAt" style="font-weight: 600; color: #334155;">--</div>
-                  </div>
-                  <div class="form-group">
-                    <label>Último Acceso</label>
-                    <div id="viewLastSignIn" style="font-weight: 600; color: #334155;">--</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="drawer-footer">
-              <button class="btn btn-outline" style="border-color: #991B1B; color: #991B1B; background: #FEF2F2;"
-                onclick="deleteUser()">
-                Eliminar Usuario
-              </button>
-              <button class="btn btn-outline" style="border-color: #EF4444; color: #EF4444;" onclick="resetPassword()">
-                Cambiar Contraseña
-              </button>
-              <button class="btn btn-primary" onclick="saveUser()">
-                Guardar Cambios
-              </button>
             </div>
           </div>
 
@@ -620,10 +616,15 @@
   </div>
 
   <div id="company-details-modal" class="modal-overlay" style="z-index: 10000;">
-    <div class="modal-content" style="max-width: 800px; width: 95%; background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #E2E8F0; padding-bottom: 1rem;">
-        <h2 id="details-modal-title" style="font-size: 1.5rem; color: #0f172a; font-weight: 700; margin: 0; font-family: var(--font-family-heading, 'Outfit');">Detalles</h2>
-        <button onclick="closeDetailsModal()" style="background: none; border: none; cursor: pointer; color: #64748b; font-size: 1.5rem;">&times;</button>
+    <div class="modal-content"
+      style="max-width: 800px; width: 95%; background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
+      <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #E2E8F0; padding-bottom: 1rem;">
+        <h2 id="details-modal-title"
+          style="font-size: 1.5rem; color: #0f172a; font-weight: 700; margin: 0; font-family: var(--font-family-heading, 'Outfit');">
+          Detalles</h2>
+        <button onclick="closeDetailsModal()"
+          style="background: none; border: none; cursor: pointer; color: #64748b; font-size: 1.5rem;">&times;</button>
       </div>
       <div id="details-modal-body" style="max-height: 500px; overflow-y: auto;">
         <p style="text-align: center; color: #64748b;">Cargando...</p>
@@ -631,21 +632,48 @@
     </div>
   </div>
 
-  <!-- Modal Crear Nuevo Cliente -->
+  <!-- Modal Crear Empresa -->
   <div id="new-client-modal" class="modal-overlay" style="z-index: 10000;">
-    <div class="modal-content" style="max-width: 500px; width: 95%; background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #E2E8F0; padding-bottom: 1rem;">
-        <h2 style="font-size: 1.25rem; color: #0f172a; font-weight: 700; margin: 0; font-family: var(--font-family-heading, 'Outfit');">Nuevo Cliente</h2>
-        <button onclick="closeNewClientModal()" style="background: none; border: none; cursor: pointer; color: #64748b; font-size: 1.5rem;">&times;</button>
+    <div class="modal-content"
+      style="max-width: 520px; width: 95%; background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
+      <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #E2E8F0; padding-bottom: 1rem;">
+        <h2 style="font-size: 1.25rem; color: #0f172a; font-weight: 700; margin: 0; font-family: var(--font-family-heading, 'Outfit');">
+          Nueva Empresa</h2>
+        <button onclick="closeNewCompanyModal()"
+          style="background: none; border: none; cursor: pointer; color: #64748b; font-size: 1.5rem;">&times;</button>
       </div>
-      <form id="new-client-form" onsubmit="createNewClient(event)">
-        <div class="form-group" style="margin-bottom: 1rem;">
-          <label>Nombre</label>
-          <input type="text" id="newClientFirstName" class="form-control" required>
+      <form id="new-client-form" onsubmit="createNewCompany(event)">
+        <div class="form-section-title" style="margin-bottom: 0.75rem;">
+          <div class="title-left">Datos de la Empresa</div>
         </div>
         <div class="form-group" style="margin-bottom: 1rem;">
-          <label>Apellido</label>
-          <input type="text" id="newClientLastName" class="form-control" required>
+          <label>Nombre de la Empresa</label>
+          <input type="text" id="newCompanyName" class="form-control" required>
+        </div>
+        <div class="form-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 0.5rem;">
+          <div class="form-group">
+            <label>Industria</label>
+            <input type="text" id="newCompanyIndustry" class="form-control" placeholder="Ej. Restaurantes">
+          </div>
+          <div class="form-group">
+            <label>País</label>
+            <input type="text" id="newCompanyCountry" class="form-control" placeholder="MX o CO">
+          </div>
+        </div>
+
+        <div class="form-section-title" style="margin: 1.5rem 0 0.75rem;">
+          <div class="title-left">Primer Administrador</div>
+        </div>
+        <div class="form-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 0.5rem;">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" id="newClientFirstName" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label>Apellido</label>
+            <input type="text" id="newClientLastName" class="form-control" required>
+          </div>
         </div>
         <div class="form-group" style="margin-bottom: 1rem;">
           <label>Correo Electrónico (Acceso)</label>
@@ -655,8 +683,65 @@
           <label>Contraseña Provisoria</label>
           <input type="text" id="newClientPassword" class="form-control" minlength="6" required>
         </div>
-        <button type="submit" id="btnCreateClient" class="btn btn-primary" style="width: 100%;">Crear Cliente</button>
+        <button type="submit" id="btnCreateClient" class="btn btn-primary" style="width: 100%;">Crear
+          Empresa</button>
       </form>
+    </div>
+  </div>
+
+  <!-- Modal Agregar Administrador -->
+  <div id="add-admin-modal" class="modal-overlay" style="z-index: 10001;">
+    <div class="modal-content"
+      style="max-width: 480px; width: 95%; background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
+      <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #E2E8F0; padding-bottom: 1rem;">
+        <h2 style="font-size: 1.25rem; color: #0f172a; font-weight: 700; margin: 0; font-family: var(--font-family-heading, 'Outfit');">
+          Agregar Administrador</h2>
+        <button onclick="closeAddAdminModal()"
+          style="background: none; border: none; cursor: pointer; color: #64748b; font-size: 1.5rem;">&times;</button>
+      </div>
+
+      <div class="tab-bar">
+        <button type="button" id="tabBtnCreate" class="tab-btn active"
+          onclick="switchAddAdminTab('create')">Crear Nuevo</button>
+        <button type="button" id="tabBtnLink" class="tab-btn" onclick="switchAddAdminTab('link')">Vincular
+          Existente</button>
+      </div>
+
+      <div id="addAdminCreatePanel">
+        <form id="add-admin-create-form" onsubmit="createAdminForCompany(event)">
+          <div class="form-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 0.5rem;">
+            <div class="form-group">
+              <label>Nombre</label>
+              <input type="text" id="addAdminFirstName" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label>Apellido</label>
+              <input type="text" id="addAdminLastName" class="form-control" required>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label>Correo Electrónico (Acceso)</label>
+            <input type="email" id="addAdminEmail" class="form-control" required>
+          </div>
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label>Contraseña Provisoria</label>
+            <input type="text" id="addAdminPassword" class="form-control" minlength="6" required>
+          </div>
+          <button type="submit" id="btnCreateAdmin" class="btn btn-primary" style="width: 100%;">Crear y
+            Vincular</button>
+        </form>
+      </div>
+
+      <div id="addAdminLinkPanel" style="display: none;">
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label>Correo del usuario existente</label>
+          <input type="email" id="addAdminLinkEmail" class="form-control" placeholder="ejemplo@correo.com">
+        </div>
+        <button type="button" class="btn btn-primary" style="width: 100%;" id="btnSearchLink"
+          onclick="searchLinkCandidate()">Buscar Usuario</button>
+        <div id="addAdminLinkResult"></div>
+      </div>
     </div>
   </div>
 
@@ -668,8 +753,8 @@
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: 'dotacian-admin-token', multiTab: false } });
 
-    let currentUserRecord = null;
-    let currentUserType = null; // 'client' or 'seller'
+    let allCompanies = [];       // Cache: company_profile rows + .admins[]
+    let currentCompanyRecord = null; // Empresa abierta en el drawer
 
     // Validación de sesión administrativa
     async function checkAdminAuth() {
@@ -679,7 +764,6 @@
         return;
       }
 
-      // Validar que exista en admin_profile
       const { data: adminData, error } = await _supabase
         .from('admin_profile')
         .select('id')
@@ -690,67 +774,64 @@
         await _supabase.auth.signOut();
         window.location.href = 'login.admin.html?error=unauthorized';
       } else {
-        loadAllUsers();
+        loadAllCompanies();
       }
     }
 
-    // Ejecutar validación inmediatamente
     checkAdminAuth();
 
-    async function loadAllUsers() {
+    // -------- Carga y render de Empresas --------
+
+    async function loadAllCompanies() {
+      const tbody = document.getElementById('companiesTableBody');
       try {
-        const { data, error } = await _supabase.rpc('get_all_users_admin_list');
-        const tbody = document.getElementById('usersTableBody');
+        const [companiesRes, usersRes] = await Promise.all([
+          _supabase.from('company_profile').select('*').order('company_name', { ascending: true }),
+          _supabase.from('company_user').select('*').eq('role', 'client')
+        ]);
 
-        if (error) {
-          console.error("Error loading users:", error);
-          tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #EF4444;">Error al cargar usuarios. Asegúrate de crear el RPC en Supabase.</td></tr>`;
-          return;
-        }
+        if (companiesRes.error) throw companiesRes.error;
+        if (usersRes.error) throw usersRes.error;
 
-        if (!data || data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No hay usuarios registrados.</td></tr>`;
-          return;
-        }
+        const companies = companiesRes.data || [];
+        const users = usersRes.data || [];
 
-        const clients = data.filter(u => u.role === 'client');
+        allCompanies = companies.map(c => ({
+          ...c,
+          admins: users.filter(u => u.company_id === c.id || u.id === c.id)
+        }));
 
-        if (clients.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No hay clientes registrados.</td></tr>`;
-          return;
-        }
-
-        tbody.innerHTML = '';
-        clients.forEach(user => {
-          const roleClass = 'role-client';
-          const roleName = 'Cliente';
-
-          const tr = document.createElement('tr');
-          tr.onclick = () => {
-            document.getElementById('searchEmail').value = user.email;
-            searchUser();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          };
-
-          tr.innerHTML = `
-            <td>
-              <div class="user-info">
-                <span class="user-name">${user.first_name} ${user.last_name}</span>
-                <span class="user-email">${user.email}</span>
-              </div>
-            </td>
-            <td><span class="role-badge ${roleClass}">${roleName}</span></td>
-            <td><span style="font-weight: 600; color: #475569;">${user.country || 'N/A'}</span></td>
-            <td><span style="font-weight: 600; color: #0F172A;">${user.company_name || 'N/A'}</span></td>
-            <td><span style="font-size: 0.875rem; background: #F1F5F9; padding: 0.25rem 0.5rem; border-radius: 0.25rem;">${user.industry || 'N/A'}</span></td>
-            <td>${formatDateShort(user.created_at)}</td>
-            <td>${formatDateShort(user.last_sign_in_at)}</td>
-          `;
-          tbody.appendChild(tr);
-        });
+        renderCompaniesTable(allCompanies);
       } catch (err) {
-        console.error("Excepción en loadAllUsers:", err);
+        console.error("Error cargando empresas:", err);
+        if (tbody) tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #EF4444;">Error al cargar empresas.</td></tr>`;
       }
+    }
+
+    function renderCompaniesTable(list) {
+      const tbody = document.getElementById('companiesTableBody');
+      if (!list || list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">No hay empresas registradas.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = '';
+      list.forEach(company => {
+        const tr = document.createElement('tr');
+        tr.onclick = () => openCompanyDrawer(company);
+        tr.innerHTML = `
+          <td>
+            <div class="user-info">
+              <span class="user-name">${company.company_name || 'Sin nombre'}</span>
+            </div>
+          </td>
+          <td><span style="font-size: 0.875rem; background: #F1F5F9; padding: 0.25rem 0.5rem; border-radius: 0.25rem;">${company.industry || 'N/A'}</span></td>
+          <td><span style="font-weight: 600; color: #475569;">${company.country || 'N/A'}</span></td>
+          <td><span style="font-weight: 700; color: #0F172A;">${company.admins.length}</span></td>
+          <td>${formatDateShort(company.created_at)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
 
     function formatDateShort(isoString) {
@@ -758,44 +839,6 @@
       return new Date(isoString).toLocaleDateString('es-MX', {
         day: '2-digit', month: 'short', year: 'numeric'
       });
-    }
-
-    async function searchUser() {
-      const email = document.getElementById('searchEmail').value.trim();
-      if (!email) {
-        showToast('Atención', 'Por favor ingresa un correo.', 'error');
-        return;
-      }
-
-      const btn = document.getElementById('btnSearch');
-      btn.textContent = 'Buscando...';
-      btn.disabled = true;
-      document.getElementById('userCard').classList.remove('active');
-
-      try {
-        const { data, error } = await _supabase.rpc('get_user_admin_details', { search_email: email });
-
-        if (error) {
-          throw error;
-        }
-
-        if (data && data.found) {
-          if (data.role !== 'client') {
-            showToast('Atención', 'Este usuario es un Fabricante. Por favor búscalo en la sección de Gestión de Fabricantes.', 'error');
-            return;
-          }
-          fillCard(data);
-        } else {
-          showToast('No encontrado', 'No se encontró ningún usuario con ese correo.', 'error');
-        }
-
-      } catch (err) {
-        console.error("Error buscando usuario:", err);
-        showToast('Error', 'Hubo un error en la búsqueda (Asegúrate de haber creado el RPC en Supabase).', 'error');
-      } finally {
-        btn.textContent = 'Buscar Usuario';
-        btn.disabled = false;
-      }
     }
 
     function formatDate(isoString) {
@@ -806,143 +849,161 @@
       });
     }
 
-    function fillCard(data) {
-      currentUserRecord = data;
-      currentUserType = data.role;
+    // -------- Búsqueda de administrador por correo --------
 
-      document.getElementById('cardEmail').textContent = data.email;
+    async function findUserByEmail(email) {
+      const { data, error } = await _supabase
+        .from('company_user')
+        .select('*')
+        .eq('role', 'client')
+        .ilike('email', email)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    }
 
-      const roleBadge = document.getElementById('cardRole');
-      if (data.role === 'client') {
-        roleBadge.textContent = 'Cliente';
-        roleBadge.className = 'role-badge role-client';
-        document.getElementById('nicknameGroup').style.display = 'flex';
-        document.getElementById('editNickname').value = data.profile?.nickname || '';
-      } else {
-        roleBadge.textContent = 'Fabricante';
-        roleBadge.className = 'role-badge role-seller';
-        document.getElementById('nicknameGroup').style.display = 'none';
+    function resolveCompanyForUser(userRow) {
+      if (!userRow) return null;
+      // Dueño: existe una empresa cuyo id es exactamente el id de este usuario
+      let company = allCompanies.find(c => c.id === userRow.id);
+      if (company) return company;
+      if (userRow.company_id) {
+        company = allCompanies.find(c => c.id === userRow.company_id);
+        if (company) return company;
+      }
+      return null;
+    }
+
+    async function searchAdminByEmail() {
+      const email = document.getElementById('searchEmail').value.trim();
+      if (!email) {
+        showToast('Atención', 'Por favor ingresa un correo.', 'error');
+        return;
       }
 
-      document.getElementById('editFirstName').value = data.profile?.first_name || '';
-      document.getElementById('editLastName').value = data.profile?.last_name || '';
-      document.getElementById('editCountry').value = data.profile?.country || '';
+      const btn = document.getElementById('btnSearch');
+      btn.textContent = 'Buscando...';
+      btn.disabled = true;
 
-      // Tiempos
-      document.getElementById('viewCreatedAt').textContent = formatDate(data.created_at);
-      document.getElementById('viewLastSignIn').textContent = formatDate(data.last_sign_in_at);
-
-      // Empresa
-      if (data.role === 'client') {
-        document.getElementById('editCompany').value = data.company?.company_name || '';
-        document.getElementById('editIndustry').value = data.company?.industry || '';
-      } else {
-        document.getElementById('editCompany').value = data.company?.seller_name || '';
-        document.getElementById('editIndustry').value = 'Fabricante';
-        document.getElementById('editIndustry').disabled = true;
+      try {
+        const userRow = await findUserByEmail(email);
+        if (!userRow) {
+          showToast('No encontrado', 'No se encontró ningún administrador con ese correo.', 'error');
+          return;
+        }
+        const company = resolveCompanyForUser(userRow);
+        if (!company) {
+          showToast('Sin empresa', 'Este usuario no tiene una empresa asignada todavía.', 'error');
+          return;
+        }
+        openCompanyDrawer(company);
+      } catch (err) {
+        console.error("Error buscando administrador:", err);
+        showToast('Error', 'Hubo un error en la búsqueda.', 'error');
+      } finally {
+        btn.textContent = 'Buscar';
+        btn.disabled = false;
       }
+    }
 
-      // Transacciones
-      document.getElementById('viewQuotesCount').textContent = data.quotes_count || 0;
-      document.getElementById('viewOrdersCount').textContent = data.orders_count || 0;
+    // -------- Drawer de Empresa --------
 
-      // Roles y Empleados (async fetch)
-      if (data.role === 'client') {
-        document.getElementById('viewActiveRoles').textContent = '...';
-        document.getElementById('viewEmployeesCount').textContent = '...';
+    function openCompanyDrawer(company) {
+      currentCompanyRecord = company;
 
-        _supabase.from('role_definition')
-          .select('*', { count: 'exact', head: true })
-          .eq('company_id', data.user_id)
-          .then(({ count, error }) => {
-            if (error) console.error("Error al obtener roles activos:", error);
-            document.getElementById('viewActiveRoles').textContent = count || 0;
-          });
+      document.getElementById('cardEmail').textContent = `${company.admins.length} administrador${company.admins.length !== 1 ? 'es' : ''}`;
+      document.getElementById('editCompany').value = company.company_name || '';
+      document.getElementById('editIndustry').value = company.industry || '';
+      document.getElementById('editCountry').value = company.country || '';
 
-        _supabase.from('company_employees')
-          .select('*', { count: 'exact', head: true })
-          .eq('company_id', data.user_id)
-          .then(({ count }) => {
-            document.getElementById('viewEmployeesCount').textContent = count || 0;
-          });
-      } else {
-        document.getElementById('viewActiveRoles').textContent = 'N/A';
-        document.getElementById('viewEmployeesCount').textContent = 'N/A';
-      }
+      renderCompanyAdmins(company);
+
+      document.getElementById('viewQuotesCount').textContent = '...';
+      document.getElementById('viewOrdersCount').textContent = '...';
+      document.getElementById('viewActiveRoles').textContent = '...';
+      document.getElementById('viewEmployeesCount').textContent = '...';
+
+      const companyId = company.id;
+
+      _supabase.from('company_quotes_requests').select('*', { count: 'exact', head: true }).eq('company_id', companyId)
+        .then(({ count }) => { document.getElementById('viewQuotesCount').textContent = count || 0; });
+      _supabase.from('company_purchase_orders').select('*', { count: 'exact', head: true }).eq('company_id', companyId)
+        .then(({ count }) => { document.getElementById('viewOrdersCount').textContent = count || 0; });
+      _supabase.from('role_definition').select('*', { count: 'exact', head: true }).eq('company_id', companyId)
+        .then(({ count }) => { document.getElementById('viewActiveRoles').textContent = count || 0; });
+      _supabase.from('company_employees').select('*', { count: 'exact', head: true }).eq('company_id', companyId)
+        .then(({ count }) => { document.getElementById('viewEmployeesCount').textContent = count || 0; });
 
       document.getElementById('drawerOverlay').classList.add('active');
       document.getElementById('userCard').classList.add('active');
     }
 
+    function renderCompanyAdmins(company) {
+      const container = document.getElementById('companyAdminsList');
+      if (!company.admins || company.admins.length === 0) {
+        container.innerHTML = '<p style="color: #94A3B8; font-size: 0.85rem;">Sin administradores todavía.</p>';
+        return;
+      }
+
+      const sorted = [...company.admins].sort((a, b) => (a.id === company.id ? -1 : b.id === company.id ? 1 : 0));
+
+      container.innerHTML = sorted.map(admin => {
+        const isOwner = admin.id === company.id;
+        return `
+          <div class="admin-row">
+            <div class="admin-info">
+              <div class="admin-name">${admin.first_name || ''} ${admin.last_name || ''} ${isOwner ? '<span class="badge-owner">Dueño</span>' : ''}</div>
+              <div class="admin-email">${admin.email}</div>
+            </div>
+            <div class="admin-actions">
+              <button onclick="resetPasswordFor('${admin.email.replace(/'/g, "\\'")}')">Contraseña</button>
+              ${isOwner ? '' : `
+                <button onclick="detachAdmin('${admin.id}')">Quitar</button>
+                <button class="danger" onclick="deleteAdminAccount('${admin.id}')">Eliminar</button>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
     function closeDrawer() {
       document.getElementById('drawerOverlay').classList.remove('active');
       document.getElementById('userCard').classList.remove('active');
+      currentCompanyRecord = null;
     }
 
-    async function saveUser() {
-      if (!currentUserRecord || !currentUserType) return;
-
-      const fName = document.getElementById('editFirstName').value.trim();
-      const lName = document.getElementById('editLastName').value.trim();
-      const country = document.getElementById('editCountry').value.trim();
-
-      let updatePayload = {
-        first_name: fName,
-        last_name: lName,
-        country: country
-      };
-
-      let table = currentUserType === 'client' ? 'company_user' : 'seller_profile';
-
-      if (currentUserType === 'client') {
-        updatePayload.nickname = document.getElementById('editNickname').value.trim();
-      }
+    async function saveCompany() {
+      if (!currentCompanyRecord) return;
 
       const companyName = document.getElementById('editCompany').value.trim();
       const industryName = document.getElementById('editIndustry').value.trim();
+      const country = document.getElementById('editCountry').value.trim();
 
       try {
-        // Actualizar Perfil (user_profile o seller_profile)
         const { error } = await _supabase
-          .from(table)
-          .update(updatePayload)
-          .eq('id', currentUserRecord.user_id);
+          .from('company_profile')
+          .upsert([{ id: currentCompanyRecord.id, company_name: companyName, industry: industryName, country: country }], { onConflict: 'id' });
 
         if (error) throw error;
 
-        // Actualizar Empresa (company_profile) - solo para clientes
-        if (currentUserType === 'client') {
-          const companyPayload = {
-            id: currentUserRecord.user_id,
-            company_name: companyName,
-            industry: industryName
-          };
-
-          const { error: compError } = await _supabase
-            .from('company_profile')
-            .upsert([companyPayload], { onConflict: 'id' });
-
-          if (compError) throw compError;
-        }
-
-        if (error) throw error;
-        showToast('Éxito', 'Perfil actualizado correctamente.', 'success');
+        showToast('Éxito', 'Datos de la empresa actualizados.', 'success');
+        await loadAllCompanies();
+        const refreshed = allCompanies.find(c => c.id === currentCompanyRecord.id);
+        if (refreshed) { currentCompanyRecord = refreshed; renderCompanyAdmins(refreshed); }
       } catch (err) {
         console.error(err);
-        showToast('Error', 'No se pudo actualizar el perfil.', 'error');
+        showToast('Error', 'No se pudo actualizar la empresa.', 'error');
       }
     }
 
-    async function resetPassword() {
-      if (!currentUserRecord) return;
-      const email = currentUserRecord.email;
-
+    async function resetPasswordFor(email) {
+      if (!email) return;
       if (!confirm(`¿Estás seguro de enviar un enlace de recuperación a ${email}?`)) return;
 
       try {
-        const { data, error } = await _supabase.auth.resetPasswordForEmail(email);
+        const { error } = await _supabase.auth.resetPasswordForEmail(email);
         if (error) throw error;
-
         showToast('Enviado', `Correo de recuperación enviado a ${email}.`, 'success');
       } catch (err) {
         console.error("Error resetting password:", err);
@@ -950,55 +1011,45 @@
       }
     }
 
-    function deleteUser() {
-      if (!currentUserRecord || !currentUserRecord.user_id) return;
-
-      let modal = document.getElementById('delete-user-modal');
-      if (modal) modal.remove();
-
-      modal = document.createElement('div');
-      modal.id = 'delete-user-modal';
-      modal.className = 'modal-overlay active';
-      modal.style.zIndex = '9999';
-      modal.innerHTML = `
-        <div class="modal-content" style="background: white; border-radius: 1.5rem; max-width: 400px; width: 90%; text-align: center; padding: 2.5rem 2rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border: 1px solid #E2E8F0; margin: auto;">
-          <div style="width: 56px; height: 56px; background: #FEF2F2; color: #EF4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
-            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-          </div>
-          <h2 style="font-family: var(--font-family-heading, 'Outfit'); color: var(--color-navy, #0f172a); font-size: 1.5rem; margin-bottom: 0.5rem; font-weight: 700;">Eliminar Usuario</h2>
-          <p style="color: var(--color-text-secondary, #64748b); font-size: 0.875rem; margin-bottom: 2rem; line-height: 1.5;">¿Estás seguro de que deseas eliminar a este usuario? Esta acción es irreversible y borrará todos sus datos.</p>
-          <div style="display: flex; gap: 1rem;">
-            <button onclick="document.getElementById('delete-user-modal').remove()" style="flex: 1; padding: 0.875rem; font-size: 0.95rem; background: #F1F5F9; color: #475569; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;">Cancelar</button>
-            <button onclick="confirmDeleteUser()" style="flex: 1; padding: 0.875rem; font-size: 0.95rem; background: #EF4444; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);">Eliminar</button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-    }
-
-    async function confirmDeleteUser() {
-      const modal = document.getElementById('delete-user-modal');
-      if (modal) modal.remove();
+    async function detachAdmin(userId) {
+      if (!confirm('¿Quitar a este administrador de la empresa? Su cuenta no se eliminará, solo dejará de tener acceso a esta empresa.')) return;
 
       try {
-        const { error } = await _supabase.rpc('delete_user_admin', {
-          target_user_id: currentUserRecord.user_id
-        });
-
+        const { error } = await _supabase.from('company_user').update({ company_id: null }).eq('id', userId);
         if (error) throw error;
 
-        showToast('Eliminado', 'El usuario ha sido eliminado permanentemente.', 'success');
-        closeDrawer();
-        searchUser(); // Recargar la busqueda o resetear
+        showToast('Listo', 'Administrador quitado de la empresa.', 'success');
+        await loadAllCompanies();
+        const refreshed = allCompanies.find(c => c.id === currentCompanyRecord.id);
+        if (refreshed) { currentCompanyRecord = refreshed; renderCompanyAdmins(refreshed); }
       } catch (err) {
-        console.error("Error eliminando usuario:", err);
-        showToast('Error', 'No se pudo eliminar al usuario.', 'error');
+        console.error(err);
+        showToast('Error', 'No se pudo quitar al administrador.', 'error');
       }
     }
 
+    async function deleteAdminAccount(userId) {
+      if (!confirm('¿Eliminar esta cuenta permanentemente? Esta acción es irreversible.')) return;
+
+      try {
+        const { error } = await _supabase.rpc('delete_user_admin', { target_user_id: userId });
+        if (error) throw error;
+
+        showToast('Eliminado', 'La cuenta ha sido eliminada permanentemente.', 'success');
+        await loadAllCompanies();
+        const refreshed = allCompanies.find(c => c.id === currentCompanyRecord.id);
+        if (refreshed) { currentCompanyRecord = refreshed; renderCompanyAdmins(refreshed); }
+      } catch (err) {
+        console.error("Error eliminando cuenta:", err);
+        showToast('Error', 'No se pudo eliminar la cuenta.', 'error');
+      }
+    }
+
+    // -------- Detalles de actividad (Cotizaciones / Órdenes / Roles / Empleados) --------
+
     async function openDetailsModal(type) {
-      if (!currentUserRecord || currentUserType !== 'client') return;
-      const companyId = currentUserRecord.user_id;
+      if (!currentCompanyRecord) return;
+      const companyId = currentCompanyRecord.id;
 
       const modal = document.getElementById('company-details-modal');
       const title = document.getElementById('details-modal-title');
@@ -1250,78 +1301,254 @@
       container.appendChild(toast);
       setTimeout(() => { toast.remove(); }, 4000);
     }
-      // -- Lógica para Crear Cliente desde Admin sin cerrar sesión --
-      function openNewClientModal() {
-        document.getElementById('new-client-modal').classList.add('active');
-      }
-      function closeNewClientModal() {
-        document.getElementById('new-client-modal').classList.remove('active');
-        document.getElementById('new-client-form').reset();
-      }
 
-      async function createNewClient(e) {
-        e.preventDefault();
-        const fName = document.getElementById('newClientFirstName').value.trim();
-        const lName = document.getElementById('newClientLastName').value.trim();
-        const email = document.getElementById('newClientEmail').value.trim();
-        const password = document.getElementById('newClientPassword').value;
-        const btn = document.getElementById('btnCreateClient');
+    // -------- Crear Empresa (empresa + primer administrador) --------
 
-        btn.disabled = true;
-        btn.textContent = 'Creando...';
+    function openNewCompanyModal() {
+      document.getElementById('new-client-modal').classList.add('active');
+    }
+    function closeNewCompanyModal() {
+      document.getElementById('new-client-modal').classList.remove('active');
+      document.getElementById('new-client-form').reset();
+    }
 
-        try {
-          // Instancia secundaria temporal para no interferir con la sesión del Admin
-          const tempClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-            auth: {
-              storageKey: 'dotacian-temp-signup',
-              persistSession: false,
-              autoRefreshToken: false,
-              detectSessionInUrl: false
-            }
-          });
+    async function createNewCompany(e) {
+      e.preventDefault();
+      const companyName = document.getElementById('newCompanyName').value.trim();
+      const industry = document.getElementById('newCompanyIndustry').value.trim();
+      const country = document.getElementById('newCompanyCountry').value.trim();
 
-          const { data, error } = await tempClient.auth.signUp({
-            email: email,
-            password: password,
-            options: {
-              data: { first_name: fName, last_name: lName }
-            }
-          });
+      const fName = document.getElementById('newClientFirstName').value.trim();
+      const lName = document.getElementById('newClientLastName').value.trim();
+      const email = document.getElementById('newClientEmail').value.trim();
+      const password = document.getElementById('newClientPassword').value;
+      const btn = document.getElementById('btnCreateClient');
 
-          if (error) throw error;
-          
-          if (data && data.user) {
-            const { error: profileError } = await _supabase.from('company_user').upsert({
-              id: data.user.id,
-              first_name: fName,
-              last_name: lName,
-              email: email,
-              role: 'client',
-              created_at: new Date().toISOString()
-            }, { onConflict: 'id' });
+      btn.disabled = true;
+      btn.textContent = 'Creando...';
 
-            if (profileError) console.warn("Error upserting to company_user:", profileError);
-
-            showToast('Éxito', 'Cliente creado correctamente.', 'success');
-            closeNewClientModal();
-            loadAllUsers(); // recargar tabla
+      try {
+        // Instancia secundaria temporal para no interferir con la sesión del Admin
+        const tempClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+          auth: {
+            storageKey: 'dotacian-temp-signup',
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false
           }
+        });
 
-        } catch (err) {
-          console.error("Error creando cliente:", err);
-          showToast('Error', err.message || 'No se pudo crear el cliente', 'error');
-        } finally {
-          btn.disabled = false;
-          btn.textContent = 'Crear Cliente';
+        const { data, error } = await tempClient.auth.signUp({
+          email: email,
+          password: password,
+          options: {
+            data: { first_name: fName, last_name: lName }
+          }
+        });
+
+        if (error) throw error;
+
+        if (data && data.user) {
+          const newUserId = data.user.id;
+
+          const { error: userError } = await _supabase.from('company_user').upsert({
+            id: newUserId,
+            first_name: fName,
+            last_name: lName,
+            email: email,
+            role: 'client',
+            company_id: null,
+            created_at: new Date().toISOString()
+          }, { onConflict: 'id' });
+
+          if (userError) console.warn("Error upserting to company_user:", userError);
+
+          const { error: companyError } = await _supabase.from('company_profile').upsert({
+            id: newUserId,
+            company_name: companyName,
+            industry: industry,
+            country: country
+          }, { onConflict: 'id' });
+
+          if (companyError) throw companyError;
+
+          showToast('Éxito', 'Empresa creada correctamente.', 'success');
+          closeNewCompanyModal();
+          await loadAllCompanies();
+          const created = allCompanies.find(c => c.id === newUserId);
+          if (created) openCompanyDrawer(created);
         }
+
+      } catch (err) {
+        console.error("Error creando empresa:", err);
+        showToast('Error', err.message || 'No se pudo crear la empresa', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Crear Empresa';
+      }
+    }
+
+    document.addEventListener('click', (e) => {
+      if (e.target.id === 'new-client-modal') closeNewCompanyModal();
+      if (e.target.id === 'add-admin-modal') closeAddAdminModal();
+    });
+
+    // -------- Agregar Administrador a empresa existente --------
+
+    function openAddAdminModal() {
+      if (!currentCompanyRecord) return;
+      switchAddAdminTab('create');
+      document.getElementById('add-admin-create-form').reset();
+      document.getElementById('addAdminLinkEmail').value = '';
+      document.getElementById('addAdminLinkResult').innerHTML = '';
+      document.getElementById('add-admin-modal').classList.add('active');
+    }
+
+    function closeAddAdminModal() {
+      document.getElementById('add-admin-modal').classList.remove('active');
+    }
+
+    function switchAddAdminTab(tab) {
+      const isCreate = tab === 'create';
+      document.getElementById('tabBtnCreate').classList.toggle('active', isCreate);
+      document.getElementById('tabBtnLink').classList.toggle('active', !isCreate);
+      document.getElementById('addAdminCreatePanel').style.display = isCreate ? 'block' : 'none';
+      document.getElementById('addAdminLinkPanel').style.display = isCreate ? 'none' : 'block';
+    }
+
+    async function createAdminForCompany(e) {
+      e.preventDefault();
+      if (!currentCompanyRecord) return;
+
+      const fName = document.getElementById('addAdminFirstName').value.trim();
+      const lName = document.getElementById('addAdminLastName').value.trim();
+      const email = document.getElementById('addAdminEmail').value.trim();
+      const password = document.getElementById('addAdminPassword').value;
+      const btn = document.getElementById('btnCreateAdmin');
+
+      btn.disabled = true;
+      btn.textContent = 'Creando...';
+
+      try {
+        const tempClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+          auth: {
+            storageKey: 'dotacian-temp-signup-admin',
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false
+          }
+        });
+
+        const { data, error } = await tempClient.auth.signUp({
+          email: email,
+          password: password,
+          options: { data: { first_name: fName, last_name: lName } }
+        });
+
+        if (error) throw error;
+
+        if (data && data.user) {
+          const { error: userError } = await _supabase.from('company_user').upsert({
+            id: data.user.id,
+            first_name: fName,
+            last_name: lName,
+            email: email,
+            role: 'client',
+            company_id: currentCompanyRecord.id,
+            created_at: new Date().toISOString()
+          }, { onConflict: 'id' });
+
+          if (userError) throw userError;
+
+          showToast('Éxito', 'Administrador agregado a la empresa.', 'success');
+          closeAddAdminModal();
+          await loadAllCompanies();
+          const refreshed = allCompanies.find(c => c.id === currentCompanyRecord.id);
+          if (refreshed) { currentCompanyRecord = refreshed; openCompanyDrawer(refreshed); }
+        }
+      } catch (err) {
+        console.error("Error creando administrador:", err);
+        showToast('Error', err.message || 'No se pudo crear el administrador', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Crear y Vincular';
+      }
+    }
+
+    async function searchLinkCandidate() {
+      const email = document.getElementById('addAdminLinkEmail').value.trim();
+      const resultBox = document.getElementById('addAdminLinkResult');
+      if (!email) {
+        showToast('Atención', 'Ingresa un correo para buscar.', 'error');
+        return;
       }
 
-      document.addEventListener('click', (e) => {
-        if (e.target.id === 'new-client-modal') {
-          closeNewClientModal();
+      const btn = document.getElementById('btnSearchLink');
+      btn.disabled = true;
+      btn.textContent = 'Buscando...';
+      resultBox.innerHTML = '';
+
+      try {
+        const userRow = await findUserByEmail(email);
+
+        if (!userRow) {
+          resultBox.innerHTML = `<div class="link-result-card" style="color:#EF4444;">No se encontró ningún usuario con ese correo.</div>`;
+          return;
         }
-      });
+
+        if (userRow.id === currentCompanyRecord.id || userRow.company_id === currentCompanyRecord.id) {
+          resultBox.innerHTML = `<div class="link-result-card">Este usuario ya es administrador de esta empresa.</div>`;
+          return;
+        }
+
+        // ¿Ya es dueño de su propia empresa?
+        const ownsCompany = allCompanies.find(c => c.id === userRow.id);
+        if (ownsCompany) {
+          resultBox.innerHTML = `<div class="link-result-card" style="color:#EF4444;">
+            <strong>${userRow.first_name} ${userRow.last_name}</strong> (${userRow.email}) ya es dueño de su propia empresa
+            (${ownsCompany.company_name || 'Sin nombre'}) y no puede vincularse a otra.
+          </div>`;
+          return;
+        }
+
+        // ¿Pertenece a otra empresa como miembro de equipo?
+        const currentCompany = userRow.company_id ? allCompanies.find(c => c.id === userRow.company_id) : null;
+
+        resultBox.innerHTML = `
+          <div class="link-result-card">
+            <div style="font-weight: 700; color: #0F172A; margin-bottom: 0.25rem;">${userRow.first_name} ${userRow.last_name}</div>
+            <div style="font-size: 0.8rem; color: #64748B; margin-bottom: 0.75rem;">${userRow.email}</div>
+            ${currentCompany ? `<p style="font-size: 0.8rem; color: #92400E; background: #FFFBEB; padding: 0.5rem 0.75rem; border-radius: 6px; margin-bottom: 0.75rem;">Actualmente pertenece a <strong>${currentCompany.company_name || 'Sin nombre'}</strong>. Vincularlo aquí lo moverá de esa empresa a esta.</p>` : ''}
+            <button class="btn btn-primary" style="width: 100%;" onclick="confirmLinkAdmin('${userRow.id}')">
+              ${currentCompany ? 'Mover a esta empresa' : 'Vincular a esta empresa'}
+            </button>
+          </div>
+        `;
+      } catch (err) {
+        console.error("Error buscando usuario para vincular:", err);
+        resultBox.innerHTML = `<div class="link-result-card" style="color:#EF4444;">Hubo un error en la búsqueda.</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Buscar Usuario';
+      }
+    }
+
+    async function confirmLinkAdmin(userId) {
+      if (!currentCompanyRecord) return;
+      try {
+        const { error } = await _supabase.from('company_user').update({ company_id: currentCompanyRecord.id }).eq('id', userId);
+        if (error) throw error;
+
+        showToast('Éxito', 'Usuario vinculado a la empresa.', 'success');
+        closeAddAdminModal();
+        await loadAllCompanies();
+        const refreshed = allCompanies.find(c => c.id === currentCompanyRecord.id);
+        if (refreshed) { currentCompanyRecord = refreshed; openCompanyDrawer(refreshed); }
+      } catch (err) {
+        console.error("Error vinculando usuario:", err);
+        showToast('Error', 'No se pudo vincular al usuario.', 'error');
+      }
+    }
   </script>
 </body>
 
