@@ -610,8 +610,9 @@
                     style="background: var(--color-navy, #0f172a); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">+
                     Agregar Empleado</button>
                 </div>
-                <p style="color: #94A3B8; font-size: 0.85rem; margin: 0;">Usa el conteo en Actividad para ver cuántos
-                  empleados tiene registrados esta empresa.</p>
+                <div id="companyEmployeesList">
+                  <p style="color: #94A3B8; font-size: 0.85rem;">Cargando...</p>
+                </div>
               </div>
 
               <!-- Actividad -->
@@ -1157,8 +1158,63 @@
       _supabase.from('company_employees').select('*', { count: 'exact', head: true }).eq('company_id', companyId)
         .then(({ count }) => { document.getElementById('viewEmployeesCount').textContent = count || 0; });
 
+      loadCompanyEmployeesList(companyId);
+
       document.getElementById('drawerOverlay').classList.add('active');
       document.getElementById('userCard').classList.add('active');
+    }
+
+    async function loadCompanyEmployeesList(companyId) {
+      const container = document.getElementById('companyEmployeesList');
+      try {
+        const { data, error } = await _supabase
+          .from('company_employees')
+          .select('id, first_name, last_name, role')
+          .eq('company_id', companyId)
+          .order('first_name');
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          container.innerHTML = '<p style="color: #94A3B8; font-size: 0.85rem;">Sin empleados registrados todavía.</p>';
+          return;
+        }
+
+        container.innerHTML = data.map(emp => `
+          <div class="admin-row">
+            <div class="admin-info">
+              <div class="admin-name">${emp.first_name || ''} ${emp.last_name || ''}</div>
+              <div class="admin-email">${emp.role || 'Sin rol asignado'}</div>
+            </div>
+            <div class="admin-actions">
+              <button class="danger" onclick="deleteCompanyEmployee('${emp.id}')">Eliminar</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error("Error cargando empleados:", err);
+        container.innerHTML = '<p style="color: #EF4444; font-size: 0.85rem;">No se pudieron cargar los empleados.</p>';
+      }
+    }
+
+    async function deleteCompanyEmployee(employeeId) {
+      if (!currentCompanyRecord) return;
+      if (!confirm('¿Eliminar a este empleado? Esta acción es irreversible.')) return;
+
+      try {
+        const { error } = await _supabase.from('company_employees').delete().eq('id', employeeId);
+        if (error) throw error;
+
+        showToast('Eliminado', 'El empleado ha sido eliminado.', 'success');
+
+        const companyId = currentCompanyRecord.id;
+        loadCompanyEmployeesList(companyId);
+        _supabase.from('company_employees').select('*', { count: 'exact', head: true }).eq('company_id', companyId)
+          .then(({ count }) => { document.getElementById('viewEmployeesCount').textContent = count || 0; });
+      } catch (err) {
+        console.error("Error eliminando empleado:", err);
+        showToast('Error', 'No se pudo eliminar al empleado.', 'error');
+      }
     }
 
     function renderCompanyAdmins(company) {
@@ -1896,6 +1952,7 @@
         const companyId = currentCompanyRecord.id;
         _supabase.from('company_employees').select('*', { count: 'exact', head: true }).eq('company_id', companyId)
           .then(({ count }) => { document.getElementById('viewEmployeesCount').textContent = count || 0; });
+        loadCompanyEmployeesList(companyId);
       } catch (err) {
         console.error("Error creando empleado:", err);
         showToast('Error', err.message || 'No se pudo agregar el empleado.', 'error');
