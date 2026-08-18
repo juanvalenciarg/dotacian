@@ -398,7 +398,7 @@
       </div>
       <nav class="sidebar-nav">
         <a href="admin.html" id="nav-dashboard" class="nav-item">Dashboard</a>
-        <a href="admin.usuarios.html" id="nav-users" class="nav-item active">Gestión de Empresas</a>
+        <a href="admin.empresas.html" id="nav-users" class="nav-item active">Gestión de Empresas</a>
         <a href="admin.sellers.html" id="nav-sellers" class="nav-item">Gestión de Fabricantes</a>
         <a href="admin.leads.html" id="nav-leads" class="nav-item">Gestión de Leads</a>
         <a href="admin.facturas.html" class="nav-item">Facturación</a>
@@ -482,6 +482,7 @@
             <table class="users-table">
               <thead>
                 <tr>
+                  <th>ID</th>
                   <th>Empresa</th>
                   <th>Industria</th>
                   <th>País</th>
@@ -491,7 +492,7 @@
               </thead>
               <tbody id="companiesTableBody">
                 <tr>
-                  <td colspan="5" style="text-align: center; color: #64748B; padding: 2rem;">Cargando empresas...
+                  <td colspan="6" style="text-align: center; color: #64748B; padding: 2rem;">Cargando empresas...
                   </td>
                 </tr>
               </tbody>
@@ -812,14 +813,14 @@
         renderCompaniesTable(allCompanies);
       } catch (err) {
         console.error("Error cargando empresas:", err);
-        if (tbody) tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #EF4444;">Error al cargar empresas.</td></tr>`;
+        if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #EF4444;">Error al cargar empresas.</td></tr>`;
       }
     }
 
     function renderCompaniesTable(list) {
       const tbody = document.getElementById('companiesTableBody');
       if (!list || list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">No hay empresas registradas.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">No hay empresas registradas.</td></tr>`;
         return;
       }
 
@@ -828,6 +829,7 @@
         const tr = document.createElement('tr');
         tr.onclick = () => openCompanyDrawer(company);
         tr.innerHTML = `
+          <td><span style="font-family: monospace; font-size: 0.78rem; color: #64748B;" title="${company.id}">${company.id.split('-')[0]}</span></td>
           <td>
             <div class="user-info">
               <span class="user-name">${company.company_name || 'Sin nombre'}</span>
