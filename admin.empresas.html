@@ -542,13 +542,32 @@
                   </div>
                   <div class="form-group">
                     <label>País</label>
-                    <select id="editCountry" class="form-control">
+                    <select id="editCountry" class="form-control" onchange="handleAdminCountryChange()">
                       <option value="">Selecciona un país...</option>
                       <option value="MX">México</option>
                       <option value="CO">Colombia</option>
                     </select>
                   </div>
                 </div>
+
+                <div class="form-section-title" style="margin: 0.5rem 0 1rem;">
+                  <div class="title-left">Información Fiscal</div>
+                </div>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Razón Social</label>
+                    <input type="text" id="editLegalName" class="form-control" placeholder="Razón social de la empresa">
+                  </div>
+                  <div class="form-group">
+                    <label id="editTaxLabel">RFC / NIT</label>
+                    <input type="text" id="editTaxId" class="form-control" placeholder="Selecciona un país primero">
+                  </div>
+                  <div class="form-group" id="editDvWrapper" style="display: none;">
+                    <label>Dígito de Verificación</label>
+                    <input type="text" id="editDv" class="form-control" placeholder="Ej. 7">
+                  </div>
+                </div>
+
                 <div style="display: flex; justify-content: flex-end;">
                   <button class="btn btn-primary" onclick="saveCompany()">Guardar Cambios de Empresa</button>
                 </div>
@@ -572,6 +591,27 @@
                 <div id="companyAdminsList">
                   <p style="color: #94A3B8; font-size: 0.85rem;">Cargando...</p>
                 </div>
+              </div>
+
+              <!-- Empleados -->
+              <div class="form-section">
+                <div class="form-section-title">
+                  <div class="title-left">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                      viewBox="0 0 24 24">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    Empleados
+                  </div>
+                  <button onclick="openAddEmployeeModal()"
+                    style="background: var(--color-navy, #0f172a); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">+
+                    Agregar Empleado</button>
+                </div>
+                <p style="color: #94A3B8; font-size: 0.85rem; margin: 0;">Usa el conteo en Actividad para ver cuántos
+                  empleados tiene registrados esta empresa.</p>
               </div>
 
               <!-- Actividad -->
@@ -754,6 +794,176 @@
     </div>
   </div>
 
+  <!-- Modal Agregar Empleado -->
+  <div id="add-employee-modal" class="modal-overlay" style="z-index: 10001;">
+    <div class="modal-content"
+      style="max-width: 620px; width: 95%; max-height: 90vh; overflow-y: auto; background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
+      <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #E2E8F0; padding-bottom: 1rem;">
+        <h2 style="font-size: 1.25rem; color: #0f172a; font-weight: 700; margin: 0; font-family: var(--font-family-heading, 'Outfit');">
+          Agregar Empleado</h2>
+        <button onclick="closeAddEmployeeModal()"
+          style="background: none; border: none; cursor: pointer; color: #64748b; font-size: 1.5rem;">&times;</button>
+      </div>
+
+      <form id="add-employee-form" onsubmit="saveNewEmployee(event)">
+        <div class="form-section-title" style="margin-bottom: 0.75rem;">
+          <div class="title-left">Información General</div>
+        </div>
+        <div class="form-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 0.5rem;">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" id="empName" class="form-control" placeholder="ej. Juan" required>
+          </div>
+          <div class="form-group">
+            <label>Apellido</label>
+            <input type="text" id="empLastName" class="form-control" placeholder="ej. Pérez" required>
+          </div>
+        </div>
+        <div class="form-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 0.5rem;">
+          <div class="form-group">
+            <label>Correo Corporativo (Opcional)</label>
+            <input type="email" id="empEmail" class="form-control" placeholder="correo@empresa.com">
+          </div>
+          <div class="form-group">
+            <label>Celular</label>
+            <input type="text" id="empPhone" class="form-control" placeholder="55 0000 0000" required>
+          </div>
+        </div>
+        <div class="form-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 0.5rem;">
+          <div class="form-group">
+            <label>Cédula/CURP</label>
+            <input type="text" id="empDoc" class="form-control" placeholder="ej. 12345678" required>
+          </div>
+          <div class="form-group">
+            <label>Fecha de Nacimiento</label>
+            <input type="date" id="empBirthDate" class="form-control">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 0.5rem;">
+          <label>Rol / Puesto</label>
+          <select id="empRole" class="form-control" required onchange="handleAdminEmpRoleChange()">
+            <option value="">Selecciona un rol...</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label>Área</label>
+          <div id="empAreaDisplay"
+            style="padding: 0.75rem; border: 1px solid #CBD5E1; border-radius: 8px; background: #f8fafc; color: #64748B; font-size: 0.9375rem;">
+            Se asigna según el rol seleccionado
+          </div>
+        </div>
+
+        <div class="form-section-title" style="margin-bottom: 0.75rem;">
+          <div class="title-left">Dirección (Opcional)</div>
+        </div>
+        <div class="form-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 0.5rem;">
+          <div class="form-group">
+            <label>País</label>
+            <input type="text" id="empAddressCountry" class="form-control" placeholder="ej. México">
+          </div>
+          <div class="form-group">
+            <label>Ciudad</label>
+            <input type="text" id="empAddressCity" class="form-control" placeholder="ej. CDMX">
+          </div>
+        </div>
+        <div class="form-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 0.5rem;">
+          <div class="form-group">
+            <label>Código Postal</label>
+            <input type="text" id="empAddressPostalCode" class="form-control" placeholder="ej. 03100">
+          </div>
+          <div class="form-group">
+            <label>Indicaciones</label>
+            <input type="text" id="empAddressIndications" class="form-control" placeholder="Torre, Casa, Apartamento">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label>Dirección</label>
+          <input type="text" id="empAddressLine" class="form-control" placeholder="Calle y número">
+        </div>
+
+        <div class="form-section-title" style="margin-bottom: 0.75rem;">
+          <div class="title-left">Tallas (Opcional)</div>
+        </div>
+        <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr; margin-bottom: 1.5rem;">
+          <div class="form-group">
+            <label>Talla Camisa</label>
+            <select id="empShirtSize" class="form-control">
+              <option value="">Selecciona...</option>
+              <option value="XS">XS</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+              <option value="2XL">2XL</option>
+              <option value="Unitalla">Unitalla</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Talla Pantalón</label>
+            <select id="empPantsSize" class="form-control">
+              <option value="">Selecciona...</option>
+              <optgroup label="Hombre">
+                <option value="28">28</option>
+                <option value="30">30</option>
+                <option value="32">32</option>
+                <option value="34">34</option>
+                <option value="36">36</option>
+                <option value="38">38</option>
+                <option value="40">40</option>
+                <option value="42">42</option>
+                <option value="44">44</option>
+              </optgroup>
+              <optgroup label="Mujer">
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+              </optgroup>
+              <option value="Unitalla">Unitalla</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Talla Zapatos</label>
+            <select id="empShoeSize" class="form-control">
+              <option value="">Selecciona...</option>
+              <option value="26">26</option>
+              <option value="27">27</option>
+              <option value="28">28</option>
+              <option value="29">29</option>
+              <option value="30">30</option>
+              <option value="31">31</option>
+              <option value="32">32</option>
+              <option value="33">33</option>
+              <option value="34">34</option>
+              <option value="35">35</option>
+              <option value="36">36</option>
+              <option value="37">37</option>
+              <option value="38">38</option>
+              <option value="39">39</option>
+              <option value="40">40</option>
+              <option value="41">41</option>
+              <option value="42">42</option>
+              <option value="43">43</option>
+              <option value="44">44</option>
+              <option value="45">45</option>
+              <option value="46">46</option>
+              <option value="Unitalla">Unitalla</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" id="btnSaveEmployee" class="btn btn-primary" style="width: 100%;">Guardar
+          Empleado</button>
+      </form>
+    </div>
+  </div>
+
   <div class="toast-container" id="toast-container"></div>
 
   <script src="assets/js/utils.js?v=4"></script>
@@ -924,6 +1134,10 @@
       document.getElementById('editCompany').value = company.company_name || '';
       document.getElementById('editIndustry').value = company.industry || '';
       document.getElementById('editCountry').value = company.country || '';
+      document.getElementById('editLegalName').value = company.legal_name || '';
+      document.getElementById('editTaxId').value = company.tax_id || '';
+      document.getElementById('editDv').value = company.dv || '';
+      handleAdminCountryChange();
 
       renderCompanyAdmins(company);
 
@@ -982,17 +1196,49 @@
       currentCompanyRecord = null;
     }
 
+    function handleAdminCountryChange() {
+      const country = document.getElementById('editCountry').value;
+      const taxLabel = document.getElementById('editTaxLabel');
+      const taxInput = document.getElementById('editTaxId');
+      const dvWrapper = document.getElementById('editDvWrapper');
+
+      if (country === 'MX') {
+        taxLabel.textContent = 'RFC de la Empresa';
+        taxInput.placeholder = 'Ej: ABC123456789';
+        dvWrapper.style.display = 'none';
+      } else if (country === 'CO') {
+        taxLabel.textContent = 'NIT de la Empresa';
+        taxInput.placeholder = 'Ej: 900.123.456';
+        dvWrapper.style.display = 'flex';
+      } else {
+        taxLabel.textContent = 'RFC / NIT';
+        taxInput.placeholder = 'Selecciona un país primero';
+        dvWrapper.style.display = 'none';
+      }
+    }
+
     async function saveCompany() {
       if (!currentCompanyRecord) return;
 
       const companyName = document.getElementById('editCompany').value.trim();
       const industryName = document.getElementById('editIndustry').value.trim();
       const country = document.getElementById('editCountry').value.trim();
+      const legalName = document.getElementById('editLegalName').value.trim();
+      const taxId = document.getElementById('editTaxId').value.trim();
+      const dv = document.getElementById('editDv').value.trim();
 
       try {
         const { error } = await _supabase
           .from('company_profile')
-          .upsert([{ id: currentCompanyRecord.id, company_name: companyName, industry: industryName, country: country }], { onConflict: 'id' });
+          .upsert([{
+            id: currentCompanyRecord.id,
+            company_name: companyName,
+            industry: industryName,
+            country: country,
+            legal_name: legalName,
+            tax_id: taxId,
+            dv: dv
+          }], { onConflict: 'id' });
 
         if (error) throw error;
 
@@ -1399,6 +1645,7 @@
     document.addEventListener('click', (e) => {
       if (e.target.id === 'new-client-modal') closeNewCompanyModal();
       if (e.target.id === 'add-admin-modal') closeAddAdminModal();
+      if (e.target.id === 'add-employee-modal') closeAddEmployeeModal();
     });
 
     // -------- Agregar Administrador a empresa existente --------
@@ -1554,6 +1801,107 @@
       } catch (err) {
         console.error("Error vinculando usuario:", err);
         showToast('Error', 'No se pudo vincular al usuario.', 'error');
+      }
+    }
+
+    // -------- Agregar Empleado a empresa existente --------
+
+    let adminRoleAreaMap = {};
+
+    async function loadCompanyRoles(companyId) {
+      const select = document.getElementById('empRole');
+      select.innerHTML = '<option value="">Selecciona un rol...</option>';
+      adminRoleAreaMap = {};
+
+      try {
+        const [rolesRes, definitionsRes] = await Promise.all([
+          _supabase.from('company_roles').select('role_name').eq('company_id', companyId),
+          _supabase.from('role_definition').select('role_name, area').eq('company_id', companyId)
+        ]);
+
+        if (rolesRes.error) throw rolesRes.error;
+
+        (definitionsRes.data || []).forEach(r => {
+          adminRoleAreaMap[(r.role_name || '').toLowerCase().trim()] = r.area || '';
+        });
+
+        (rolesRes.data || []).forEach(r => {
+          const opt = document.createElement('option');
+          opt.value = r.role_name;
+          opt.textContent = r.role_name;
+          select.appendChild(opt);
+        });
+      } catch (err) {
+        console.error("Error cargando roles de la empresa:", err);
+      }
+    }
+
+    function handleAdminEmpRoleChange() {
+      const role = document.getElementById('empRole').value;
+      const display = document.getElementById('empAreaDisplay');
+      const area = adminRoleAreaMap[role.toLowerCase().trim()] || '';
+      display.textContent = area || 'Se asigna según el rol seleccionado';
+    }
+
+    function openAddEmployeeModal() {
+      if (!currentCompanyRecord) return;
+      document.getElementById('add-employee-form').reset();
+      document.getElementById('empAreaDisplay').textContent = 'Se asigna según el rol seleccionado';
+      document.getElementById('add-employee-modal').classList.add('active');
+      loadCompanyRoles(currentCompanyRecord.id);
+    }
+
+    function closeAddEmployeeModal() {
+      document.getElementById('add-employee-modal').classList.remove('active');
+    }
+
+    async function saveNewEmployee(e) {
+      e.preventDefault();
+      if (!currentCompanyRecord) return;
+
+      const role = document.getElementById('empRole').value;
+      const area = adminRoleAreaMap[role.toLowerCase().trim()] || '';
+      const btn = document.getElementById('btnSaveEmployee');
+      btn.disabled = true;
+      btn.textContent = 'Guardando...';
+
+      try {
+        const { error } = await _supabase.from('company_employees').insert([{
+          company_id: currentCompanyRecord.id,
+          first_name: document.getElementById('empName').value.trim(),
+          last_name: document.getElementById('empLastName').value.trim(),
+          email: document.getElementById('empEmail').value.trim() || null,
+          id_document: document.getElementById('empDoc').value.trim(),
+          phone: document.getElementById('empPhone').value.trim(),
+          role: role,
+          area: area || null,
+          birth_date: document.getElementById('empBirthDate').value || null,
+          address_country: document.getElementById('empAddressCountry').value.trim() || null,
+          address_city: document.getElementById('empAddressCity').value.trim() || null,
+          address_postal_code: document.getElementById('empAddressPostalCode').value.trim() || null,
+          address_line: document.getElementById('empAddressLine').value.trim() || null,
+          address_indications: document.getElementById('empAddressIndications').value.trim() || null,
+          shirt_size: document.getElementById('empShirtSize').value,
+          pants_size: document.getElementById('empPantsSize').value,
+          shoe_size: document.getElementById('empShoeSize').value,
+          status: 'none',
+          status_updated_at: new Date().toISOString()
+        }]);
+
+        if (error) throw error;
+
+        showToast('Éxito', 'Empleado agregado correctamente.', 'success');
+        closeAddEmployeeModal();
+
+        const companyId = currentCompanyRecord.id;
+        _supabase.from('company_employees').select('*', { count: 'exact', head: true }).eq('company_id', companyId)
+          .then(({ count }) => { document.getElementById('viewEmployeesCount').textContent = count || 0; });
+      } catch (err) {
+        console.error("Error creando empleado:", err);
+        showToast('Error', err.message || 'No se pudo agregar el empleado.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Guardar Empleado';
       }
     }
   </script>
