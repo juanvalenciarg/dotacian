@@ -795,7 +795,7 @@
       try {
         const [companiesRes, usersRes] = await Promise.all([
           _supabase.from('company_profile').select('*').order('company_name', { ascending: true }),
-          _supabase.from('company_user').select('*').eq('role', 'client')
+          _supabase.from('company_user').select('*')
         ]);
 
         if (companiesRes.error) throw companiesRes.error;
@@ -863,7 +863,6 @@
       const { data, error } = await _supabase
         .from('company_user')
         .select('*')
-        .eq('role', 'client')
         .ilike('email', email)
         .maybeSingle();
       if (error) throw error;
@@ -1364,7 +1363,6 @@
             first_name: fName,
             last_name: lName,
             email: email,
-            role: 'client',
             company_id: null,
             created_at: new Date().toISOString()
           }, { onConflict: 'id' });
@@ -1461,7 +1459,6 @@
             first_name: fName,
             last_name: lName,
             email: email,
-            role: 'client',
             company_id: currentCompanyRecord.id,
             created_at: new Date().toISOString()
           }, { onConflict: 'id' });
