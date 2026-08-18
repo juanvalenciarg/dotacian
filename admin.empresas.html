@@ -1197,10 +1197,18 @@
       }
     }
 
-    async function deleteCompanyEmployee(employeeId) {
+    function deleteCompanyEmployee(employeeId) {
       if (!currentCompanyRecord) return;
-      if (!confirm('¿Eliminar a este empleado? Esta acción es irreversible.')) return;
+      showConfirmDialog({
+        title: 'Eliminar Empleado',
+        message: '¿Eliminar a este empleado? Esta acción es irreversible.',
+        confirmText: 'Eliminar',
+        danger: true,
+        onConfirm: () => confirmDeleteCompanyEmployee(employeeId)
+      });
+    }
 
+    async function confirmDeleteCompanyEmployee(employeeId) {
       try {
         const { error } = await _supabase.from('company_employees').delete().eq('id', employeeId);
         if (error) throw error;
@@ -1308,10 +1316,18 @@
       }
     }
 
-    async function resetPasswordFor(email) {
+    function resetPasswordFor(email) {
       if (!email) return;
-      if (!confirm(`¿Estás seguro de enviar un enlace de recuperación a ${email}?`)) return;
+      showConfirmDialog({
+        title: 'Enviar Recuperación',
+        message: `¿Estás seguro de enviar un enlace de recuperación a ${email}?`,
+        confirmText: 'Enviar',
+        danger: false,
+        onConfirm: () => confirmResetPasswordFor(email)
+      });
+    }
 
+    async function confirmResetPasswordFor(email) {
       try {
         const { error } = await _supabase.auth.resetPasswordForEmail(email);
         if (error) throw error;
@@ -1322,9 +1338,17 @@
       }
     }
 
-    async function detachAdmin(userId) {
-      if (!confirm('¿Quitar a este administrador de la empresa? Su cuenta no se eliminará, solo dejará de tener acceso a esta empresa.')) return;
+    function detachAdmin(userId) {
+      showConfirmDialog({
+        title: 'Quitar Administrador',
+        message: '¿Quitar a este administrador de la empresa? Su cuenta no se eliminará, solo dejará de tener acceso a esta empresa.',
+        confirmText: 'Quitar',
+        danger: true,
+        onConfirm: () => confirmDetachAdmin(userId)
+      });
+    }
 
+    async function confirmDetachAdmin(userId) {
       try {
         const { error } = await _supabase.from('company_user').update({ company_id: null }).eq('id', userId);
         if (error) throw error;
@@ -1339,9 +1363,17 @@
       }
     }
 
-    async function deleteAdminAccount(userId) {
-      if (!confirm('¿Eliminar esta cuenta permanentemente? Esta acción es irreversible.')) return;
+    function deleteAdminAccount(userId) {
+      showConfirmDialog({
+        title: 'Eliminar Cuenta',
+        message: '¿Eliminar esta cuenta permanentemente? Esta acción es irreversible.',
+        confirmText: 'Eliminar',
+        danger: true,
+        onConfirm: () => confirmDeleteAdminAccount(userId)
+      });
+    }
 
+    async function confirmDeleteAdminAccount(userId) {
       try {
         const { error } = await _supabase.rpc('delete_user_admin', { target_user_id: userId });
         if (error) throw error;
@@ -1611,6 +1643,38 @@
       `;
       container.appendChild(toast);
       setTimeout(() => { toast.remove(); }, 4000);
+    }
+
+    function showConfirmDialog({ title, message, confirmText = 'Eliminar', danger = true, onConfirm }) {
+      let modal = document.getElementById('generic-confirm-modal');
+      if (modal) modal.remove();
+
+      modal = document.createElement('div');
+      modal.id = 'generic-confirm-modal';
+      modal.className = 'modal-overlay active';
+      modal.style.zIndex = '10002';
+      const accent = danger ? '#EF4444' : 'var(--color-cyan, #06B6D4)';
+      const accentBg = danger ? '#FEF2F2' : 'rgba(6, 182, 212, 0.1)';
+      const confirmBg = danger ? '#EF4444' : 'var(--color-cyan, #06B6D4)';
+      const confirmColor = danger ? 'white' : '#080A10';
+
+      modal.innerHTML = `
+        <div class="modal-content" style="background: white; border-radius: 1.5rem; max-width: 400px; width: 90%; text-align: center; padding: 2.5rem 2rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border: 1px solid #E2E8F0; margin: auto;">
+          <div style="width: 56px; height: 56px; background: ${accentBg}; color: ${accent}; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+          </div>
+          <h2 style="font-family: var(--font-family-heading, 'Outfit'); color: var(--color-navy, #0f172a); font-size: 1.5rem; margin-bottom: 0.5rem; font-weight: 700;">${title}</h2>
+          <p style="color: var(--color-text-secondary, #64748b); font-size: 0.875rem; margin-bottom: 2rem; line-height: 1.5;">${message}</p>
+          <div style="display: flex; gap: 1rem;">
+            <button id="generic-confirm-cancel" style="flex: 1; padding: 0.875rem; font-size: 0.95rem; background: #F1F5F9; color: #475569; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;">Cancelar</button>
+            <button id="generic-confirm-accept" style="flex: 1; padding: 0.875rem; font-size: 0.95rem; background: ${confirmBg}; color: ${confirmColor}; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.15);">${confirmText}</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      document.getElementById('generic-confirm-cancel').onclick = () => modal.remove();
+      document.getElementById('generic-confirm-accept').onclick = () => { modal.remove(); onConfirm(); };
     }
 
     // -------- Crear Empresa (empresa + primer administrador) --------
