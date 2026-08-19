@@ -374,7 +374,7 @@
                     <input type="text" id="country" disabled>
                   </div>
                   <div class="form-group">
-                    <label>Número de Empleados</label>
+                    <label>Número de Empleados (activos en la plataforma)</label>
                     <input type="number" id="employee_count" disabled>
                   </div>
                   <div class="form-group">
@@ -382,240 +382,6 @@
                     <div class="input-group">
                       <span class="input-prefix" id="budget_prefix">$</span>
                       <input type="number" id="monthly_budget" disabled>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Logistica Section -->
-              <div class="config-section">
-                <h3>Logística y Entrega</h3>
-                <div class="form-grid">
-                  <!-- Direccion -->
-                  <div class="form-group">
-                    <label>Dirección Principal de Entrega</label>
-                    <input type="text" id="delivery_address" disabled>
-                  </div>
-                  <div class="form-group">
-                    <label>Departamento / Estado</label>
-                    <select id="delivery_state" disabled>
-                      <option value="">Selecciona una opción...</option>
-                    </select>
-                  </div>
-
-                  <!-- Hidden legacy input to maintain code stability -->
-                  <input type="hidden" id="contact_phone">
-
-                  <!-- Contacto 1 -->
-                  <div class="form-group" style="grid-column: span 2; margin-top: 1rem;">
-                    <h4 style="color: var(--color-navy); margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 700;">
-                      Contacto Principal de Entrega</h4>
-                    <div class="contact-grid">
-                      <div>
-                        <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Nombre Completo</label>
-                        <input type="text" id="delivery_contact_1_name" disabled placeholder="Nombre del contacto"
-                          style="width: 100%; margin-top: 0.25rem;">
-                      </div>
-                      <div>
-                        <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Teléfono /
-                          WhatsApp</label>
-                        <input type="tel" id="delivery_contact_1_phone" disabled placeholder="Ej: +57 300 123 4567"
-                          style="width: 100%; margin-top: 0.25rem;">
-                      </div>
-                      <div>
-                        <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Correo
-                          Electrónico</label>
-                        <input type="email" id="delivery_contact_1_email" disabled placeholder="contacto@empresa.com"
-                          style="width: 100%; margin-top: 0.25rem;">
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Contacto 2 -->
-                  <div class="form-group" style="grid-column: span 2; margin-top: 0.5rem;">
-                    <h4 style="color: var(--color-navy); margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 700;">
-                      Contacto Secundario de Entrega</h4>
-                    <div class="contact-grid">
-                      <div>
-                        <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Nombre Completo</label>
-                        <input type="text" id="delivery_contact_2_name" disabled placeholder="Nombre del contacto"
-                          style="width: 100%; margin-top: 0.25rem;">
-                      </div>
-                      <div>
-                        <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Teléfono /
-                          WhatsApp</label>
-                        <input type="tel" id="delivery_contact_2_phone" disabled placeholder="Ej: +57 300 123 4567"
-                          style="width: 100%; margin-top: 0.25rem;">
-                      </div>
-                      <div>
-                        <label style="font-size: 0.8125rem; font-weight: 600; color: #64748B;">Correo
-                          Electrónico</label>
-                        <input type="email" id="delivery_contact_2_email" disabled placeholder="contacto2@empresa.com"
-                          style="width: 100%; margin-top: 0.25rem;">
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Horarios de Entrega -->
-                  <div class="form-group" style="grid-column: span 2; margin-top: 1rem;">
-                    <h4 style="color: var(--color-navy); margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 700;">
-                      Horarios de Entrega Autorizados</h4>
-                    <div class="hours-grid">
-
-                      <!-- Lunes -->
-                      <div class="hours-row"
-                        style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                          <input type="checkbox" id="hour_active_Lunes" class="hour-toggle"
-                            style="width: 18px; height: 18px; cursor: pointer;" disabled
-                            onchange="toggleDayHours('Lunes')">
-                          <span
-                            style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Lunes</span>
-                        </div>
-                        <div id="time_inputs_Lunes"
-                          style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
-                          <input type="time" id="hour_start_Lunes" class="hour-start"
-                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                            disabled value="08:00">
-                          <span style="color: #64748B; font-size: 0.8125rem;">a</span>
-                          <input type="time" id="hour_end_Lunes" class="hour-end"
-                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                            disabled value="17:00">
-                        </div>
-                      </div>
-
-                      <!-- Martes -->
-                      <div class="hours-row"
-                        style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                          <input type="checkbox" id="hour_active_Martes" class="hour-toggle"
-                            style="width: 18px; height: 18px; cursor: pointer;" disabled
-                            onchange="toggleDayHours('Martes')">
-                          <span
-                            style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Martes</span>
-                        </div>
-                        <div id="time_inputs_Martes"
-                          style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
-                          <input type="time" id="hour_start_Martes" class="hour-start"
-                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                            disabled value="08:00">
-                          <span style="color: #64748B; font-size: 0.8125rem;">a</span>
-                          <input type="time" id="hour_end_Martes" class="hour-end"
-                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                            disabled value="17:00">
-                        </div>
-                      </div>
-
-                      <!-- Miércoles -->
-                      <div class="hours-row"
-                        style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                          <input type="checkbox" id="hour_active_Miercoles" class="hour-toggle"
-                            style="width: 18px; height: 18px; cursor: pointer;" disabled
-                            onchange="toggleDayHours('Miercoles')">
-                          <span
-                            style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Miércoles</span>
-                        </div>
-                        <div id="time_inputs_Miercoles"
-                          style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
-                          <input type="time" id="hour_start_Miercoles" class="hour-start"
-                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                            disabled value="08:00">
-                          <span style="color: #64748B; font-size: 0.8125rem;">a</span>
-                          <input type="time" id="hour_end_Miercoles" class="hour-end"
-                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                            disabled value="17:00">
-                        </div>
-                      </div>
-
-                      <!-- Jueves -->
-                      <div class="hours-row"
-                        style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                          <input type="checkbox" id="hour_active_Jueves" class="hour-toggle"
-                            style="width: 18px; height: 18px; cursor: pointer;" disabled
-                            onchange="toggleDayHours('Jueves')">
-                          <span
-                            style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Jueves</span>
-                        </div>
-                        <div id="time_inputs_Jueves"
-                          style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
-                          <input type="time" id="hour_start_Jueves" class="hour-start"
-                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                            disabled value="08:00">
-                          <span style="color: #64748B; font-size: 0.8125rem;">a</span>
-                          <input type="time" id="hour_end_Jueves" class="hour-end"
-                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                            disabled value="17:00">
-                        </div>
-                      </div>
-
-                      <!-- Viernes -->
-                      <div class="hours-row"
-                        style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                          <input type="checkbox" id="hour_active_Viernes" class="hour-toggle"
-                            style="width: 18px; height: 18px; cursor: pointer;" disabled
-                            onchange="toggleDayHours('Viernes')">
-                          <span
-                            style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Viernes</span>
-                        </div>
-                        <div id="time_inputs_Viernes"
-                          style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
-                          <input type="time" id="hour_start_Viernes" class="hour-start"
-                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                            disabled value="08:00">
-                          <span style="color: #64748B; font-size: 0.8125rem;">a</span>
-                          <input type="time" id="hour_end_Viernes" class="hour-end"
-                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                            disabled value="17:00">
-                        </div>
-                      </div>
-
-                      <!-- Sábado -->
-                      <div class="hours-row"
-                        style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                          <input type="checkbox" id="hour_active_Sabado" class="hour-toggle"
-                            style="width: 18px; height: 18px; cursor: pointer;" disabled
-                            onchange="toggleDayHours('Sabado')">
-                          <span
-                            style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Sábado</span>
-                        </div>
-                        <div id="time_inputs_Sabado"
-                          style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
-                          <input type="time" id="hour_start_Sabado" class="hour-start"
-                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                            disabled value="08:00">
-                          <span style="color: #64748B; font-size: 0.8125rem;">a</span>
-                          <input type="time" id="hour_end_Sabado" class="hour-end"
-                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                            disabled value="14:00">
-                        </div>
-                      </div>
-
-                      <!-- Domingo -->
-                      <div class="hours-row"
-                        style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem; background: white; border-radius: 10px; border: 1px solid #E2E8F0;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                          <input type="checkbox" id="hour_active_Domingo" class="hour-toggle"
-                            style="width: 18px; height: 18px; cursor: pointer;" disabled
-                            onchange="toggleDayHours('Domingo')">
-                          <span
-                            style="font-weight: 600; font-size: 0.875rem; color: var(--color-navy); width: 70px;">Domingo</span>
-                        </div>
-                        <div id="time_inputs_Domingo"
-                          style="display: flex; align-items: center; gap: 0.25rem; opacity: 0.5; pointer-events: none;">
-                          <input type="time" id="hour_start_Domingo" class="hour-start"
-                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                            disabled value="08:00">
-                          <span style="color: #64748B; font-size: 0.8125rem;">a</span>
-                          <input type="time" id="hour_end_Domingo" class="hour-end"
-                            style="width: 85px; padding: 0.25rem 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8125rem;"
-                            disabled value="12:00">
-                        </div>
-                      </div>
-
                     </div>
                   </div>
                 </div>
@@ -683,62 +449,20 @@
       return formatted;
     }
 
-    const colombiaDepartments = [
-      "Bogotá D.C.", "Antioquia", "Valle del Cauca", "Atlántico", "Santander",
-      "Cundinamarca", "Bolívar", "Tolima", "Nariño", "Córdoba", "Huila",
-      "Norte de Santander", "Meta", "Magdalena", "Cesar", "Caldas", "Risaralda",
-      "Sucre", "Quindío", "Chocó", "Cauca", "Casanare", "Caquetá", "Arauca",
-      "Putumayo", "Guajira", "Amazonas", "Guainía", "Guaviare", "San Andrés",
-      "Vaupés", "Vichada"
-    ];
+    async function loadActiveEmployeeCount(companyId) {
+      const input = document.getElementById('employee_count');
+      try {
+        const { data, error } = await _supabase
+          .from('company_employees')
+          .select('role_status')
+          .eq('company_id', companyId);
+        if (error) throw error;
 
-    const mexicoStates = [
-      "Ciudad de México", "Aguascalientes", "Baja California", "Baja California Sur",
-      "Campeche", "Chiapas", "Chihuahua", "Coahuila", "Colima", "Durango",
-      "Guanajuato", "Guerrero", "Hidalgo", "Jalisco", "México", "Michoacán",
-      "Morelos", "Nayarit", "Nuevo León", "Oaxaca", "Puebla", "Querétaro",
-      "Quintana Roo", "San Luis Potosí", "Sinaloa", "Sonora", "Tabasco",
-      "Tamaulipas", "Tlaxcala", "Veracruz", "Yucatán", "Zacatecas"
-    ];
-
-    function updateStateDropdown(countryCode) {
-      const stateSelect = document.getElementById('delivery_state');
-      if (!stateSelect) return;
-
-      const prevVal = stateSelect.value;
-      stateSelect.innerHTML = '<option value="">Selecciona una opción...</option>';
-
-      const clean = (countryCode || '').trim().toUpperCase();
-      let list = [];
-      if (clean === 'CO' || clean === 'COLOMBIA') {
-        list = colombiaDepartments;
-      } else if (clean === 'MX' || clean === 'MEXICO' || clean === 'MÉXICO') {
-        list = mexicoStates;
-      }
-
-      list.forEach(state => {
-        const opt = document.createElement('option');
-        opt.value = state;
-        opt.textContent = state;
-        stateSelect.appendChild(opt);
-      });
-
-      if (prevVal && list.includes(prevVal)) {
-        stateSelect.value = prevVal;
-      }
-    }
-
-    function toggleDayHours(day) {
-      const cb = document.getElementById(`hour_active_${day}`);
-      const container = document.getElementById(`time_inputs_${day}`);
-      if (cb && container) {
-        if (cb.checked) {
-          container.style.opacity = '1';
-          container.style.pointerEvents = 'auto';
-        } else {
-          container.style.opacity = '0.5';
-          container.style.pointerEvents = 'none';
-        }
+        const activeCount = (data || []).filter(e => e.role_status === 'active' || e.role_status === null || e.role_status === '').length;
+        input.value = activeCount;
+      } catch (err) {
+        console.error("Error calculando empleados activos:", err);
+        input.value = 0;
       }
     }
 
@@ -797,53 +521,8 @@
         document.getElementById('tax_id').value = profile?.tax_id || '';
         document.getElementById('industry').value = profile?.industry || 'restaurantes';
         document.getElementById('country').value = finalCountry;
-        document.getElementById('employee_count').value = profile?.employee_count || 0;
         document.getElementById('monthly_budget').value = profile?.monthly_budget || 0;
-        document.getElementById('delivery_address').value = profile?.delivery_address || '';
-        document.getElementById('contact_phone').value = profile?.contact_phone || '';
-
-        // Dynamic State Dropdown populate & load
-        updateStateDropdown(finalCountry);
-        const stateSelect = document.getElementById('delivery_state');
-        if (stateSelect) {
-          stateSelect.value = profile?.delivery_state || '';
-        }
-
-        // Contact 1 loading
-        document.getElementById('delivery_contact_1_name').value = profile?.delivery_contact_1_name || '';
-        document.getElementById('delivery_contact_1_phone').value = profile?.delivery_contact_1_phone || '';
-        document.getElementById('delivery_contact_1_email').value = profile?.delivery_contact_1_email || '';
-
-        // Contact 2 loading
-        document.getElementById('delivery_contact_2_name').value = profile?.delivery_contact_2_name || '';
-        document.getElementById('delivery_contact_2_phone').value = profile?.delivery_contact_2_phone || '';
-        document.getElementById('delivery_contact_2_email').value = profile?.delivery_contact_2_email || '';
-
-        // Delivery hours loading
-        const days = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
-        let hoursObj = {};
-        try {
-          if (profile?.delivery_hours) {
-            hoursObj = typeof profile.delivery_hours === 'string'
-              ? JSON.parse(profile.delivery_hours)
-              : profile.delivery_hours;
-          }
-        } catch (e) {
-          console.error("Error parsing delivery hours: ", e);
-        }
-
-        days.forEach(day => {
-          const activeCb = document.getElementById(`hour_active_${day}`);
-          const startInput = document.getElementById(`hour_start_${day}`);
-          const opponentEnd = document.getElementById(`hour_end_${day}`);
-          if (activeCb && startInput && opponentEnd) {
-            const dayData = hoursObj[day] || { enabled: false, start: '08:00', end: '17:00' };
-            activeCb.checked = dayData.enabled;
-            startInput.value = dayData.start || '08:00';
-            opponentEnd.value = dayData.end || '17:00';
-            toggleDayHours(day);
-          }
-        });
+        loadActiveEmployeeCount(companyId);
 
         const countryClean = finalCountry.trim().toUpperCase();
         const taxLabel = document.getElementById('tax_label');
@@ -902,7 +581,7 @@
       isEditing = !isEditing;
       const inputs = document.querySelectorAll('#config-form input, #config-form select');
       inputs.forEach(input => {
-        if (input.id === 'country') {
+        if (input.id === 'country' || input.id === 'employee_count') {
           input.disabled = true;
           return;
         }
@@ -935,40 +614,14 @@
       const taxVal = document.getElementById('tax_id').value;
       const dvVal = (countryVal === 'CO' || countryVal === 'COLOMBIA') ? document.getElementById('tax_dv').value : '';
 
-      const days = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
-      const hoursObj = {};
-      days.forEach(day => {
-        const activeCb = document.getElementById(`hour_active_${day}`);
-        const startInput = document.getElementById(`hour_start_${day}`);
-        const opponentEnd = document.getElementById(`hour_end_${day}`);
-        if (activeCb && startInput && opponentEnd) {
-          hoursObj[day] = {
-            enabled: activeCb.checked,
-            start: startInput.value,
-            end: opponentEnd.value
-          };
-        }
-      });
-
       const updates = {
         id: companyId,
         company_name: document.getElementById('company_name').value,
         legal_name: document.getElementById('legal_name').value,
         industry: document.getElementById('industry').value,
-        employee_count: parseInt(document.getElementById('employee_count').value) || 0,
         monthly_budget: parseInt(document.getElementById('monthly_budget').value) || 0,
         tax_id: taxVal,
         dv: dvVal,
-        delivery_address: document.getElementById('delivery_address').value,
-        delivery_state: document.getElementById('delivery_state').value,
-        delivery_contact_1_name: document.getElementById('delivery_contact_1_name').value,
-        delivery_contact_1_phone: document.getElementById('delivery_contact_1_phone').value,
-        delivery_contact_1_email: document.getElementById('delivery_contact_1_email').value,
-        delivery_contact_2_name: document.getElementById('delivery_contact_2_name').value,
-        delivery_contact_2_phone: document.getElementById('delivery_contact_2_phone').value,
-        delivery_contact_2_email: document.getElementById('delivery_contact_2_email').value,
-        delivery_hours: hoursObj,
-        contact_phone: document.getElementById('contact_phone').value,
         country: document.getElementById('country').value,
         selected_roles: currentProfile ? currentProfile.selected_roles : []
       };
