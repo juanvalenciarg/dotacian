@@ -156,6 +156,25 @@
       gap: 1rem;
     }
 
+    .asset-row-info {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex: 1;
+      min-width: 0;
+      cursor: pointer;
+    }
+
+    .asset-row-chevron {
+      flex-shrink: 0;
+      color: var(--color-text-muted);
+      transition: transform 0.2s ease;
+    }
+
+    .asset-row:has(.asset-detail-panel.open) .asset-row-chevron {
+      transform: rotate(90deg);
+    }
+
     .asset-row-name {
       font-weight: 600;
       font-size: 0.9rem;
@@ -670,16 +689,19 @@
 
       wrap.innerHTML = `
         <div class="asset-row-main">
-          <div>
-            <div class="asset-row-name">${nombre}</div>
-            <div class="asset-row-summary">${summaryForRow(row)}</div>
+          <div class="asset-row-info" onclick="toggleDetailPanel('${s}')">
+            <svg class="asset-row-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            <div>
+              <div class="asset-row-name">${nombre}</div>
+              <div class="asset-row-summary">${summaryForRow(row)}</div>
+            </div>
           </div>
           <label class="toggle-switch">
             <input type="checkbox" ${isActive ? 'checked' : ''} onchange="toggleAsset(this, '${category}', '${tipo}', '${escapeAttr(nombre)}')">
             <span class="slider"></span>
           </label>
         </div>
-        <div class="asset-detail-panel ${isActive ? 'open' : ''}" id="panel-${s}">
+        <div class="asset-detail-panel" id="panel-${s}">
           <div class="asset-providers-block">
             <div class="asset-providers-head">
               <label>Proveedores</label>
@@ -755,6 +777,11 @@
     function toggleRenovMeses(checkbox, s) {
       const wrap = document.getElementById(`renovwrap-${s}`);
       if (wrap) wrap.style.display = checkbox.checked ? '' : 'none';
+    }
+
+    function toggleDetailPanel(s) {
+      const panel = document.getElementById(`panel-${s}`);
+      if (panel) panel.classList.toggle('open');
     }
 
     function slug(str) {
@@ -896,7 +923,7 @@
         const row = panel.closest('.asset-row');
         const toggle = row.querySelector('.toggle-switch input');
         toggle.checked = true;
-        panel.classList.add('open');
+        panel.classList.remove('open');
         row.querySelector('.asset-row-summary').textContent = summaryForRow(saved);
 
         const providerList = document.getElementById(`providers-${s}`);
