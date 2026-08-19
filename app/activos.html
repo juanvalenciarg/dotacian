@@ -274,6 +274,126 @@
       accent-color: var(--color-cyan);
       cursor: pointer;
     }
+
+    .asset-providers-block {
+      margin-bottom: 1.25rem;
+    }
+
+    .asset-providers-head {
+      margin-bottom: 0.6rem;
+    }
+
+    .asset-providers-head label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-text-secondary);
+      margin-bottom: 0.2rem;
+    }
+
+    .asset-providers-hint {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+
+    .provider-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .provider-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    @media (max-width: 600px) {
+      .provider-row {
+        grid-template-columns: 1fr auto;
+        grid-template-areas: "nombre remove" "contacto contacto";
+      }
+
+      .provider-row input:first-of-type { grid-area: nombre; }
+      .provider-row input:last-of-type { grid-area: contacto; }
+      .provider-row .provider-remove-btn { grid-area: remove; }
+    }
+
+    .provider-row input[type="text"] {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 0.85rem;
+      box-sizing: border-box;
+    }
+
+    .provider-remove-btn {
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      color: var(--color-text-muted);
+      width: 34px;
+      height: 34px;
+      flex-shrink: 0;
+      cursor: pointer;
+      font-size: 0.9rem;
+      line-height: 1;
+    }
+
+    .provider-remove-btn:hover {
+      border-color: #EF4444;
+      color: #EF4444;
+    }
+
+    .btn-add-provider {
+      background: none;
+      border: 1px dashed var(--color-border);
+      border-radius: var(--radius-md);
+      color: var(--color-cyan);
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 0.5rem 0.9rem;
+      cursor: pointer;
+    }
+
+    .btn-add-provider:hover {
+      background: var(--color-cyan-dim);
+    }
+
+    .asset-lifecycle-grid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem 1.5rem;
+      margin-bottom: 1.25rem;
+      padding-top: 1rem;
+      border-top: 1px dashed var(--color-border);
+    }
+
+    .renov-months-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .renov-months-wrap label {
+      margin-bottom: 0;
+      white-space: nowrap;
+    }
+
+    .renov-months-wrap input {
+      width: 80px;
+      padding: 0.4rem 0.6rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 0.85rem;
+      box-sizing: border-box;
+    }
   </style>
 </head>
 
@@ -397,7 +517,7 @@
       <div class="dashboard-content-wrapper" style="padding-top: 5rem;">
         <div style="margin-bottom: 2rem;">
           <h1 class="dot-greeting" style="text-align: left; margin-bottom: 0.5rem; font-size: 3rem; background: linear-gradient(90deg, #94A3B8 0%, #1E293B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Catálogo de Activos</h1>
-          <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;">Activa los tipos de activos que tu empresa puede asignar a los roles y, si quieres, define proveedor, costo y tiempos.</p>
+          <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;">Activa los tipos de activos que tu empresa puede asignar a los roles y, si quieres, registra tus proveedores y cómo se maneja el ciclo de vida de cada activo.</p>
         </div>
 
         <div class="app-container">
@@ -450,6 +570,7 @@
 
     let currentCompanyId = null;
     let assetRowsByKey = {}; // "tipo|nombre" -> row de company_assets
+    let assetProvidersByAssetId = {}; // company_asset_id -> [{id, nombre, contacto}]
 
     function assetKey(tipo, nombre) {
       return `${tipo}|${nombre}`;
@@ -478,6 +599,20 @@
         (data || []).forEach(row => {
           assetRowsByKey[assetKey(row.tipo, row.nombre)] = row;
         });
+
+        assetProvidersByAssetId = {};
+        const assetIds = (data || []).map(row => row.id);
+        if (assetIds.length > 0) {
+          const { data: provData, error: provError } = await _supabase
+            .from('company_asset_providers')
+            .select('*')
+            .in('company_asset_id', assetIds);
+          if (provError) throw provError;
+          (provData || []).forEach(p => {
+            if (!assetProvidersByAssetId[p.company_asset_id]) assetProvidersByAssetId[p.company_asset_id] = [];
+            assetProvidersByAssetId[p.company_asset_id].push(p);
+          });
+        }
 
         renderCatalog();
       } catch (err) {
@@ -524,64 +659,102 @@
       const key = assetKey(tipo, nombre);
       const row = assetRowsByKey[key] || null;
       const isActive = !!(row && row.activo);
+      const s = slug(key);
+      const providers = row ? (assetProvidersByAssetId[row.id] || []) : [];
+      const esRenovable = !!(row && row.es_renovable);
+      const devolvible = !row || row.devolvible_offboarding !== false;
 
       const wrap = document.createElement('div');
       wrap.className = 'asset-row';
       wrap.dataset.name = nombre.toLowerCase();
 
-      const summaryParts = [];
-      if (row && row.proveedor_nombre) summaryParts.push(row.proveedor_nombre);
-      if (row && row.precio_unitario) summaryParts.push(`$${Number(row.precio_unitario).toLocaleString('es-MX')}`);
-      const summaryText = summaryParts.length > 0 ? summaryParts.join(' · ') : 'Sin parametrizar todavía';
-
       wrap.innerHTML = `
         <div class="asset-row-main">
           <div>
             <div class="asset-row-name">${nombre}</div>
-            <div class="asset-row-summary">${isActive ? summaryText : 'Desactivado'}</div>
+            <div class="asset-row-summary">${summaryForRow(row)}</div>
           </div>
           <label class="toggle-switch">
             <input type="checkbox" ${isActive ? 'checked' : ''} onchange="toggleAsset(this, '${category}', '${tipo}', '${escapeAttr(nombre)}')">
             <span class="slider"></span>
           </label>
         </div>
-        <div class="asset-detail-panel ${isActive ? 'open' : ''}" id="panel-${slug(key)}">
-          <div class="asset-detail-grid">
-            <div class="asset-field">
-              <label>Proveedor</label>
-              <input type="text" id="prov-${slug(key)}" placeholder="ej. Textiles del Norte S.A." value="${escapeAttr(row && row.proveedor_nombre || '')}">
+        <div class="asset-detail-panel ${isActive ? 'open' : ''}" id="panel-${s}">
+          <div class="asset-providers-block">
+            <div class="asset-providers-head">
+              <label>Proveedores</label>
+              <span class="asset-providers-hint">Agrega los proveedores con los que trabajas para este activo; un agente podrá cotizar directamente con ellos.</span>
             </div>
-            <div class="asset-field">
-              <label>Contacto del proveedor</label>
-              <input type="text" id="cont-${slug(key)}" placeholder="Teléfono o correo" value="${escapeAttr(row && row.proveedor_contacto || '')}">
+            <div class="provider-list" id="providers-${s}">
+              ${(providers.length > 0 ? providers : [null]).map(providerRowHtml).join('')}
             </div>
-            <div class="asset-field">
-              <label>Costo unitario</label>
-              <input type="number" id="costo-${slug(key)}" min="0" step="0.01" placeholder="0.00" value="${row && row.precio_unitario != null ? row.precio_unitario : ''}">
-            </div>
-            <div class="asset-field">
-              <label>Tiempo de entrega (días)</label>
-              <input type="number" id="entrega-${slug(key)}" min="0" step="1" placeholder="ej. 15" value="${row && row.tiempo_entrega_dias != null ? row.tiempo_entrega_dias : ''}">
-            </div>
-            <div class="asset-field">
-              <label>Renovación (meses)</label>
-              <input type="number" id="renov-${slug(key)}" min="0" step="1" placeholder="ej. 6" value="${row && row.tiempo_renovacion_meses != null ? row.tiempo_renovacion_meses : ''}">
-            </div>
-            ${tipo === 'uniforme' ? `
-            <div class="asset-field">
-              <label>Colores disponibles</label>
-              <input type="text" id="colores-${slug(key)}" placeholder="Azul marino, Blanco" value="${escapeAttr(row && Array.isArray(row.colores) ? row.colores.join(', ') : '')}">
-            </div>` : ''}
+            <button type="button" class="btn-add-provider" onclick="addProviderRow('${s}')">+ Agregar proveedor</button>
           </div>
-          <label class="asset-field-checkbox" style="margin-bottom: 1rem;">
-            <input type="checkbox" id="reutiliza-${slug(key)}" ${!row || row.reutilizable ? 'checked' : ''}>
-            Se reutiliza con el siguiente empleado cuando el actual sale
-          </label>
+
+          <div class="asset-lifecycle-grid">
+            <label class="asset-field-checkbox">
+              <input type="checkbox" id="renovable-${s}" onchange="toggleRenovMeses(this, '${s}')" ${esRenovable ? 'checked' : ''}>
+              Es renovable
+            </label>
+            <div class="renov-months-wrap" id="renovwrap-${s}" style="${esRenovable ? '' : 'display:none;'}">
+              <label>Cada</label>
+              <input type="number" id="renovmeses-${s}" min="1" step="1" placeholder="meses" value="${row && row.renovacion_meses != null ? row.renovacion_meses : ''}">
+              <label>meses</label>
+            </div>
+
+            <label class="asset-field-checkbox">
+              <input type="checkbox" id="devolvible-${s}" ${devolvible ? 'checked' : ''}>
+              Se devuelve en el offboarding
+            </label>
+
+            <label class="asset-field-checkbox">
+              <input type="checkbox" id="reutiliza-${s}" ${!row || row.reutilizable ? 'checked' : ''}>
+              Se reutiliza con el siguiente empleado cuando el actual sale
+            </label>
+          </div>
+
           <button type="button" class="btn btn-outline" style="padding: 0.5rem 1.25rem; font-size: 0.8125rem;" onclick="saveAssetDetails('${category}', '${tipo}', '${escapeAttr(nombre)}')">Guardar detalles</button>
         </div>
       `;
 
       return wrap;
+    }
+
+    function summaryForRow(row) {
+      if (!row || !row.activo) return 'Desactivado';
+      const providers = assetProvidersByAssetId[row.id] || [];
+      return providers.length > 0
+        ? `${providers.length} proveedor${providers.length > 1 ? 'es' : ''}`
+        : 'Sin proveedores registrados';
+    }
+
+    function providerRowHtml(p) {
+      const pid = p && p.id ? p.id : '';
+      return `
+        <div class="provider-row" data-provider-id="${pid}">
+          <input type="text" class="prov-nombre" placeholder="ej. Textiles del Norte S.A." value="${escapeAttr(p && p.nombre || '')}">
+          <input type="text" class="prov-contacto" placeholder="Teléfono o correo" value="${escapeAttr(p && p.contacto || '')}">
+          <button type="button" class="provider-remove-btn" onclick="removeProviderRow(this)" title="Quitar proveedor">✕</button>
+        </div>
+      `;
+    }
+
+    function addProviderRow(s) {
+      const container = document.getElementById(`providers-${s}`);
+      if (container) container.insertAdjacentHTML('beforeend', providerRowHtml(null));
+    }
+
+    function removeProviderRow(btn) {
+      const container = btn.closest('.provider-list');
+      btn.closest('.provider-row').remove();
+      if (container && container.children.length === 0) {
+        container.insertAdjacentHTML('beforeend', providerRowHtml(null));
+      }
+    }
+
+    function toggleRenovMeses(checkbox, s) {
+      const wrap = document.getElementById(`renovwrap-${s}`);
+      if (wrap) wrap.style.display = checkbox.checked ? '' : 'none';
     }
 
     function slug(str) {
@@ -634,12 +807,7 @@
 
         assetRowsByKey[key] = saved;
         if (panel) panel.classList.toggle('open', activo);
-        if (summaryEl) {
-          const parts = [];
-          if (saved.proveedor_nombre) parts.push(saved.proveedor_nombre);
-          if (saved.precio_unitario) parts.push(`$${Number(saved.precio_unitario).toLocaleString('es-MX')}`);
-          summaryEl.textContent = activo ? (parts.length ? parts.join(' · ') : 'Sin parametrizar todavía') : 'Desactivado';
-        }
+        if (summaryEl) summaryEl.textContent = summaryForRow(saved);
         updateCategoryCounts();
       } catch (err) {
         console.error('Error activando/desactivando activo:', err);
@@ -670,14 +838,17 @@
       const key = assetKey(tipo, nombre);
       const s = slug(key);
 
-      const proveedorNombre = document.getElementById(`prov-${s}`).value.trim();
-      const proveedorContacto = document.getElementById(`cont-${s}`).value.trim();
-      const costo = document.getElementById(`costo-${s}`).value;
-      const entrega = document.getElementById(`entrega-${s}`).value;
-      const renovacion = document.getElementById(`renov-${s}`).value;
+      const esRenovable = document.getElementById(`renovable-${s}`).checked;
+      const renovMesesRaw = document.getElementById(`renovmeses-${s}`).value;
+      const devolvible = document.getElementById(`devolvible-${s}`).checked;
       const reutilizable = document.getElementById(`reutiliza-${s}`).checked;
-      const coloresInput = document.getElementById(`colores-${s}`);
-      const colores = coloresInput ? coloresInput.value.split(',').map(c => c.trim()).filter(Boolean) : [];
+
+      const providers = Array.from(document.querySelectorAll(`#providers-${s} .provider-row`))
+        .map(rowEl => ({
+          nombre: rowEl.querySelector('.prov-nombre').value.trim(),
+          contacto: rowEl.querySelector('.prov-contacto').value.trim()
+        }))
+        .filter(p => p.nombre || p.contacto);
 
       const existing = assetRowsByKey[key];
       const payload = {
@@ -686,13 +857,10 @@
         tipo,
         nombre,
         activo: true,
-        proveedor_nombre: proveedorNombre || null,
-        proveedor_contacto: proveedorContacto || null,
-        precio_unitario: costo ? parseFloat(costo) : null,
-        tiempo_entrega_dias: entrega ? parseInt(entrega) : null,
-        tiempo_renovacion_meses: renovacion ? parseInt(renovacion) : null,
+        es_renovable: esRenovable,
+        renovacion_meses: esRenovable && renovMesesRaw ? parseInt(renovMesesRaw) : null,
+        devolvible_offboarding: devolvible,
         reutilizable,
-        colores,
         updated_at: new Date().toISOString()
       };
 
@@ -709,16 +877,31 @@
         }
         assetRowsByKey[key] = saved;
 
+        // Reemplaza la lista completa de proveedores por la que quedó en el formulario.
+        const { error: delError } = await _supabase.from('company_asset_providers').delete().eq('company_asset_id', saved.id);
+        if (delError) throw delError;
+
+        let savedProviders = [];
+        if (providers.length > 0) {
+          const { data: provData, error: provError } = await _supabase
+            .from('company_asset_providers')
+            .insert(providers.map(p => ({ company_id: currentCompanyId, company_asset_id: saved.id, nombre: p.nombre, contacto: p.contacto || null })))
+            .select();
+          if (provError) throw provError;
+          savedProviders = provData || [];
+        }
+        assetProvidersByAssetId[saved.id] = savedProviders;
+
         const panel = document.getElementById(`panel-${s}`);
         const row = panel.closest('.asset-row');
         const toggle = row.querySelector('.toggle-switch input');
         toggle.checked = true;
         panel.classList.add('open');
-        const summaryEl = row.querySelector('.asset-row-summary');
-        const parts = [];
-        if (saved.proveedor_nombre) parts.push(saved.proveedor_nombre);
-        if (saved.precio_unitario) parts.push(`$${Number(saved.precio_unitario).toLocaleString('es-MX')}`);
-        summaryEl.textContent = parts.length ? parts.join(' · ') : 'Sin parametrizar todavía';
+        row.querySelector('.asset-row-summary').textContent = summaryForRow(saved);
+
+        const providerList = document.getElementById(`providers-${s}`);
+        if (providerList) providerList.innerHTML = (savedProviders.length > 0 ? savedProviders : [null]).map(providerRowHtml).join('');
+
         updateCategoryCounts();
 
         if (window.showToast) showToast('Éxito', 'Detalles guardados correctamente.');
