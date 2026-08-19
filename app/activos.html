@@ -568,26 +568,10 @@
         <div style="padding: 1.75rem;">
           <h2 style="font-size: 1.125rem; color: var(--color-navy); margin: 0 0 0.75rem;">Este activo está asignado a roles</h2>
           <p id="assetRolesModalMessage" style="font-size: 0.9rem; color: var(--color-text-secondary); line-height: 1.5; margin: 0 0 1rem;"></p>
-          <ul id="assetRolesModalList" style="margin: 0 0 1.75rem; padding-left: 1.25rem; font-size: 0.85rem; color: var(--color-navy); font-weight: 600;"></ul>
-          <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.75rem;">
-            <button class="btn btn-outline" onclick="closeAssetRolesModal()">Cancelar</button>
-            <button class="btn btn-outline" id="assetRolesModalRemoveBtn" onclick="openAssetRemoveFromRolesModal()">Quitar también de esos roles</button>
-            <button class="btn" id="assetRolesModalAcceptBtn" onclick="handleAssetRolesModalAccept()" style="background: var(--color-navy); color: white; border: none;">Desactivar solo en Activos</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Alerta adicional: confirmar remoción del activo en roles específicos -->
-    <div class="modal-overlay" id="assetRemoveFromRolesModal">
-      <div class="modal-content-lg" style="max-width: 460px;">
-        <div style="padding: 1.75rem;">
-          <h2 style="font-size: 1.125rem; color: var(--color-navy); margin: 0 0 0.75rem;">Quitar de los roles seleccionados</h2>
-          <p style="font-size: 0.9rem; color: var(--color-text-secondary); line-height: 1.5; margin: 0 0 1rem;">Selecciona los roles de los que quieres quitar este activo. Los empleados con ese rol dejarán de tenerlo asignado.</p>
-          <div id="assetRemoveFromRolesList" style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.75rem;"></div>
+          <div id="assetRolesModalList" style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.75rem;"></div>
           <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
-            <button class="btn btn-outline" onclick="closeAssetRemoveFromRolesModal(true)">Cancelar</button>
-            <button class="btn" onclick="confirmRemoveAssetFromRoles()" style="background: #EF4444; color: white; border: none;">Quitar y desactivar</button>
+            <button class="btn btn-outline" onclick="closeAssetRolesModal()">Cancelar</button>
+            <button class="btn" onclick="confirmDeactivateWithRoles()" style="background: #EF4444; color: white; border: none;">Quitar y desactivar</button>
           </div>
         </div>
       </div>
@@ -914,8 +898,13 @@
       pendingDeactivate = { checkbox, category, tipo, nombre, roles };
       const count = roles.length;
       document.getElementById('assetRolesModalMessage').textContent =
-        `"${nombre}" está asignado en ${count} rol${count > 1 ? 'es' : ''}. Si lo desactivas aquí, seguirá asignado en esos roles hasta que lo quites manualmente.`;
-      document.getElementById('assetRolesModalList').innerHTML = roles.map(r => `<li>${escapeAttr(r.role_name)}</li>`).join('');
+        `"${nombre}" está asignado en ${count} rol${count > 1 ? 'es' : ''}. Selecciona de cuáles quitarlo antes de desactivarlo; los empleados con ese rol dejarán de tenerlo asignado.`;
+      document.getElementById('assetRolesModalList').innerHTML = roles.map(r => `
+        <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--color-navy); cursor: pointer;">
+          <input type="checkbox" class="remove-role-check" value="${r.id}" checked style="width: 16px; height: 16px; accent-color: var(--color-cyan); cursor: pointer;">
+          ${escapeAttr(r.role_name)}
+        </label>
+      `).join('');
       document.getElementById('assetRolesModal').classList.add('active');
     }
 
@@ -924,43 +913,13 @@
       pendingDeactivate = null;
     }
 
-    async function handleAssetRolesModalAccept() {
-      if (!pendingDeactivate) return;
-      const { checkbox, category, tipo, nombre } = pendingDeactivate;
-      document.getElementById('assetRolesModal').classList.remove('active');
-      pendingDeactivate = null;
-      await applyAssetActive(checkbox, category, tipo, nombre, false);
-    }
-
-    function openAssetRemoveFromRolesModal() {
-      if (!pendingDeactivate) return;
-      document.getElementById('assetRolesModal').classList.remove('active');
-      const list = document.getElementById('assetRemoveFromRolesList');
-      list.innerHTML = pendingDeactivate.roles.map(r => `
-        <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--color-navy); cursor: pointer;">
-          <input type="checkbox" class="remove-role-check" value="${r.id}" checked style="width: 16px; height: 16px; accent-color: var(--color-cyan); cursor: pointer;">
-          ${escapeAttr(r.role_name)}
-        </label>
-      `).join('');
-      document.getElementById('assetRemoveFromRolesModal').classList.add('active');
-    }
-
-    function closeAssetRemoveFromRolesModal(reopenPrevious) {
-      document.getElementById('assetRemoveFromRolesModal').classList.remove('active');
-      if (reopenPrevious && pendingDeactivate) {
-        openAssetRolesModal(pendingDeactivate.checkbox, pendingDeactivate.category, pendingDeactivate.tipo, pendingDeactivate.nombre, pendingDeactivate.roles);
-      } else {
-        pendingDeactivate = null;
-      }
-    }
-
-    async function confirmRemoveAssetFromRoles() {
+    async function confirmDeactivateWithRoles() {
       if (!pendingDeactivate) return;
       const { checkbox, category, tipo, nombre, roles } = pendingDeactivate;
-      const checkedIds = Array.from(document.querySelectorAll('#assetRemoveFromRolesList .remove-role-check:checked')).map(c => c.value);
+      const checkedIds = Array.from(document.querySelectorAll('#assetRolesModalList .remove-role-check:checked')).map(c => c.value);
       const rolesToUpdate = roles.filter(r => checkedIds.includes(String(r.id)));
 
-      document.getElementById('assetRemoveFromRolesModal').classList.remove('active');
+      document.getElementById('assetRolesModal').classList.remove('active');
       pendingDeactivate = null;
 
       try {
