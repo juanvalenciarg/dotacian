@@ -324,23 +324,26 @@
 
     .provider-row {
       display: grid;
-      grid-template-columns: 1fr 1fr auto;
+      grid-template-columns: 1fr 1fr 1fr auto;
       gap: 0.5rem;
       align-items: center;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 700px) {
       .provider-row {
         grid-template-columns: 1fr auto;
-        grid-template-areas: "nombre remove" "contacto contacto";
+        grid-template-areas: "nombre remove" "correo correo" "telefono telefono";
       }
 
-      .provider-row input:first-of-type { grid-area: nombre; }
-      .provider-row input:last-of-type { grid-area: contacto; }
+      .provider-row .prov-nombre { grid-area: nombre; }
+      .provider-row .prov-correo { grid-area: correo; }
+      .provider-row .prov-telefono { grid-area: telefono; }
       .provider-row .provider-remove-btn { grid-area: remove; }
     }
 
-    .provider-row input[type="text"] {
+    .provider-row input[type="text"],
+    .provider-row input[type="email"],
+    .provider-row input[type="tel"] {
       width: 100%;
       padding: 0.6rem 0.75rem;
       border: 1px solid var(--color-border);
@@ -604,7 +607,7 @@
 
     let currentCompanyId = null;
     let assetRowsByKey = {}; // "tipo|nombre" -> row de company_assets
-    let assetProvidersByAssetId = {}; // company_asset_id -> [{id, nombre, contacto}]
+    let assetProvidersByAssetId = {}; // company_asset_id -> [{id, nombre, correo, telefono}]
 
     function assetKey(tipo, nombre) {
       return `${tipo}|${nombre}`;
@@ -770,7 +773,8 @@
       return `
         <div class="provider-row" data-provider-id="${pid}">
           <input type="text" class="prov-nombre" placeholder="ej. Textiles del Norte S.A." value="${escapeAttr(p && p.nombre || '')}">
-          <input type="text" class="prov-contacto" placeholder="Teléfono o correo" value="${escapeAttr(p && p.contacto || '')}">
+          <input type="email" class="prov-correo" placeholder="Correo (obligatorio)" value="${escapeAttr(p && p.correo || '')}">
+          <input type="tel" class="prov-telefono" placeholder="Teléfono (opcional)" value="${escapeAttr(p && p.telefono || '')}">
           <button type="button" class="provider-remove-btn" onclick="removeProviderRow(this)" title="Quitar proveedor">✕</button>
         </div>
       `;
@@ -963,12 +967,20 @@
       const devolvible = document.getElementById(`devolvible-${s}`).checked;
       const reutilizable = document.getElementById(`reutiliza-${s}`).checked;
 
-      const providers = Array.from(document.querySelectorAll(`#providers-${s} .provider-row`))
+      const providerRows = Array.from(document.querySelectorAll(`#providers-${s} .provider-row`))
         .map(rowEl => ({
           nombre: rowEl.querySelector('.prov-nombre').value.trim(),
-          contacto: rowEl.querySelector('.prov-contacto').value.trim()
+          correo: rowEl.querySelector('.prov-correo').value.trim(),
+          telefono: rowEl.querySelector('.prov-telefono').value.trim()
         }))
-        .filter(p => p.nombre || p.contacto);
+        .filter(p => p.nombre || p.correo || p.telefono);
+
+      const providersMissingCorreo = providerRows.filter(p => !p.correo);
+      if (providersMissingCorreo.length > 0) {
+        if (window.showToast) showToast('Falta el correo', 'Cada proveedor necesita un correo para poder cotizar con él.', 'error');
+        return;
+      }
+      const providers = providerRows;
 
       const existing = assetRowsByKey[key];
       const payload = {
@@ -1005,7 +1017,7 @@
         if (providers.length > 0) {
           const { data: provData, error: provError } = await _supabase
             .from('company_asset_providers')
-            .insert(providers.map(p => ({ company_id: currentCompanyId, company_asset_id: saved.id, nombre: p.nombre, contacto: p.contacto || null })))
+            .insert(providers.map(p => ({ company_id: currentCompanyId, company_asset_id: saved.id, nombre: p.nombre || null, correo: p.correo, telefono: p.telefono || null })))
             .select();
           if (provError) throw provError;
           savedProviders = provData || [];
