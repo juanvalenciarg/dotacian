@@ -406,6 +406,65 @@
       font-size: 0.8rem;
     }
 
+    .asset-specs-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-cyan);
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      white-space: nowrap;
+    }
+
+    .asset-specs-toggle svg {
+      transition: transform 0.2s ease;
+    }
+
+    .asset-specs-toggle.open svg {
+      transform: rotate(90deg);
+    }
+
+    .asset-specs-grid {
+      display: none;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.6rem;
+      width: 100%;
+      margin-left: 2rem;
+      padding: 0.75rem 0.85rem;
+      background: white;
+      border: 1px solid var(--color-smoke-mid);
+      border-radius: 10px;
+    }
+
+    .asset-specs-grid.open {
+      display: grid;
+    }
+
+    .asset-spec-field label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--color-text-secondary);
+      margin-bottom: 0.25rem;
+    }
+
+    .asset-spec-field select,
+    .asset-spec-field input[type="text"] {
+      width: 100%;
+      padding: 0.4rem 0.5rem;
+      border: 1px solid var(--color-smoke-mid);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.78rem;
+      color: var(--color-navy);
+      box-sizing: border-box;
+      background: white;
+    }
+
     /* Legacy (keep for backward compat) */
     .status-active {
       color: #10B981;
@@ -1290,6 +1349,8 @@
     function createAssetRowElement(item, checked) {
       const requiereReposicion = !!item.requiere_reposicion;
       const reposicionMeses = item.reposicion_meses || 6;
+      const specFields = ASSET_SPECS[item.name] || [];
+      const hasSpecValues = !!(item.specs && Object.keys(item.specs).some(k => item.specs[k]));
 
       const div = document.createElement('div');
       div.className = "role-asset-item";
@@ -1324,9 +1385,243 @@
             </div>
             ${t('reposicion.months')}
           </div>
+          ${specFields.length > 0 ? `
+          <button type="button" class="asset-specs-toggle${hasSpecValues ? ' open' : ''}" onclick="toggleAssetSpecs(this)">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            Especificaciones para cotizar${hasSpecValues ? ' ✓' : ''}
+          </button>` : ''}
         </div>
+        ${renderAssetSpecsGrid(item.name, item.specs, hasSpecValues)}
       `;
       return div;
+    }
+
+    // Campos de especificación por tipo de activo: lo mínimo que un proveedor
+    // necesita para poder cotizar en el mercado. Se guardan en item.specs y
+    // viajan con el rol para que Dot arme solicitudes de cotización/compra.
+    const ASSET_SPECS = {
+      'Laptop': [
+        { key: 'marca_modelo', label: 'Marca / modelo preferido', type: 'text', placeholder: 'ej. Dell Latitude, Lenovo ThinkPad' },
+        { key: 'procesador', label: 'Procesador', type: 'select', options: ['Intel Core i3', 'Intel Core i5', 'Intel Core i7', 'Intel Core i9', 'AMD Ryzen 5', 'AMD Ryzen 7', 'Apple M-series'] },
+        { key: 'ram', label: 'RAM', type: 'select', options: ['8GB', '16GB', '32GB', '64GB'] },
+        { key: 'almacenamiento', label: 'Almacenamiento', type: 'select', options: ['256GB SSD', '512GB SSD', '1TB SSD', '1TB HDD'] },
+        { key: 'pantalla', label: 'Tamaño de pantalla', type: 'select', options: ['13"', '14"', '15"', '16" o más'] },
+        { key: 'so', label: 'Sistema operativo', type: 'select', options: ['Windows', 'macOS', 'Linux', 'ChromeOS'] }
+      ],
+      'Monitor': [
+        { key: 'tamano', label: 'Tamaño', type: 'select', options: ['21"-23"', '24"-27"', '28" o más'] },
+        { key: 'resolucion', label: 'Resolución', type: 'select', options: ['Full HD', 'QHD/2K', '4K'] },
+        { key: 'panel', label: 'Tipo de panel', type: 'select', options: ['IPS', 'VA', 'TN'] },
+        { key: 'curvo', label: 'Curvo', type: 'select', options: ['Sí', 'No'] }
+      ],
+      'Cargador de laptop': [
+        { key: 'conector', label: 'Tipo de conector', type: 'select', options: ['USB-C', 'Propietario/original'] },
+        { key: 'potencia', label: 'Potencia', type: 'select', options: ['45W', '65W', '90W', '100W o más'] }
+      ],
+      'Mouse': [
+        { key: 'conexion', label: 'Conexión', type: 'select', options: ['Alámbrico', 'Inalámbrico'] },
+        { key: 'ergonomico', label: 'Ergonómico', type: 'select', options: ['Sí', 'No'] }
+      ],
+      'Teclado': [
+        { key: 'tipo', label: 'Tipo', type: 'select', options: ['Membrana', 'Mecánico'] },
+        { key: 'distribucion', label: 'Distribución', type: 'select', options: ['Español Latam', 'Español España', 'Inglés US'] }
+      ],
+      'Audífonos': [
+        { key: 'tipo', label: 'Tipo', type: 'select', options: ['Diadema', 'In-ear', 'On-ear'] },
+        { key: 'microfono', label: 'Con micrófono', type: 'select', options: ['Sí', 'No'] },
+        { key: 'conexion', label: 'Conexión', type: 'select', options: ['Alámbrico', 'Inalámbrico'] }
+      ],
+      'Celular': [
+        { key: 'so', label: 'Sistema operativo', type: 'select', options: ['Android', 'iOS'] },
+        { key: 'almacenamiento', label: 'Almacenamiento', type: 'select', options: ['64GB', '128GB', '256GB o más'] },
+        { key: 'gama', label: 'Gama', type: 'select', options: ['Básica', 'Media', 'Alta'] }
+      ],
+      'Tablet': [
+        { key: 'so', label: 'Sistema operativo', type: 'select', options: ['Android', 'iOS', 'Windows'] },
+        { key: 'pantalla', label: 'Tamaño de pantalla', type: 'select', options: ['8"-9"', '10"-11"', '12" o más'] },
+        { key: 'conectividad', label: 'Conectividad', type: 'select', options: ['WiFi', 'WiFi + Celular'] }
+      ],
+      'Camiseta/Camisa': [
+        { key: 'talla', label: 'Talla', type: 'select', options: ['XS', 'S', 'M', 'L', 'XL', 'XXL'] },
+        { key: 'color', label: 'Color', type: 'text', placeholder: 'ej. Azul marino' },
+        { key: 'tela', label: 'Tipo de tela', type: 'select', options: ['Algodón', 'Poliéster', 'Mezcla algodón/poliéster'] },
+        { key: 'manga', label: 'Manga', type: 'select', options: ['Corta', 'Larga'] },
+        { key: 'logo', label: 'Logo bordado/estampado', type: 'select', options: ['Sí', 'No'] }
+      ],
+      'Pantalón': [
+        { key: 'talla', label: 'Talla', type: 'select', options: ['XS', 'S', 'M', 'L', 'XL', 'XXL'] },
+        { key: 'color', label: 'Color', type: 'text', placeholder: 'ej. Negro' },
+        { key: 'tela', label: 'Tipo de tela', type: 'select', options: ['Drill', 'Jean', 'Dacrón', 'Otra'] }
+      ],
+      'Zapatos/Calzado': [
+        { key: 'talla', label: 'Talla', type: 'text', placeholder: 'ej. 40' },
+        { key: 'color', label: 'Color', type: 'text', placeholder: 'ej. Negro' },
+        { key: 'tipo', label: 'Tipo', type: 'select', options: ['Tenis', 'Formal', 'Mocasín'] }
+      ],
+      'Chaqueta': [
+        { key: 'talla', label: 'Talla', type: 'select', options: ['XS', 'S', 'M', 'L', 'XL', 'XXL'] },
+        { key: 'color', label: 'Color', type: 'text', placeholder: 'ej. Negro' },
+        { key: 'impermeable', label: 'Impermeable', type: 'select', options: ['Sí', 'No'] },
+        { key: 'forro_termico', label: 'Forro térmico', type: 'select', options: ['Sí', 'No'] }
+      ],
+      'Delantal': [
+        { key: 'color', label: 'Color', type: 'text', placeholder: 'ej. Negro' },
+        { key: 'material', label: 'Material', type: 'select', options: ['Algodón', 'Impermeable/PVC', 'Cuero'] }
+      ],
+      'Overol': [
+        { key: 'talla', label: 'Talla', type: 'select', options: ['XS', 'S', 'M', 'L', 'XL', 'XXL'] },
+        { key: 'color', label: 'Color', type: 'text', placeholder: 'ej. Azul' },
+        { key: 'tela', label: 'Tipo de tela', type: 'select', options: ['Drill', 'Jean', 'Ignífuga (FR)'] },
+        { key: 'reflectivos', label: 'Con cintas reflectivas', type: 'select', options: ['Sí', 'No'] }
+      ],
+      'Filipina': [
+        { key: 'talla', label: 'Talla', type: 'select', options: ['XS', 'S', 'M', 'L', 'XL', 'XXL'] },
+        { key: 'color', label: 'Color', type: 'text', placeholder: 'ej. Blanco' },
+        { key: 'manga', label: 'Manga', type: 'select', options: ['Corta', 'Larga'] }
+      ],
+      'Gorro': [
+        { key: 'tipo', label: 'Tipo', type: 'select', options: ['Cachucha', 'Gorro de cocina', 'Gorro térmico'] },
+        { key: 'color', label: 'Color', type: 'text', placeholder: 'ej. Blanco' }
+      ],
+      'Tarjeta de acceso': [
+        { key: 'tecnologia', label: 'Tecnología', type: 'select', options: ['RFID', 'NFC', 'Banda magnética'] },
+        { key: 'con_foto', label: 'Con foto impresa', type: 'select', options: ['Sí', 'No'] }
+      ],
+      'Llave de oficina': [
+        { key: 'cerradura', label: 'Tipo de cerradura', type: 'select', options: ['Tradicional', 'Electrónica'] },
+        { key: 'copias', label: 'Copias necesarias', type: 'text', placeholder: 'ej. 2' }
+      ],
+      'Gafete/Credencial': [
+        { key: 'material', label: 'Material', type: 'select', options: ['PVC', 'Papel laminado'] },
+        { key: 'cordon', label: 'Con cordón/portagafete', type: 'select', options: ['Sí', 'No'] }
+      ],
+      'Auto': [
+        { key: 'tipo', label: 'Tipo', type: 'select', options: ['Sedán', 'SUV', 'Pickup', 'Van/Furgón'] },
+        { key: 'transmision', label: 'Transmisión', type: 'select', options: ['Manual', 'Automática'] },
+        { key: 'combustible', label: 'Combustible', type: 'select', options: ['Gasolina', 'Diésel', 'Híbrido', 'Eléctrico'] }
+      ],
+      'Moto': [
+        { key: 'cilindraje', label: 'Cilindraje', type: 'select', options: ['100-150cc', '150-250cc', '250cc o más'] },
+        { key: 'tipo', label: 'Tipo', type: 'select', options: ['Urbana', 'Trabajo/Carga', 'Deportiva'] }
+      ],
+      'Bicicleta': [
+        { key: 'tipo', label: 'Tipo', type: 'select', options: ['Urbana', 'Montaña', 'Eléctrica'] },
+        { key: 'talla', label: 'Talla de marco', type: 'select', options: ['S', 'M', 'L'] }
+      ],
+      'Kit de herramientas': [
+        { key: 'contenido', label: 'Tipo de kit', type: 'select', options: ['Básico', 'Eléctrico', 'Especializado'] },
+        { key: 'maletin', label: 'Con maletín', type: 'select', options: ['Sí', 'No'] }
+      ],
+      'Radio de comunicación': [
+        { key: 'alcance', label: 'Alcance', type: 'select', options: ['Corto', 'Medio', 'Largo'] },
+        { key: 'frecuencia', label: 'Frecuencia', type: 'select', options: ['VHF', 'UHF'] }
+      ],
+      'Casco': [
+        { key: 'norma', label: 'Norma de certificación', type: 'select', options: ['ANSI Z89.1', 'EN 397', 'Otra'] },
+        { key: 'tipo', label: 'Tipo', type: 'select', options: ['Tipo I', 'Tipo II'] },
+        { key: 'color', label: 'Color', type: 'text', placeholder: 'ej. Blanco (por jerarquía)' }
+      ],
+      'Zapatos de seguridad': [
+        { key: 'talla', label: 'Talla', type: 'text', placeholder: 'ej. 40' },
+        { key: 'norma', label: 'Norma', type: 'select', options: ['ANSI Z41', 'EN ISO 20345', 'Otra'] },
+        { key: 'punta', label: 'Punta', type: 'select', options: ['Acero', 'Composite (no metálica)'] },
+        { key: 'dielectrico', label: 'Resistente dieléctrico', type: 'select', options: ['Sí', 'No'] }
+      ],
+      'Equipo para trabajo en alturas': [
+        { key: 'tipo', label: 'Tipo de equipo', type: 'select', options: ['Arnés cuerpo completo', 'Línea de vida', 'Kit completo (arnés + línea + mosquetones)'] },
+        { key: 'norma', label: 'Norma', type: 'select', options: ['ANSI Z359', 'EN 361', 'Otra'] },
+        { key: 'capacidad', label: 'Capacidad de peso', type: 'text', placeholder: 'ej. 140 kg' }
+      ],
+      'Gafas de protección': [
+        { key: 'lente', label: 'Tipo de lente', type: 'select', options: ['Claro', 'Oscuro', 'Fotocromático'] },
+        { key: 'norma', label: 'Norma', type: 'select', options: ['ANSI Z87.1', 'EN 166', 'Otra'] }
+      ],
+      'Guantes de seguridad': [
+        { key: 'material', label: 'Material', type: 'select', options: ['Cuero', 'Nitrilo', 'Kevlar', 'Algodón/lona'] },
+        { key: 'talla', label: 'Talla', type: 'select', options: ['S', 'M', 'L', 'XL'] },
+        { key: 'resistencia', label: 'Resistencia principal', type: 'select', options: ['Corte', 'Químico', 'Eléctrico', 'Abrasión'] }
+      ],
+      'Chaleco reflectivo': [
+        { key: 'clase', label: 'Clase (ANSI 107)', type: 'select', options: ['Clase 1', 'Clase 2', 'Clase 3'] },
+        { key: 'talla', label: 'Talla', type: 'select', options: ['S', 'M', 'L', 'XL'] }
+      ],
+      'Protección auditiva': [
+        { key: 'tipo', label: 'Tipo', type: 'select', options: ['Tapones desechables', 'Tapones reutilizables', 'Orejeras'] },
+        { key: 'nrr', label: 'Reducción de ruido (NRR)', type: 'text', placeholder: 'ej. 25 dB' }
+      ],
+      'Respirador/Mascarilla': [
+        { key: 'tipo', label: 'Tipo', type: 'select', options: ['Desechable N95', 'Media cara reutilizable', 'Cara completa'] },
+        { key: 'filtro', label: 'Filtro', type: 'select', options: ['Partículas', 'Gases/Vapores', 'Combinado'] }
+      ],
+      'Lámpara de casco': [
+        { key: 'tipo', label: 'Tipo', type: 'select', options: ['LED', 'Halógena'] },
+        { key: 'autonomia', label: 'Autonomía de batería', type: 'text', placeholder: 'ej. 10 horas' },
+        { key: 'antiexplosiva', label: 'Certificación antiexplosiva', type: 'select', options: ['Sí', 'No'] }
+      ],
+      'Equipo de protección personal': [
+        { key: 'descripcion', label: 'Describe qué necesitas', type: 'text', placeholder: 'ej. Protector facial, mandil de cuero...' }
+      ],
+      'Google Workspace': [
+        { key: 'plan', label: 'Plan', type: 'select', options: ['Business Starter', 'Business Standard', 'Business Plus', 'Enterprise'] }
+      ],
+      'Microsoft 365': [
+        { key: 'plan', label: 'Plan', type: 'select', options: ['Business Basic', 'Business Standard', 'Business Premium', 'Enterprise'] }
+      ],
+      'CRM': [
+        { key: 'plataforma', label: 'Plataforma preferida', type: 'text', placeholder: 'ej. HubSpot, Salesforce' }
+      ],
+      'ERP': [
+        { key: 'plataforma', label: 'Plataforma preferida', type: 'text', placeholder: 'ej. SAP, Odoo' }
+      ],
+      'VPN': [
+        { key: 'proveedor', label: 'Proveedor preferido', type: 'text', placeholder: 'ej. NordLayer, Tailscale' }
+      ],
+      'Usuario de sistema interno': [
+        { key: 'sistema', label: 'Sistema', type: 'text', placeholder: 'ej. ERP interno' }
+      ],
+      'Correo corporativo': [
+        { key: 'dominio', label: 'Dominio', type: 'text', placeholder: 'ej. @tuempresa.com' }
+      ]
+    };
+
+    function escapeAttrRoles(str) {
+      return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function renderAssetSpecsGrid(itemName, specs, open) {
+      const fields = ASSET_SPECS[itemName];
+      if (!fields || fields.length === 0) return '';
+      return `
+        <div class="asset-specs-grid${open ? ' open' : ''}">
+          ${fields.map(f => {
+            const val = (specs && specs[f.key]) || '';
+            if (f.type === 'select') {
+              return `
+                <div class="asset-spec-field">
+                  <label>${f.label}</label>
+                  <select class="asset-spec-input" data-key="${f.key}">
+                    <option value="">Sin especificar</option>
+                    ${f.options.map(o => `<option value="${escapeAttrRoles(o)}" ${val === o ? 'selected' : ''}>${o}</option>`).join('')}
+                  </select>
+                </div>
+              `;
+            }
+            return `
+              <div class="asset-spec-field">
+                <label>${f.label}</label>
+                <input type="text" class="asset-spec-input" data-key="${f.key}" placeholder="${escapeAttrRoles(f.placeholder || '')}" value="${escapeAttrRoles(val)}">
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    function toggleAssetSpecs(btn) {
+      const row = btn.closest('.role-asset-item');
+      const grid = row ? row.querySelector('.asset-specs-grid') : null;
+      btn.classList.toggle('open');
+      if (grid) grid.classList.toggle('open');
     }
 
     // Catálogo jerárquico usado para armar rápidamente los activos de un rol
@@ -1698,6 +1993,15 @@
         if (requiereReposicion) {
           const monthsVal = el.querySelector('.months-val');
           item.reposicion_meses = parseInt(monthsVal?.textContent) || 6;
+        }
+
+        const specInputs = el.querySelectorAll('.asset-spec-input');
+        if (specInputs.length > 0) {
+          const specs = {};
+          specInputs.forEach(input => {
+            if (input.value) specs[input.dataset.key] = input.value;
+          });
+          if (Object.keys(specs).length > 0) item.specs = specs;
         }
 
         updatedItems.push(item);
