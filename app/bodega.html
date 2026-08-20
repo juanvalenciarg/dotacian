@@ -2304,9 +2304,10 @@
       select.appendChild(def);
       stockItems.sort((a, b) => a[0].localeCompare(b[0])).forEach(([key, qty]) => {
         const [productName, talla] = key.split(':::');
+        const tallaSuffix = (talla && talla !== 'N/A') ? ` — Talla ${talla}` : '';
         const opt = document.createElement('option');
         opt.value = key; // "product:::size"
-        opt.textContent = `${productName} — Talla ${talla} (${qty} en stock)`;
+        opt.textContent = `${productName}${tallaSuffix} (${qty} en stock)`;
         select.appendChild(opt);
       });
       // On selection: auto-fill size field and show stock indicator
@@ -2332,8 +2333,9 @@
       }
       const available = currentStockSnapshot[key] || 0;
       const [productName, talla] = key.split(':::');
+      const tallaSuffix = (talla && talla !== 'N/A') ? ` talla ${talla}` : '';
       indicator.style.display = 'block';
-      indicator.textContent = `⚠ Stock disponible de ${productName} talla ${talla}: ${available} unidad${available !== 1 ? 'es' : ''}`;
+      indicator.textContent = `⚠ Stock disponible de ${productName}${tallaSuffix}: ${available} unidad${available !== 1 ? 'es' : ''}`;
       qtyHint.textContent = `máx. ${available}`;
     }
 
