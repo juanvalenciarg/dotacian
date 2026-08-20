@@ -1908,8 +1908,9 @@
       items.forEach((item, index) => {
         const qty = item.quantity || item.qty || 1;
         const img = item.image || item.img || '';
-        const size = guessSize(item.name, empObj);
-        deliveryItemsList.appendChild(buildDeliveryRow(item.name, qty, size, img, index));
+        const sized = isSizedItem(item);
+        const size = sized ? guessSize(item.name, empObj) : '';
+        deliveryItemsList.appendChild(buildDeliveryRow(item.name, qty, size, img, index, item.specs, sized));
       });
 
       // Query deliveries and stock from Supabase in background
@@ -2102,16 +2103,28 @@
       document.getElementById('detailModal').classList.add('active');
     }
 
+    // Antes se usaba de catch-all para CUALQUIER activo (un Monitor terminaba
+    // mostrando "Talla: M"). Ahora solo se llama cuando isSizedItem() dice que
+    // el activo realmente tiene talla.
     function guessSize(name, empObj) {
-      if (!empObj) return 'M';
-      const n = name.toLowerCase();
+      if (!empObj) return '';
+      const n = (name || '').toLowerCase();
       if (n.includes('pantalón') || n.includes('pant') || n.includes('jeans') || n.includes('bermuda')) {
-        return empObj.pants_size || '32';
+        return empObj.pants_size || '';
       }
       if (n.includes('zapato') || n.includes('bota') || n.includes('tenis') || n.includes('calzado')) {
-        return empObj.shoe_size || '27';
+        return empObj.shoe_size || '';
       }
-      return empObj.shirt_size || 'M';
+      return empObj.shirt_size || '';
+    }
+
+    // Determina si un activo tiene talla (ropa/calzado). Los items que vienen
+    // de role_definition ya traen tipo:'uniforme'; los del kit de fallback
+    // hardcodeado no, así que se complementa con el nombre.
+    function isSizedItem(item) {
+      if (item && item.tipo === 'uniforme') return true;
+      const n = ((item && item.name) || '').toLowerCase();
+      return /pantalón|pant|jeans|bermuda|zapato|bota|tenis|calzado|camis|playera|chaqueta|filipina|overol|delantal|gorro/.test(n);
     }
 
     function getStockAmount(name, size) {
@@ -2126,10 +2139,10 @@
       const nameInput = row.querySelector('input[placeholder="Activo"]');
       const sizeInput = row.querySelector('input[placeholder="Talla"]');
       const badgeContainer = row.querySelector('.stock-badge-container');
-      if (!nameInput || !sizeInput || !badgeContainer) return;
+      if (!nameInput || !badgeContainer) return;
 
       const name = nameInput.value.trim();
-      const size = sizeInput.value.trim();
+      const size = sizeInput ? sizeInput.value.trim() : '';
       const stock = getStockAmount(name, size);
 
       if (stock > 0) {
@@ -2193,10 +2206,52 @@
       });
     }
 
-    function buildDeliveryRow(name, qty, size, img, id) {
+    function prettifySpecKey(key) {
+      return String(key).replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function escapeDeliveryLabel(str) {
+      return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function renderDeliveryDetailHtml(size, specs, sized) {
+      const specEntries = specs ? Object.entries(specs).filter(([, v]) => v) : [];
+      if (!sized && specEntries.length === 0) return '';
+      return `
+        <div class="delivery-item-detail" style="display:none; margin-top:0.65rem; padding-top:0.65rem; border-top:1px dashed #e2e8f0; padding-left:2.9rem;">
+          <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+            ${sized ? `
+            <div style="display:flex; align-items:center; gap:4px;">
+              <span style="font-size:0.7rem; color:#94a3b8;">Talla:</span>
+              <input type="text" value="${escapeDeliveryLabel(size)}" placeholder="Talla"
+                style="width:60px; font-size:0.8125rem; font-weight:700; color:#0f172a; border:1px solid #e2e8f0; border-radius:6px; background:#f8fafc; padding:3px 6px; text-align:center; outline:none;"
+                oninput="updateRowStockBadge(this.closest('[data-delivery-item-id]'))">
+            </div>` : ''}
+            ${specEntries.map(([k, v]) => `
+              <span style="font-size:0.75rem; color:#475569; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:3px 8px;">
+                <strong style="color:#0f172a;">${escapeDeliveryLabel(prettifySpecKey(k))}:</strong> ${escapeDeliveryLabel(v)}
+              </span>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleDeliveryDetail(btn) {
+      const row = btn.closest('[data-delivery-item-id]');
+      const detail = row ? row.querySelector('.delivery-item-detail') : null;
+      if (!detail) return;
+      const isOpen = detail.style.display === 'block';
+      detail.style.display = isOpen ? 'none' : 'block';
+      btn.style.color = isOpen ? '#0891B2' : '#0f172a';
+      const svg = btn.querySelector('svg');
+      if (svg) svg.style.transform = isOpen ? '' : 'rotate(90deg)';
+    }
+
+    function buildDeliveryRow(name, qty, size, img, id, specs, sized) {
       const wrapper = document.createElement('div');
       wrapper.dataset.deliveryItemId = id;
-      wrapper.style.cssText = 'display:flex; align-items:center; gap:0.75rem; background:white; padding:0.75rem 1rem; border-radius:12px; border:1px solid #e2e8f0; transition:all 0.2s;';
+      wrapper.style.cssText = 'display:flex; flex-direction:column; background:white; padding:0.75rem 1rem; border-radius:12px; border:1px solid #e2e8f0; transition:all 0.2s;';
       wrapper.onmouseover = () => wrapper.style.borderColor = '#bae6fd';
       wrapper.onmouseout = () => wrapper.style.borderColor = '#e2e8f0';
 
@@ -2208,63 +2263,67 @@
         stockBadgeHtml = `<span style="font-size:0.75rem; font-weight:600; color:#ef4444; background:#fef2f2; padding:2px 8px; border-radius:12px; border:1px solid #fecaca;">Stock: 0</span>`;
       }
 
+      const detailHtml = renderDeliveryDetailHtml(size, specs, sized);
+
       wrapper.innerHTML = `
-        <!-- Checkbox -->
-        <label style="display:flex; align-items:center; cursor:pointer; flex-shrink:0; margin:0;">
-          <input type="checkbox" checked
-            onchange="updateGenerateButtonState()"
-            style="width:18px; height:18px; accent-color:#06B6D4; cursor:pointer; border-radius:5px;">
-        </label>
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <!-- Checkbox -->
+          <label style="display:flex; align-items:center; cursor:pointer; flex-shrink:0; margin:0;">
+            <input type="checkbox" checked
+              onchange="updateGenerateButtonState()"
+              style="width:18px; height:18px; accent-color:#06B6D4; cursor:pointer; border-radius:5px;">
+          </label>
 
-        <!-- Thumbnail -->
-        <div style="width:44px; height:44px; background:#f1f5f9; border-radius:10px; overflow:hidden; flex-shrink:0; display:flex; align-items:center; justify-content:center;">
-          <img src="${img}" style="width:100%; height:100%; object-fit:contain;"
-            onerror="this.parentElement.style.background='#e2e8f0'; this.parentElement.innerHTML='<span style=\\'font-size:0.65rem; font-weight:700; color:#94a3b8;\\'>Kit</span>';">
+          <!-- Thumbnail -->
+          <div style="width:44px; height:44px; background:#f1f5f9; border-radius:10px; overflow:hidden; flex-shrink:0; display:flex; align-items:center; justify-content:center;">
+            <img src="${img}" style="width:100%; height:100%; object-fit:contain;"
+              onerror="this.parentElement.style.background='#e2e8f0'; this.parentElement.innerHTML='<span style=\\'font-size:0.65rem; font-weight:700; color:#94a3b8;\\'>Kit</span>';">
+          </div>
+
+          <!-- Name (editable) -->
+          <div style="flex:1; min-width:0;">
+            <input type="text" value="${name}"
+              style="width:100%; font-size:0.875rem; font-weight:600; color:#0f172a; border:none; background:transparent; outline:none; padding:0;"
+              placeholder="Activo"
+              oninput="updateRowStockBadge(this.closest('[data-delivery-item-id]'))"
+              onfocus="this.style.background='#f0f9ff'; this.style.borderRadius='6px'; this.style.padding='2px 6px';"
+              onblur="this.style.background='transparent'; this.style.padding='0';">
+          </div>
+
+          <!-- Detail toggle (talla + specs del activo, si aplica) -->
+          ${detailHtml ? `
+          <button type="button" class="delivery-detail-toggle" onclick="toggleDeliveryDetail(this)"
+            style="display:flex; align-items:center; gap:0.25rem; flex-shrink:0; background:none; border:none; cursor:pointer; color:#0891B2; font-size:0.75rem; font-weight:700; padding:0.25rem 0.4rem;">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            Detalle
+          </button>` : ''}
+
+          <!-- Stock Badge Container -->
+          <div class="stock-badge-container" style="flex-shrink:0; display:flex; align-items:center; justify-content:center; min-width:65px; margin:0 4px;">
+            ${stockBadgeHtml}
+          </div>
+
+          <!-- Qty Stepper -->
+          <div style="display:flex; align-items:center; gap:2px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:3px;" onclick="event.stopPropagation();">
+            <button type="button" onclick="stepDeliveryQty(this, -1)"
+              style="width:24px; height:24px; border:none; background:none; cursor:pointer; color:#475569; font-size:1rem; display:flex; align-items:center; justify-content:center; border-radius:5px; transition:background 0.15s;"
+              onmouseover="this.style.background='#e2e8f0';" onmouseout="this.style.background='none';">−</button>
+            <input type="number" value="${qty}" min="1" max="99"
+              oninput="updateRowStockBadge(this.closest('[data-delivery-item-id]')); updateGenerateButtonState();"
+              style="width:26px; border:none; text-align:center; font-size:0.875rem; font-weight:700; color:#0f172a; background:transparent; -moz-appearance:textfield; outline:none;">
+            <button type="button" onclick="stepDeliveryQty(this, 1)"
+              style="width:24px; height:24px; border:none; background:none; cursor:pointer; color:#475569; font-size:1rem; display:flex; align-items:center; justify-content:center; border-radius:5px; transition:background 0.15s;"
+              onmouseover="this.style.background='#e2e8f0';" onmouseout="this.style.background='none';">+</button>
+          </div>
+
+          <!-- Delete -->
+          <button type="button" onclick="removeDeliveryRow(this)"
+            style="width:32px; height:32px; border:none; background:#fff5f5; color:#ef4444; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all 0.15s;"
+            onmouseover="this.style.background='#fee2e2';" onmouseout="this.style.background='#fff5f5';" title="Eliminar">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
         </div>
-
-        <!-- Name (editable) -->
-        <div style="flex:1; min-width:0;">
-          <input type="text" value="${name}"
-            style="width:100%; font-size:0.875rem; font-weight:600; color:#0f172a; border:none; background:transparent; outline:none; padding:0;"
-            placeholder="Activo"
-            oninput="updateRowStockBadge(this.closest('[data-delivery-item-id]'))"
-            onfocus="this.style.background='#f0f9ff'; this.style.borderRadius='6px'; this.style.padding='2px 6px';"
-            onblur="this.style.background='transparent'; this.style.padding='0';">
-        </div>
-
-        <!-- Size field -->
-        <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
-          <span style="font-size:0.7rem; color:#94a3b8;">Talla:</span>
-          <input type="text" value="${size}"
-            style="width:45px; font-size:0.8125rem; font-weight:700; color:#0f172a; border:1px solid #e2e8f0; border-radius:6px; background:#f8fafc; padding:3px 6px; text-align:center; outline:none;"
-            placeholder="Talla"
-            oninput="updateRowStockBadge(this.closest('[data-delivery-item-id]'))">
-        </div>
-
-        <!-- Stock Badge Container -->
-        <div class="stock-badge-container" style="flex-shrink:0; display:flex; align-items:center; justify-content:center; min-width:65px; margin:0 4px;">
-          ${stockBadgeHtml}
-        </div>
-
-        <!-- Qty Stepper -->
-        <div style="display:flex; align-items:center; gap:2px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:3px;" onclick="event.stopPropagation();">
-          <button type="button" onclick="stepDeliveryQty(this, -1)"
-            style="width:24px; height:24px; border:none; background:none; cursor:pointer; color:#475569; font-size:1rem; display:flex; align-items:center; justify-content:center; border-radius:5px; transition:background 0.15s;"
-            onmouseover="this.style.background='#e2e8f0';" onmouseout="this.style.background='none';">−</button>
-          <input type="number" value="${qty}" min="1" max="99"
-            oninput="updateRowStockBadge(this.closest('[data-delivery-item-id]')); updateGenerateButtonState();"
-            style="width:26px; border:none; text-align:center; font-size:0.875rem; font-weight:700; color:#0f172a; background:transparent; -moz-appearance:textfield; outline:none;">
-          <button type="button" onclick="stepDeliveryQty(this, 1)"
-            style="width:24px; height:24px; border:none; background:none; cursor:pointer; color:#475569; font-size:1rem; display:flex; align-items:center; justify-content:center; border-radius:5px; transition:background 0.15s;"
-            onmouseover="this.style.background='#e2e8f0';" onmouseout="this.style.background='none';">+</button>
-        </div>
-
-        <!-- Delete -->
-        <button type="button" onclick="removeDeliveryRow(this)"
-          style="width:32px; height:32px; border:none; background:#fff5f5; color:#ef4444; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all 0.15s;"
-          onmouseover="this.style.background='#fee2e2';" onmouseout="this.style.background:#fff5f5';" title="Eliminar">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+        ${detailHtml}
       `;
       return wrapper;
     }
@@ -2290,7 +2349,7 @@
     let _customDeliveryItemId = 2000;
     function addCustomDeliveryItem() {
       const list = document.getElementById('deliveryItemsList');
-      const row = buildDeliveryRow('', 1, 'M', '', _customDeliveryItemId++);
+      const row = buildDeliveryRow('', 1, '', '', _customDeliveryItemId++, null, true);
       list.appendChild(row);
       const input = row.querySelector('input[placeholder="Activo"]');
       if (input) {
