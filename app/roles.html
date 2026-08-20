@@ -1349,7 +1349,7 @@
     function createAssetRowElement(item, checked) {
       const requiereReposicion = !!item.requiere_reposicion;
       const reposicionMeses = item.reposicion_meses || 6;
-      const specFields = ASSET_SPECS[item.name] || [];
+      const specFields = getAssetSpecFields(item.name);
       const hasSpecValues = !!(item.specs && Object.keys(item.specs).some(k => item.specs[k]));
 
       const div = document.createElement('div');
@@ -1396,12 +1396,19 @@
       return div;
     }
 
+    // Campos base que aplican a cualquier activo: sirven para que Dot sepa si
+    // hay una marca/referencia puntual que el proveedor deba cotizar, más allá
+    // de las características técnicas propias de cada tipo (ASSET_SPECS).
+    const BASE_ASSET_SPEC_FIELDS = [
+      { key: 'marca', label: 'Marca preferida', type: 'text', placeholder: 'ej. 3M, Dell, Nike...' },
+      { key: 'referencia', label: 'Referencia / modelo', type: 'text', placeholder: 'ej. código o modelo específico' }
+    ];
+
     // Campos de especificación por tipo de activo: lo mínimo que un proveedor
     // necesita para poder cotizar en el mercado. Se guardan en item.specs y
     // viajan con el rol para que Dot arme solicitudes de cotización/compra.
     const ASSET_SPECS = {
       'Laptop': [
-        { key: 'marca_modelo', label: 'Marca / modelo preferido', type: 'text', placeholder: 'ej. Dell Latitude, Lenovo ThinkPad' },
         { key: 'procesador', label: 'Procesador', type: 'select', options: ['Intel Core i3', 'Intel Core i5', 'Intel Core i7', 'Intel Core i9', 'AMD Ryzen 5', 'AMD Ryzen 7', 'Apple M-series'] },
         { key: 'ram', label: 'RAM', type: 'select', options: ['8GB', '16GB', '32GB', '64GB'] },
         { key: 'almacenamiento', label: 'Almacenamiento', type: 'select', options: ['256GB SSD', '512GB SSD', '1TB SSD', '1TB HDD'] },
@@ -1584,12 +1591,18 @@
       ]
     };
 
+    function getAssetSpecFields(itemName) {
+      const specific = ASSET_SPECS[itemName];
+      if (!specific) return [];
+      return [...BASE_ASSET_SPEC_FIELDS, ...specific];
+    }
+
     function escapeAttrRoles(str) {
       return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
     function renderAssetSpecsGrid(itemName, specs, open) {
-      const fields = ASSET_SPECS[itemName];
+      const fields = getAssetSpecFields(itemName);
       if (!fields || fields.length === 0) return '';
       return `
         <div class="asset-specs-grid${open ? ' open' : ''}">
@@ -1732,7 +1745,7 @@
         const subcatsHtml = Object.keys(subcats).map(key => {
           const sub = subcats[key];
           const itemsHtml = sub.items.map(name => {
-            const specFields = ASSET_SPECS[name] || [];
+            const specFields = getAssetSpecFields(name);
             return `
             <div class="new-role-asset-row" style="padding: 0.3rem 0;">
               <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
