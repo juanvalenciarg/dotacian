@@ -122,6 +122,28 @@
       gap: 0.75rem;
       transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
       border: 1px solid rgba(0, 180, 216, 0.1);
+      max-height: calc(100vh - 4rem);
+      max-width: min(90vw, 420px);
+      overflow-y: auto;
+    }
+
+    .notification-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #94a3b8;
+      flex-shrink: 0;
+      padding: 2px;
+      margin-left: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+    }
+
+    .notification-close:hover {
+      background: #f1f5f9;
+      color: #0f172a;
     }
 
     .notification-toast.active {
@@ -255,6 +277,9 @@
   <div id="notificationToast" class="notification-toast">
     <div class="notification-icon">✓</div>
     <div class="notification-text" id="notificationText">Mensaje guardado</div>
+    <button type="button" class="notification-close" onclick="closeNotification()" title="Cerrar" aria-label="Cerrar">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
   </div>
 
   <div class="app-layout" id="app-layout-wrapper">
@@ -1235,6 +1260,15 @@
       }
     }
 
+    function closeNotification() {
+      const toast = document.getElementById('notificationToast');
+      if (window.activeNotificationTimeout) {
+        clearTimeout(window.activeNotificationTimeout);
+        window.activeNotificationTimeout = null;
+      }
+      if (toast) toast.classList.remove('active');
+    }
+
 
     // Helper to load and convert any image URL to base64 dynamically to avoid CORS/Taint errors on canvas
     async function getBase64Image(url) {
@@ -1892,13 +1926,17 @@
 
       const empObj = allEmployees.find(e => e.db_id === db_id);
 
-      items.forEach((item, index) => {
-        const qty = item.quantity || item.qty || 1;
-        const img = item.image || item.img || '';
-        const sized = isSizedItem(item);
-        const size = sized ? guessSize(item.name, empObj) : '';
-        deliveryItemsList.appendChild(buildDeliveryRow(item.name, qty, size, img, index, item.specs, sized));
-      });
+      // Solo activos físicos se entregan/firman aquí y contra stock de
+      // bodega. Los digitales (licencias, accesos) tendrán su propio flujo.
+      items
+        .filter(item => item.category !== 'digital')
+        .forEach((item, index) => {
+          const qty = item.quantity || item.qty || 1;
+          const img = item.image || item.img || '';
+          const sized = isSizedItem(item);
+          const size = sized ? guessSize(item.name, empObj) : '';
+          deliveryItemsList.appendChild(buildDeliveryRow(item.name, qty, size, img, index, item.specs, sized));
+        });
 
       // Query deliveries and stock from Supabase in background
       (async () => {
