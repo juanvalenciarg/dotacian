@@ -933,7 +933,7 @@
               </div>
             </div>
 
-            <div>
+            <div id="adjustSizeWrap" style="display: none;">
               <label
                 style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Talla</label>
               <input type="text" id="adjustSize" placeholder="Ej. M, L, Unitalla"
@@ -2255,6 +2255,8 @@
       select.innerHTML = '';
       if (garments.length === 0) {
         select.innerHTML = '<option value="">Sin activos configurados en los roles activos</option>';
+        select.onchange = null;
+        updateAdjustSizeVisibility();
         return;
       }
       const def = document.createElement('option');
@@ -2267,6 +2269,25 @@
         opt.textContent = g;
         select.appendChild(opt);
       });
+      select.onchange = updateAdjustSizeVisibility;
+      updateAdjustSizeVisibility();
+    }
+
+    // Talla solo tiene sentido para uniformes/calzado. Para el resto de
+    // activos (laptops, cascos, monitores...) el campo queda oculto y se
+    // guarda con talla 'N/A', igual que ya se lee en loadInventory().
+    function updateAdjustSizeVisibility() {
+      const wrap = document.getElementById('adjustSizeWrap');
+      const productSelect = document.getElementById('adjustProduct');
+      if (!wrap || !productSelect) return;
+
+      let name = productSelect.value || '';
+      if (adjustMode === 'remove') name = name.split(':::')[0];
+
+      const tipo = (window._adjustGarmentTipos || {})[name];
+      const sized = name ? isSizedItemDot({ tipo, name }) : false;
+      wrap.style.display = sized ? 'block' : 'none';
+      if (!sized && adjustMode === 'add') document.getElementById('adjustSize').value = '';
     }
 
     function repopulateProductSelectForRemove(select) {
@@ -2296,7 +2317,9 @@
           document.getElementById('adjustSize').value = talla;
         }
         updateStockIndicator(selectedKey);
+        updateAdjustSizeVisibility();
       };
+      updateAdjustSizeVisibility();
     }
 
     function updateStockIndicator(key) {
@@ -2320,6 +2343,7 @@
       productSelect.innerHTML = '<option value="">Cargando activos autorizados...</option>';
       productSelect.onchange = null;
       document.getElementById('adjustSize').value = '';
+      document.getElementById('adjustSizeWrap').style.display = 'none';
       document.getElementById('adjustQty').value = '';
       document.getElementById('adjustReason').value = '';
       document.getElementById('adjustStockIndicator').style.display = 'none';
@@ -2365,14 +2389,22 @@
         if (defErr) throw defErr;
 
         const garmentsSet = new Set();
+        const garmentTipos = {};
         (roleDefs || []).forEach(rd => {
           if (activeRoleNames.includes(rd.role_name.toLowerCase().trim())) {
             const items = rd.items || [];
-            items.forEach(it => { if (it.name) garmentsSet.add(it.name.trim()); });
+            items.forEach(it => {
+              if (it.name) {
+                const trimmed = it.name.trim();
+                garmentsSet.add(trimmed);
+                if (it.tipo) garmentTipos[trimmed] = it.tipo;
+              }
+            });
           }
         });
 
         window._adjustGarments = Array.from(garmentsSet).sort();
+        window._adjustGarmentTipos = garmentTipos;
         repopulateProductSelectForAdd(productSelect);
 
       } catch (err) {
@@ -2400,7 +2432,10 @@
         [product, size] = selectedKey.split(':::');
       } else {
         product = document.getElementById('adjustProduct').value.trim();
-        size = document.getElementById('adjustSize').value.trim() || 'Unitalla';
+        const tipo = (window._adjustGarmentTipos || {})[product];
+        const sized = product ? isSizedItemDot({ tipo, name: product }) : false;
+        const rawSize = document.getElementById('adjustSize').value.trim();
+        size = sized ? (rawSize || 'Unitalla') : 'N/A';
       }
 
       const state = document.getElementById('adjustState').value;
