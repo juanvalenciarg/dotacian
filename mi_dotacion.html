@@ -385,6 +385,17 @@
       const ctx = canvas.getContext('2d');
       let drawing = false;
 
+      // Intenta cerrar la pestaña sola tras confirmar. Los navegadores solo
+      // dejan que un script cierre pestañas que él mismo abrió (no las que
+      // el usuario abrió pegando/tocando el link, ej. desde WhatsApp), así
+      // que esto es "best effort": si el navegador lo bloquea, no pasa nada
+      // y el mensaje de "ya puedes cerrar esta pestaña" queda como respaldo.
+      function tryAutoCloseTab() {
+        setTimeout(() => {
+          try { window.close(); } catch (e) { }
+        }, 1500);
+      }
+
       function getParameterByName(name, url = window.location.href) {
         name = name.replace(/[\[\]]/g, '\\$&');
         const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
@@ -542,6 +553,7 @@
 
             const showSavedSuccess = () => {
               document.getElementById('successModal').classList.add('active');
+              tryAutoCloseTab();
               const modalTitle = document.querySelector('#successModal h3');
               if (modalTitle) modalTitle.textContent = '¡Tallas Guardadas!';
               const modalDesc = document.querySelector('#successModal p');
@@ -639,6 +651,7 @@
           // Bloquear si ya está firmado
           if (del.status === 'signed') {
             document.getElementById('successModal').classList.add('active');
+            tryAutoCloseTab();
             return;
           }
 
@@ -802,6 +815,7 @@
 
           // Solo si llegamos aquí mostramos el éxito
           document.getElementById('successModal').classList.add('active');
+          tryAutoCloseTab();
 
         } catch (err) {
           console.error('Submission failed:', err);
