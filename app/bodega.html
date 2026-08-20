@@ -997,38 +997,9 @@
                   <th>Stock Mínimo</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="minimosTableBody">
                 <tr>
-                  <td style="font-weight: 600; color: var(--color-navy);">Camisa Oxford</td>
-                  <td>M</td>
-                  <td><span class="bodega-badge badge-listo" style="font-size: 0.65rem;">12 unid.</span></td>
-                  <td><input type="number" value="10"
-                      style="width: 70px; padding: 0.4rem; border: 1px solid var(--color-border); border-radius: 6px; font-size: 0.875rem; text-align: center;">
-                  </td>
-                </tr>
-                <tr>
-                  <td style="font-weight: 600; color: var(--color-navy);">Camisa Oxford</td>
-                  <td>L</td>
-                  <td><span class="bodega-badge badge-en-transito" style="font-size: 0.65rem;">8 unid.</span></td>
-                  <td><input type="number" value="10"
-                      style="width: 70px; padding: 0.4rem; border: 1px solid var(--color-border); border-radius: 6px; font-size: 0.875rem; text-align: center;">
-                  </td>
-                </tr>
-                <tr>
-                  <td style="font-weight: 600; color: var(--color-navy);">Mandil Barista</td>
-                  <td>Unitalla</td>
-                  <td><span class="bodega-badge badge-en-transito" style="font-size: 0.65rem;">5 unid.</span></td>
-                  <td><input type="number" value="15"
-                      style="width: 70px; padding: 0.4rem; border: 1px solid var(--color-border); border-radius: 6px; font-size: 0.875rem; text-align: center;">
-                  </td>
-                </tr>
-                <tr>
-                  <td style="font-weight: 600; color: var(--color-navy);">Pantalón Cargo</td>
-                  <td>32</td>
-                  <td><span class="bodega-badge badge-listo" style="font-size: 0.65rem;">6 unid.</span></td>
-                  <td><input type="number" value="5"
-                      style="width: 70px; padding: 0.4rem; border: 1px solid var(--color-border); border-radius: 6px; font-size: 0.875rem; text-align: center;">
-                  </td>
+                  <td colspan="4" style="text-align:center; padding: 1.5rem; color: var(--color-text-muted);">Cargando...</td>
                 </tr>
               </tbody>
             </table>
@@ -1084,8 +1055,23 @@
     <!-- Scrollable content -->
     <div style="overflow-y: auto; flex: 1; padding: 0 1.25rem 2rem;">
 
-      <!-- Renovations section -->
+      <!-- Low stock section -->
       <div class="alerts-section-title">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"
+          style="vertical-align: -1px;">
+          <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+          <path d="m3.3 7 8.7 5 8.7-5" /><path d="M12 22V12" />
+        </svg>
+        Stock Bajo Mínimo
+      </div>
+      <div id="stockAlertsList">
+        <div style="text-align: center; padding: 2rem 1rem; color: var(--color-text-muted); font-size: 0.875rem;">
+          Cargando...
+        </div>
+      </div>
+
+      <!-- Renovations section -->
+      <div class="alerts-section-title" style="margin-top: 1.5rem;">
         <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"
           style="vertical-align: -1px;">
           <rect width="18" height="18" x="3" y="4" rx="2" />
@@ -1449,17 +1435,204 @@
       };
     }
 
-    function openMinimosModal() {
+    // Arma un PDF de solicitud de cotización para un activo bajo mínimo,
+    // usando el activo y los proveedores ya registrados en Activos
+    // (company_assets / company_asset_providers). No envía nada todavía:
+    // el usuario descarga el PDF y lo manda por correo a mano.
+    async function cotizarActivo(productName, talla, cantidadSugerida) {
+      if (!currentCompanyId) return;
+
+      try {
+        const { data: assetRows, error: assetErr } = await _supabase
+          .from('company_assets')
+          .select('id, nombre, tipo, es_renovable, renovacion_meses')
+          .eq('company_id', currentCompanyId)
+          .ilike('nombre', productName.trim());
+        if (assetErr) throw assetErr;
+
+        const asset = (assetRows || [])[0];
+        if (!asset) {
+          if (window.showToast) showToast('Sin activo vinculado', `No encontramos "${productName}" en Activos. Revisa que el nombre coincida con el catálogo de Activos.`, 'error');
+          return;
+        }
+
+        const { data: providers, error: provErr } = await _supabase
+          .from('company_asset_providers')
+          .select('nombre, correo, telefono')
+          .eq('company_asset_id', asset.id);
+        if (provErr) throw provErr;
+
+        if (!providers || providers.length === 0) {
+          if (window.showToast) showToast('Sin proveedores', `"${productName}" no tiene proveedores registrados. Agrégalos en Activos antes de cotizar.`, 'error');
+          return;
+        }
+
+        buildCotizacionPDF(productName, talla, cantidadSugerida, providers);
+      } catch (err) {
+        console.error('Error generando cotización:', err);
+        if (window.showToast) showToast('Error', 'No se pudo generar la solicitud de cotización.', 'error');
+      }
+    }
+
+    function buildCotizacionPDF(productName, talla, cantidad, providers) {
+      const dateStr = new Date().toLocaleDateString('es-MX');
+      const companyName = (document.getElementById('company-name-display')?.textContent || '').trim();
+
+      const providersHtml = providers.map(p => `
+        <tr>
+          <td style="padding:8px; border-bottom:1px solid #e2e8f0;">${p.nombre || '—'}</td>
+          <td style="padding:8px; border-bottom:1px solid #e2e8f0;">${p.correo || '—'}</td>
+          <td style="padding:8px; border-bottom:1px solid #e2e8f0;">${p.telefono || '—'}</td>
+        </tr>
+      `).join('');
+
+      const printFrame = document.createElement('iframe');
+      printFrame.style.position = 'absolute';
+      printFrame.style.top = '-10000px';
+      printFrame.style.left = '-10000px';
+      document.body.appendChild(printFrame);
+
+      const frameDoc = printFrame.contentWindow ? printFrame.contentWindow.document : printFrame.contentDocument;
+      frameDoc.open();
+      frameDoc.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Solicitud_Cotizacion_${productName.replace(/[^a-zA-Z0-9]/g, '_')}</title>
+            <style>
+              body { font-family: 'Helvetica Neue', Arial, sans-serif; padding: 20px; color: #1e293b; background: #fff; }
+              table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 12px; }
+              th { padding: 10px 8px; border-bottom: 2px solid #cbd5e1; font-size: 0.875rem; text-transform: uppercase; color: #475569; }
+              .detail-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; margin-top: 16px; }
+              .detail-box div { margin-bottom: 4px; font-size: 0.9rem; }
+              .detail-box strong { color: #0f172a; }
+            </style>
+          </head>
+          <body>
+            <h2 style="margin-bottom: 5px;">Solicitud de Cotización</h2>
+            <p style="color: #64748b; margin-top: 0;">${companyName ? companyName + ' · ' : ''}Fecha: ${dateStr}</p>
+            <div class="detail-box">
+              <div><strong>Activo:</strong> ${productName}</div>
+              ${talla && talla !== 'N/A' ? `<div><strong>Talla:</strong> ${talla}</div>` : ''}
+              <div><strong>Cantidad a cotizar:</strong> ${cantidad}</div>
+            </div>
+            <h3 style="margin-top: 24px; margin-bottom: 0;">Proveedores registrados</h3>
+            <table>
+              <thead>
+                <tr><th>Proveedor</th><th>Correo</th><th>Teléfono</th></tr>
+              </thead>
+              <tbody>
+                ${providersHtml}
+              </tbody>
+            </table>
+          </body>
+        </html>
+      `);
+      frameDoc.close();
+
+      printFrame.onload = function () {
+        printFrame.contentWindow.focus();
+        printFrame.contentWindow.print();
+        setTimeout(() => { document.body.removeChild(printFrame); }, 1000);
+      };
+    }
+
+    function escapeBodegaAttr(str) {
+      return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    async function openMinimosModal() {
       document.getElementById('minimosModal').classList.add('active');
+      const tbody = document.getElementById('minimosTableBody');
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 1.5rem; color: var(--color-text-muted);">Cargando...</td></tr>';
+
+      if (!currentCompanyId) return;
+
+      try {
+        const { data: minimosData, error } = await _supabase
+          .from('company_stock_minimums')
+          .select('*')
+          .eq('company_id', currentCompanyId);
+        if (error) throw error;
+
+        const minimoMap = {};
+        (minimosData || []).forEach(m => {
+          minimoMap[`${m.product_name}_${m.talla}`] = m.minimo;
+        });
+
+        // Unión: productos con stock real hoy + productos que ya tienen un
+        // mínimo configurado aunque hoy estén en 0 (no aparecerían en
+        // inventoryData, que filtra filas con stock 0).
+        const rowsMap = {};
+        (inventoryData || []).forEach(item => {
+          const key = `${item.activo}_${item.talla}`;
+          rowsMap[key] = { producto: item.activo, talla: item.talla, stock: (item.nuevos || 0) + (item.seminuevos || 0) };
+        });
+        (minimosData || []).forEach(m => {
+          const key = `${m.product_name}_${m.talla}`;
+          if (!rowsMap[key]) rowsMap[key] = { producto: m.product_name, talla: m.talla, stock: 0 };
+        });
+
+        const rows = Object.values(rowsMap).sort((a, b) => a.producto.localeCompare(b.producto) || a.talla.localeCompare(b.talla));
+
+        if (rows.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 1.5rem; color: var(--color-text-muted);">Aún no hay activos en bodega para configurar.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = rows.map(r => {
+          const key = `${r.producto}_${r.talla}`;
+          const minimo = minimoMap[key] != null ? minimoMap[key] : 0;
+          const badgeClass = r.stock > 0 ? 'badge-listo' : 'badge-en-transito';
+          return `
+            <tr data-product="${escapeBodegaAttr(r.producto)}" data-talla="${escapeBodegaAttr(r.talla)}">
+              <td style="font-weight: 600; color: var(--color-navy);">${r.producto}</td>
+              <td>${r.talla}</td>
+              <td><span class="bodega-badge ${badgeClass}" style="font-size: 0.65rem;">${r.stock} unid.</span></td>
+              <td><input type="number" class="minimo-input" min="0" value="${minimo}"
+                  style="width: 70px; padding: 0.4rem; border: 1px solid var(--color-border); border-radius: 6px; font-size: 0.875rem; text-align: center;">
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error('Error cargando mínimos:', err);
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 1.5rem; color: #EF4444;">No se pudieron cargar los mínimos.</td></tr>';
+      }
     }
 
     function closeMinimosModal() {
       document.getElementById('minimosModal').classList.remove('active');
     }
 
-    function saveMinimos() {
-      alert('Se han guardado los mínimos de operación con éxito.');
-      closeMinimosModal();
+    async function saveMinimos() {
+      if (!currentCompanyId) return;
+      const rows = document.querySelectorAll('#minimosTableBody tr[data-product]');
+      const upserts = Array.from(rows).map(row => ({
+        company_id: currentCompanyId,
+        product_name: row.dataset.product,
+        talla: row.dataset.talla,
+        minimo: parseInt(row.querySelector('.minimo-input').value) || 0,
+        updated_at: new Date().toISOString()
+      }));
+
+      if (upserts.length === 0) {
+        closeMinimosModal();
+        return;
+      }
+
+      try {
+        const { error } = await _supabase
+          .from('company_stock_minimums')
+          .upsert(upserts, { onConflict: 'company_id,product_name,talla' });
+        if (error) throw error;
+        if (window.showToast) showToast('Éxito', 'Se han guardado los mínimos de operación.');
+        closeMinimosModal();
+        loadAlertsData();
+      } catch (err) {
+        console.error('Error guardando mínimos:', err);
+        if (window.showToast) showToast('Error', 'No se pudieron guardar los mínimos.', 'error');
+      }
     }
 
     // Close modals when clicking outside
@@ -1936,14 +2109,70 @@
     }
 
     async function loadAlertsData() {
+      const stockList = document.getElementById('stockAlertsList');
       const renewalList = document.getElementById('renewalAlertsList');
       const damageList = document.getElementById('damageAlertsList');
       const subtitle = document.getElementById('alertsSubtitle');
 
+      stockList.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--color-text-muted);font-size:0.875rem;">Cargando...</div>';
       renewalList.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--color-text-muted);font-size:0.875rem;">Cargando...</div>';
       damageList.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--color-text-muted);font-size:0.875rem;">Cargando...</div>';
 
       if (!currentCompanyId) return;
+
+      let stockAlertsCount = 0;
+      try {
+        // ── 0. Low Stock Alerts ──────────────────────────────────
+        const { data: minimosData, error: minErr } = await _supabase
+          .from('company_stock_minimums')
+          .select('*')
+          .eq('company_id', currentCompanyId);
+        if (minErr) throw minErr;
+
+        const stockMap = {};
+        (inventoryData || []).forEach(item => {
+          stockMap[`${item.activo}_${item.talla}`] = (item.nuevos || 0) + (item.seminuevos || 0);
+        });
+
+        const belowMin = (minimosData || [])
+          .map(m => ({
+            producto: m.product_name,
+            talla: m.talla,
+            stock: stockMap[`${m.product_name}_${m.talla}`] || 0,
+            minimo: m.minimo
+          }))
+          .filter(m => m.stock < m.minimo);
+
+        stockAlertsCount = belowMin.length;
+
+        if (belowMin.length === 0) {
+          stockList.innerHTML = `
+            <div style="display:flex;align-items:center;gap:0.75rem;padding:1rem;background:#F0FDF4;border-radius:12px;border:1px solid #BBF7D0;">
+              <svg width="18" height="18" fill="none" stroke="#16A34A" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <span style="font-size:0.8125rem;color:#15803D;font-weight:600;">Todo el stock está por encima del mínimo configurado.</span>
+            </div>`;
+        } else {
+          stockList.innerHTML = '';
+          belowMin.sort((a, b) => (a.stock - a.minimo) - (b.stock - b.minimo)).forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'alert-item alert-danger';
+            row.innerHTML = `
+              <div class="alert-item-icon" style="background:#FEE2E2;color:#DC2626;">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:0.875rem;font-weight:700;color:var(--color-navy);margin-bottom:2px;">${item.producto}${item.talla && item.talla !== 'N/A' ? ` · Talla ${item.talla}` : ''}</div>
+                <div style="font-size:0.75rem;color:#DC2626;font-weight:600;">Stock: ${item.stock} · Mínimo: ${item.minimo}</div>
+              </div>
+              <button type="button" onclick="cotizarActivo('${escapeBodegaAttr(item.producto)}', '${escapeBodegaAttr(item.talla)}', ${Math.max(item.minimo - item.stock, 1)})"
+                style="flex-shrink:0;font-size:0.7rem;font-weight:700;color:var(--color-cyan);background:none;cursor:pointer;padding:0.3rem 0.6rem;border:1px solid var(--color-cyan);border-radius:6px;white-space:nowrap;">Cotizar</button>`;
+            stockList.appendChild(row);
+          });
+        }
+      } catch (err) {
+        console.error('Error cargando alertas de stock:', err);
+        stockList.innerHTML = '<div style="color:#EF4444;font-size:0.875rem;padding:1rem;">No se pudieron cargar los mínimos.</div>';
+      }
 
       try {
         // ── 1. Renewal Alerts ────────────────────────────────────
@@ -2079,7 +2308,7 @@
         }
 
         // Update badges
-        const totalCount = renewalAlerts.length + (damageData ? damageData.length : 0);
+        const totalCount = stockAlertsCount + renewalAlerts.length + (damageData ? damageData.length : 0);
         updateAlertsBadges(totalCount);
         subtitle.textContent = totalCount > 0
           ? `${totalCount} alerta${totalCount !== 1 ? 's' : ''} activa${totalCount !== 1 ? 's' : ''}`
