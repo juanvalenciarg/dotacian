@@ -491,21 +491,30 @@
             'Calzado': emp.shoe_size || ''
           };
 
-          // Generar selects
+          // Generar selects. Las opciones deben ser IDÉNTICAS a las de
+          // "Detalles del Empleado" en app/empleados.html: si un valor que
+          // guarda el empleado aquí no existe como <option> allá, el select
+          // del admin se queda en blanco aunque el dato sí se haya guardado.
           checklist.innerHTML = `
             <div style="display:flex; flex-direction:column; gap:1rem; padding-bottom: 1rem;">
               <div>
                 <label style="display:block; font-size:0.75rem; color:#64748B; margin-bottom:0.25rem;">Talla de Camisa/Playera</label>
                 <select id="emp-size-camisa" style="width:100%; padding:0.75rem; border:1px solid #E2E8F0; border-radius:0.5rem; outline:none; background:white;">
                   <option value="">Selecciona...</option>
-                  ${['XS','S','M','L','XL','2XL','3XL'].map(s => `<option value="${s}" ${sizes.Camisa === s ? 'selected':''}>${s}</option>`).join('')}
+                  ${['XS','S','M','L','XL','2XL'].map(s => `<option value="${s}" ${sizes.Camisa === s ? 'selected':''}>${s}</option>`).join('')}
+                  <option value="Unitalla" ${sizes.Camisa === 'Unitalla' ? 'selected':''}>Unitalla</option>
                 </select>
               </div>
               <div>
                 <label style="display:block; font-size:0.75rem; color:#64748B; margin-bottom:0.25rem;">Talla de Pantalón</label>
                 <select id="emp-size-pantalon" style="width:100%; padding:0.75rem; border:1px solid #E2E8F0; border-radius:0.5rem; outline:none; background:white;">
                   <option value="">Selecciona...</option>
-                  ${Array.from({length: 21}, (_, i) => i + 26).map(s => `<option value="${s}" ${sizes['Pantalón'] === String(s) ? 'selected':''}>${s}</option>`).join('')}
+                  <optgroup label="Hombre">
+                    ${[28,30,32,34,36,38,40,42,44].map(s => `<option value="${s}" ${sizes['Pantalón'] === String(s) ? 'selected':''}>${s}</option>`).join('')}
+                  </optgroup>
+                  <optgroup label="Mujer">
+                    ${[2,3,4,5,6,7,8,9,10].map(s => `<option value="${s}" ${sizes['Pantalón'] === String(s) ? 'selected':''}>${s}</option>`).join('')}
+                  </optgroup>
                   <option value="Unitalla" ${sizes['Pantalón'] === 'Unitalla' ? 'selected':''}>Unitalla</option>
                 </select>
               </div>
@@ -513,7 +522,7 @@
                 <label style="display:block; font-size:0.75rem; color:#64748B; margin-bottom:0.25rem;">Talla de Calzado</label>
                 <select id="emp-size-calzado" style="width:100%; padding:0.75rem; border:1px solid #E2E8F0; border-radius:0.5rem; outline:none; background:white;">
                   <option value="">Selecciona...</option>
-                  ${[22,23,24,25,26,27,28,29,30,31].map(s => `<option value="${s}" ${sizes.Calzado === String(s) ? 'selected':''}>${s}</option>`).join('')}
+                  ${Array.from({length: 21}, (_, i) => i + 26).map(s => `<option value="${s}" ${sizes.Calzado === String(s) ? 'selected':''}>${s}</option>`).join('')}
                   <option value="Unitalla" ${sizes.Calzado === 'Unitalla' ? 'selected':''}>Unitalla</option>
                 </select>
               </div>
