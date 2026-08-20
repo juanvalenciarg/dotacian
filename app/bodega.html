@@ -972,6 +972,18 @@
               </div>
             </div>
 
+            <!-- Valor de compra: solo aplica al agregar. Es la fuente del KPI "Valor del Inventario" -->
+            <div id="adjustCostWrap">
+              <label
+                style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Valor
+                de compra unitario</label>
+              <input type="number" id="adjustUnitCost" min="0" step="0.01" placeholder="$ 0.00"
+                style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem;">
+              <span
+                style="font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-top: 0.3rem;">Costo
+                pagado por unidad. Se usa para calcular el valor total de la bodega.</span>
+            </div>
+
             <div>
               <label
                 style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Motivo
@@ -1320,11 +1332,11 @@
       });
 
       inventoryData = Object.values(grouped).filter(g => g.nuevos > 0 || g.seminuevos > 0);
+      window.rawInventoryData = data;
 
       calculateTotals();
       renderPieChart();
 
-      window.rawInventoryData = data;
       updateHistoricalChart('month');
 
       // Update modal if open
@@ -1337,13 +1349,19 @@
       const totalActivos = inventoryData.reduce((sum, item) => sum + item.nuevos + item.seminuevos, 0);
       document.getElementById('kpiTotalActivos').textContent = totalActivos;
 
+      // Valor real por lote (unit_cost, capturado al agregar inventario) tiene
+      // prioridad sobre el price map inferido por nombre; este último queda
+      // como respaldo para lotes viejos que no tienen costo guardado.
       let totalValue = 0;
       const priceMap = window.inventoryPriceMap || {};
+      const rawData = window.rawInventoryData || [];
 
-      inventoryData.forEach(item => {
-        const prodKey = (item.activo || '').trim().toLowerCase();
-        const unitPrice = priceMap[prodKey] || 450; // fallback if not in map
-        const qty = (item.nuevos || 0) + (item.seminuevos || 0);
+      rawData.forEach(item => {
+        const qty = item.quantity || 0;
+        const hasCost = item.unit_cost !== null && item.unit_cost !== undefined && item.unit_cost !== '';
+        const unitPrice = hasCost
+          ? Number(item.unit_cost)
+          : (priceMap[(item.product_name || '').trim().toLowerCase()] || 450);
         totalValue += qty * unitPrice;
       });
 
@@ -2476,6 +2494,7 @@
         qtyHint.textContent = '';
         stockIndicator.style.display = 'none';
         btnGuardar.style.background = '';
+        document.getElementById('adjustCostWrap').style.display = 'block';
         // Restore full garments list for add mode
         repopulateProductSelectForAdd(productSelect);
       } else {
@@ -2489,6 +2508,7 @@
         infoText.textContent = 'Los activos quitados reducirán el stock en bodega y se descontarán del próximo cálculo de cotización automático.';
         stockIndicator.style.display = 'none';
         btnGuardar.style.background = '#EF4444';
+        document.getElementById('adjustCostWrap').style.display = 'none';
 
         // Rebuild snapshot keyed by "product:::size" for accurate per-size validation
         currentStockSnapshot = {};
@@ -2607,6 +2627,8 @@
       document.getElementById('adjustSpecsWrap').style.display = 'none';
       document.getElementById('adjustSpecsGrid').innerHTML = '';
       document.getElementById('adjustQty').value = '';
+      document.getElementById('adjustUnitCost').value = '';
+      document.getElementById('adjustCostWrap').style.display = 'block';
       document.getElementById('adjustReason').value = '';
       document.getElementById('adjustStockIndicator').style.display = 'none';
       document.getElementById('adjustQtyHint').textContent = '';
@@ -2734,6 +2756,14 @@
         if (Object.keys(collected).length > 0) specs = collected;
       }
 
+      // Valor de compra unitario — solo aplica al agregar y es opcional,
+      // para no bloquear el ajuste si el usuario no lo tiene a la mano.
+      let unitCost = null;
+      if (adjustMode === 'add') {
+        const rawCost = parseFloat(document.getElementById('adjustUnitCost').value);
+        if (!isNaN(rawCost) && rawCost >= 0) unitCost = rawCost;
+      }
+
       try {
         const payload = {
           company_id: currentCompanyId,
@@ -2745,6 +2775,7 @@
           status: state === 'seminuevo' ? 'seminuevo' : 'available'
         };
         if (specs) payload.specs = specs;
+        if (unitCost !== null) payload.unit_cost = unitCost;
 
         const { error } = await _supabase.from('company_storage').insert(payload);
 
