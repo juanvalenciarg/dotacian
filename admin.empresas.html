@@ -166,11 +166,12 @@
     }
 
     .form-control {
+      width: 100%;
       padding: 0.75rem 1rem;
       border: 1px solid #CBD5E1;
       border-radius: 8px;
       font-family: inherit;
-      font-size: 0.95rem;
+      font-size: 16px;
       color: #334155;
       background: white;
       transition: all 0.2s;
@@ -1721,30 +1722,29 @@
           }
         });
 
-        if (error) throw error;
+        if (error) {
+          if (error.message && error.message.toLowerCase().includes('already registered')) {
+            throw new Error('Ese correo ya tiene una cuenta registrada. Usa un correo distinto para el primer administrador.');
+          }
+          throw error;
+        }
 
         if (data && data.user) {
           const newUserId = data.user.id;
 
-          const { error: userError } = await _supabase.from('company_user').upsert({
-            id: newUserId,
-            first_name: fName,
-            last_name: lName,
-            email: email,
-            company_id: null,
-            created_at: new Date().toISOString()
-          }, { onConflict: 'id' });
+          // company_user/company_profile se crean vía RPC (SECURITY DEFINER) porque
+          // la sesión de staff no puede escribir filas de otro usuario bajo RLS.
+          const { error: rpcError } = await _supabase.rpc('admin_create_company', {
+            p_owner_id: newUserId,
+            p_company_name: companyName,
+            p_industry: industry,
+            p_country: country,
+            p_first_name: fName,
+            p_last_name: lName,
+            p_email: email
+          });
 
-          if (userError) console.warn("Error upserting to company_user:", userError);
-
-          const { error: companyError } = await _supabase.from('company_profile').upsert({
-            id: newUserId,
-            company_name: companyName,
-            industry: industry,
-            country: country
-          }, { onConflict: 'id' });
-
-          if (companyError) throw companyError;
+          if (rpcError) throw rpcError;
 
           showToast('Éxito', 'Empresa creada correctamente.', 'success');
           closeNewCompanyModal();
@@ -1820,19 +1820,25 @@
           options: { data: { first_name: fName, last_name: lName } }
         });
 
-        if (error) throw error;
+        if (error) {
+          if (error.message && error.message.toLowerCase().includes('already registered')) {
+            throw new Error('Ese correo ya tiene una cuenta registrada. Usa la pestaña "Vincular Existente" para agregarlo como administrador.');
+          }
+          throw error;
+        }
 
         if (data && data.user) {
-          const { error: userError } = await _supabase.from('company_user').upsert({
-            id: data.user.id,
-            first_name: fName,
-            last_name: lName,
-            email: email,
-            company_id: currentCompanyRecord.id,
-            created_at: new Date().toISOString()
-          }, { onConflict: 'id' });
+          // company_user se crea vía RPC (SECURITY DEFINER) porque la sesión de
+          // staff no puede escribir la fila de otro usuario bajo RLS.
+          const { error: rpcError } = await _supabase.rpc('admin_create_company_admin', {
+            p_user_id: data.user.id,
+            p_company_id: currentCompanyRecord.id,
+            p_first_name: fName,
+            p_last_name: lName,
+            p_email: email
+          });
 
-          if (userError) throw userError;
+          if (rpcError) throw rpcError;
 
           showToast('Éxito', 'Administrador agregado a la empresa.', 'success');
           closeAddAdminModal();
