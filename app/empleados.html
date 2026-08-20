@@ -2284,7 +2284,7 @@
       if (svg) svg.style.transform = isOpen ? '' : 'rotate(90deg)';
     }
 
-    function buildDeliveryRow(name, qty, size, img, id, specs, sized) {
+    function buildDeliveryRow(name, qty, size, img, id, specs, sized, editableName) {
       const wrapper = document.createElement('div');
       wrapper.dataset.deliveryItemId = id;
       wrapper.style.cssText = 'display:flex; flex-direction:column; background:white; padding:0.75rem 1rem; border-radius:12px; border:1px solid #e2e8f0; transition:all 0.2s;';
@@ -2316,14 +2316,21 @@
               onerror="this.parentElement.style.background='#e2e8f0'; this.parentElement.innerHTML='<span style=\\'font-size:0.65rem; font-weight:700; color:#94a3b8;\\'>Kit</span>';">
           </div>
 
-          <!-- Name (editable) -->
+          <!-- Name: editable solo para activos agregados a mano; los que
+               vienen de Activos/Roles quedan fijos con esa parametrización. -->
           <div style="flex:1; min-width:0;">
+            ${editableName ? `
             <input type="text" value="${name}"
               style="width:100%; font-size:0.875rem; font-weight:600; color:#0f172a; border:none; background:transparent; outline:none; padding:0;"
               placeholder="Activo"
               oninput="updateRowStockBadge(this.closest('[data-delivery-item-id]'))"
               onfocus="this.style.background='#f0f9ff'; this.style.borderRadius='6px'; this.style.padding='2px 6px';"
               onblur="this.style.background='transparent'; this.style.padding='0';">
+            ` : `
+            <input type="text" value="${name}" readonly
+              style="width:100%; font-size:0.875rem; font-weight:600; color:#0f172a; border:none; background:transparent; outline:none; padding:0; cursor:default;"
+              placeholder="Activo">
+            `}
           </div>
 
           <!-- Detail toggle (talla + specs del activo, si aplica) -->
@@ -2385,7 +2392,7 @@
     let _customDeliveryItemId = 2000;
     function addCustomDeliveryItem() {
       const list = document.getElementById('deliveryItemsList');
-      const row = buildDeliveryRow('', 1, '', '', _customDeliveryItemId++, null, true);
+      const row = buildDeliveryRow('', 1, '', '', _customDeliveryItemId++, null, true, true);
       list.appendChild(row);
       const input = row.querySelector('input[placeholder="Activo"]');
       if (input) {
