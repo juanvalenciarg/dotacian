@@ -11,6 +11,7 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap"
     rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <link rel="stylesheet" href="/styles.css">
   <style>
     .bodega-badge {
@@ -592,11 +593,19 @@
       </header>
 
       <div class="dashboard-content-wrapper" style="padding-top: 5rem;">
-        <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end;">
+        <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap;">
           <div>
             <h1 class="dot-greeting" style="text-align: left; margin-bottom: 0.5rem; font-size: 3rem; background: linear-gradient(90deg, #94A3B8 0%, #1E293B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Bodega</h1>
             <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;">Activos en stock — producidos pero pendientes de entrega al empleado</p>
           </div>
+          <button type="button" onclick="openCotizarDotModal()"
+            style="flex-shrink: 0; display: flex; align-items: center; gap: 0.6rem; padding: 0.85rem 1.5rem; background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); color: white; border: none; border-radius: 14px; font-size: 0.9375rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(15,23,42,0.25); transition: transform 0.15s;"
+            onmouseover="this.style.transform='translateY(-1px)';" onmouseout="this.style.transform='translateY(0)';">
+            <svg width="18" height="18" fill="none" stroke="#22D3EE" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M12 2a5 5 0 0 0-5 5v2a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5z"/><path d="M8 14v1a4 4 0 0 0 8 0v-1"/><line x1="12" y1="19" x2="12" y2="22"/>
+            </svg>
+            Cotizar con Dot
+          </button>
         </div>
         <div class="app-container">
           <!-- Main KPI Area -->
@@ -1020,6 +1029,56 @@
         </div>
       </div>
     </main>
+  </div>
+
+  <!-- ── Cotizar con Dot ──────────────────────────────────── -->
+  <div class="modal-overlay" id="cotizarDotModal">
+    <div class="modal-content" style="max-width: 480px;">
+      <button class="modal-close" onclick="closeCotizarDotModal()">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </button>
+
+      <h2 style="font-family: var(--font-family-heading); color: var(--color-navy); font-size: 1.5rem; margin-bottom: 0.5rem;">
+        Cotizar con Dot</h2>
+      <p style="color: var(--color-text-secondary); font-size: 0.875rem; margin-bottom: 1.5rem;">Dot arma un PDF de
+        solicitud de cotización con lo que necesita un rol o una persona específica, usando los proveedores ya
+        registrados en Activos.</p>
+
+      <div style="display: flex; gap: 0.75rem; margin-bottom: 1.25rem;">
+        <label style="flex: 1; display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 10px; cursor: pointer; font-size: 0.875rem; font-weight: 600; color: var(--color-navy);">
+          <input type="radio" name="cotizarDotMode" value="rol" checked onchange="toggleCotizarDotMode()" style="accent-color: var(--color-cyan);">
+          Por rol
+        </label>
+        <label style="flex: 1; display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 10px; cursor: pointer; font-size: 0.875rem; font-weight: 600; color: var(--color-navy);">
+          <input type="radio" name="cotizarDotMode" value="empleado" onchange="toggleCotizarDotMode()" style="accent-color: var(--color-cyan);">
+          Por persona
+        </label>
+      </div>
+
+      <div id="cotizarDotRoleWrap">
+        <label style="font-size: 0.75rem; font-weight: 700; color: var(--color-text-secondary); display: block; margin-bottom: 0.4rem;">Rol</label>
+        <select id="cotizarDotRoleSelect" style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 10px; font-size: 0.875rem; background: white; margin-bottom: 1.25rem;">
+          <option value="">Cargando roles...</option>
+        </select>
+      </div>
+
+      <div id="cotizarDotEmpleadoWrap" style="display: none;">
+        <label style="font-size: 0.75rem; font-weight: 700; color: var(--color-text-secondary); display: block; margin-bottom: 0.4rem;">Persona</label>
+        <select id="cotizarDotEmpleadoSelect" style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 10px; font-size: 0.875rem; background: white; margin-bottom: 1.25rem;">
+          <option value="">Cargando empleados...</option>
+        </select>
+      </div>
+
+      <div id="cotizarDotStatus" style="font-size: 0.8125rem; color: var(--color-text-muted); margin-bottom: 1rem; display: none;"></div>
+
+      <button type="button" id="cotizarDotGenerateBtn" onclick="generarCotizacionDot()" class="btn btn-primary"
+        style="width: 100%; padding: 0.85rem; font-size: 0.9375rem; font-weight: 700; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 0.6rem;">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Generar PDF de cotización
+      </button>
+    </div>
   </div>
 
   <!-- ── Alerts Panel ──────────────────────────────────── -->
@@ -1539,6 +1598,320 @@
 
     function escapeBodegaAttr(str) {
       return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    // ── Cotizar con Dot ──────────────────────────────────────────
+    // A partir de lo que necesita un rol (o una persona puntual), arma un
+    // PDF de solicitud de cotización usando los proveedores ya registrados
+    // en Activos para cada ítem — sin depender del portal de vendedores.
+    let _cotizarDotRoles = [];
+    let _cotizarDotEmpleados = [];
+
+    function isSizedItemDot(item) {
+      if (item && item.tipo === 'uniforme') return true;
+      const n = ((item && item.name) || '').toLowerCase();
+      return /pantalón|pant|jeans|bermuda|zapato|bota|tenis|calzado|camis|playera|chaqueta|filipina|overol|delantal|gorro/.test(n);
+    }
+
+    function guessSizeDot(name, empObj) {
+      if (!empObj) return '';
+      const n = (name || '').toLowerCase();
+      if (n.includes('pantalón') || n.includes('pant') || n.includes('jeans') || n.includes('bermuda')) return empObj.pants_size || '';
+      if (n.includes('zapato') || n.includes('bota') || n.includes('tenis') || n.includes('calzado')) return empObj.shoe_size || '';
+      return empObj.shirt_size || '';
+    }
+
+    async function openCotizarDotModal() {
+      document.getElementById('cotizarDotModal').classList.add('active');
+      document.getElementById('cotizarDotStatus').style.display = 'none';
+      if (!currentCompanyId) return;
+
+      const roleSelect = document.getElementById('cotizarDotRoleSelect');
+      const empSelect = document.getElementById('cotizarDotEmpleadoSelect');
+
+      try {
+        const [{ data: roles }, { data: employees }] = await Promise.all([
+          _supabase.from('company_roles').select('role_name').eq('company_id', currentCompanyId),
+          _supabase.from('company_employees').select('id, first_name, last_name, role').eq('company_id', currentCompanyId)
+        ]);
+
+        _cotizarDotRoles = (roles || []).map(r => r.role_name).filter(Boolean).sort();
+        _cotizarDotEmpleados = (employees || []).filter(e => e.role);
+
+        roleSelect.innerHTML = _cotizarDotRoles.length > 0
+          ? _cotizarDotRoles.map(r => `<option value="${escapeBodegaAttr(r)}">${r}</option>`).join('')
+          : '<option value="">Sin roles activos</option>';
+
+        empSelect.innerHTML = _cotizarDotEmpleados.length > 0
+          ? _cotizarDotEmpleados.map(e => `<option value="${e.id}">${escapeBodegaAttr(`${e.first_name} ${e.last_name}`)} · ${escapeBodegaAttr(e.role)}</option>`).join('')
+          : '<option value="">Sin empleados con rol asignado</option>';
+      } catch (err) {
+        console.error('Error cargando roles/empleados para Cotizar con Dot:', err);
+        roleSelect.innerHTML = '<option value="">Error al cargar</option>';
+        empSelect.innerHTML = '<option value="">Error al cargar</option>';
+      }
+    }
+
+    function closeCotizarDotModal() {
+      document.getElementById('cotizarDotModal').classList.remove('active');
+    }
+
+    function toggleCotizarDotMode() {
+      const mode = document.querySelector('input[name="cotizarDotMode"]:checked').value;
+      document.getElementById('cotizarDotRoleWrap').style.display = mode === 'rol' ? 'block' : 'none';
+      document.getElementById('cotizarDotEmpleadoWrap').style.display = mode === 'empleado' ? 'block' : 'none';
+    }
+
+    async function generarCotizacionDot() {
+      const mode = document.querySelector('input[name="cotizarDotMode"]:checked').value;
+      const statusEl = document.getElementById('cotizarDotStatus');
+      const btn = document.getElementById('cotizarDotGenerateBtn');
+
+      let roleName = '';
+      let employeeName = '';
+      let empObj = null;
+
+      if (mode === 'rol') {
+        roleName = document.getElementById('cotizarDotRoleSelect').value;
+        if (!roleName) {
+          if (window.showToast) showToast('Falta el rol', 'Selecciona un rol para continuar.', 'error');
+          return;
+        }
+      } else {
+        const empId = document.getElementById('cotizarDotEmpleadoSelect').value;
+        empObj = _cotizarDotEmpleados.find(e => e.id === empId);
+        if (!empObj) {
+          if (window.showToast) showToast('Falta la persona', 'Selecciona un empleado para continuar.', 'error');
+          return;
+        }
+        roleName = empObj.role;
+        employeeName = `${empObj.first_name} ${empObj.last_name}`.trim();
+      }
+
+      btn.disabled = true;
+      statusEl.style.display = 'block';
+      statusEl.textContent = 'Armando la solicitud de cotización...';
+
+      try {
+        const { data: roleDef, error: roleErr } = await _supabase
+          .from('role_definition')
+          .select('items')
+          .eq('company_id', currentCompanyId)
+          .ilike('role_name', roleName.trim())
+          .maybeSingle();
+        if (roleErr) throw roleErr;
+
+        const items = (roleDef?.items || []).filter(it => it.name && it.category !== 'digital');
+        if (items.length === 0) {
+          statusEl.textContent = '';
+          statusEl.style.display = 'none';
+          if (window.showToast) showToast('Sin activos físicos', `El rol "${roleName}" no tiene activos físicos configurados.`, 'error');
+          return;
+        }
+
+        const enriched = [];
+        for (const item of items) {
+          const { data: assetRows } = await _supabase
+            .from('company_assets')
+            .select('id')
+            .eq('company_id', currentCompanyId)
+            .ilike('nombre', item.name.trim());
+          const asset = (assetRows || [])[0];
+
+          let providers = [];
+          if (asset) {
+            const { data: p } = await _supabase
+              .from('company_asset_providers')
+              .select('nombre, correo, telefono')
+              .eq('company_asset_id', asset.id);
+            providers = p || [];
+          }
+
+          const sized = isSizedItemDot(item);
+          const size = sized ? (empObj ? guessSizeDot(item.name, empObj) : (item.specs && item.specs.talla) || '') : '';
+
+          enriched.push({
+            name: item.name,
+            qty: item.qty || item.quantity || 1,
+            size,
+            specs: item.specs || {},
+            providers,
+            hasAsset: !!asset
+          });
+        }
+
+        await buildCotizacionDotPDF({ roleName, employeeName, items: enriched });
+        closeCotizarDotModal();
+      } catch (err) {
+        console.error('Error generando cotización con Dot:', err);
+        if (window.showToast) showToast('Error', 'No se pudo generar la solicitud de cotización.', 'error');
+      } finally {
+        btn.disabled = false;
+        statusEl.style.display = 'none';
+      }
+    }
+
+    async function buildCotizacionDotPDF({ roleName, employeeName, items }) {
+      let jsPDFClass = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+      if (!jsPDFClass) {
+        if (window.showToast) showToast('Error', 'Librería PDF no disponible. Recarga la página.', 'error');
+        return;
+      }
+
+      let cp = null;
+      try {
+        const { data } = await _supabase
+          .from('company_profile')
+          .select('company_name, legal_name, tax_id, dv, country, delivery_address, delivery_state, delivery_contact_1_name, delivery_contact_1_phone, delivery_contact_1_email')
+          .eq('id', currentCompanyId)
+          .maybeSingle();
+        cp = data || null;
+      } catch (e) { console.warn('No se pudo cargar company_profile para el PDF:', e); }
+
+      const doc = new jsPDFClass({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const pageW = doc.internal.pageSize.getWidth();
+      const margin = 18;
+      let y = 0;
+
+      // ── Header bar ──────────────────────────────────────────
+      doc.setFillColor(14, 23, 44);
+      doc.rect(0, 0, pageW, 32, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(20);
+      doc.text('dotacian', margin, 20);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text('Cotización generada por Dot', margin, 27);
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('Solicitud de Cotización', pageW - margin, 18, { align: 'right' });
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text(new Date().toLocaleDateString('es-MX'), pageW - margin, 25, { align: 'right' });
+
+      y = 44;
+
+      // ── Company info block (mismo patrón que cotizaciones.html) ──
+      if (cp) {
+        const taxStr = cp.tax_id ? `${cp.tax_id}${cp.dv ? '-' + cp.dv : ''}` : '';
+        const addressStr = [cp.delivery_address, cp.delivery_state, cp.country].filter(Boolean).join(', ');
+        const contactStr = [cp.delivery_contact_1_name, cp.delivery_contact_1_phone, cp.delivery_contact_1_email].filter(Boolean).join(' · ');
+
+        const blockH = contactStr ? 34 : 26;
+        doc.setFillColor(240, 249, 255);
+        doc.roundedRect(margin, y, pageW - margin * 2, blockH, 3, 3, 'F');
+        doc.setDrawColor(6, 182, 212);
+        doc.setLineWidth(0.4);
+        doc.roundedRect(margin, y, pageW - margin * 2, blockH, 3, 3, 'S');
+        doc.setLineWidth(0.1);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10.5);
+        doc.setTextColor(14, 23, 44);
+        doc.text(cp.company_name || 'Empresa', margin + 6, y + 9);
+
+        let infoLine = '';
+        if (cp.legal_name && cp.legal_name !== cp.company_name) infoLine += cp.legal_name;
+        if (taxStr) infoLine += (infoLine ? '  ·  ' : '') + taxStr;
+        if (infoLine) {
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(8);
+          doc.setTextColor(71, 85, 105);
+          doc.text(infoLine, margin + 6, y + 15.5);
+        }
+        if (addressStr) {
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(7.5);
+          doc.setTextColor(100, 116, 139);
+          doc.text(addressStr, margin + 6, infoLine ? y + 21 : y + 16);
+        }
+        if (contactStr) {
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(7.5);
+          doc.setTextColor(100, 116, 139);
+          const nextY = addressStr ? (infoLine ? y + 26 : y + 22) : (infoLine ? y + 21 : y + 16);
+          doc.text(contactStr, margin + 6, nextY);
+        }
+        y += blockH + 8;
+      } else {
+        y += 4;
+      }
+
+      // ── Para quién es ─────────────────────────────────────────
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(14, 23, 44);
+      doc.text(employeeName ? `Dotación para: ${employeeName}  (${roleName})` : `Dotación para el rol: ${roleName}`, margin, y);
+      y += 8;
+
+      // ── Table header ──────────────────────────────────────────
+      const cols = { name: margin + 2, specs: margin + 52, qty: margin + 122, prov: margin + 138 };
+      const drawTableHeader = () => {
+        doc.setFillColor(6, 182, 212);
+        doc.rect(margin, y, pageW - margin * 2, 8, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.text('ACTIVO', cols.name, y + 5.5);
+        doc.text('ESPECIFICACIONES', cols.specs, y + 5.5);
+        doc.text('CANT.', cols.qty, y + 5.5);
+        doc.text('PROVEEDOR(ES)', cols.prov, y + 5.5);
+        y += 8;
+      };
+      drawTableHeader();
+
+      items.forEach((item, idx) => {
+        const specParts = [];
+        if (item.size) specParts.push(`Talla: ${item.size}`);
+        Object.entries(item.specs || {}).forEach(([k, v]) => { if (v) specParts.push(`${k}: ${v}`); });
+        const specsText = specParts.join(' · ') || '—';
+
+        const provText = item.providers.length > 0
+          ? item.providers.map(p => `${p.nombre}${p.correo ? ' (' + p.correo + ')' : ''}`).join(', ')
+          : (item.hasAsset ? 'Sin proveedores registrados' : 'Sin vincular en Activos');
+
+        const nameLines = doc.splitTextToSize(item.name, 46);
+        const specsLines = doc.splitTextToSize(specsText, 62);
+        const provLines = doc.splitTextToSize(provText, 55);
+        const lineCount = Math.max(nameLines.length, specsLines.length, provLines.length, 1);
+        const rowH = lineCount * 4 + 4;
+
+        if (y + rowH > 275) { doc.addPage(); y = 20; drawTableHeader(); }
+
+        if (idx % 2 === 0) {
+          doc.setFillColor(248, 250, 252);
+          doc.rect(margin, y, pageW - margin * 2, rowH, 'F');
+        }
+        doc.setDrawColor(226, 232, 240);
+        doc.line(margin, y + rowH, pageW - margin, y + rowH);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(14, 23, 44);
+        doc.text(nameLines, cols.name, y + 5.5);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.5);
+        doc.setTextColor(71, 85, 105);
+        doc.text(specsLines, cols.specs, y + 5.5);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.setTextColor(14, 23, 44);
+        doc.text(String(item.qty), cols.qty, y + 5.5);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.5);
+        doc.setTextColor(item.providers.length > 0 ? 71 : 220, item.providers.length > 0 ? 85 : 38, item.providers.length > 0 ? 105 : 38);
+        doc.text(provLines, cols.prov, y + 5.5);
+
+        y += rowH;
+      });
+
+      const fileTag = (employeeName || roleName).replace(/[^a-zA-Z0-9]/g, '_');
+      doc.save(`Cotizacion_Dot_${fileTag}.pdf`);
     }
 
     async function openMinimosModal() {
