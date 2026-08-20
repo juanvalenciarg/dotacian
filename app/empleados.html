@@ -1077,19 +1077,6 @@
           <!-- Kit Items List -->
           <div id="availableKitList" style="display: flex; flex-direction: column; gap: 0.625rem;"></div>
 
-          <!-- Add Custom Item Button -->
-          <button onclick="addCustomKitItem()"
-            style="width: 100%; margin-top: 0.875rem; padding: 0.75rem; border: 1.5px dashed #cbd5e1; border-radius: 12px; background: #f8fafc; color: #475569; font-size: 0.875rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s;"
-            onmouseover="this.style.borderColor='#06B6D4';this.style.color='#0891b2';this.style.background='#f0f9ff';"
-            onmouseout="this.style.borderColor='#cbd5e1';this.style.color='#475569';this.style.background='#f8fafc';">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            Agregar activo para cotizar
-          </button>
-
-
           <!-- CTA -->
           <button id="confirmBtn" onclick="assignNewKit()"
             style="width: 100%; margin-top: 1rem; padding: 1rem 1.5rem; background: #06B6D4; color: white; border: none; border-radius: 14px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(6,182,212,0.35); display: flex; align-items: center; justify-content: center; gap: 0.75rem;"
@@ -2055,14 +2042,18 @@
       if (kitRoleTag) kitRoleTag.textContent = role;
 
       // Render the available kit as premium editable rows (always enabled to allow quoting new kits)
+      // Solo activos físicos van a cotización: lo digital (licencias, accesos)
+      // tendrá su propio flujo más adelante, no se cotiza con proveedores.
       availableKitList.innerHTML = '';
-      items.forEach((item, index) => {
-        const moq = item.moq || 1;
-        const qty = item.quantity || item.qty || 1;
-        const img = item.image || item.img || '';
-        const size = guessSize(item.name, empObj);
-        availableKitList.appendChild(buildKitRow(item.name, qty, img, index, moq, size));
-      });
+      items
+        .filter(item => item.category !== 'digital')
+        .forEach((item, index) => {
+          const moq = item.moq || 1;
+          const qty = item.quantity || item.qty || 1;
+          const img = item.image || item.img || '';
+          const size = isSizedItem(item) ? guessSize(item.name, empObj) : '';
+          availableKitList.appendChild(buildKitRow(item.name, qty, img, index, moq, size));
+        });
       updateKitSummary();
 
       // Button state
@@ -2590,17 +2581,6 @@
 
     function removeKitRow(btn) {
       btn.closest('[data-kit-id]').remove();
-      updateKitSummary();
-    }
-
-    let _customKitId = 1000;
-    function addCustomKitItem() {
-      const list = document.getElementById('availableKitList');
-      const row = buildKitRow('', 1, '', _customKitId++);
-      list.appendChild(row);
-      // Focus the name input immediately
-      const input = row.querySelector('input[type="text"]');
-      if (input) { input.focus(); input.style.background = '#f0f9ff'; input.style.borderRadius = '6px'; input.style.padding = '2px 6px'; }
       updateKitSummary();
     }
 
