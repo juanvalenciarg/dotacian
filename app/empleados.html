@@ -109,9 +109,14 @@
     /* Custom Notification Style */
     .notification-toast {
       position: fixed;
-      top: -100px;
+      top: 2rem;
       left: 50%;
-      transform: translateX(-50%);
+      /* Escondido: opacity/pointer-events, no un offset de "top" fijo — con
+         contenido largo (ej. muchas filas de "sin stock") un top:-100px no
+         alcanza a sacar toda la caja de la pantalla y queda visible. */
+      transform: translateX(-50%) translateY(-30px);
+      opacity: 0;
+      pointer-events: none;
       background: white;
       padding: 1rem 2rem;
       border-radius: 100px;
@@ -120,7 +125,7 @@
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.68, -0.55, 0.27, 1.55);
       border: 1px solid rgba(0, 180, 216, 0.1);
       max-height: calc(100vh - 4rem);
       max-width: min(90vw, 420px);
@@ -147,7 +152,9 @@
     }
 
     .notification-toast.active {
-      top: 2rem;
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      pointer-events: auto;
     }
 
     .notification-icon {
