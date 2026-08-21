@@ -1349,7 +1349,8 @@
     function createAssetRowElement(item, checked) {
       const requiereReposicion = !!item.requiere_reposicion;
       const reposicionMeses = item.reposicion_meses || 6;
-      const specFields = getAssetSpecFields(item.name);
+      const itemCategory = item.category || 'fisico';
+      const specFields = getAssetSpecFields(item.name, itemCategory);
       const hasSpecValues = !!(item.specs && Object.keys(item.specs).some(k => item.specs[k]));
 
       const div = document.createElement('div');
@@ -1388,10 +1389,10 @@
           ${specFields.length > 0 ? `
           <button type="button" class="asset-specs-toggle${hasSpecValues ? ' open' : ''}" onclick="toggleAssetSpecs(this)">
             <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            Especificaciones para cotizar${hasSpecValues ? ' ✓' : ''}
+            ${getAssetSpecsToggleLabel(itemCategory)}${hasSpecValues ? ' ✓' : ''}
           </button>` : ''}
         </div>
-        ${renderAssetSpecsGrid(item.name, item.specs, hasSpecValues)}
+        ${renderAssetSpecsGrid(item.name, item.specs, hasSpecValues, itemCategory)}
       `;
       return div;
     }
@@ -1402,6 +1403,14 @@
     const BASE_ASSET_SPEC_FIELDS = [
       { key: 'marca', label: 'Marca preferida', type: 'text', placeholder: 'ej. 3M, Dell, Nike...' },
       { key: 'referencia', label: 'Referencia / modelo', type: 'text', placeholder: 'ej. código o modelo específico' }
+    ];
+
+    // Un activo digital no se cotiza a un proveedor: lo que el admin que crea
+    // el acceso necesita saber es qué nivel de permisos darle al empleado.
+    // Genérico por ahora — cada plataforma define sus propios roles, pero
+    // esto cubre el caso común hasta que se necesite algo más específico.
+    const BASE_DIGITAL_SPEC_FIELDS = [
+      { key: 'nivel_acceso', label: 'Nivel de acceso', type: 'select', options: ['Superadmin', 'Admin', 'Usuario', 'Solo consulta'] }
     ];
 
     // Campos de especificación por tipo de activo: lo mínimo que un proveedor
@@ -1565,9 +1574,6 @@
         { key: 'autonomia', label: 'Autonomía de batería', type: 'text', placeholder: 'ej. 10 horas' },
         { key: 'antiexplosiva', label: 'Certificación antiexplosiva', type: 'select', options: ['Sí', 'No'] }
       ],
-      'Equipo de protección personal': [
-        { key: 'descripcion', label: 'Describe qué necesitas', type: 'text', placeholder: 'ej. Protector facial, mandil de cuero...' }
-      ],
       'Google Workspace': [
         { key: 'plan', label: 'Plan', type: 'select', options: ['Business Starter', 'Business Standard', 'Business Plus', 'Enterprise'] }
       ],
@@ -1591,18 +1597,25 @@
       ]
     };
 
-    function getAssetSpecFields(itemName) {
+    function getAssetSpecFields(itemName, category) {
       const specific = ASSET_SPECS[itemName];
+      if (category === 'digital') {
+        return [...BASE_DIGITAL_SPEC_FIELDS, ...(specific || [])];
+      }
       if (!specific) return [];
       return [...BASE_ASSET_SPEC_FIELDS, ...specific];
+    }
+
+    function getAssetSpecsToggleLabel(category) {
+      return category === 'digital' ? 'Nivel de acceso' : 'Especificaciones para cotizar';
     }
 
     function escapeAttrRoles(str) {
       return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
-    function renderAssetSpecsGrid(itemName, specs, open) {
-      const fields = getAssetSpecFields(itemName);
+    function renderAssetSpecsGrid(itemName, specs, open, category) {
+      const fields = getAssetSpecFields(itemName, category);
       if (!fields || fields.length === 0) return '';
       return `
         <div class="asset-specs-grid${open ? ' open' : ''}">
@@ -1745,7 +1758,7 @@
         const subcatsHtml = Object.keys(subcats).map(key => {
           const sub = subcats[key];
           const itemsHtml = sub.items.map(name => {
-            const specFields = getAssetSpecFields(name);
+            const specFields = getAssetSpecFields(name, catKey);
             return `
             <div class="new-role-asset-row" style="padding: 0.3rem 0;">
               <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
@@ -1763,10 +1776,10 @@
               <div class="new-role-asset-controls" style="display: none; padding-left: 1.6rem; padding-top: 0.35rem;">
                 <button type="button" class="asset-specs-toggle" onclick="toggleAssetSpecs(this)">
                   <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                  Especificaciones para cotizar
+                  ${getAssetSpecsToggleLabel(catKey)}
                 </button>
               </div>
-              ${renderAssetSpecsGrid(name, null, false)}` : ''}
+              ${renderAssetSpecsGrid(name, null, false, catKey)}` : ''}
             </div>
           `;
           }).join('');
