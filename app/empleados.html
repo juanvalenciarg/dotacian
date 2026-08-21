@@ -2409,10 +2409,15 @@
             : '';
         } else {
           // 'solicitado' o 'activado': el empleado se fue con el acceso vigente.
-          statusBadge = `<span style="font-size:0.7rem; font-weight:700; color:#065f46; background:#d1fae5; padding:3px 10px; border-radius:12px;">${status === 'activado' ? 'Activado' : 'Solicitado'} · empleado de baja</span>`;
-          actionHtml = contactoEmail
-            ? `<button type="button" class="btn btn-primary" style="padding:0.4rem 0.9rem; font-size:0.75rem; background:#dc2626;" onclick="requestDigitalAssetRevocation('${employeeId}', '${escapeAttr(employeeName)}', '${escapeAttr(tipo)}', '${escapeAttr(nombre)}', '${escapeAttr(contactoEmail)}')">Solicitar revocación</button>`
-            : `<span style="font-size:0.75rem; color:var(--color-text-muted);">Sin contacto para avisar</span>`;
+          const graciaVigente = statusRow.revocar_disponible_at && new Date(statusRow.revocar_disponible_at) > new Date();
+          statusBadge = graciaVigente
+            ? `<span style="font-size:0.7rem; font-weight:700; color:#9a3412; background:#ffedd5; padding:3px 10px; border-radius:12px;">En período de gracia hasta ${fmtDate(statusRow.revocar_disponible_at)}</span>`
+            : `<span style="font-size:0.7rem; font-weight:700; color:#065f46; background:#d1fae5; padding:3px 10px; border-radius:12px;">${status === 'activado' ? 'Activado' : 'Solicitado'} · empleado de baja</span>`;
+          actionHtml = graciaVigente
+            ? `<span style="font-size:0.75rem; color:var(--color-text-muted);">Se puede revocar desde el ${fmtDate(statusRow.revocar_disponible_at)}</span>`
+            : (contactoEmail
+              ? `<button type="button" class="btn btn-primary" style="padding:0.4rem 0.9rem; font-size:0.75rem; background:#dc2626;" onclick="requestDigitalAssetRevocation('${employeeId}', '${escapeAttr(employeeName)}', '${escapeAttr(tipo)}', '${escapeAttr(nombre)}', '${escapeAttr(contactoEmail)}')">Solicitar revocación</button>`
+              : `<span style="font-size:0.75rem; color:var(--color-text-muted);">Sin contacto para avisar</span>`);
         }
       } else if (!contactoEmail) {
         statusBadge = '<span style="font-size:0.7rem; font-weight:700; color:#b45309; background:#fef3c7; padding:3px 10px; border-radius:12px;">Sin contacto configurado</span>';
@@ -2574,25 +2579,62 @@
 
     // Offboarding: si al desactivar/dar de baja al empleado quedan accesos
     // digitales solicitados o activados, hay que avisar para que se revoquen.
+    // Cada activo digital define en su catálogo si eso pasa de inmediato o
+    // después de un período de gracia (ver app/activos.html); aquí se calcula
+    // revocar_disponible_at por fila para que la ficha del empleado sepa
+    // cuándo habilitar el botón de "Solicitar revocación".
     async function checkAndPromptDigitalRevocation(employeeIds) {
       const ids = Array.isArray(employeeIds) ? employeeIds : [employeeIds];
       try {
-        const { data, error } = await _supabase
+        const { data: pending, error: pendingError } = await _supabase
           .from('employee_digital_assets')
-          .select('employee_id')
+          .select('*')
           .in('employee_id', ids)
           .in('status', ['solicitado', 'activado']);
-        if (error) throw error;
-        if (!data || data.length === 0) return;
+        if (pendingError) throw pendingError;
+        if (!pending || pending.length === 0) return;
 
-        const affectedEmployees = new Set(data.map(row => row.employee_id)).size;
-        const plural = data.length > 1;
+        const { data: sessionData } = await _supabase.auth.getSession();
+        const companyId = await resolveCompanyId(_supabase, sessionData?.session?.user?.id);
+
+        const { data: catalog, error: catalogError } = await _supabase
+          .from('company_assets')
+          .select('tipo, nombre, offboarding_modo, offboarding_gracia_dias')
+          .eq('company_id', companyId)
+          .eq('category', 'digital');
+        if (catalogError) throw catalogError;
+
+        const catalogByKey = {};
+        (catalog || []).forEach(row => { catalogByKey[`${row.tipo}|${row.nombre}`] = row; });
+
+        const now = new Date();
+        let disponibleYa = 0;
+        let conGracia = 0;
+
+        await Promise.all(pending.map(async (row) => {
+          const config = catalogByKey[`${row.tipo}|${row.nombre}`];
+          let revocarDisponibleAt = null;
+          if (config && config.offboarding_modo === 'gracia' && config.offboarding_gracia_dias) {
+            const fecha = new Date(now);
+            fecha.setDate(fecha.getDate() + config.offboarding_gracia_dias);
+            revocarDisponibleAt = fecha.toISOString();
+            conGracia++;
+          } else {
+            disponibleYa++;
+          }
+
+          const { error: updError } = await _supabase
+            .from('employee_digital_assets')
+            .update({ revocar_disponible_at: revocarDisponibleAt, updated_at: new Date().toISOString() })
+            .eq('id', row.id);
+          if (updError) console.error('Error guardando revocar_disponible_at:', updError);
+        }));
+
         if (window.showToast) {
-          showToast(
-            'Revisa los accesos digitales',
-            `${data.length} acceso${plural ? 's' : ''} digital${plural ? 'es' : ''} de ${affectedEmployees} empleado${affectedEmployees > 1 ? 's' : ''} dado${affectedEmployees > 1 ? 's' : ''} de baja sigue${plural ? 'n' : ''} vigente${plural ? 's' : ''}. Ábre su ficha para solicitar la revocación.`,
-            'error'
-          );
+          const partes = [];
+          if (disponibleYa > 0) partes.push(`${disponibleYa} listo${disponibleYa > 1 ? 's' : ''} para solicitar revocación`);
+          if (conGracia > 0) partes.push(`${conGracia} con período de gracia`);
+          showToast('Revisa los accesos digitales', `${partes.join(' y ')}. Ábre la ficha del empleado para gestionarlos.`, 'error');
         }
       } catch (err) {
         console.error('Error revisando activos digitales para offboarding:', err);

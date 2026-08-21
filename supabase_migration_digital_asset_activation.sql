@@ -41,6 +41,9 @@ create index if not exists employee_digital_assets_company_idx
 -- 3. RLS: mismo criterio de acceso que company_asset_providers.
 alter table employee_digital_assets enable row level security;
 
+drop policy if exists "employee_digital_assets_select" on employee_digital_assets;
+drop policy if exists "employee_digital_assets_write" on employee_digital_assets;
+
 create policy "employee_digital_assets_select" on employee_digital_assets
   for select using (
     company_id = auth.uid()

@@ -593,7 +593,7 @@
           uniforme: { label: 'Uniformes', items: ['Camiseta/Camisa', 'Pantalón', 'Zapatos/Calzado', 'Chaqueta', 'Delantal', 'Overol', 'Filipina', 'Gorro'] },
           acceso: { label: 'Acceso', items: ['Tarjeta de acceso', 'Llave de oficina', 'Gafete/Credencial'] },
           vehiculo: { label: 'Vehículos', items: ['Auto', 'Moto', 'Bicicleta'] },
-          equipo: { label: 'Herramientas / EPP', items: ['Kit de herramientas', 'Radio de comunicación', 'Casco', 'Zapatos de seguridad', 'Equipo para trabajo en alturas', 'Gafas de protección', 'Guantes de seguridad', 'Chaleco reflectivo', 'Protección auditiva', 'Respirador/Mascarilla', 'Lámpara de casco', 'Equipo de protección personal'] }
+          equipo: { label: 'Herramientas / EPP', items: ['Kit de herramientas', 'Radio de comunicación', 'Casco', 'Zapatos de seguridad', 'Equipo para trabajo en alturas', 'Gafas de protección', 'Guantes de seguridad', 'Chaleco reflectivo', 'Protección auditiva', 'Respirador/Mascarilla', 'Lámpara de casco'] }
         }
       },
       digital: {
@@ -701,6 +701,8 @@
       const esRenovable = !!(row && row.es_renovable);
       const devolvible = !row || row.devolvible_offboarding !== false;
       const isDigital = category === 'digital';
+      const offboardingModo = (row && row.offboarding_modo) || 'inmediato';
+      const offboardingGraciaDias = row && row.offboarding_gracia_dias != null ? row.offboarding_gracia_dias : '';
 
       const wrap = document.createElement('div');
       wrap.className = 'asset-row';
@@ -760,6 +762,20 @@
               <label>meses</label>
             </div>
 
+            ${isDigital ? `
+            <label class="asset-field-checkbox">
+              <input type="radio" name="offboardingModo-${s}" value="inmediato" ${offboardingModo !== 'gracia' ? 'checked' : ''} onchange="toggleOffboardingGracia(this, '${s}')">
+              Al dar de baja: desactivar de inmediato
+            </label>
+            <div class="renov-months-wrap">
+              <label>
+                <input type="radio" name="offboardingModo-${s}" value="gracia" ${offboardingModo === 'gracia' ? 'checked' : ''} onchange="toggleOffboardingGracia(this, '${s}')" style="margin-right: 0.4rem; accent-color: var(--color-cyan);">
+                Desactivar después de
+              </label>
+              <input type="number" id="offboardingDias-${s}" min="1" step="1" placeholder="días" value="${offboardingGraciaDias}" ${offboardingModo === 'gracia' ? '' : 'disabled'}>
+              <label>días</label>
+            </div>
+            ` : `
             <label class="asset-field-checkbox">
               <input type="checkbox" id="devolvible-${s}" ${devolvible ? 'checked' : ''}>
               Se devuelve en el offboarding
@@ -769,6 +785,7 @@
               <input type="checkbox" id="reutiliza-${s}" ${!row || row.reutilizable ? 'checked' : ''}>
               Se reutiliza con el siguiente empleado cuando el actual sale
             </label>
+            `}
           </div>
 
           <button type="button" class="btn btn-outline" style="padding: 0.5rem 1.25rem; font-size: 0.8125rem;" onclick="saveAssetDetails('${category}', '${tipo}', '${escapeAttr(nombre)}')">Guardar detalles</button>
@@ -817,6 +834,11 @@
     function toggleRenovMeses(checkbox, s) {
       const wrap = document.getElementById(`renovwrap-${s}`);
       if (wrap) wrap.style.display = checkbox.checked ? '' : 'none';
+    }
+
+    function toggleOffboardingGracia(radio, s) {
+      const diasInput = document.getElementById(`offboardingDias-${s}`);
+      if (diasInput) diasInput.disabled = radio.value !== 'gracia';
     }
 
     function toggleDetailPanel(s) {
@@ -986,12 +1008,14 @@
 
       const esRenovable = document.getElementById(`renovable-${s}`).checked;
       const renovMesesRaw = document.getElementById(`renovmeses-${s}`).value;
-      const devolvible = document.getElementById(`devolvible-${s}`).checked;
-      const reutilizable = document.getElementById(`reutiliza-${s}`).checked;
 
       let providers = [];
       let contactoNombre = null;
       let contactoEmail = null;
+      let devolvible = true;
+      let reutilizable = true;
+      let offboardingModo = null;
+      let offboardingGraciaDias = null;
 
       if (isDigital) {
         contactoNombre = document.getElementById(`contactoNombre-${s}`).value.trim() || null;
@@ -1000,7 +1024,21 @@
           if (window.showToast) showToast('Falta el correo', 'Registra el correo del contacto para poder solicitar la activación.', 'error');
           return;
         }
+
+        const modoRadio = document.querySelector(`input[name="offboardingModo-${s}"]:checked`);
+        offboardingModo = modoRadio ? modoRadio.value : 'inmediato';
+        if (offboardingModo === 'gracia') {
+          const diasRaw = document.getElementById(`offboardingDias-${s}`).value;
+          offboardingGraciaDias = diasRaw ? parseInt(diasRaw) : null;
+          if (!offboardingGraciaDias) {
+            if (window.showToast) showToast('Falta la cantidad de días', 'Indica después de cuántos días se debe desactivar.', 'error');
+            return;
+          }
+        }
       } else {
+        devolvible = document.getElementById(`devolvible-${s}`).checked;
+        reutilizable = document.getElementById(`reutiliza-${s}`).checked;
+
         const providerRows = Array.from(document.querySelectorAll(`#providers-${s} .provider-row`))
           .map(rowEl => ({
             nombre: rowEl.querySelector('.prov-nombre').value.trim(),
@@ -1030,6 +1068,8 @@
         reutilizable,
         contacto_encargado_nombre: contactoNombre,
         contacto_encargado_email: contactoEmail,
+        offboarding_modo: offboardingModo,
+        offboarding_gracia_dias: offboardingGraciaDias,
         updated_at: new Date().toISOString()
       };
 
