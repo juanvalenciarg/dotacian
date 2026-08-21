@@ -1020,10 +1020,6 @@
       if (isDigital) {
         contactoNombre = document.getElementById(`contactoNombre-${s}`).value.trim() || null;
         contactoEmail = document.getElementById(`contactoEmail-${s}`).value.trim() || null;
-        if (!contactoEmail) {
-          if (window.showToast) showToast('Falta el correo', 'Registra el correo del contacto para poder solicitar la activación.', 'error');
-          return;
-        }
 
         const modoRadio = document.querySelector(`input[name="offboardingModo-${s}"]:checked`);
         offboardingModo = modoRadio ? modoRadio.value : 'inmediato';
