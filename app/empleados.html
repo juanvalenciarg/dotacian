@@ -1092,6 +1092,26 @@
           </div>
         </div>
 
+        <!-- Section: Activos Digitales -->
+        <div id="digitalAssetsSection"
+          style="display: none; border-top: 2px dashed var(--color-border); padding-top: 2rem; margin-top: 1rem; margin-bottom: 2rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+            <div>
+              <h4 style="color: var(--color-navy); font-size: 1.125rem; margin-bottom: 0.25rem; font-weight: 700;">
+                Activos Digitales</h4>
+              <p style="font-size: 0.8125rem; color: var(--color-text-secondary);">Licencias y accesos que trae el
+                rol de este empleado. No se cotizan ni se entregan físicamente: solicita al encargado que cree el
+                acceso.</p>
+            </div>
+            <span
+              style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: #ede9fe; color: #6d28d9; padding: 5px 12px; border-radius: 20px; white-space: nowrap;">DIGITAL</span>
+          </div>
+
+          <div id="digitalAssetsList" style="display: flex; flex-direction: column; gap: 0.625rem;">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
         <!-- Danger Zone section -->
         <div style="border-top: 2px dashed var(--color-border); padding-top: 2rem; margin-top: 1rem;">
 
@@ -1883,6 +1903,11 @@
           deliveryItemsList.appendChild(buildDeliveryRow(item.name, qty, size, img, index, item.specs, sized));
         });
 
+      const digitalItems = items.filter(item => item.category === 'digital');
+      window.currentEmployeeDigitalItems = digitalItems;
+      const employeeIsActive = role_status === 'active' || role_status === null || role_status === '';
+      loadDigitalAssetsSection(db_id, name, digitalItems, employeeIsActive);
+
       // Query deliveries and stock from Supabase in background
       (async () => {
         try {
@@ -2165,6 +2190,10 @@
       return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
+    function escapeAttr(str) {
+      return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
     function renderDeliveryDetailHtml(size, specs, sized) {
       const specEntries = specs ? Object.entries(specs).filter(([, v]) => v) : [];
       if (!sized && specEntries.length === 0) return '';
@@ -2284,6 +2313,290 @@
         ${detailHtml}
       `;
       return wrapper;
+    }
+
+    // Activos digitales (licencias, accesos): no se cotizan ni se entregan
+    // contra bodega, se activan por correo con el encargado de la plataforma.
+    window.digitalAssetStatusByEmployee = {};
+
+    async function loadDigitalAssetsSection(employeeId, employeeName, digitalItems, employeeActive) {
+      const section = document.getElementById('digitalAssetsSection');
+      const list = document.getElementById('digitalAssetsList');
+      if (!section || !list) return;
+
+      if (!digitalItems || digitalItems.length === 0) {
+        section.style.display = 'none';
+        list.innerHTML = '';
+        return;
+      }
+
+      section.style.display = '';
+      list.innerHTML = '<span style="color: var(--color-text-muted); font-size: 0.875rem;">Cargando activos digitales...</span>';
+
+      try {
+        const { data: sessionData } = await _supabase.auth.getSession();
+        const companyId = await resolveCompanyId(_supabase, sessionData?.session?.user?.id);
+
+        const catalogKeys = digitalItems.map(item => `${item.tipo || ''}|${item.name}`);
+
+        const [catalogRes, statusRes] = await Promise.all([
+          companyId ? _supabase
+            .from('company_assets')
+            .select('tipo, nombre, contacto_encargado_nombre, contacto_encargado_email')
+            .eq('company_id', companyId)
+            .eq('category', 'digital') : Promise.resolve({ data: [] }),
+          _supabase
+            .from('employee_digital_assets')
+            .select('*')
+            .eq('employee_id', employeeId)
+        ]);
+
+        if (catalogRes.error) throw catalogRes.error;
+        if (statusRes.error) throw statusRes.error;
+
+        const catalogByKey = {};
+        (catalogRes.data || []).forEach(row => {
+          catalogByKey[`${row.tipo}|${row.nombre}`] = row;
+        });
+
+        const statusByKey = {};
+        (statusRes.data || []).forEach(row => {
+          statusByKey[`${row.tipo}|${row.nombre}`] = row;
+        });
+        window.digitalAssetStatusByEmployee[employeeId] = statusByKey;
+        window.currentEmployeeActive = employeeActive !== false;
+
+        list.innerHTML = '';
+        digitalItems.forEach(item => {
+          const tipo = item.tipo || item.name;
+          const key = `${tipo}|${item.name}`;
+          const catalogRow = catalogByKey[key] || null;
+          const statusRow = statusByKey[key] || null;
+          list.appendChild(buildDigitalAssetRow(employeeId, employeeName, tipo, item.name, catalogRow, statusRow, employeeActive !== false));
+        });
+      } catch (err) {
+        console.error('Error cargando activos digitales:', err);
+        list.innerHTML = '<span style="color: var(--color-coral); font-size: 0.8125rem;">No se pudieron cargar los activos digitales.</span>';
+      }
+    }
+
+    function buildDigitalAssetRow(employeeId, employeeName, tipo, nombre, catalogRow, statusRow, employeeActive) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'digital-asset-row';
+      wrapper.dataset.tipo = tipo;
+      wrapper.dataset.nombre = nombre;
+      wrapper.id = `digital-asset-${slugifyDigital(tipo)}-${slugifyDigital(nombre)}`;
+      wrapper.style.cssText = 'display:flex; align-items:center; justify-content:space-between; gap:1rem; padding: 0.75rem 1rem; border-radius: 10px; background: #faf5ff; border: 1px solid #ede9fe;';
+
+      const contactoEmail = catalogRow && catalogRow.contacto_encargado_email;
+      const status = statusRow ? statusRow.status : 'pendiente';
+
+      let statusBadge;
+      let actionHtml;
+
+      const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+
+      // Empleado dado de baja/desactivado: si el acceso llegó a solicitarse o
+      // activarse, hay que pedirle al encargado que lo revoque.
+      if (employeeActive === false && (status === 'solicitado' || status === 'activado' || status === 'revocacion_solicitada' || status === 'revocado')) {
+        if (status === 'revocado') {
+          statusBadge = `<span style="font-size:0.7rem; font-weight:700; color:#64748b; background:#f1f5f9; padding:3px 10px; border-radius:12px;">Revocado${statusRow.revocado_at ? ' · ' + fmtDate(statusRow.revocado_at) : ''}</span>`;
+          actionHtml = '';
+        } else if (status === 'revocacion_solicitada') {
+          statusBadge = `<span style="font-size:0.7rem; font-weight:700; color:#9a3412; background:#ffedd5; padding:3px 10px; border-radius:12px;">Revocación solicitada${statusRow.revocacion_solicitada_at ? ' · ' + fmtDate(statusRow.revocacion_solicitada_at) : ''}</span>`;
+          actionHtml = contactoEmail
+            ? `<button type="button" class="btn btn-primary" style="padding:0.4rem 0.9rem; font-size:0.75rem; background:#059669;" onclick="markDigitalAssetRevoked('${employeeId}', '${escapeAttr(tipo)}', '${escapeAttr(nombre)}')">Marcar como revocado</button>`
+            : '';
+        } else {
+          // 'solicitado' o 'activado': el empleado se fue con el acceso vigente.
+          statusBadge = `<span style="font-size:0.7rem; font-weight:700; color:#065f46; background:#d1fae5; padding:3px 10px; border-radius:12px;">${status === 'activado' ? 'Activado' : 'Solicitado'} · empleado de baja</span>`;
+          actionHtml = contactoEmail
+            ? `<button type="button" class="btn btn-primary" style="padding:0.4rem 0.9rem; font-size:0.75rem; background:#dc2626;" onclick="requestDigitalAssetRevocation('${employeeId}', '${escapeAttr(employeeName)}', '${escapeAttr(tipo)}', '${escapeAttr(nombre)}', '${escapeAttr(contactoEmail)}')">Solicitar revocación</button>`
+            : `<span style="font-size:0.75rem; color:var(--color-text-muted);">Sin contacto para avisar</span>`;
+        }
+      } else if (!contactoEmail) {
+        statusBadge = '<span style="font-size:0.7rem; font-weight:700; color:#b45309; background:#fef3c7; padding:3px 10px; border-radius:12px;">Sin contacto configurado</span>';
+        actionHtml = `<span style="font-size:0.75rem; color:var(--color-text-muted);">Configura el contacto en Activos</span>`;
+      } else if (status === 'activado') {
+        statusBadge = `<span style="font-size:0.7rem; font-weight:700; color:#065f46; background:#d1fae5; padding:3px 10px; border-radius:12px;">Activado${statusRow.activado_at ? ' · ' + fmtDate(statusRow.activado_at) : ''}</span>`;
+        actionHtml = `<button type="button" class="btn btn-outline" style="padding:0.4rem 0.9rem; font-size:0.75rem;" onclick="requestDigitalAssetActivation('${employeeId}', '${escapeAttr(employeeName)}', '${escapeAttr(tipo)}', '${escapeAttr(nombre)}', '${escapeAttr(contactoEmail)}')">Reenviar solicitud</button>`;
+      } else if (status === 'solicitado') {
+        statusBadge = `<span style="font-size:0.7rem; font-weight:700; color:#0369a1; background:#e0f2fe; padding:3px 10px; border-radius:12px;">Solicitado${statusRow.solicitado_at ? ' · ' + fmtDate(statusRow.solicitado_at) : ''}</span>`;
+        actionHtml = `<button type="button" class="btn btn-primary" style="padding:0.4rem 0.9rem; font-size:0.75rem; background:#059669;" onclick="markDigitalAssetActivated('${employeeId}', '${escapeAttr(tipo)}', '${escapeAttr(nombre)}')">Marcar como activado</button>`;
+      } else {
+        statusBadge = '<span style="font-size:0.7rem; font-weight:700; color:#64748b; background:#f1f5f9; padding:3px 10px; border-radius:12px;">Pendiente</span>';
+        actionHtml = `<button type="button" class="btn btn-primary" style="padding:0.4rem 0.9rem; font-size:0.75rem; background:#7c3aed;" onclick="requestDigitalAssetActivation('${employeeId}', '${escapeAttr(employeeName)}', '${escapeAttr(tipo)}', '${escapeAttr(nombre)}', '${escapeAttr(contactoEmail)}')">Solicitar activación</button>`;
+      }
+
+      wrapper.innerHTML = `
+        <div>
+          <div style="font-weight:600; color:var(--color-navy); font-size:0.875rem;">${nombre}</div>
+          <div style="margin-top:0.25rem;">${statusBadge}</div>
+        </div>
+        <div>${actionHtml}</div>
+      `;
+
+      return wrapper;
+    }
+
+    function slugifyDigital(str) {
+      return String(str || '').toLowerCase().replace(/[^a-z0-9]/g, '_');
+    }
+
+    async function requestDigitalAssetActivation(employeeId, employeeName, tipo, nombre, contactoEmail) {
+      const subject = `Solicitud de activación: ${nombre} para ${employeeName}`;
+      const body = `Hola,\n\nSe asignó el activo digital "${nombre}" al empleado ${employeeName}. Por favor crea el acceso correspondiente cuando puedas.\n\nGracias.`;
+      const mailtoUrl = `mailto:${encodeURIComponent(contactoEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.location.href = mailtoUrl;
+
+      try {
+        const { data: sessionData } = await _supabase.auth.getSession();
+        const companyId = await resolveCompanyId(_supabase, sessionData?.session?.user?.id);
+
+        const { data, error } = await _supabase
+          .from('employee_digital_assets')
+          .upsert({
+            company_id: companyId,
+            employee_id: employeeId,
+            tipo,
+            nombre,
+            status: 'solicitado',
+            contacto_email: contactoEmail,
+            solicitado_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'employee_id,tipo,nombre' })
+          .select()
+          .single();
+        if (error) throw error;
+
+        window.digitalAssetStatusByEmployee[employeeId] = window.digitalAssetStatusByEmployee[employeeId] || {};
+        window.digitalAssetStatusByEmployee[employeeId][`${tipo}|${nombre}`] = data;
+
+        refreshDigitalAssetRow(employeeId, employeeName, tipo, nombre, data);
+        if (window.showToast) showToast('Solicitud enviada', 'Se abrió tu correo con la solicitud de activación.');
+      } catch (err) {
+        console.error('Error registrando solicitud de activación:', err);
+        if (window.showToast) showToast('Error', 'El correo se abrió, pero no se pudo guardar el estado de la solicitud.', 'error');
+      }
+    }
+
+    async function markDigitalAssetActivated(employeeId, tipo, nombre) {
+      try {
+        const { data, error } = await _supabase
+          .from('employee_digital_assets')
+          .update({ status: 'activado', activado_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+          .eq('employee_id', employeeId)
+          .eq('tipo', tipo)
+          .eq('nombre', nombre)
+          .select()
+          .single();
+        if (error) throw error;
+
+        window.digitalAssetStatusByEmployee[employeeId] = window.digitalAssetStatusByEmployee[employeeId] || {};
+        window.digitalAssetStatusByEmployee[employeeId][`${tipo}|${nombre}`] = data;
+
+        const employeeName = document.getElementById('detailName') ? document.getElementById('detailName').textContent : '';
+        refreshDigitalAssetRow(employeeId, employeeName, tipo, nombre, data);
+        if (window.showToast) showToast('Activo actualizado', `${nombre} quedó marcado como activado.`);
+      } catch (err) {
+        console.error('Error marcando activo digital como activado:', err);
+        if (window.showToast) showToast('Error', 'No se pudo actualizar el estado.', 'error');
+      }
+    }
+
+    // Cuando el empleado se da de baja con un acceso ya solicitado/activado,
+    // hay que avisarle al mismo encargado para que lo revoque.
+    async function requestDigitalAssetRevocation(employeeId, employeeName, tipo, nombre, contactoEmail) {
+      const subject = `Solicitud de revocación de acceso: ${nombre} (${employeeName})`;
+      const body = `Hola,\n\n${employeeName} ya no forma parte del equipo. Por favor revoca/desactiva su acceso a "${nombre}" cuando puedas.\n\nGracias.`;
+      const mailtoUrl = `mailto:${encodeURIComponent(contactoEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.location.href = mailtoUrl;
+
+      try {
+        const { data, error } = await _supabase
+          .from('employee_digital_assets')
+          .update({
+            status: 'revocacion_solicitada',
+            revocacion_solicitada_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .eq('employee_id', employeeId)
+          .eq('tipo', tipo)
+          .eq('nombre', nombre)
+          .select()
+          .single();
+        if (error) throw error;
+
+        window.digitalAssetStatusByEmployee[employeeId] = window.digitalAssetStatusByEmployee[employeeId] || {};
+        window.digitalAssetStatusByEmployee[employeeId][`${tipo}|${nombre}`] = data;
+
+        refreshDigitalAssetRow(employeeId, employeeName, tipo, nombre, data);
+        if (window.showToast) showToast('Solicitud enviada', 'Se abrió tu correo con la solicitud de revocación.');
+      } catch (err) {
+        console.error('Error registrando solicitud de revocación:', err);
+        if (window.showToast) showToast('Error', 'El correo se abrió, pero no se pudo guardar el estado de la solicitud.', 'error');
+      }
+    }
+
+    async function markDigitalAssetRevoked(employeeId, tipo, nombre) {
+      try {
+        const { data, error } = await _supabase
+          .from('employee_digital_assets')
+          .update({ status: 'revocado', revocado_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+          .eq('employee_id', employeeId)
+          .eq('tipo', tipo)
+          .eq('nombre', nombre)
+          .select()
+          .single();
+        if (error) throw error;
+
+        window.digitalAssetStatusByEmployee[employeeId] = window.digitalAssetStatusByEmployee[employeeId] || {};
+        window.digitalAssetStatusByEmployee[employeeId][`${tipo}|${nombre}`] = data;
+
+        const employeeName = document.getElementById('detailName') ? document.getElementById('detailName').textContent : '';
+        refreshDigitalAssetRow(employeeId, employeeName, tipo, nombre, data);
+        if (window.showToast) showToast('Acceso revocado', `${nombre} quedó marcado como revocado.`);
+      } catch (err) {
+        console.error('Error marcando activo digital como revocado:', err);
+        if (window.showToast) showToast('Error', 'No se pudo actualizar el estado.', 'error');
+      }
+    }
+
+    function refreshDigitalAssetRow(employeeId, employeeName, tipo, nombre, statusRow) {
+      const rowId = `digital-asset-${slugifyDigital(tipo)}-${slugifyDigital(nombre)}`;
+      const existingRow = document.getElementById(rowId);
+      if (!existingRow) return;
+      const contactoEmail = statusRow ? statusRow.contacto_email : null;
+      const catalogRow = contactoEmail ? { contacto_encargado_email: contactoEmail } : null;
+      const newRow = buildDigitalAssetRow(employeeId, employeeName, tipo, nombre, catalogRow, statusRow, window.currentEmployeeActive !== false);
+      existingRow.replaceWith(newRow);
+    }
+
+    // Offboarding: si al desactivar/dar de baja al empleado quedan accesos
+    // digitales solicitados o activados, hay que avisar para que se revoquen.
+    async function checkAndPromptDigitalRevocation(employeeIds) {
+      const ids = Array.isArray(employeeIds) ? employeeIds : [employeeIds];
+      try {
+        const { data, error } = await _supabase
+          .from('employee_digital_assets')
+          .select('employee_id')
+          .in('employee_id', ids)
+          .in('status', ['solicitado', 'activado']);
+        if (error) throw error;
+        if (!data || data.length === 0) return;
+
+        const affectedEmployees = new Set(data.map(row => row.employee_id)).size;
+        const plural = data.length > 1;
+        if (window.showToast) {
+          showToast(
+            'Revisa los accesos digitales',
+            `${data.length} acceso${plural ? 's' : ''} digital${plural ? 'es' : ''} de ${affectedEmployees} empleado${affectedEmployees > 1 ? 's' : ''} dado${affectedEmployees > 1 ? 's' : ''} de baja sigue${plural ? 'n' : ''} vigente${plural ? 's' : ''}. Ábre su ficha para solicitar la revocación.`,
+            'error'
+          );
+        }
+      } catch (err) {
+        console.error('Error revisando activos digitales para offboarding:', err);
+      }
     }
 
     function stepDeliveryQty(btn, delta) {
@@ -2514,6 +2827,7 @@
 
         showToast("Empleados de Baja", "Los empleados han sido dados de baja exitosamente.");
         await fetchEmployees();
+        checkAndPromptDigitalRevocation(dbIds);
       } catch (err) {
         console.error("Error terminating employees:", err);
         showToast("Error", "No se pudo dar de baja a los empleados.");
@@ -2538,6 +2852,7 @@
 
         showToast("Estado Actualizado", `Empleado ${isCurrentlyActive ? 'desactivado' : 'activado'} exitosamente.`);
         await fetchEmployees();
+        if (newStatus === 'inactive') checkAndPromptDigitalRevocation(dbId);
       } catch (err) {
         console.error("Error updating employee status:", err);
         showToast("Error", "No se pudo actualizar el estado del empleado.", 'error');

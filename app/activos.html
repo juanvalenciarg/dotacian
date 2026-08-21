@@ -700,26 +700,26 @@
       const providers = row ? (assetProvidersByAssetId[row.id] || []) : [];
       const esRenovable = !!(row && row.es_renovable);
       const devolvible = !row || row.devolvible_offboarding !== false;
+      const isDigital = category === 'digital';
 
       const wrap = document.createElement('div');
       wrap.className = 'asset-row';
       wrap.dataset.name = nombre.toLowerCase();
 
-      wrap.innerHTML = `
-        <div class="asset-row-main">
-          <div class="asset-row-info" onclick="toggleDetailPanel('${s}')">
-            <svg class="asset-row-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            <div>
-              <div class="asset-row-name">${nombre}</div>
-              <div class="asset-row-summary">${summaryForRow(row)}</div>
+      const providersOrContactBlock = isDigital ? `
+          <div class="asset-providers-block">
+            <div class="asset-providers-head">
+              <label>Contacto de activación</label>
+              <span class="asset-providers-hint">La persona que crea el acceso en esta plataforma. Al asignar este activo a un empleado, se le podrá solicitar la activación por correo.</span>
+            </div>
+            <div class="provider-list">
+              <div class="provider-row" style="grid-template-columns: 1fr 1fr;">
+                <input type="text" id="contactoNombre-${s}" placeholder="Nombre (ej. Soporte TI)" value="${escapeAttr(row && row.contacto_encargado_nombre || '')}">
+                <input type="email" id="contactoEmail-${s}" placeholder="Correo (obligatorio para poder solicitar)" value="${escapeAttr(row && row.contacto_encargado_email || '')}">
+              </div>
             </div>
           </div>
-          <label class="toggle-switch">
-            <input type="checkbox" ${isActive ? 'checked' : ''} onchange="toggleAsset(this, '${category}', '${tipo}', '${escapeAttr(nombre)}')">
-            <span class="slider"></span>
-          </label>
-        </div>
-        <div class="asset-detail-panel" id="panel-${s}">
+      ` : `
           <div class="asset-providers-block">
             <div class="asset-providers-head">
               <label>Proveedores</label>
@@ -730,6 +730,24 @@
             </div>
             <button type="button" class="btn-add-provider" onclick="addProviderRow('${s}')">+ Agregar proveedor</button>
           </div>
+      `;
+
+      wrap.innerHTML = `
+        <div class="asset-row-main">
+          <div class="asset-row-info" onclick="toggleDetailPanel('${s}')">
+            <svg class="asset-row-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            <div>
+              <div class="asset-row-name">${nombre}</div>
+              <div class="asset-row-summary">${summaryForRow(row, isDigital)}</div>
+            </div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" ${isActive ? 'checked' : ''} onchange="toggleAsset(this, '${category}', '${tipo}', '${escapeAttr(nombre)}')">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="asset-detail-panel" id="panel-${s}">
+          ${providersOrContactBlock}
 
           <div class="asset-lifecycle-grid">
             <label class="asset-field-checkbox">
@@ -760,8 +778,11 @@
       return wrap;
     }
 
-    function summaryForRow(row) {
+    function summaryForRow(row, isDigital) {
       if (!row || !row.activo) return 'Desactivado';
+      if (isDigital) {
+        return row.contacto_encargado_email ? `Contacto: ${row.contacto_encargado_email}` : 'Sin contacto de activación';
+      }
       const providers = assetProvidersByAssetId[row.id] || [];
       return providers.length > 0
         ? `${providers.length} proveedor${providers.length > 1 ? 'es' : ''}`
@@ -961,26 +982,40 @@
     async function saveAssetDetails(category, tipo, nombre) {
       const key = assetKey(tipo, nombre);
       const s = slug(key);
+      const isDigital = category === 'digital';
 
       const esRenovable = document.getElementById(`renovable-${s}`).checked;
       const renovMesesRaw = document.getElementById(`renovmeses-${s}`).value;
       const devolvible = document.getElementById(`devolvible-${s}`).checked;
       const reutilizable = document.getElementById(`reutiliza-${s}`).checked;
 
-      const providerRows = Array.from(document.querySelectorAll(`#providers-${s} .provider-row`))
-        .map(rowEl => ({
-          nombre: rowEl.querySelector('.prov-nombre').value.trim(),
-          correo: rowEl.querySelector('.prov-correo').value.trim(),
-          telefono: rowEl.querySelector('.prov-telefono').value.trim()
-        }))
-        .filter(p => p.nombre || p.correo || p.telefono);
+      let providers = [];
+      let contactoNombre = null;
+      let contactoEmail = null;
 
-      const providersMissingCorreo = providerRows.filter(p => !p.correo);
-      if (providersMissingCorreo.length > 0) {
-        if (window.showToast) showToast('Falta el correo', 'Cada proveedor necesita un correo para poder cotizar con él.', 'error');
-        return;
+      if (isDigital) {
+        contactoNombre = document.getElementById(`contactoNombre-${s}`).value.trim() || null;
+        contactoEmail = document.getElementById(`contactoEmail-${s}`).value.trim() || null;
+        if (!contactoEmail) {
+          if (window.showToast) showToast('Falta el correo', 'Registra el correo del contacto para poder solicitar la activación.', 'error');
+          return;
+        }
+      } else {
+        const providerRows = Array.from(document.querySelectorAll(`#providers-${s} .provider-row`))
+          .map(rowEl => ({
+            nombre: rowEl.querySelector('.prov-nombre').value.trim(),
+            correo: rowEl.querySelector('.prov-correo').value.trim(),
+            telefono: rowEl.querySelector('.prov-telefono').value.trim()
+          }))
+          .filter(p => p.nombre || p.correo || p.telefono);
+
+        const providersMissingCorreo = providerRows.filter(p => !p.correo);
+        if (providersMissingCorreo.length > 0) {
+          if (window.showToast) showToast('Falta el correo', 'Cada proveedor necesita un correo para poder cotizar con él.', 'error');
+          return;
+        }
+        providers = providerRows;
       }
-      const providers = providerRows;
 
       const existing = assetRowsByKey[key];
       const payload = {
@@ -993,6 +1028,8 @@
         renovacion_meses: esRenovable && renovMesesRaw ? parseInt(renovMesesRaw) : null,
         devolvible_offboarding: devolvible,
         reutilizable,
+        contacto_encargado_nombre: contactoNombre,
+        contacto_encargado_email: contactoEmail,
         updated_at: new Date().toISOString()
       };
 
@@ -1009,27 +1046,30 @@
         }
         assetRowsByKey[key] = saved;
 
-        // Reemplaza la lista completa de proveedores por la que quedó en el formulario.
-        const { error: delError } = await _supabase.from('company_asset_providers').delete().eq('company_asset_id', saved.id);
-        if (delError) throw delError;
+        let savedProviders = assetProvidersByAssetId[saved.id] || [];
+        if (!isDigital) {
+          // Reemplaza la lista completa de proveedores por la que quedó en el formulario.
+          const { error: delError } = await _supabase.from('company_asset_providers').delete().eq('company_asset_id', saved.id);
+          if (delError) throw delError;
 
-        let savedProviders = [];
-        if (providers.length > 0) {
-          const { data: provData, error: provError } = await _supabase
-            .from('company_asset_providers')
-            .insert(providers.map(p => ({ company_id: currentCompanyId, company_asset_id: saved.id, nombre: p.nombre || null, correo: p.correo, telefono: p.telefono || null })))
-            .select();
-          if (provError) throw provError;
-          savedProviders = provData || [];
+          savedProviders = [];
+          if (providers.length > 0) {
+            const { data: provData, error: provError } = await _supabase
+              .from('company_asset_providers')
+              .insert(providers.map(p => ({ company_id: currentCompanyId, company_asset_id: saved.id, nombre: p.nombre || null, correo: p.correo, telefono: p.telefono || null })))
+              .select();
+            if (provError) throw provError;
+            savedProviders = provData || [];
+          }
+          assetProvidersByAssetId[saved.id] = savedProviders;
         }
-        assetProvidersByAssetId[saved.id] = savedProviders;
 
         const panel = document.getElementById(`panel-${s}`);
         const row = panel.closest('.asset-row');
         const toggle = row.querySelector('.toggle-switch input');
         toggle.checked = true;
         panel.classList.remove('open');
-        row.querySelector('.asset-row-summary').textContent = summaryForRow(saved);
+        row.querySelector('.asset-row-summary').textContent = summaryForRow(saved, isDigital);
 
         const providerList = document.getElementById(`providers-${s}`);
         if (providerList) providerList.innerHTML = (savedProviders.length > 0 ? savedProviders : [null]).map(providerRowHtml).join('');
