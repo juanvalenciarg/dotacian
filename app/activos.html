@@ -1064,10 +1064,12 @@
         reutilizable,
         contacto_encargado_nombre: contactoNombre,
         contacto_encargado_email: contactoEmail,
-        offboarding_modo: offboardingModo,
-        offboarding_gracia_dias: offboardingGraciaDias,
         updated_at: new Date().toISOString()
       };
+      if (isDigital) {
+        payload.offboarding_modo = offboardingModo;
+        payload.offboarding_gracia_dias = offboardingGraciaDias;
+      }
 
       try {
         let saved;
