@@ -360,52 +360,6 @@
       text-transform: capitalize;
     }
 
-    .asset-renewal-input {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.75rem;
-      color: var(--color-text-secondary);
-      white-space: nowrap;
-    }
-
-    .months-stepper {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: white;
-      padding: 0.25rem 0.5rem;
-      border-radius: 8px;
-      border: 1px solid var(--color-smoke-mid);
-    }
-
-    .months-stepper button {
-      border: none;
-      background: none;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: bold;
-      width: 18px;
-      height: 18px;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--color-text-secondary);
-    }
-
-    .months-stepper button.increment {
-      color: var(--color-cyan);
-    }
-
-    .months-val {
-      min-width: 16px;
-      text-align: center;
-      font-weight: 700;
-      color: var(--color-navy);
-      font-size: 0.8rem;
-    }
-
     .asset-specs-toggle {
       display: flex;
       align-items: center;
@@ -1347,8 +1301,6 @@
     }
 
     function createAssetRowElement(item, checked) {
-      const requiereReposicion = !!item.requiere_reposicion;
-      const reposicionMeses = item.reposicion_meses || 6;
       const itemCategory = item.category || 'fisico';
       const specFields = getAssetSpecFields(item.name, itemCategory);
       const hasSpecValues = !!(item.specs && Object.keys(item.specs).some(k => item.specs[k]));
@@ -1373,19 +1325,6 @@
           </div>
         </div>
         <div class="asset-item-controls" style="display: ${checked ? 'flex' : 'none'}; align-items: center; flex-wrap: wrap; gap: 0.75rem; padding-left: 2rem; border-top: 1px solid var(--color-smoke-mid); padding-top: 0.6rem;">
-          <label class="reposicion-toggle" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--color-text-secondary); cursor: pointer; white-space: nowrap;">
-            <input type="checkbox" class="requiere-reposicion" ${requiereReposicion ? 'checked' : ''} onchange="toggleReposicionInput(this)" style="width: 15px; height: 15px; accent-color: var(--color-cyan); cursor: pointer;">
-            ${t('reposicion.question')}
-          </label>
-          <div class="asset-renewal-input" style="display: ${requiereReposicion ? 'flex' : 'none'};">
-            ${t('reposicion.every')}
-            <div class="months-stepper">
-              <button type="button" onclick="changeMonths(this, -1)">-</button>
-              <span class="months-val">${reposicionMeses}</span>
-              <button type="button" class="increment" onclick="changeMonths(this, 1)">+</button>
-            </div>
-            ${t('reposicion.months')}
-          </div>
           ${specFields.length > 0 ? `
           <button type="button" class="asset-specs-toggle${hasSpecValues ? ' open' : ''}" onclick="toggleAssetSpecs(this)">
             <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
@@ -1807,8 +1746,6 @@
         const qty = qtyVal ? parseInt(qtyVal.textContent) || 1 : 1;
         const item = { name: cb.dataset.name, category: cb.dataset.category, tipo: cb.dataset.tipo, qty };
         if (item.tipo === 'uniforme') { item.color = 'Predeterminado'; item.available_sizes = 'S-XL'; }
-        item.requiere_reposicion = item.tipo === 'uniforme';
-        if (item.requiere_reposicion) item.reposicion_meses = 6;
 
         const specInputs = row ? row.querySelectorAll('.asset-spec-input') : [];
         if (specInputs.length > 0) {
@@ -1908,8 +1845,6 @@
         item.color = 'Predeterminado';
         item.available_sizes = 'S-XL';
       }
-      item.requiere_reposicion = tipo === 'uniforme';
-      if (item.requiere_reposicion) item.reposicion_meses = 6;
       list.appendChild(createAssetRowElement(item, true));
       toggleAddAssetForm(false);
     }
@@ -1999,24 +1934,11 @@
       if (controls) controls.style.display = checkbox.checked ? 'flex' : 'none';
     }
 
-    function toggleReposicionInput(checkbox) {
-      const controls = checkbox.closest('.asset-item-controls');
-      const input = controls ? controls.querySelector('.asset-renewal-input') : null;
-      if (input) input.style.display = checkbox.checked ? 'flex' : 'none';
-    }
-
     function changeQty(btn, delta) {
       const span = btn.parentElement.querySelector('.qty-val');
       let current = parseInt(span.innerText);
       current = Math.max(1, current + delta);
       span.innerText = current;
-    }
-
-    function changeMonths(btn, delta) {
-      const span = btn.parentElement.querySelector('.months-val');
-      let current = parseInt(span.textContent);
-      current = Math.max(1, Math.min(24, current + delta));
-      span.textContent = current;
     }
 
     function closeRoleConfig() {
@@ -2042,13 +1964,6 @@
         if (tipo === 'uniforme') {
           item.color = existing ? existing.color : 'Predeterminado';
           item.available_sizes = existing ? existing.available_sizes : 'S-XL';
-        }
-
-        const requiereReposicion = el.querySelector('.requiere-reposicion')?.checked || false;
-        item.requiere_reposicion = requiereReposicion;
-        if (requiereReposicion) {
-          const monthsVal = el.querySelector('.months-val');
-          item.reposicion_meses = parseInt(monthsVal?.textContent) || 6;
         }
 
         const specInputs = el.querySelectorAll('.asset-spec-input');
