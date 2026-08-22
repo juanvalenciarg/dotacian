@@ -16,6 +16,7 @@
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <link rel="stylesheet" href="/styles.css">
   <style>
     /* Calendario (Flatpickr) - Fecha de Nacimiento */
@@ -2018,7 +2019,7 @@
           const img = item.image || item.img || '';
           const sized = isSizedItem(item);
           const size = sized ? guessSize(item.name, empObj) : '';
-          deliveryItemsList.appendChild(buildDeliveryRow(item.name, qty, size, img, index, item.specs, sized));
+          deliveryItemsList.appendChild(buildDeliveryRow(item.name, qty, size, img, index, item.specs, sized, false, item.tipo));
         });
 
       const digitalItems = items.filter(item => item.category === 'digital');
@@ -2035,7 +2036,7 @@
           const { data: sessionData } = await _supabase.auth.getSession();
           const companyId = await resolveCompanyId(_supabase, sessionData?.session?.user?.id);
 
-          const [deliveriesRes, storageRes] = await Promise.all([
+          const [deliveriesRes, storageRes, activeAssetsRes] = await Promise.all([
             _supabase
               .from('uniform_deliveries')
               .select('*')
@@ -2044,7 +2045,12 @@
             companyId ? _supabase
               .from('company_storage')
               .select('product_name, size, quantity, status, unit_cost, specs, created_at')
-              .eq('company_id', companyId) : Promise.resolve({ data: [] })
+              .eq('company_id', companyId) : Promise.resolve({ data: [] }),
+            companyId ? _supabase
+              .from('company_assets')
+              .select('tipo, nombre')
+              .eq('company_id', companyId)
+              .eq('activo', true) : Promise.resolve({ data: [] })
           ]);
 
           if (deliveriesRes.error) throw deliveriesRes.error;
@@ -2055,6 +2061,16 @@
 
           window.currentEmployeeDeliveries = deliveries;
           window.currentEmployeeObj = empObj;
+
+          // Otros activos activados en el mismo "tipo" (subcategoría del
+          // catálogo), para poder sugerir un sustituto cuando no hay stock
+          // del activo exacto que pide el rol.
+          window.companyActiveAssetsByTipo = {};
+          (activeAssetsRes.data || []).forEach(row => {
+            if (!row.tipo || !row.nombre) return;
+            if (!window.companyActiveAssetsByTipo[row.tipo]) window.companyActiveAssetsByTipo[row.tipo] = [];
+            window.companyActiveAssetsByTipo[row.tipo].push(row.nombre);
+          });
 
           // Build company stock map
           window.companyStockMap = {};
@@ -2287,6 +2303,291 @@
       return firstWithStock ? firstWithStock.specs : null;
     }
 
+    // Otros activos activados en la misma subcategoría (tipo) que sí tienen
+    // stock, para ofrecerlos como sustituto cuando no hay del exacto.
+    function getSimilarAvailableItems(tipo, excludeName, size) {
+      if (!tipo) return [];
+      const candidates = (window.companyActiveAssetsByTipo || {})[tipo] || [];
+      const excludeLower = (excludeName || '').trim().toLowerCase();
+      return candidates
+        .filter(n => n.trim().toLowerCase() !== excludeLower)
+        .map(n => ({ name: n, stock: getStockAmount(n, size) }))
+        .filter(c => c.stock > 0);
+    }
+
+    function toggleSimilarPicker(btn) {
+      const row = btn.closest('[data-delivery-item-id]');
+      const meta = row && window._deliveryItemMeta[row.dataset.deliveryItemId];
+      const picker = row ? row.querySelector('.similar-picker') : null;
+      if (!row || !meta || !picker) return;
+
+      const isOpen = picker.style.display === 'flex';
+      if (isOpen) {
+        picker.style.display = 'none';
+        picker.innerHTML = '';
+        return;
+      }
+
+      const nameInput = row.querySelector('input[placeholder="Activo"]');
+      const currentName = nameInput ? nameInput.value.trim() : meta.name;
+      const alternatives = getSimilarAvailableItems(meta.tipo, currentName, meta.size);
+
+      picker.innerHTML = alternatives.length === 0
+        ? '<span style="font-size:0.75rem; color:var(--color-text-muted);">No hay otro activo activado con stock en esta misma categoría.</span>'
+        : alternatives.map(alt => `
+          <button type="button" onclick="substituteDeliveryItem(this, '${escapeAttr(alt.name)}')"
+            style="font-size:0.75rem; font-weight:600; color:#0f172a; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.3rem 0.6rem; cursor:pointer;">
+            Entregar "${escapeDeliveryLabel(alt.name)}" en su lugar (Stock: ${alt.stock})
+          </button>
+        `).join('');
+      picker.style.display = 'flex';
+    }
+
+    function substituteDeliveryItem(btn, newName) {
+      const row = btn.closest('[data-delivery-item-id]');
+      if (!row) return;
+      const id = row.dataset.deliveryItemId;
+      const meta = window._deliveryItemMeta[id];
+
+      const nameInput = row.querySelector('input[placeholder="Activo"]');
+      if (nameInput) nameInput.value = newName;
+
+      // El sustituto es un activo distinto: la ficha de specs del rol ya no
+      // aplica, se muestran las specs reales del lote que sí hay en bodega.
+      if (meta) { meta.name = newName; meta.roleSpecs = null; }
+
+      updateRowStockBadge(row);
+      updateGenerateButtonState();
+    }
+
+    async function buildQuoteItemData(companyId, name, qty, size, specs) {
+      let providers = [];
+      let hasAsset = false;
+      try {
+        const { data: assetRows } = await _supabase
+          .from('company_assets')
+          .select('id')
+          .eq('company_id', companyId)
+          .ilike('nombre', name.trim());
+        const asset = (assetRows || [])[0];
+        hasAsset = !!asset;
+        if (asset) {
+          const { data: p } = await _supabase
+            .from('company_asset_providers')
+            .select('nombre, correo, telefono')
+            .eq('company_asset_id', asset.id);
+          providers = p || [];
+        }
+      } catch (err) {
+        console.error('Error buscando proveedores para cotización:', err);
+      }
+      return { name, qty, size, specs, providers, hasAsset };
+    }
+
+    async function cotizarActivoFaltante(btn) {
+      const row = btn.closest('[data-delivery-item-id]');
+      if (!row) return;
+      const id = row.dataset.deliveryItemId;
+      const meta = window._deliveryItemMeta[id];
+      if (!meta) return;
+
+      const nameInput = row.querySelector('input[placeholder="Activo"]');
+      const qtyInput = row.querySelector('input[type="number"]');
+      const name = nameInput ? nameInput.value.trim() : meta.name;
+      const qty = qtyInput ? (parseInt(qtyInput.value) || 1) : 1;
+
+      const originalLabel = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Generando...';
+
+      try {
+        const { data: sessionData } = await _supabase.auth.getSession();
+        const companyId = await resolveCompanyId(_supabase, sessionData?.session?.user?.id);
+        if (!companyId) throw new Error('No session found');
+
+        const itemData = await buildQuoteItemData(companyId, name, qty, meta.size, meta.roleSpecs);
+        const employeeName = document.getElementById('detailName')?.textContent || '';
+        const role = (window.currentEmployeeObj && window.currentEmployeeObj.assignedRole) || '';
+
+        await buildCotizacionDotPDF({ roleName: role, employeeName, items: [itemData] });
+        if (window.showToast) showToast('PDF generado', 'Descarga lista para reenviar al proveedor.');
+      } catch (err) {
+        console.error('Error generando cotización con Dot:', err);
+        if (window.showToast) showToast('Error', 'No se pudo generar la cotización.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalLabel;
+      }
+    }
+
+    // Mismo documento que "Cotizar con Dot" en app/bodega.html, aplicado a
+    // un solo activo faltante en vez de todo el kit del rol.
+    async function buildCotizacionDotPDF({ roleName, employeeName, items }) {
+      let jsPDFClass = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+      if (!jsPDFClass) {
+        if (window.showToast) showToast('Error', 'Librería PDF no disponible. Recarga la página.', 'error');
+        return;
+      }
+
+      const { data: sessionData } = await _supabase.auth.getSession();
+      const companyId = await resolveCompanyId(_supabase, sessionData?.session?.user?.id);
+
+      let cp = null;
+      try {
+        const { data } = await _supabase
+          .from('company_profile')
+          .select('company_name, legal_name, tax_id, dv, country, delivery_address, delivery_state, delivery_contact_1_name, delivery_contact_1_phone, delivery_contact_1_email')
+          .eq('id', companyId)
+          .maybeSingle();
+        cp = data || null;
+      } catch (e) { console.warn('No se pudo cargar company_profile para el PDF:', e); }
+
+      const doc = new jsPDFClass({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const pageW = doc.internal.pageSize.getWidth();
+      const margin = 18;
+      let y = 0;
+
+      // ── Header bar ──────────────────────────────────────────
+      doc.setFillColor(14, 23, 44);
+      doc.rect(0, 0, pageW, 32, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(20);
+      doc.text('dotacian', margin, 20);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text('Cotización generada por Dot', margin, 27);
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('Solicitud de Cotización', pageW - margin, 18, { align: 'right' });
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text(new Date().toLocaleDateString('es-MX'), pageW - margin, 25, { align: 'right' });
+
+      y = 44;
+
+      // ── Company info block (mismo patrón que cotizaciones.html) ──
+      if (cp) {
+        const taxStr = cp.tax_id ? `${cp.tax_id}${cp.dv ? '-' + cp.dv : ''}` : '';
+        const addressStr = [cp.delivery_address, cp.delivery_state, cp.country].filter(Boolean).join(', ');
+        const contactStr = [cp.delivery_contact_1_name, cp.delivery_contact_1_phone, cp.delivery_contact_1_email].filter(Boolean).join(' · ');
+
+        const blockH = contactStr ? 34 : 26;
+        doc.setFillColor(240, 249, 255);
+        doc.roundedRect(margin, y, pageW - margin * 2, blockH, 3, 3, 'F');
+        doc.setDrawColor(6, 182, 212);
+        doc.setLineWidth(0.4);
+        doc.roundedRect(margin, y, pageW - margin * 2, blockH, 3, 3, 'S');
+        doc.setLineWidth(0.1);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10.5);
+        doc.setTextColor(14, 23, 44);
+        doc.text(cp.company_name || 'Empresa', margin + 6, y + 9);
+
+        let infoLine = '';
+        if (cp.legal_name && cp.legal_name !== cp.company_name) infoLine += cp.legal_name;
+        if (taxStr) infoLine += (infoLine ? '  ·  ' : '') + taxStr;
+        if (infoLine) {
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(8);
+          doc.setTextColor(71, 85, 105);
+          doc.text(infoLine, margin + 6, y + 15.5);
+        }
+        if (addressStr) {
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(7.5);
+          doc.setTextColor(100, 116, 139);
+          doc.text(addressStr, margin + 6, infoLine ? y + 21 : y + 16);
+        }
+        if (contactStr) {
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(7.5);
+          doc.setTextColor(100, 116, 139);
+          const nextY = addressStr ? (infoLine ? y + 26 : y + 22) : (infoLine ? y + 21 : y + 16);
+          doc.text(contactStr, margin + 6, nextY);
+        }
+        y += blockH + 8;
+      } else {
+        y += 4;
+      }
+
+      // ── Para quién es ─────────────────────────────────────────
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(14, 23, 44);
+      doc.text(employeeName ? `Dotación para: ${employeeName}  (${roleName})` : `Dotación para el rol: ${roleName}`, margin, y);
+      y += 8;
+
+      // ── Table header ──────────────────────────────────────────
+      const cols = { name: margin + 2, specs: margin + 52, qty: margin + 122, prov: margin + 138 };
+      const drawTableHeader = () => {
+        doc.setFillColor(6, 182, 212);
+        doc.rect(margin, y, pageW - margin * 2, 8, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.text('ACTIVO', cols.name, y + 5.5);
+        doc.text('ESPECIFICACIONES', cols.specs, y + 5.5);
+        doc.text('CANT.', cols.qty, y + 5.5);
+        doc.text('PROVEEDOR(ES)', cols.prov, y + 5.5);
+        y += 8;
+      };
+      drawTableHeader();
+
+      items.forEach((item, idx) => {
+        const specParts = [];
+        if (item.size) specParts.push(`Talla: ${item.size}`);
+        Object.entries(item.specs || {}).forEach(([k, v]) => { if (v) specParts.push(`${k}: ${v}`); });
+        const specsText = specParts.join(' · ') || '—';
+
+        const provText = item.providers.length > 0
+          ? item.providers.map(p => `${p.nombre}${p.correo ? ' (' + p.correo + ')' : ''}`).join(', ')
+          : (item.hasAsset ? 'Sin proveedores registrados' : 'Sin vincular en Activos');
+
+        const nameLines = doc.splitTextToSize(item.name, 46);
+        const specsLines = doc.splitTextToSize(specsText, 62);
+        const provLines = doc.splitTextToSize(provText, 55);
+        const lineCount = Math.max(nameLines.length, specsLines.length, provLines.length, 1);
+        const rowH = lineCount * 4 + 4;
+
+        if (y + rowH > 275) { doc.addPage(); y = 20; drawTableHeader(); }
+
+        if (idx % 2 === 0) {
+          doc.setFillColor(248, 250, 252);
+          doc.rect(margin, y, pageW - margin * 2, rowH, 'F');
+        }
+        doc.setDrawColor(226, 232, 240);
+        doc.line(margin, y + rowH, pageW - margin, y + rowH);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(14, 23, 44);
+        doc.text(nameLines, cols.name, y + 5.5);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.5);
+        doc.setTextColor(71, 85, 105);
+        doc.text(specsLines, cols.specs, y + 5.5);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.setTextColor(14, 23, 44);
+        doc.text(String(item.qty), cols.qty, y + 5.5);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.5);
+        doc.setTextColor(item.providers.length > 0 ? 71 : 220, item.providers.length > 0 ? 85 : 38, item.providers.length > 0 ? 105 : 38);
+        doc.text(provLines, cols.prov, y + 5.5);
+
+        y += rowH;
+      });
+
+      const fileTag = (employeeName || roleName).replace(/[^a-zA-Z0-9]/g, '_');
+      doc.save(`Cotizacion_Dot_${fileTag}.pdf`);
+    }
+
     function updateRowStockBadge(row) {
       const nameInput = row.querySelector('input[placeholder="Activo"]');
       const sizeInput = row.querySelector('input[placeholder="Talla"]');
@@ -2302,6 +2603,16 @@
       } else {
         badgeContainer.innerHTML = `<span style="font-size:0.75rem; font-weight:600; color:#ef4444; background:#fef2f2; padding:2px 8px; border-radius:12px; border:1px solid #fecaca;">Stock: 0</span>`;
       }
+
+      const shortageActions = row.querySelector('.delivery-shortage-actions');
+      if (shortageActions) {
+        shortageActions.style.display = stock > 0 ? 'none' : 'flex';
+        if (stock > 0) {
+          const picker = shortageActions.querySelector('.similar-picker');
+          if (picker) { picker.style.display = 'none'; picker.innerHTML = ''; }
+        }
+      }
+
       refreshDeliveryRowDetail(row);
       // Update the button state dynamically!
       updateGenerateButtonState();
@@ -2447,14 +2758,14 @@
       if (svg) svg.style.transform = isOpen ? '' : 'rotate(90deg)';
     }
 
-    function buildDeliveryRow(name, qty, size, img, id, specs, sized, editableName) {
+    function buildDeliveryRow(name, qty, size, img, id, specs, sized, editableName, tipo) {
       const wrapper = document.createElement('div');
       wrapper.dataset.deliveryItemId = id;
       wrapper.style.cssText = 'display:flex; flex-direction:column; background:white; padding:0.75rem 1rem; border-radius:12px; border:1px solid #e2e8f0; transition:all 0.2s;';
       wrapper.onmouseover = () => wrapper.style.borderColor = '#bae6fd';
       wrapper.onmouseout = () => wrapper.style.borderColor = '#e2e8f0';
 
-      window._deliveryItemMeta[String(id)] = { name, size, sized: !!sized, roleSpecs: specs || null };
+      window._deliveryItemMeta[String(id)] = { name, size, sized: !!sized, roleSpecs: specs || null, tipo: tipo || null };
 
       const stock = getStockAmount(name, size);
       let stockBadgeHtml = '';
@@ -2532,6 +2843,18 @@
           </button>
         </div>
         ${detailHtml}
+        <div class="delivery-shortage-actions" style="display:${stock > 0 ? 'none' : 'flex'}; margin-top:0.65rem; padding-top:0.65rem; border-top:1px dashed #fecaca; padding-left:2.9rem; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+          <span style="font-size:0.75rem; color:#ef4444; font-weight:600;">Sin stock de este activo.</span>
+          <button type="button" onclick="toggleSimilarPicker(this)"
+            style="font-size:0.75rem; font-weight:700; color:#0891B2; background:#ecfeff; border:1px solid #a5f3fc; border-radius:8px; padding:0.3rem 0.65rem; cursor:pointer;">
+            Ver alternativas disponibles
+          </button>
+          <button type="button" onclick="cotizarActivoFaltante(this)"
+            style="font-size:0.75rem; font-weight:700; color:white; background:#0f172a; border:none; border-radius:8px; padding:0.3rem 0.65rem; cursor:pointer;">
+            Cotizar con Dot
+          </button>
+          <div class="similar-picker" style="display:none; width:100%; margin-top:0.4rem; flex-wrap:wrap; gap:0.4rem;"></div>
+        </div>
       `;
       refreshDeliveryRowDetail(wrapper);
       return wrapper;
