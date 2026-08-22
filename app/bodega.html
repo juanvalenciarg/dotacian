@@ -1350,20 +1350,39 @@
       const totalActivos = inventoryData.reduce((sum, item) => sum + item.nuevos + item.seminuevos, 0);
       document.getElementById('kpiTotalActivos').textContent = totalActivos;
 
-      // Valor real por lote (unit_cost, capturado al agregar inventario) tiene
-      // prioridad sobre el price map inferido por nombre; este último queda
-      // como respaldo para lotes viejos que no tienen costo guardado.
-      let totalValue = 0;
+      // El valor se calcula sobre la cantidad NETA restante por producto, no
+      // fila por fila: las entregas a empleados (mi_dotacion.html) y las
+      // bajas manuales insertan filas de company_storage con cantidad
+      // negativa pero sin unit_cost, así que precificar cada fila por su
+      // cuenta dejaba "valor fantasma" aunque el stock físico ya fuera 0.
+      // El costo unitario de cada producto es el promedio ponderado de sus
+      // entradas (unit_cost), con el price map como respaldo si nunca se
+      // registró un costo de compra.
       const priceMap = window.inventoryPriceMap || {};
       const rawData = window.rawInventoryData || [];
 
+      const byProduct = {};
       rawData.forEach(item => {
+        const name = item.product_name || 'Desconocido';
+        if (!byProduct[name]) byProduct[name] = { netQty: 0, addedQtySum: 0, addedCostSum: 0 };
         const qty = item.quantity || 0;
+        byProduct[name].netQty += qty;
+
         const hasCost = item.unit_cost !== null && item.unit_cost !== undefined && item.unit_cost !== '';
-        const unitPrice = hasCost
-          ? Number(item.unit_cost)
-          : (priceMap[(item.product_name || '').trim().toLowerCase()] || 450);
-        totalValue += qty * unitPrice;
+        if (hasCost && qty > 0) {
+          byProduct[name].addedQtySum += qty;
+          byProduct[name].addedCostSum += qty * Number(item.unit_cost);
+        }
+      });
+
+      let totalValue = 0;
+      Object.keys(byProduct).forEach(name => {
+        const entry = byProduct[name];
+        if (entry.netQty <= 0) return;
+        const unitPrice = entry.addedQtySum > 0
+          ? entry.addedCostSum / entry.addedQtySum
+          : (priceMap[name.trim().toLowerCase()] || 450);
+        totalValue += entry.netQty * unitPrice;
       });
 
       document.getElementById('kpiValorBodega').textContent = formatCurrency(totalValue);
