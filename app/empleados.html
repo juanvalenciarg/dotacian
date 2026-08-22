@@ -1775,7 +1775,14 @@
       const initials = name.split(' ').map(n => n[0]).join('');
       detailPhone.textContent = phone;
       detailAvatar.textContent = initials;
-      detailBirthDate.textContent = name === 'Juan Sánchez' ? '12 Oct 1992' : '25 Mar 1995';
+
+      const empObj = allEmployees.find(e => e.db_id === db_id);
+      if (empObj && empObj.birth_date) {
+        const bd = new Date(empObj.birth_date + 'T00:00:00');
+        detailBirthDate.textContent = bd.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
+      } else {
+        detailBirthDate.textContent = 'Sin registrar';
+      }
 
       detailRole.dataset.dbId = db_id;
 
@@ -1889,8 +1896,6 @@
       // Prepopulate the "Entregar Activos" checklist
       const deliveryItemsList = document.getElementById('deliveryItemsList');
       deliveryItemsList.innerHTML = '';
-
-      const empObj = allEmployees.find(e => e.db_id === db_id);
 
       // Solo activos físicos se entregan/firman aquí y contra stock de
       // bodega. Los digitales (licencias, accesos) tendrán su propio flujo.
@@ -3550,6 +3555,7 @@
             pants_size: emp.pants_size || '',
             shoe_size: emp.shoe_size || '',
             id_document: emp.id_document || '',
+            birth_date: emp.birth_date || null,
             sizes_confirmed_at: emp.sizes_confirmed_at || null,
             sizes_request_expires_at: emp.sizes_request_expires_at || null
           };
