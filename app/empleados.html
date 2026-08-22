@@ -2292,15 +2292,26 @@
       return lotsByKey;
     }
 
-    // Specs del lote más antiguo con stock disponible (el que realmente se
-    // entregaría primero). Null si no hay ningún lote físico coincidente.
-    function getOldestLotSpecs(name, size) {
+    // Bodega guarda el stock por nombre genérico ("Laptop"), sin distinguir
+    // marca/modelo — así que cualquier rol que pida "Laptop" ve el mismo
+    // lote físico, sea cual sea su marca. Si el rol pide una marca puntual,
+    // se prioriza el lote que coincida; si ninguno coincide, se devuelve
+    // igual el lote más antiguo pero marcado como brandMismatch para que la
+    // UI avise en vez de mostrarlo como si fuera un match exacto.
+    function getOldestLotSpecs(name, size, roleSpecs) {
       const nameKey = (name || '').trim().toLowerCase();
       const sizeKey = normalizeSizeKey(size);
       const key = `${nameKey}_${sizeKey}_nuevo`;
       const lots = (window.companyLotsMap || {})[key] || [];
-      const firstWithStock = lots.find(l => l.qty > 0 && l.specs);
-      return firstWithStock ? firstWithStock.specs : null;
+      const available = lots.filter(l => l.qty > 0 && l.specs);
+      if (available.length === 0) return null;
+
+      const targetBrand = roleSpecs && roleSpecs.marca ? roleSpecs.marca.trim().toLowerCase() : null;
+      if (targetBrand) {
+        const brandMatch = available.find(l => (l.specs.marca || '').trim().toLowerCase() === targetBrand);
+        if (brandMatch) return { specs: brandMatch.specs, brandMismatch: false };
+      }
+      return { specs: available[0].specs, brandMismatch: !!targetBrand };
     }
 
     // Otros activos activados en la misma subcategoría (tipo) que sí tienen
@@ -2684,16 +2695,20 @@
     }
 
     function buildDeliveryDetailInner(name, size, sized, roleSpecs) {
-      const lotSpecs = getOldestLotSpecs(name, size);
+      const lotResult = getOldestLotSpecs(name, size, roleSpecs);
+      const lotSpecs = lotResult ? lotResult.specs : null;
       const specsToShow = lotSpecs || roleSpecs;
       const specEntries = specsToShow ? Object.entries(specsToShow).filter(([, v]) => v) : [];
       const hasContent = sized || specEntries.length > 0;
 
-      const sourceNote = lotSpecs
-        ? '<div style="width:100%; font-size:0.7rem; color:#0f766e; font-weight:700; margin-bottom:0.35rem;">Specs del lote disponible en bodega</div>'
-        : (specEntries.length > 0
-          ? '<div style="width:100%; font-size:0.7rem; color:#94a3b8; font-weight:700; margin-bottom:0.35rem;">Ficha sugerida del rol — sin lote físico coincidente en bodega</div>'
-          : '');
+      let sourceNote = '';
+      if (lotSpecs && lotResult.brandMismatch) {
+        sourceNote = `<div style="width:100%; font-size:0.7rem; color:#b45309; font-weight:700; margin-bottom:0.35rem;">Atención: el lote disponible en bodega es de otra marca (el rol pide "${escapeDeliveryLabel(roleSpecs.marca)}") — revisa antes de entregar</div>`;
+      } else if (lotSpecs) {
+        sourceNote = '<div style="width:100%; font-size:0.7rem; color:#0f766e; font-weight:700; margin-bottom:0.35rem;">Specs del lote disponible en bodega</div>';
+      } else if (specEntries.length > 0) {
+        sourceNote = '<div style="width:100%; font-size:0.7rem; color:#94a3b8; font-weight:700; margin-bottom:0.35rem;">Ficha sugerida del rol — sin lote físico coincidente en bodega</div>';
+      }
 
       const html = `
         ${sourceNote}
