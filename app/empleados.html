@@ -1626,6 +1626,47 @@
       document.getElementById('bulkModal').classList.remove('active');
     }
 
+    // Mismos campos que "Registrar Nuevo Empleado": obligatorios/opcionales
+    // idénticos, incluida la dirección condicionada a la entrega a domicilio.
+    const BULK_TEMPLATE_COLUMNS = [
+      { header: 'Nombre', required: true },
+      { header: 'Apellido', required: true },
+      { header: 'Correo Corporativo', required: true },
+      { header: 'Celular', required: true },
+      { header: 'Número de Identificación', required: true },
+      { header: 'Fecha de Nacimiento (dd/mm/aaaa)', required: true },
+      { header: 'Rol / Puesto', required: true },
+      { header: '¿Entrega en Domicilio? (Sí/No)', required: false },
+      { header: 'País', required: false, note: 'Obligatorio si hay entrega a domicilio' },
+      { header: 'Ciudad', required: false, note: 'Obligatorio si hay entrega a domicilio' },
+      { header: 'Código Postal', required: false },
+      { header: 'Dirección', required: false, note: 'Obligatorio si hay entrega a domicilio' },
+      { header: 'Indicaciones', required: false },
+      { header: 'Talla Camisa', required: false },
+      { header: 'Talla Pantalón', required: false },
+      { header: 'Talla Zapatos', required: false }
+    ];
+
+    // Consulta los roles activos directamente en vez de depender de
+    // window.activeRolesList: esa variable la llena loadActiveRoles() 1
+    // segundo después de cargar la página, así que si el admin abre "Carga
+    // Masiva" y descarga la plantilla antes de ese tiempo, todavía no existe
+    // y la plantilla terminaba mostrando roles de ejemplo (Mesero/Chef/
+    // Barista) en vez de los roles reales de la empresa.
+    async function getActiveRoleNames() {
+      try {
+        const { data: sessionData } = await _supabase.auth.getSession();
+        const companyId = await resolveCompanyId(_supabase, sessionData?.session?.user?.id);
+        if (!companyId) return [];
+        const { data, error } = await _supabase.from('company_roles').select('role_name').eq('company_id', companyId);
+        if (error) throw error;
+        return (data || []).map(r => r.role_name);
+      } catch (err) {
+        console.error('Error cargando roles activos:', err);
+        return [];
+      }
+    }
+
     async function downloadTemplate() {
       if (typeof ExcelJS === 'undefined') {
         alert("Librería de Excel no cargada. Intenta nuevamente.");
@@ -1635,29 +1676,61 @@
       const workbook = new ExcelJS.Workbook();
       const sheet = workbook.addWorksheet('Empleados');
 
-      // Add Headers
-      sheet.addRow(["Nombre", "Apellido", "Número de Identificación", "Fecha de Nacimiento", "Celular", "Rol / Puesto", "Talla Camisa", "Talla Pantalon", "Talla Zapatos"]);
+      // Fila de leyenda + encabezados con la etiqueta de obligatorio/opcional
+      // pegada al nombre del campo, para que quede claro sin depender solo del color.
+      sheet.addRow(['Obligatorio = debe llenarse. Opcional = se puede dejar en blanco.']);
+      sheet.mergeCells(1, 1, 1, BULK_TEMPLATE_COLUMNS.length);
+      sheet.getRow(1).font = { italic: true, color: { argb: 'FF64748B' } };
+
+      sheet.addRow(BULK_TEMPLATE_COLUMNS.map(col => {
+        const tag = col.required ? 'Obligatorio' : (col.note ? `Opcional — ${col.note}` : 'Opcional');
+        return `${col.header} (${tag})`;
+      }));
 
       // Add Example Row
-      const activeRoles = window.activeRolesList || ['Mesero', 'Chef', 'Barista'];
-      const exampleRole = activeRoles.length > 0 ? activeRoles[0] : 'Mesero';
-      sheet.addRow(["Ejemplo Juan", "Pérez", "12345678", "15/05/1990", "5512345678", exampleRole, "M", "32", "27"]);
+      const activeRoles = await getActiveRoleNames();
+      const exampleRole = activeRoles.length > 0 ? activeRoles[0] : '';
+      sheet.addRow([
+        "Ejemplo Juan", "Pérez", "juan.perez@empresa.com", "5512345678", "12345678", "15/05/1990", exampleRole,
+        "No", "", "", "", "", "", "M", "32", "27"
+      ]);
 
-      // Formatting headers
-      sheet.getRow(1).font = { bold: true };
-      sheet.columns.forEach(col => { col.width = 20; });
+      // Formatting: encabezados en negrita, color distinto según obligatorio/opcional
+      const headerRow = sheet.getRow(2);
+      headerRow.font = { bold: true };
+      headerRow.eachCell((cell, colNumber) => {
+        const col = BULK_TEMPLATE_COLUMNS[colNumber - 1];
+        cell.alignment = { wrapText: true, vertical: 'middle' };
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: col && col.required ? 'FFFDE2E2' : 'FFF1F5F9' }
+        };
+      });
+      headerRow.height = 45;
+      sheet.columns.forEach(col => { col.width = 26; });
 
-      // Add Data Validation Dropdown for Roles (Column F, from row 2 to 1000)
+      // Add Data Validation Dropdown for Roles (Columna G, filas 3 a 1000)
       // ExcelJS requires a comma-separated string wrapped in quotes for list validation
-      const rolesString = `"${activeRoles.join(',')}"`;
-      for (let i = 2; i <= 1000; i++) {
-        sheet.getCell(`F${i}`).dataValidation = {
+      const rolesString = activeRoles.length > 0 ? `"${activeRoles.join(',')}"` : null;
+      for (let i = 3; i <= 1000; i++) {
+        if (rolesString) {
+          sheet.getCell(`G${i}`).dataValidation = {
+            type: 'list',
+            allowBlank: true,
+            formulae: [rolesString],
+            showErrorMessage: true,
+            errorTitle: 'Rol Inválido',
+            error: 'Por favor selecciona un rol de la lista desplegable.'
+          };
+        }
+        sheet.getCell(`H${i}`).dataValidation = {
           type: 'list',
           allowBlank: true,
-          formulae: [rolesString],
+          formulae: ['"Sí,No"'],
           showErrorMessage: true,
-          errorTitle: 'Rol Inválido',
-          error: 'Por favor selecciona un rol de la lista desplegable.'
+          errorTitle: 'Valor inválido',
+          error: 'Escribe Sí o No.'
         };
       }
 
@@ -1694,14 +1767,33 @@
       }
     }
 
+    // Acepta texto "dd/mm/aaaa", una fecha de Excel ya convertida a Date, o el
+    // serial numérico que a veces entrega SheetJS cuando la celda quedó con
+    // formato de fecha en el propio Excel.
+    function parseBulkBirthDate(raw) {
+      if (raw === null || raw === undefined || raw === '') return null;
+      if (raw instanceof Date) return raw.toISOString().slice(0, 10);
+      if (typeof raw === 'number') {
+        const excelEpoch = new Date(Date.UTC(1899, 11, 30));
+        return new Date(excelEpoch.getTime() + raw * 86400000).toISOString().slice(0, 10);
+      }
+      const match = String(raw).trim().match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+      if (!match) return null;
+      const day = parseInt(match[1], 10), month = parseInt(match[2], 10), year = parseInt(match[3], 10);
+      if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+      return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+
     async function processBulkUpload() {
-      if (!bulkFileContent || bulkFileContent.length < 2) {
+      // Fila 1 = leyenda, fila 2 = encabezados, fila 3 en adelante = datos.
+      if (!bulkFileContent || bulkFileContent.length < 3) {
         showToast("Error", "El archivo está vacío o no tiene formato válido.");
         return;
       }
 
-      const rows = bulkFileContent.slice(1);
+      const rows = bulkFileContent.slice(2);
       let added = 0;
+      let skipped = 0;
 
       try {
         const { data: sessionData } = await _supabase.auth.getSession();
@@ -1712,25 +1804,48 @@
         rows.forEach(row => {
           if (!row || row.length < 2) return;
 
-          const name = row[0] || '';
-          const lastName = row[1] || '';
-          const docId = row[2] ? String(row[2]) : '';
-          // row[3] is birth date
-          const phone = row[4] ? String(row[4]) : '';
-          const role = row[5] || '';
+          const name = (row[0] || '').toString().trim();
+          const lastName = (row[1] || '').toString().trim();
+          const email = (row[2] || '').toString().trim();
+          const phone = row[3] ? String(row[3]).trim() : '';
+          const docId = row[4] ? String(row[4]).trim() : '';
+          const birthDate = parseBulkBirthDate(row[5]);
+          const role = (row[6] || '').toString().trim();
+          const wantsHomeDelivery = /^s[ií]/i.test((row[7] || '').toString().trim());
+          const addressCountry = (row[8] || '').toString().trim();
+          const addressCity = (row[9] || '').toString().trim();
+          const addressPostalCode = (row[10] || '').toString().trim();
+          const addressLine = (row[11] || '').toString().trim();
+          const addressIndications = (row[12] || '').toString().trim();
 
-          if (!name || !lastName) return;
+          if (!name && !lastName && !email && !phone) return; // fila vacía, no cuenta como error
+
+          if (!name || !lastName || !email || !phone || !docId || !birthDate || !role) {
+            skipped++;
+            return;
+          }
+          if (wantsHomeDelivery && (!addressCountry || !addressCity || !addressLine)) {
+            skipped++;
+            return;
+          }
 
           inserts.push({
             company_id: companyId,
             first_name: name,
             last_name: lastName,
+            email: email,
             id_document: docId,
             phone: phone,
             role: role,
-            shirt_size: row[6] || '',
-            pants_size: row[7] || '',
-            shoe_size: row[8] || '',
+            birth_date: birthDate,
+            address_country: addressCountry || null,
+            address_city: addressCity || null,
+            address_postal_code: addressPostalCode || null,
+            address_line: addressLine || null,
+            address_indications: addressIndications || null,
+            shirt_size: row[13] || '',
+            pants_size: row[14] || '',
+            shoe_size: row[15] || '',
             status: 'none'
           });
           added++;
@@ -1742,7 +1857,10 @@
           await fetchEmployees();
         }
 
-        showToast("Carga Exitosa", `Se han registrado ${added} empleados masivamente.`);
+        const skippedMsg = skipped > 0
+          ? ` ${skipped} fila${skipped > 1 ? 's' : ''} se omitió${skipped > 1 ? 'ron' : ''} por faltar datos obligatorios.`
+          : '';
+        showToast("Carga Exitosa", `Se han registrado ${added} empleados masivamente.${skippedMsg}`);
         closeBulkModal();
       } catch (err) {
         console.error("Error bulk uploading:", err);
