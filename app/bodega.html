@@ -2779,7 +2779,9 @@
           if (activeRoleNames.includes(rd.role_name.toLowerCase().trim())) {
             const items = rd.items || [];
             items.forEach(it => {
-              if (it.name) {
+              // Los activos digitales (licencias, accesos) no se manejan en
+              // bodega: no ocupan espacio físico ni se cotizan a proveedor.
+              if (it.name && it.category !== 'digital') {
                 const trimmed = it.name.trim();
                 garmentsSet.add(trimmed);
                 if (it.tipo) garmentTipos[trimmed] = it.tipo;
