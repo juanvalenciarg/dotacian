@@ -1335,6 +1335,7 @@
 
       inventoryData = Object.values(grouped).filter(g => g.nuevos > 0 || g.seminuevos > 0);
       window.rawInventoryData = data;
+      window.remainingLotsByKey = computeRemainingLotsByKey(data);
 
       calculateTotals();
       renderPieChart();
@@ -1347,30 +1348,36 @@
       }
     }
 
-    function calculateTotals() {
-      const totalActivos = inventoryData.reduce((sum, item) => sum + item.nuevos + item.seminuevos, 0);
-      document.getElementById('kpiTotalActivos').textContent = totalActivos;
+    // Costeo FIFO agrupado por producto + talla + estado (nuevo/seminuevo):
+    // cada alta abre un lote con su unit_cost/specs; cada baja (dar de baja
+    // o entrega a un empleado, que no llevan unit_cost) consume primero el
+    // lote más antiguo que siga abierto. Un promedio simple sobre todo el
+    // historial "contamina" el costo del stock actual con lotes de prueba
+    // que ya se dieron de baja hace rato; FIFO refleja qué lote es el que
+    // realmente sigue en bodega. Se reutiliza tanto para el KPI de valor
+    // como para el desglose con detalle por lote.
+    function computeRemainingLotsByKey(rawData) {
+      const sorted = [...rawData].sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
+      const lotsByKey = {};
 
-      // Costeo FIFO por producto: cada alta abre un lote con su unit_cost;
-      // cada baja (dar de baja o entrega a un empleado, que no llevan
-      // unit_cost) consume primero el lote más antiguo que siga abierto.
-      // Un promedio simple sobre todo el historial "contamina" el costo del
-      // stock actual con lotes de prueba que ya se dieron de baja hace
-      // rato; FIFO refleja qué lote es el que realmente sigue en bodega.
-      const priceMap = window.inventoryPriceMap || {};
-      const rawData = [...(window.rawInventoryData || [])]
-        .sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
-
-      const lotsByProduct = {};
-      rawData.forEach(item => {
-        const name = item.product_name || 'Desconocido';
-        if (!lotsByProduct[name]) lotsByProduct[name] = [];
-        const lots = lotsByProduct[name];
-        let qty = item.quantity || 0;
+      sorted.forEach(item => {
+        const product = item.product_name || 'Desconocido';
+        const size = item.size || 'N/A';
+        const isUsed = item.status === 'seminuevo' || item.category === 'seminuevo';
+        const key = `${product}__${size}__${isUsed ? 'usado' : 'nuevo'}`;
+        if (!lotsByKey[key]) lotsByKey[key] = [];
+        const lots = lotsByKey[key];
+        const qty = item.quantity || 0;
 
         if (qty > 0) {
           const hasCost = item.unit_cost !== null && item.unit_cost !== undefined && item.unit_cost !== '';
-          lots.push({ qty, cost: hasCost ? Number(item.unit_cost) : null });
+          lots.push({
+            qty,
+            product,
+            cost: hasCost ? Number(item.unit_cost) : null,
+            specs: item.specs || null,
+            created_at: item.created_at
+          });
         } else {
           let toRemove = -qty;
           while (toRemove > 0 && lots.length > 0) {
@@ -1382,15 +1389,98 @@
         }
       });
 
+      return lotsByKey;
+    }
+
+    function calculateTotals() {
+      const totalActivos = inventoryData.reduce((sum, item) => sum + item.nuevos + item.seminuevos, 0);
+      document.getElementById('kpiTotalActivos').textContent = totalActivos;
+
+      const priceMap = window.inventoryPriceMap || {};
+      const lotsByKey = window.remainingLotsByKey || {};
+
       let totalValue = 0;
-      Object.keys(lotsByProduct).forEach(name => {
-        const fallbackPrice = priceMap[name.trim().toLowerCase()] || 450;
-        lotsByProduct[name].forEach(lot => {
+      Object.values(lotsByKey).forEach(lots => {
+        lots.forEach(lot => {
+          const fallbackPrice = priceMap[lot.product.trim().toLowerCase()] || 450;
           totalValue += lot.qty * (lot.cost !== null ? lot.cost : fallbackPrice);
         });
       });
 
       document.getElementById('kpiValorBodega').textContent = formatCurrency(totalValue);
+    }
+
+    function renderLotDetailCell(key) {
+      const lots = (window.remainingLotsByKey && window.remainingLotsByKey[key] || []).filter(l => l.qty > 0);
+      if (lots.length === 0) {
+        return '<span style="font-size: 0.8rem; color: var(--color-text-muted);">Sin detalles adicionales para este lote.</span>';
+      }
+      return lots.map(lot => {
+        const specFields = getAssetSpecFieldsDot(lot.product);
+        const specEntries = lot.specs ? Object.entries(lot.specs).filter(([, v]) => v) : [];
+        const specHtml = specEntries.length > 0
+          ? specEntries.map(([k, v]) => {
+            const field = specFields.find(f => f.key === k);
+            return `<span style="display:inline-block; background:white; border:1px solid var(--color-smoke-mid); border-radius:6px; padding:0.2rem 0.5rem; margin:0.15rem 0.3rem 0.15rem 0; font-size:0.75rem;"><strong>${field ? field.label : k}:</strong> ${v}</span>`;
+          }).join('')
+          : '<span style="font-size: 0.75rem; color: var(--color-text-muted);">Sin especificaciones registradas.</span>';
+        const costText = lot.cost !== null ? formatCurrency(lot.cost) : 'Sin costo registrado';
+        const dateText = lot.created_at
+          ? new Date(lot.created_at).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })
+          : '';
+        return `
+          <div style="padding: 0.5rem 0; border-bottom: 1px dashed var(--color-smoke-mid);">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem;">
+              <span style="font-weight: 700; font-size: 0.8rem; color: var(--color-navy);">${lot.qty} unidad${lot.qty > 1 ? 'es' : ''} · ${costText} c/u</span>
+              <span style="font-size: 0.7rem; color: var(--color-text-muted); white-space: nowrap;">${dateText}</span>
+            </div>
+            <div>${specHtml}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleInventoryRowDetail(trRow) {
+      const detailRow = trRow.nextElementSibling;
+      if (!detailRow || !detailRow.classList.contains('inventory-detail-row')) return;
+      const isOpen = detailRow.style.display !== 'none';
+      detailRow.style.display = isOpen ? 'none' : 'table-row';
+      const chevron = trRow.querySelector('.inventory-row-chevron');
+      if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(90deg)';
+    }
+
+    function buildInventoryRow(item, kind, key) {
+      const isNew = kind === 'nuevo';
+      const qty = isNew ? item.nuevos : item.seminuevos;
+      const badge = isNew
+        ? '<span class="bodega-badge badge-listo" style="font-size: 0.65rem;">Nuevo</span>'
+        : '<span class="bodega-badge" style="font-size: 0.65rem; background: var(--color-cyan-dim); color: var(--color-cyan);">Seminuevo</span>';
+
+      const tr = document.createElement('tr');
+      tr.style.cursor = 'pointer';
+      tr.innerHTML = `
+        <td>
+          <span class="inventory-row-chevron" style="display: inline-flex; vertical-align: middle; margin-right: 0.5rem; transition: transform 0.15s;">
+            <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </span>
+          <span style="font-weight: 600; color: var(--color-navy);">${item.activo}</span>
+        </td>
+        <td>${item.talla}</td>
+        <td>${badge}</td>
+        <td><span style="font-weight: 700; color: var(--color-navy);">${qty}</span></td>
+      `;
+      tr.addEventListener('click', () => toggleInventoryRowDetail(tr));
+
+      const detailTr = document.createElement('tr');
+      detailTr.className = 'inventory-detail-row';
+      detailTr.style.display = 'none';
+      const detailTd = document.createElement('td');
+      detailTd.colSpan = 4;
+      detailTd.style.cssText = 'background: #F8FAFC; padding: 0.75rem 1.25rem;';
+      detailTd.innerHTML = renderLotDetailCell(key);
+      detailTr.appendChild(detailTd);
+
+      return [tr, detailTr];
     }
 
     function renderInventoryTable(query = '') {
@@ -1407,28 +1497,14 @@
         totalNuevos += item.nuevos;
         totalSeminuevos += item.seminuevos;
 
-        // Row for New stock
         if (item.nuevos > 0) {
-          const trNew = document.createElement('tr');
-          trNew.innerHTML = `
-            <td><span style="font-weight: 600; color: var(--color-navy);">${item.activo}</span></td>
-            <td>${item.talla}</td>
-            <td><span class="bodega-badge badge-listo" style="font-size: 0.65rem;">Nuevo</span></td>
-            <td><span style="font-weight: 700; color: var(--color-navy);">${item.nuevos}</span></td>
-          `;
-          tbody.appendChild(trNew);
+          const key = `${item.activo}__${item.talla}__nuevo`;
+          buildInventoryRow(item, 'nuevo', key).forEach(row => tbody.appendChild(row));
         }
 
-        // Row for Pre-owned stock
         if (item.seminuevos > 0) {
-          const trUsed = document.createElement('tr');
-          trUsed.innerHTML = `
-            <td><span style="font-weight: 600; color: var(--color-navy);">${item.activo}</span></td>
-            <td>${item.talla}</td>
-            <td><span class="bodega-badge" style="font-size: 0.65rem; background: var(--color-cyan-dim); color: var(--color-cyan);">Seminuevo</span></td>
-            <td><span style="font-weight: 700; color: var(--color-navy);">${item.seminuevos}</span></td>
-          `;
-          tbody.appendChild(trUsed);
+          const key = `${item.activo}__${item.talla}__usado`;
+          buildInventoryRow(item, 'seminuevo', key).forEach(row => tbody.appendChild(row));
         }
       });
 
