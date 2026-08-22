@@ -183,7 +183,7 @@ async function populateHeaderProfile(supabaseClient) {
     if (!session) return;
     
     let { data: profileData } = await supabaseClient.from('company_user').select('first_name, last_name, country').eq('id', session.user.id).limit(1);
-    let { data: compData } = await supabaseClient.from('company_profile').select('company_name, industry, country, language').eq('id', session.user.id).limit(1);
+    let { data: compData } = await supabaseClient.from('company_profile').select('company_name, industry, country, language, logo_url').eq('id', session.user.id).limit(1);
     
     let profile = profileData && profileData.length > 0 ? profileData[0] : null;
     let comp = compData && compData.length > 0 ? compData[0] : null;
@@ -231,6 +231,8 @@ async function populateHeaderProfile(supabaseClient) {
       document.getElementById('popover-avatar-initials').textContent = initials;
     }
 
+    renderCompanyLogo(comp && comp.logo_url ? comp.logo_url : null);
+
     const userLanguage = (comp && comp.language) || null;
     if (userLanguage) localStorage.setItem('dotacian_lang', userLanguage);
 
@@ -238,6 +240,29 @@ async function populateHeaderProfile(supabaseClient) {
   } catch (err) {
     console.error('Error populating header profile', err);
   }
+}
+
+// Logo de la empresa en la esquina superior derecha del topbar (app/*.html).
+// Ojo: hay dos elementos ".header-right" por página (uno es el del avatar
+// en el sidebar), por eso se busca específicamente dentro de ".app-header".
+function renderCompanyLogo(logoUrl) {
+  const headerRight = document.querySelector('.app-header .header-right');
+  if (!headerRight) return;
+
+  let img = document.getElementById('company-logo-img');
+  if (!logoUrl) {
+    if (img) img.remove();
+    return;
+  }
+
+  if (!img) {
+    img = document.createElement('img');
+    img.id = 'company-logo-img';
+    img.alt = 'Logo de la empresa';
+    img.style.cssText = 'margin-left: auto; max-height: 40px; max-width: 160px; object-fit: contain;';
+    headerRight.appendChild(img);
+  }
+  img.src = logoUrl;
 }
 
 function toggleUserPopover(e) {
