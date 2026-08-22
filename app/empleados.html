@@ -2019,7 +2019,7 @@
           const img = item.image || item.img || '';
           const sized = isSizedItem(item);
           const size = sized ? guessSize(item.name, empObj) : '';
-          deliveryItemsList.appendChild(buildDeliveryRow(item.name, qty, size, img, index, item.specs, sized, false, item.tipo));
+          deliveryItemsList.appendChild(buildDeliveryRow(item.name, qty, size, img, index, item.specs, sized));
         });
 
       const digitalItems = items.filter(item => item.category === 'digital');
@@ -2036,7 +2036,7 @@
           const { data: sessionData } = await _supabase.auth.getSession();
           const companyId = await resolveCompanyId(_supabase, sessionData?.session?.user?.id);
 
-          const [deliveriesRes, storageRes, activeAssetsRes] = await Promise.all([
+          const [deliveriesRes, storageRes] = await Promise.all([
             _supabase
               .from('uniform_deliveries')
               .select('*')
@@ -2045,12 +2045,7 @@
             companyId ? _supabase
               .from('company_storage')
               .select('product_name, size, quantity, status, unit_cost, specs, created_at')
-              .eq('company_id', companyId) : Promise.resolve({ data: [] }),
-            companyId ? _supabase
-              .from('company_assets')
-              .select('tipo, nombre')
-              .eq('company_id', companyId)
-              .eq('activo', true) : Promise.resolve({ data: [] })
+              .eq('company_id', companyId) : Promise.resolve({ data: [] })
           ]);
 
           if (deliveriesRes.error) throw deliveriesRes.error;
@@ -2061,16 +2056,6 @@
 
           window.currentEmployeeDeliveries = deliveries;
           window.currentEmployeeObj = empObj;
-
-          // Otros activos activados en el mismo "tipo" (subcategoría del
-          // catálogo), para poder sugerir un sustituto cuando no hay stock
-          // del activo exacto que pide el rol.
-          window.companyActiveAssetsByTipo = {};
-          (activeAssetsRes.data || []).forEach(row => {
-            if (!row.tipo || !row.nombre) return;
-            if (!window.companyActiveAssetsByTipo[row.tipo]) window.companyActiveAssetsByTipo[row.tipo] = [];
-            window.companyActiveAssetsByTipo[row.tipo].push(row.nombre);
-          });
 
           // Build company stock map
           window.companyStockMap = {};
@@ -2264,6 +2249,8 @@
     // (que no llevan unit_cost) consume primero el lote más antiguo. Así se
     // sabe exactamente qué unidad física (con sus specs reales) es la que
     // se va a entregar, en vez de solo la ficha genérica del rol.
+    let _deliveryLotIdCounter = 0;
+
     function computeRemainingDeliveryLots(rawStorageRows) {
       const sorted = [...rawStorageRows].sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
       const lotsByKey = {};
@@ -2278,7 +2265,7 @@
 
         if (qty > 0) {
           const hasCost = item.unit_cost !== null && item.unit_cost !== undefined && item.unit_cost !== '';
-          lots.push({ qty, cost: hasCost ? Number(item.unit_cost) : null, specs: item.specs || null });
+          lots.push({ id: ++_deliveryLotIdCounter, qty, cost: hasCost ? Number(item.unit_cost) : null, specs: item.specs || null });
         } else {
           let toRemove = -qty;
           while (toRemove > 0 && lots.length > 0) {
@@ -2292,81 +2279,64 @@
       return lotsByKey;
     }
 
-    // Bodega guarda el stock por nombre genérico ("Laptop"), sin distinguir
-    // marca/modelo — así que cualquier rol que pida "Laptop" ve el mismo
-    // lote físico, sea cual sea su marca. Si el rol pide una marca puntual,
-    // se prioriza el lote que coincida; si ninguno coincide, se devuelve
-    // igual el lote más antiguo pero marcado como brandMismatch para que la
-    // UI avise en vez de mostrarlo como si fuera un match exacto.
-    function getOldestLotSpecs(name, size, roleSpecs) {
+    function getAvailableLots(name, size) {
       const nameKey = (name || '').trim().toLowerCase();
       const sizeKey = normalizeSizeKey(size);
       const key = `${nameKey}_${sizeKey}_nuevo`;
       const lots = (window.companyLotsMap || {})[key] || [];
-      const available = lots.filter(l => l.qty > 0 && l.specs);
+      return lots.filter(l => l.qty > 0);
+    }
+
+    // Bodega guarda el stock por nombre genérico ("Laptop"), sin distinguir
+    // marca/modelo — así que cualquier rol que pida "Laptop" ve el mismo
+    // lote físico, sea cual sea su marca. Si el rol pide una marca puntual,
+    // se prioriza el lote que coincida; si el admin ya eligió manualmente
+    // otro lote (preferredLotId, desde "Ver otros lotes disponibles"), ese
+    // gana sobre cualquier otra regla. Si ninguno coincide con la marca del
+    // rol, se devuelve igual el lote más antiguo pero marcado como
+    // brandMismatch para que la UI avise en vez de mostrarlo como match.
+    function getOldestLotSpecs(name, size, roleSpecs, preferredLotId) {
+      const available = getAvailableLots(name, size).filter(l => l.specs);
       if (available.length === 0) return null;
+
+      if (preferredLotId != null) {
+        const preferred = available.find(l => l.id === preferredLotId);
+        if (preferred) return { specs: preferred.specs, brandMismatch: false, lotId: preferred.id };
+      }
 
       const targetBrand = roleSpecs && roleSpecs.marca ? roleSpecs.marca.trim().toLowerCase() : null;
       if (targetBrand) {
         const brandMatch = available.find(l => (l.specs.marca || '').trim().toLowerCase() === targetBrand);
-        if (brandMatch) return { specs: brandMatch.specs, brandMismatch: false };
+        if (brandMatch) return { specs: brandMatch.specs, brandMismatch: false, lotId: brandMatch.id };
       }
-      return { specs: available[0].specs, brandMismatch: !!targetBrand };
+      return { specs: available[0].specs, brandMismatch: !!targetBrand, lotId: available[0].id };
     }
 
-    // Otros activos activados en la misma subcategoría (tipo) que sí tienen
-    // stock, para ofrecerlos como sustituto cuando no hay del exacto.
-    function getSimilarAvailableItems(tipo, excludeName, size) {
-      if (!tipo) return [];
-      const candidates = (window.companyActiveAssetsByTipo || {})[tipo] || [];
-      const excludeLower = (excludeName || '').trim().toLowerCase();
-      return candidates
-        .filter(n => n.trim().toLowerCase() !== excludeLower)
-        .map(n => ({ name: n, stock: getStockAmount(n, size) }))
-        .filter(c => c.stock > 0);
+    // Otros lotes del MISMO activo (ej. otra marca de "Audífonos" que
+    // también está en bodega) — nunca de otro producto, aunque esté en la
+    // misma subcategoría del catálogo (eso agrupaba cosas tan distintas
+    // como audífonos y laptops bajo "Cómputo").
+    function getAlternativeLots(name, size, excludeLotId) {
+      return getAvailableLots(name, size).filter(l => l.id !== excludeLotId);
+    }
+
+    function describeLot(lot) {
+      const specs = lot.specs || {};
+      const label = [specs.marca, specs.referencia].filter(Boolean).join(' ');
+      return label || 'otro lote disponible';
     }
 
     function toggleSimilarPicker(btn) {
-      const row = btn.closest('[data-delivery-item-id]');
-      const meta = row && window._deliveryItemMeta[row.dataset.deliveryItemId];
       const picker = btn.nextElementSibling;
-      if (!row || !meta || !picker || !picker.classList.contains('similar-picker')) return;
-
-      const isOpen = picker.style.display === 'flex';
-      if (isOpen) {
-        picker.style.display = 'none';
-        picker.innerHTML = '';
-        return;
-      }
-
-      const nameInput = row.querySelector('input[placeholder="Activo"]');
-      const currentName = nameInput ? nameInput.value.trim() : meta.name;
-      const alternatives = getSimilarAvailableItems(meta.tipo, currentName, meta.size);
-
-      picker.innerHTML = alternatives.length === 0
-        ? '<span style="font-size:0.75rem; color:var(--color-text-muted);">No hay otro activo activado con stock en esta misma categoría.</span>'
-        : alternatives.map(alt => `
-          <button type="button" onclick="substituteDeliveryItem(this, '${escapeAttr(alt.name)}')"
-            style="font-size:0.75rem; font-weight:600; color:#0f172a; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.3rem 0.6rem; cursor:pointer;">
-            Entregar "${escapeDeliveryLabel(alt.name)}" en su lugar (Stock: ${alt.stock})
-          </button>
-        `).join('');
-      picker.style.display = 'flex';
+      if (!picker || !picker.classList.contains('similar-picker')) return;
+      picker.style.display = picker.style.display === 'flex' ? 'none' : 'flex';
     }
 
-    function substituteDeliveryItem(btn, newName) {
+    function selectDeliveryLot(btn, lotId) {
       const row = btn.closest('[data-delivery-item-id]');
       if (!row) return;
-      const id = row.dataset.deliveryItemId;
-      const meta = window._deliveryItemMeta[id];
-
-      const nameInput = row.querySelector('input[placeholder="Activo"]');
-      if (nameInput) nameInput.value = newName;
-
-      // El sustituto es un activo distinto: la ficha de specs del rol ya no
-      // aplica, se muestran las specs reales del lote que sí hay en bodega.
-      if (meta) { meta.name = newName; meta.roleSpecs = null; }
-
+      const meta = window._deliveryItemMeta[row.dataset.deliveryItemId];
+      if (meta) meta.preferredLotId = lotId;
       updateRowStockBadge(row);
       updateGenerateButtonState();
     }
@@ -2688,14 +2658,14 @@
       return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
-    function buildDeliveryDetailInner(name, size, sized, roleSpecs, tipo) {
-      const lotResult = getOldestLotSpecs(name, size, roleSpecs);
+    function buildDeliveryDetailInner(name, size, sized, roleSpecs, preferredLotId) {
+      const lotResult = getOldestLotSpecs(name, size, roleSpecs, preferredLotId);
       const lotSpecs = lotResult ? lotResult.specs : null;
       const specsToShow = lotSpecs || roleSpecs;
       const specEntries = specsToShow ? Object.entries(specsToShow).filter(([, v]) => v) : [];
       const targetBrand = roleSpecs && roleSpecs.marca;
-      const hasSimilarPicker = !!tipo;
-      const hasContent = sized || specEntries.length > 0 || hasSimilarPicker;
+      const alternativeLots = lotResult ? getAlternativeLots(name, size, lotResult.lotId) : [];
+      const hasContent = sized || specEntries.length > 0 || alternativeLots.length > 0;
 
       let sourceNote = '';
       if (lotSpecs && lotResult.brandMismatch) {
@@ -2708,13 +2678,22 @@
         sourceNote = '<div style="width:100%; font-size:0.7rem; color:#94a3b8; font-weight:700; margin-bottom:0.35rem;">Ficha sugerida del rol — sin lote físico coincidente en bodega</div>';
       }
 
-      const similarBlock = hasSimilarPicker ? `
+      // Solo otros lotes del MISMO activo (ej. otra marca de este mismo
+      // producto que también está en bodega) — nunca otro producto distinto.
+      const similarBlock = alternativeLots.length > 0 ? `
         <div style="width:100%; margin-top:0.5rem; padding-top:0.5rem; border-top:1px dashed #e2e8f0;">
           <button type="button" onclick="toggleSimilarPicker(this)"
             style="font-size:0.75rem; font-weight:700; color:#0891B2; background:#ecfeff; border:1px solid #a5f3fc; border-radius:8px; padding:0.3rem 0.65rem; cursor:pointer;">
-            Ver opciones similares
+            Ver otros lotes disponibles de este activo
           </button>
-          <div class="similar-picker" style="display:none; margin-top:0.4rem; flex-wrap:wrap; gap:0.4rem;"></div>
+          <div class="similar-picker" style="display:none; margin-top:0.4rem; flex-wrap:wrap; gap:0.4rem;">
+            ${alternativeLots.map(lot => `
+              <button type="button" onclick="selectDeliveryLot(this, ${lot.id})"
+                style="font-size:0.75rem; font-weight:600; color:#0f172a; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.3rem 0.6rem; cursor:pointer;">
+                Usar ${escapeDeliveryLabel(describeLot(lot))} (Stock: ${lot.qty})
+              </button>
+            `).join('')}
+          </div>
         </div>
       ` : '';
 
@@ -2763,7 +2742,7 @@
       const existingSizeInput = row.querySelector('.delivery-item-detail input[placeholder="Talla"]');
       const size = existingSizeInput ? existingSizeInput.value.trim() : meta.size;
 
-      const { hasContent, html } = buildDeliveryDetailInner(name, size, meta.sized, meta.roleSpecs, meta.tipo);
+      const { hasContent, html } = buildDeliveryDetailInner(name, size, meta.sized, meta.roleSpecs, meta.preferredLotId);
 
       const detailDiv = row.querySelector('.delivery-item-detail');
       const toggleBtn = row.querySelector('.delivery-detail-toggle');
@@ -2782,14 +2761,14 @@
       if (svg) svg.style.transform = isOpen ? '' : 'rotate(90deg)';
     }
 
-    function buildDeliveryRow(name, qty, size, img, id, specs, sized, editableName, tipo) {
+    function buildDeliveryRow(name, qty, size, img, id, specs, sized, editableName) {
       const wrapper = document.createElement('div');
       wrapper.dataset.deliveryItemId = id;
       wrapper.style.cssText = 'display:flex; flex-direction:column; background:white; padding:0.75rem 1rem; border-radius:12px; border:1px solid #e2e8f0; transition:all 0.2s;';
       wrapper.onmouseover = () => wrapper.style.borderColor = '#bae6fd';
       wrapper.onmouseout = () => wrapper.style.borderColor = '#e2e8f0';
 
-      window._deliveryItemMeta[String(id)] = { name, size, sized: !!sized, roleSpecs: specs || null, tipo: tipo || null };
+      window._deliveryItemMeta[String(id)] = { name, size, sized: !!sized, roleSpecs: specs || null, preferredLotId: null };
 
       const stock = getStockAmount(name, size);
       let stockBadgeHtml = '';
@@ -2799,7 +2778,7 @@
         stockBadgeHtml = `<span style="font-size:0.75rem; font-weight:600; color:#ef4444; background:#fef2f2; padding:2px 8px; border-radius:12px; border:1px solid #fecaca;">Stock: 0</span>`;
       }
 
-      const { hasContent: hasDetailContent } = buildDeliveryDetailInner(name, size, sized, specs, tipo);
+      const { hasContent: hasDetailContent } = buildDeliveryDetailInner(name, size, sized, specs, null);
       const detailHtml = renderDeliveryDetailHtml();
 
       wrapper.innerHTML = `
