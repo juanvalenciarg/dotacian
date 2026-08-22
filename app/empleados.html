@@ -631,8 +631,8 @@
 
           <div style="display: flex; gap: 1rem; margin-bottom: 1.25rem;">
             <div style="flex: 1;">
-              <label>Correo Corporativo (Opcional)</label>
-              <input type="email" id="empEmail" placeholder="correo@empresa.com">
+              <label>Correo Corporativo</label>
+              <input type="email" id="empEmail" placeholder="correo@empresa.com" required>
             </div>
             <div style="flex: 1;">
               <label>Celular</label>
@@ -642,8 +642,8 @@
 
           <div style="display: flex; gap: 1rem; margin-bottom: 1.25rem;">
             <div style="flex: 1;">
-              <label>Cédula/CURP</label>
-              <input type="text" id="empDoc" placeholder="ej. 12345678" required>
+              <label>Número de Identificación</label>
+              <input type="text" id="empDoc" placeholder="ej. cédula, CURP, DNI, pasaporte..." required>
             </div>
             <div style="flex: 1;">
               <label>Fecha de Nacimiento</label>
@@ -666,14 +666,17 @@
             </div>
           </div>
 
-          <button type="button" id="addressToggleBtn" onclick="toggleAddressSection()"
-            style="background: none; border: none; color: var(--color-cyan); font-weight: 700; font-size: 0.875rem; cursor: pointer; padding: 0; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.4rem;">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            Agregar dirección (opcional)
-          </button>
+          <div style="margin-bottom: 1.25rem;">
+            <label>¿Se le entrega algo en su domicilio?</label>
+            <div style="display: flex; gap: 1.25rem; margin-top: 0.5rem;">
+              <label style="display: flex; align-items: center; gap: 0.4rem; font-weight: 500; cursor: pointer;">
+                <input type="radio" name="empHomeDelivery" value="no" checked onchange="toggleAddressSection()"> No
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.4rem; font-weight: 500; cursor: pointer;">
+                <input type="radio" name="empHomeDelivery" value="si" onchange="toggleAddressSection()"> Sí
+              </label>
+            </div>
+          </div>
 
           <div id="addressSection" style="display: none;">
             <div style="display: flex; gap: 1rem; margin-bottom: 1.25rem;">
@@ -843,7 +846,7 @@
               <span style="color: var(--color-border);">|</span>
               <p id="detailPhone" style="color: var(--color-text-secondary); font-size: 0.875rem;">55 1234 5678</p>
               <span style="color: var(--color-border);">|</span>
-              <p id="detailDoc" style="color: var(--color-text-secondary); font-size: 0.875rem;">Cédula/CURP: —</p>
+              <p id="detailDoc" style="color: var(--color-text-secondary); font-size: 0.875rem;">ID: —</p>
             </div>
           </div>
         </div>
@@ -1330,7 +1333,7 @@
               <p style="margin: 2px 0 0 0; font-size: 0.95rem; color: #334155; font-weight: 600;">${emp.phone || 'N/A'}</p>
             </div>
             <div>
-              <p style="margin: 0; font-size: 0.75rem; text-transform: uppercase; color: #64748b; font-weight: 700; letter-spacing: 0.05em;">Cédula / CURP</p>
+              <p style="margin: 0; font-size: 0.75rem; text-transform: uppercase; color: #64748b; font-weight: 700; letter-spacing: 0.05em;">Número de Identificación</p>
               <p style="margin: 2px 0 0 0; font-size: 0.95rem; color: #334155; font-weight: 600;">${docVal}</p>
             </div>
           </div>
@@ -1519,14 +1522,9 @@
 
     function resetEmployeeModalUI() {
       updateEmployeePreview();
+      const noRadio = document.querySelector('input[name="empHomeDelivery"][value="no"]');
+      if (noRadio) noRadio.checked = true;
       document.getElementById('addressSection').style.display = 'none';
-      document.getElementById('addressToggleBtn').innerHTML = `
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-        Agregar dirección (opcional)
-      `;
       dismissAddressSuggestions();
       handleEmpRoleChange();
     }
@@ -1548,12 +1546,8 @@
 
     function toggleAddressSection() {
       const section = document.getElementById('addressSection');
-      const btn = document.getElementById('addressToggleBtn');
-      const isHidden = section.style.display === 'none';
-      section.style.display = isHidden ? 'block' : 'none';
-      btn.innerHTML = isHidden
-        ? `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12" /></svg> Quitar dirección`
-        : `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg> Agregar dirección (opcional)`;
+      const wantsHomeDelivery = document.querySelector('input[name="empHomeDelivery"]:checked')?.value === 'si';
+      section.style.display = wantsHomeDelivery ? 'block' : 'none';
     }
 
     function updateEmployeePreview() {
@@ -1642,7 +1636,7 @@
       const sheet = workbook.addWorksheet('Empleados');
 
       // Add Headers
-      sheet.addRow(["Nombre", "Apellido", "Cédula/CURP", "Fecha de Nacimiento", "Celular", "Rol / Puesto", "Talla Camisa", "Talla Pantalon", "Talla Zapatos"]);
+      sheet.addRow(["Nombre", "Apellido", "Número de Identificación", "Fecha de Nacimiento", "Celular", "Rol / Puesto", "Talla Camisa", "Talla Pantalon", "Talla Zapatos"]);
 
       // Add Example Row
       const activeRoles = window.activeRolesList || ['Mesero', 'Chef', 'Barista'];
@@ -2064,7 +2058,7 @@
       // Populate document ID next to phone number
       const detailDoc = document.getElementById('detailDoc');
       if (detailDoc) {
-        detailDoc.textContent = empObj && empObj.id_document ? `Cédula/CURP: ${empObj.id_document}` : 'Cédula/CURP: —';
+        detailDoc.textContent = empObj && empObj.id_document ? `ID: ${empObj.id_document}` : 'ID: —';
       }
 
       // Reset action button to 'Actualizar Tallas'
@@ -3308,6 +3302,7 @@
       const role = document.getElementById('empRole').value;
       const birthDate = document.getElementById('empBirthDate').value;
       const area = getEmpAreaValue();
+      const wantsHomeDelivery = document.querySelector('input[name="empHomeDelivery"]:checked')?.value === 'si';
       const addressCountry = document.getElementById('empAddressCountry').value.trim();
       const addressCity = document.getElementById('empAddressCity').value.trim();
       const addressPostalCode = document.getElementById('empAddressPostalCode').value.trim();
@@ -3317,6 +3312,11 @@
       const pantsSize = document.getElementById('empPantsSize').value;
       const shoeSize = document.getElementById('empShoeSize').value;
       const requestSizes = document.getElementById('empRequestSizes')?.checked;
+
+      if (wantsHomeDelivery && (!addressCountry || !addressCity || !addressLine)) {
+        showToast('Falta la dirección', 'Ya que se le entrega algo en su domicilio, completa país, ciudad y dirección.', 'error');
+        return;
+      }
 
       try {
         const { data: sessionData } = await _supabase.auth.getSession();
