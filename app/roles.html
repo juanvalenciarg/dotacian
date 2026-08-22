@@ -1525,15 +1525,6 @@
       ],
       'ERP': [
         { key: 'plataforma', label: 'Plataforma preferida', type: 'text', placeholder: 'ej. SAP, Odoo' }
-      ],
-      'VPN': [
-        { key: 'proveedor', label: 'Proveedor preferido', type: 'text', placeholder: 'ej. NordLayer, Tailscale' }
-      ],
-      'Usuario de sistema interno': [
-        { key: 'sistema', label: 'Sistema', type: 'text', placeholder: 'ej. ERP interno' }
-      ],
-      'Correo corporativo': [
-        { key: 'dominio', label: 'Dominio', type: 'text', placeholder: 'ej. @tuempresa.com' }
       ]
     };
 
@@ -1605,8 +1596,7 @@
           equipo: { label: t('catalog.equipo.label'), tipo: 'equipo', items: [t('item.kitHerramientas'), t('item.radio'), t('item.casco'), t('item.zapatosSeguridad'), t('item.equipoAlturas'), t('item.gafasProteccion'), t('item.guantesSeguridad'), t('item.chalecoReflectivo'), t('item.proteccionAuditiva'), t('item.respirador'), t('item.lamparaCasco')] }
         },
         digital: {
-          licencia: { label: t('catalog.licencia.label'), tipo: 'licencia', items: [t('item.googleWorkspace'), t('item.microsoft365'), t('item.crm'), t('item.erp')] },
-          acceso_digital: { label: t('catalog.acceso_digital.label'), tipo: 'acceso_digital', items: [t('item.vpn'), t('item.usuarioSistema'), t('item.correoCorp')] }
+          licencia: { label: t('catalog.licencia.label'), tipo: 'licencia', items: [t('item.googleWorkspace'), t('item.microsoft365'), t('item.crm'), t('item.erp')] }
         }
       };
     }
