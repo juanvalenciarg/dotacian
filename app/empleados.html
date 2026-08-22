@@ -2329,8 +2329,8 @@
     function toggleSimilarPicker(btn) {
       const row = btn.closest('[data-delivery-item-id]');
       const meta = row && window._deliveryItemMeta[row.dataset.deliveryItemId];
-      const picker = row ? row.querySelector('.similar-picker') : null;
-      if (!row || !meta || !picker) return;
+      const picker = btn.nextElementSibling;
+      if (!row || !meta || !picker || !picker.classList.contains('similar-picker')) return;
 
       const isOpen = picker.style.display === 'flex';
       if (isOpen) {
@@ -2616,13 +2616,7 @@
       }
 
       const shortageActions = row.querySelector('.delivery-shortage-actions');
-      if (shortageActions) {
-        shortageActions.style.display = stock > 0 ? 'none' : 'flex';
-        if (stock > 0) {
-          const picker = shortageActions.querySelector('.similar-picker');
-          if (picker) { picker.style.display = 'none'; picker.innerHTML = ''; }
-        }
-      }
+      if (shortageActions) shortageActions.style.display = stock > 0 ? 'none' : 'flex';
 
       refreshDeliveryRowDetail(row);
       // Update the button state dynamically!
@@ -2694,21 +2688,35 @@
       return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
-    function buildDeliveryDetailInner(name, size, sized, roleSpecs) {
+    function buildDeliveryDetailInner(name, size, sized, roleSpecs, tipo) {
       const lotResult = getOldestLotSpecs(name, size, roleSpecs);
       const lotSpecs = lotResult ? lotResult.specs : null;
       const specsToShow = lotSpecs || roleSpecs;
       const specEntries = specsToShow ? Object.entries(specsToShow).filter(([, v]) => v) : [];
-      const hasContent = sized || specEntries.length > 0;
+      const targetBrand = roleSpecs && roleSpecs.marca;
+      const hasSimilarPicker = !!tipo;
+      const hasContent = sized || specEntries.length > 0 || hasSimilarPicker;
 
       let sourceNote = '';
       if (lotSpecs && lotResult.brandMismatch) {
         sourceNote = `<div style="width:100%; font-size:0.7rem; color:#b45309; font-weight:700; margin-bottom:0.35rem;">Atención: el lote disponible en bodega es de otra marca (el rol pide "${escapeDeliveryLabel(roleSpecs.marca)}") — revisa antes de entregar</div>`;
+      } else if (lotSpecs && targetBrand) {
+        sourceNote = '<div style="width:100%; font-size:0.7rem; color:#0f766e; font-weight:700; margin-bottom:0.35rem;">Coincidencia exacta con lo que pide el rol</div>';
       } else if (lotSpecs) {
         sourceNote = '<div style="width:100%; font-size:0.7rem; color:#0f766e; font-weight:700; margin-bottom:0.35rem;">Specs del lote disponible en bodega</div>';
       } else if (specEntries.length > 0) {
         sourceNote = '<div style="width:100%; font-size:0.7rem; color:#94a3b8; font-weight:700; margin-bottom:0.35rem;">Ficha sugerida del rol — sin lote físico coincidente en bodega</div>';
       }
+
+      const similarBlock = hasSimilarPicker ? `
+        <div style="width:100%; margin-top:0.5rem; padding-top:0.5rem; border-top:1px dashed #e2e8f0;">
+          <button type="button" onclick="toggleSimilarPicker(this)"
+            style="font-size:0.75rem; font-weight:700; color:#0891B2; background:#ecfeff; border:1px solid #a5f3fc; border-radius:8px; padding:0.3rem 0.65rem; cursor:pointer;">
+            Ver opciones similares
+          </button>
+          <div class="similar-picker" style="display:none; margin-top:0.4rem; flex-wrap:wrap; gap:0.4rem;"></div>
+        </div>
+      ` : '';
 
       const html = `
         ${sourceNote}
@@ -2726,6 +2734,7 @@
             </span>
           `).join('')}
         </div>
+        ${similarBlock}
       `;
       return { hasContent, html };
     }
@@ -2754,7 +2763,7 @@
       const existingSizeInput = row.querySelector('.delivery-item-detail input[placeholder="Talla"]');
       const size = existingSizeInput ? existingSizeInput.value.trim() : meta.size;
 
-      const { hasContent, html } = buildDeliveryDetailInner(name, size, meta.sized, meta.roleSpecs);
+      const { hasContent, html } = buildDeliveryDetailInner(name, size, meta.sized, meta.roleSpecs, meta.tipo);
 
       const detailDiv = row.querySelector('.delivery-item-detail');
       const toggleBtn = row.querySelector('.delivery-detail-toggle');
@@ -2790,7 +2799,7 @@
         stockBadgeHtml = `<span style="font-size:0.75rem; font-weight:600; color:#ef4444; background:#fef2f2; padding:2px 8px; border-radius:12px; border:1px solid #fecaca;">Stock: 0</span>`;
       }
 
-      const { hasContent: hasDetailContent } = buildDeliveryDetailInner(name, size, sized, specs);
+      const { hasContent: hasDetailContent } = buildDeliveryDetailInner(name, size, sized, specs, tipo);
       const detailHtml = renderDeliveryDetailHtml();
 
       wrapper.innerHTML = `
@@ -2859,16 +2868,11 @@
         </div>
         ${detailHtml}
         <div class="delivery-shortage-actions" style="display:${stock > 0 ? 'none' : 'flex'}; margin-top:0.65rem; padding-top:0.65rem; border-top:1px dashed #fecaca; padding-left:2.9rem; align-items:center; flex-wrap:wrap; gap:0.5rem;">
-          <span style="font-size:0.75rem; color:#ef4444; font-weight:600;">Sin stock de este activo.</span>
-          <button type="button" onclick="toggleSimilarPicker(this)"
-            style="font-size:0.75rem; font-weight:700; color:#0891B2; background:#ecfeff; border:1px solid #a5f3fc; border-radius:8px; padding:0.3rem 0.65rem; cursor:pointer;">
-            Ver alternativas disponibles
-          </button>
+          <span style="font-size:0.75rem; color:#ef4444; font-weight:600;">Sin stock de este activo. Revisa "Detalle" para ver opciones similares o cotizar.</span>
           <button type="button" onclick="cotizarActivoFaltante(this)"
             style="font-size:0.75rem; font-weight:700; color:white; background:#0f172a; border:none; border-radius:8px; padding:0.3rem 0.65rem; cursor:pointer;">
             Cotizar con Dot
           </button>
-          <div class="similar-picker" style="display:none; width:100%; margin-top:0.4rem; flex-wrap:wrap; gap:0.4rem;"></div>
         </div>
       `;
       refreshDeliveryRowDetail(wrapper);
