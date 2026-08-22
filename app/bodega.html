@@ -1225,7 +1225,8 @@
       const { data, error } = await _supabase
         .from('company_storage')
         .select('*')
-        .eq('company_id', currentCompanyId);
+        .eq('company_id', currentCompanyId)
+        .order('created_at', { ascending: true });
 
       if (error) {
         console.error('Error cargando storage:', error);
@@ -1350,39 +1351,43 @@
       const totalActivos = inventoryData.reduce((sum, item) => sum + item.nuevos + item.seminuevos, 0);
       document.getElementById('kpiTotalActivos').textContent = totalActivos;
 
-      // El valor se calcula sobre la cantidad NETA restante por producto, no
-      // fila por fila: las entregas a empleados (mi_dotacion.html) y las
-      // bajas manuales insertan filas de company_storage con cantidad
-      // negativa pero sin unit_cost, así que precificar cada fila por su
-      // cuenta dejaba "valor fantasma" aunque el stock físico ya fuera 0.
-      // El costo unitario de cada producto es el promedio ponderado de sus
-      // entradas (unit_cost), con el price map como respaldo si nunca se
-      // registró un costo de compra.
+      // Costeo FIFO por producto: cada alta abre un lote con su unit_cost;
+      // cada baja (dar de baja o entrega a un empleado, que no llevan
+      // unit_cost) consume primero el lote más antiguo que siga abierto.
+      // Un promedio simple sobre todo el historial "contamina" el costo del
+      // stock actual con lotes de prueba que ya se dieron de baja hace
+      // rato; FIFO refleja qué lote es el que realmente sigue en bodega.
       const priceMap = window.inventoryPriceMap || {};
-      const rawData = window.rawInventoryData || [];
+      const rawData = [...(window.rawInventoryData || [])]
+        .sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
 
-      const byProduct = {};
+      const lotsByProduct = {};
       rawData.forEach(item => {
         const name = item.product_name || 'Desconocido';
-        if (!byProduct[name]) byProduct[name] = { netQty: 0, addedQtySum: 0, addedCostSum: 0 };
-        const qty = item.quantity || 0;
-        byProduct[name].netQty += qty;
+        if (!lotsByProduct[name]) lotsByProduct[name] = [];
+        const lots = lotsByProduct[name];
+        let qty = item.quantity || 0;
 
-        const hasCost = item.unit_cost !== null && item.unit_cost !== undefined && item.unit_cost !== '';
-        if (hasCost && qty > 0) {
-          byProduct[name].addedQtySum += qty;
-          byProduct[name].addedCostSum += qty * Number(item.unit_cost);
+        if (qty > 0) {
+          const hasCost = item.unit_cost !== null && item.unit_cost !== undefined && item.unit_cost !== '';
+          lots.push({ qty, cost: hasCost ? Number(item.unit_cost) : null });
+        } else {
+          let toRemove = -qty;
+          while (toRemove > 0 && lots.length > 0) {
+            const consumed = Math.min(toRemove, lots[0].qty);
+            lots[0].qty -= consumed;
+            toRemove -= consumed;
+            if (lots[0].qty <= 0) lots.shift();
+          }
         }
       });
 
       let totalValue = 0;
-      Object.keys(byProduct).forEach(name => {
-        const entry = byProduct[name];
-        if (entry.netQty <= 0) return;
-        const unitPrice = entry.addedQtySum > 0
-          ? entry.addedCostSum / entry.addedQtySum
-          : (priceMap[name.trim().toLowerCase()] || 450);
-        totalValue += entry.netQty * unitPrice;
+      Object.keys(lotsByProduct).forEach(name => {
+        const fallbackPrice = priceMap[name.trim().toLowerCase()] || 450;
+        lotsByProduct[name].forEach(lot => {
+          totalValue += lot.qty * (lot.cost !== null ? lot.cost : fallbackPrice);
+        });
       });
 
       document.getElementById('kpiValorBodega').textContent = formatCurrency(totalValue);
