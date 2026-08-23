@@ -687,6 +687,7 @@
                     <th style="cursor: pointer;" onclick="sortTable(3)">Alerta Renovación ↕</th>
                     <th style="cursor: pointer;" onclick="sortTable(4)">Estado ↕</th>
                     <th>Tallas</th>
+                    <th style="cursor: pointer;" onclick="sortTable(6)">Fecha de Ingreso ↕</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -816,6 +817,14 @@
               <label>Fecha de Nacimiento</label>
               <input type="text" id="empBirthDate" placeholder="dd/mm/aaaa" autocomplete="off" required>
             </div>
+          </div>
+
+          <div style="display: flex; gap: 1rem; margin-bottom: 1.25rem;">
+            <div style="flex: 1;">
+              <label>Fecha de Ingreso</label>
+              <input type="text" id="empHireDate" placeholder="dd/mm/aaaa" autocomplete="off">
+            </div>
+            <div style="flex: 1;"></div>
           </div>
 
           <div style="margin-bottom: 1.25rem;">
@@ -1163,6 +1172,13 @@
               style="font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-bottom: 0.25rem;">Próxima
               Entrega</label>
             <strong id="detailNextDelivery" style="font-size: 0.875rem; color: #F59E0B;">15 Nov 2026</strong>
+          </div>
+          <div class="app-card"
+            style="padding: 1rem; margin: 0; background: #f8fafc; border: 1px solid var(--color-border);">
+            <label
+              style="font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-bottom: 0.25rem;">Fecha
+              de Ingreso</label>
+            <strong id="detailHireDate" style="font-size: 0.875rem; color: var(--color-navy);">Sin registrar</strong>
           </div>
         </div>
 
@@ -1721,6 +1737,7 @@
     function closeModal() {
       document.getElementById('employeeModal').classList.remove('active');
       if (window.empBirthDatePicker) window.empBirthDatePicker.clear();
+      if (window.empHireDatePicker) window.empHireDatePicker.clear();
     }
 
     function resetEmployeeModalUI() {
@@ -1847,7 +1864,8 @@
       { header: 'Indicaciones', required: false },
       { header: 'Talla Camisa', required: false },
       { header: 'Talla Pantalón', required: false },
-      { header: 'Talla Zapatos', required: false }
+      { header: 'Talla Zapatos', required: false },
+      { header: 'Fecha de Ingreso (dd/mm/aaaa)', required: false }
     ];
 
     // Consulta los roles activos directamente en vez de depender de
@@ -1895,7 +1913,7 @@
       const exampleRole = activeRoles.length > 0 ? activeRoles[0] : '';
       sheet.addRow([
         "Ejemplo Juan", "Pérez", "juan.perez@empresa.com", "5512345678", "12345678", "15/05/1990", exampleRole,
-        "No", "", "", "", "", "", "M", "32", "27"
+        "No", "", "", "", "", "", "M", "32", "27", "01/03/2026"
       ]);
 
       // Formatting: encabezados en negrita, color distinto según obligatorio/opcional
@@ -2020,6 +2038,7 @@
           const addressPostalCode = (row[10] || '').toString().trim();
           const addressLine = (row[11] || '').toString().trim();
           const addressIndications = (row[12] || '').toString().trim();
+          const hireDate = parseBulkBirthDate(row[16]);
 
           if (!name && !lastName && !email && !phone) return; // fila vacía, no cuenta como error
 
@@ -2049,6 +2068,7 @@
             shirt_size: row[13] || '',
             pants_size: row[14] || '',
             shoe_size: row[15] || '',
+            hire_date: hireDate,
             status: 'none'
           });
           added++;
@@ -2080,6 +2100,7 @@
       const detailPantsSize = document.getElementById('detailPantsSize');
       const detailShoeSize = document.getElementById('detailShoeSize');
       const detailBirthDate = document.getElementById('detailBirthDate');
+      const detailHireDate = document.getElementById('detailHireDate');
       const detailLastDelivery = document.getElementById('detailLastDelivery');
       const detailNextDelivery = document.getElementById('detailNextDelivery');
       const signatureDate = document.getElementById('signatureDate');
@@ -2097,6 +2118,13 @@
         detailBirthDate.textContent = bd.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
       } else {
         detailBirthDate.textContent = 'Sin registrar';
+      }
+
+      if (empObj && empObj.hire_date) {
+        const hd = new Date(empObj.hire_date + 'T00:00:00');
+        detailHireDate.textContent = hd.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
+      } else {
+        detailHireDate.textContent = 'Sin registrar';
       }
 
       detailRole.dataset.dbId = db_id;
@@ -4261,6 +4289,7 @@
       const phone = document.getElementById('empPhone').value;
       const role = document.getElementById('empRole').value;
       const birthDate = document.getElementById('empBirthDate').value;
+      const hireDate = document.getElementById('empHireDate').value;
       const area = getEmpAreaValue();
       const wantsHomeDelivery = document.querySelector('input[name="empHomeDelivery"]:checked')?.value === 'si';
       const addressCountry = document.getElementById('empAddressCountry').value.trim();
@@ -4293,6 +4322,7 @@
           role: role,
           area: area || null,
           birth_date: birthDate || null,
+          hire_date: hireDate || null,
           address_country: addressCountry || null,
           address_city: addressCity || null,
           address_postal_code: addressPostalCode || null,
@@ -4368,6 +4398,35 @@
       showToast('Industria Cambiada', 'Se ha actualizado la dotación sugerida para ' + industry);
     }
 
+    // Fecha de ingreso + badge para detectar de un vistazo los ingresos
+    // nuevos (últimos 30 días) o próximos (fecha todavía no llega).
+    function buildHireDateCellHtml(hireDateStr) {
+      if (!hireDateStr) {
+        return '<span style="color: var(--color-text-muted); font-size: 0.8125rem;">—</span>';
+      }
+
+      const hireDate = new Date(hireDateStr + 'T00:00:00');
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const diffDays = Math.round((hireDate - today) / (1000 * 60 * 60 * 24));
+
+      const dateLabel = hireDate.toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
+
+      let badge = '';
+      if (diffDays > 0) {
+        badge = `<span class="status-badge" style="background:#EEF2FF; color:#4338CA; font-weight:700; font-size:0.7rem;">Próximo ingreso</span>`;
+      } else if (diffDays >= -30) {
+        badge = `<span class="status-badge" style="background:#ECFDF5; color:#059669; font-weight:700; font-size:0.7rem;">Nuevo</span>`;
+      }
+
+      return `
+        <div style="display:flex; flex-direction:column; align-items:flex-start; gap:0.3rem;">
+          <span style="font-size:0.8125rem; color:var(--color-navy);">${dateLabel}</span>
+          ${badge}
+        </div>
+      `;
+    }
+
     function renderEmployees(industry) {
       const tbody = document.getElementById('employees-tbody');
       tbody.innerHTML = '';
@@ -4404,6 +4463,7 @@
           <td>
             <span class="status-badge" style="background: ${sizesBadgeColor}; color: ${sizesTextColor}; font-weight: 700;">${sizesBadgeText}</span>
           </td>
+          <td>${buildHireDateCellHtml(emp.hire_date)}</td>
           <td>
             <div style="display: flex; gap: 0.5rem; justify-content: flex-start; align-items: center;">
               <button class="btn btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.75rem; min-width: 60px;" onclick="openDetailModal('${emp.name}', '${assign.role}', '85%', '${emp.address}', '${emp.phone}', '${emp.status}', '${emp.db_id}', '${emp.role_status}')">Ver</button>
@@ -4516,6 +4576,7 @@
             shoe_size: emp.shoe_size || '',
             id_document: emp.id_document || '',
             birth_date: emp.birth_date || null,
+            hire_date: emp.hire_date || null,
             sizes_confirmed_at: emp.sizes_confirmed_at || null,
             sizes_request_expires_at: emp.sizes_request_expires_at || null
           };
@@ -4559,12 +4620,29 @@
       });
     }
 
+    // Sin maxDate: a diferencia del nacimiento, la fecha de ingreso puede
+    // quedar en el futuro a propósito (para dejar registrado un ingreso ya
+    // confirmado que todavía no arranca) y así verlo como "Próximo ingreso"
+    // en la tabla antes de que llegue la fecha.
+    function initHireDatePicker() {
+      window.empHireDatePicker = flatpickr("#empHireDate", {
+        locale: "es",
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d/m/Y",
+        allowInput: true,
+        minDate: "1990-01-01",
+        disableMobile: true
+      });
+    }
+
     // Initial render
     window.onload = () => {
       setTimeout(fetchEmployees, 1000); // Wait for Supabase to init
       setTimeout(loadActiveRoles, 1000); // Wait for Supabase to init
       setTimeout(loadRoleGarments, 1000); // Load configured garments from DB
       initBirthDatePicker();
+      initHireDatePicker();
     };
 
     window.roleGarments = {};
