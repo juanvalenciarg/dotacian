@@ -88,15 +88,16 @@ security definer
 set search_path = public
 as $$
 begin
-  if not exists (select 1 from admin_profile where id = auth.uid()) then
+  if not exists (select 1 from admin_profile where admin_profile.id = auth.uid()) then
     raise exception 'No autorizado';
   end if;
 
   return query
     select
-      q.id, q.company_id, cp.company_name, cp.legal_name, cp.tax_id, cp.dv, cp.country,
-      cp.delivery_address, cp.delivery_state,
-      cp.delivery_contact_1_name, cp.delivery_contact_1_phone, cp.delivery_contact_1_email,
+      q.id, q.company_id,
+      cp.company_name::text, cp.legal_name::text, cp.tax_id::text, cp.dv::text, cp.country::text,
+      cp.delivery_address::text, cp.delivery_state::text,
+      cp.delivery_contact_1_name::text, cp.delivery_contact_1_phone::text, cp.delivery_contact_1_email::text,
       q.prompt_text, q.target_mode, q.target_role, q.target_employee_id, q.target_employee_name,
       q.item_name, q.item_qty, q.item_size, q.status, q.pdf_generated_at, q.created_at
     from company_dot_quote_requests q
@@ -114,7 +115,7 @@ security definer
 set search_path = public
 as $$
 begin
-  if not exists (select 1 from admin_profile where id = auth.uid()) then
+  if not exists (select 1 from admin_profile where admin_profile.id = auth.uid()) then
     raise exception 'No autorizado';
   end if;
 

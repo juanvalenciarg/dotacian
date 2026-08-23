@@ -2686,6 +2686,21 @@
         ? `¡Listo! ✅ Ya estoy armando tu solicitud de cotización${forWho}. En un momento vas a poder verla y generar el PDF desde el panel de administración.`
         : 'Se me complicó guardar tu solicitud 😕. Intenta de nuevo en un momento.');
       dotChatState = 'done';
+      appendDotCloseButton();
+    }
+
+    function appendDotCloseButton() {
+      const history = document.getElementById('dotChatHistory');
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'display: flex; justify-content: center; margin-top: 0.25rem;';
+      wrap.innerHTML = `
+        <button type="button" onclick="closeDotChatModal()"
+          style="padding: 0.6rem 1.5rem; border-radius: 99px; border: 1.5px solid var(--color-border); background: white; color: var(--color-navy); font-size: 0.8125rem; font-weight: 700; cursor: pointer;">
+          Cerrar
+        </button>
+      `;
+      history.appendChild(wrap);
+      history.scrollTop = history.scrollHeight;
     }
 
     async function saveDotQuoteRequest(promptText) {
