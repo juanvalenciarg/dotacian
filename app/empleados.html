@@ -3033,7 +3033,23 @@
       rows.forEach(row => {
         updateRowStockBadge(row);
         refreshDeliveryRowDetail(row);
+
+        // Esta es la primera vez que se conoce el stock real de cada fila
+        // (antes de esto todo arranca marcado a ciegas). Por default solo
+        // deben quedar seleccionados los activos que sí tienen existencias
+        // — los que no, requieren que el usuario los revise a propósito
+        // ("Detalle"/"Cotizar con Dot") en vez de bloquear "Entrega" por
+        // sorpresa con algo que nunca se pudo entregar.
+        const nameInput = row.querySelector('input[placeholder="Activo"]');
+        const sizeInput = row.querySelector('input[placeholder="Talla"]');
+        const checkbox = row.querySelector('input[type="checkbox"]');
+        if (nameInput && checkbox) {
+          const name = nameInput.value.trim();
+          const size = sizeInput ? sizeInput.value.trim() : '';
+          checkbox.checked = getStockAmount(name, size) > 0;
+        }
       });
+      updateGenerateButtonState();
     }
 
     function prettifySpecKey(key) {
