@@ -619,6 +619,21 @@
       gap: 2rem;
     }
 
+    .insights-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .insight-row {
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .insight-row:last-child {
+      border-bottom: none;
+    }
+
     .logo-thumbnail {
       width: 40px;
       height: 40px;
@@ -817,6 +832,40 @@
                 los últimos 6 meses.</p>
               <div style="position: relative; height: 280px;">
                 <canvas id="monthlyPurchaseChart"></canvas>
+              </div>
+            </div>
+
+            <div class="insights-row">
+              <div class="app-card" style="padding: 1.75rem;">
+                <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.25rem;">
+                  Valor de Activos por Rol</h3>
+                <p style="color: #64748B; font-size: 0.875rem; margin-bottom: 1rem;">Valor estimado del kit
+                  asignado a cada rol.</p>
+                <div id="roleValueList">
+                  <div style="color: var(--color-text-muted); font-size: 0.875rem; padding: 1rem 0;">Cargando...
+                  </div>
+                </div>
+              </div>
+
+              <div class="app-card" style="padding: 1.75rem;">
+                <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.25rem;">
+                  Roles con Mayor Cantidad de Activos</h3>
+                <p style="color: #64748B; font-size: 0.875rem; margin-bottom: 1rem;">Unidades físicas asignadas
+                  por rol.</p>
+                <div id="roleQtyList">
+                  <div style="color: var(--color-text-muted); font-size: 0.875rem; padding: 1rem 0;">Cargando...
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="app-card" style="padding: 1.75rem; margin-top: 1.5rem;">
+              <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.25rem;">
+                Entregas por Empleado</h3>
+              <p style="color: #64748B; font-size: 0.875rem; margin-bottom: 1rem;">% de activos entregados vs.
+                pendientes según el kit de su rol.</p>
+              <div id="employeeDeliveryList">
+                <div style="color: var(--color-text-muted); font-size: 0.875rem; padding: 1rem 0;">Cargando...</div>
               </div>
             </div>
           </div> <!-- Close dashboard-left -->
@@ -1031,6 +1080,7 @@
       if (assetsEl) assetsEl.textContent = assetsCount;
 
       loadMonthlyPurchaseChart(userId);
+      loadAssetInsightCards(userId);
 
 
       let completedSteps = 0;
@@ -1095,6 +1145,207 @@
       if (layout) {
         layout.classList.toggle('sidebar-open');
       }
+    }
+
+    function escapeDashHtml(str) {
+      return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // ── Valor por rol, roles con más activos, y % de entrega por empleado ──
+    async function loadAssetInsightCards(companyId) {
+      if (!companyId) return;
+
+      const roleValueListEl = document.getElementById('roleValueList');
+      const roleQtyListEl = document.getElementById('roleQtyList');
+      const employeeDeliveryListEl = document.getElementById('employeeDeliveryList');
+
+      try {
+        const [{ data: roleDefs }, { data: employees }, { data: catalogData }, { data: poData }, { data: quoteData }, { data: deliveries }] = await Promise.all([
+          _supabase.from('role_definition').select('role_name, items').eq('company_id', companyId),
+          _supabase.from('company_employees').select('id, first_name, last_name, role').eq('company_id', companyId).neq('role_status', 'inactive'),
+          _supabase.from('seller_catalog').select('name, base_price'),
+          _supabase.from('company_purchase_orders').select('items').eq('company_id', companyId),
+          _supabase.from('company_quotes_requests').select('product_name, unit_price').eq('company_id', companyId),
+          _supabase.from('uniform_deliveries').select('employee_id, status, items, signed_at, created_at').eq('status', 'signed')
+        ]);
+
+        // Mismo criterio de precios que app/bodega.html (catálogo > POs >
+        // cotizaciones > fallback estándar), para que "valor por rol" sea
+        // consistente con el valor de inventario que ya se muestra ahí.
+        const priceMap = {
+          'camisa oxford ejecutiva': 450, 'camisa oxford': 450,
+          'pantalón cocina pro': 350, 'pantalón de cocina': 350,
+          'filipina chef classic': 490, 'filipina chef': 490, 'filipina chef stretch': 550,
+          'mandil barista premium': 280, 'mandil barista': 280,
+          'polo piqué classic': 220, 'polo piqué': 220,
+          'conjunto antifluido': 650, 'overol industrial': 750,
+          'botas de seguridad': 850, 'bota de seguridad': 850, 'zapatos de seguridad': 850,
+          'tenis antiderrapantes': 490, 'zapato antiderrapante': 490
+        };
+        (catalogData || []).forEach(item => {
+          if (item.name) priceMap[item.name.trim().toLowerCase()] = item.base_price || 0;
+        });
+        (poData || []).forEach(po => {
+          (Array.isArray(po.items) ? po.items : []).forEach(it => {
+            if (it.product_name && it.unit_price) priceMap[it.product_name.trim().toLowerCase()] = it.unit_price;
+          });
+        });
+        (quoteData || []).forEach(q => {
+          if (q.product_name && q.unit_price) priceMap[q.product_name.trim().toLowerCase()] = q.unit_price;
+        });
+
+        // ── Valor y cantidad de activos físicos por rol ──
+        const roleStats = (roleDefs || []).map(rd => {
+          const items = (rd.items || []).filter(it => it.name && it.category !== 'digital');
+          let totalQty = 0;
+          let totalValue = 0;
+          items.forEach(it => {
+            const qty = it.qty || it.quantity || 1;
+            const price = priceMap[(it.name || '').trim().toLowerCase()] || 0;
+            totalQty += qty;
+            totalValue += qty * price;
+          });
+          return { roleName: rd.role_name || 'Sin nombre', itemTypes: items.length, totalQty, totalValue };
+        });
+
+        renderRoleValueCard(roleStats);
+        renderRoleQtyCard(roleStats);
+
+        // ── % de activos entregados por empleado ──
+        // Se compara el kit físico vigente del rol contra los ítems de la
+        // última entrega FIRMADA de cada empleado (mismo criterio que ya
+        // usa el checklist de "Entregar Activos" en app/empleados.html).
+        const lastDeliveryByEmployee = {};
+        (deliveries || []).forEach(d => {
+          const date = new Date(d.signed_at || d.created_at);
+          const prev = lastDeliveryByEmployee[d.employee_id];
+          if (!prev || date > prev.date) {
+            lastDeliveryByEmployee[d.employee_id] = { date, items: Array.isArray(d.items) ? d.items : [] };
+          }
+        });
+
+        const roleItemsMap = {};
+        (roleDefs || []).forEach(rd => {
+          roleItemsMap[(rd.role_name || '').toLowerCase().trim()] = (rd.items || []).filter(it => it.name && it.category !== 'digital');
+        });
+
+        const employeeStats = (employees || []).map(emp => {
+          const roleKey = (emp.role || '').toLowerCase().trim();
+          const expectedItems = roleItemsMap[roleKey] || [];
+          const delivered = lastDeliveryByEmployee[emp.id];
+          const deliveredNames = new Set((delivered ? delivered.items : []).map(it => (it.name || '').trim().toLowerCase()));
+
+          const expectedCount = expectedItems.length;
+          const deliveredCount = expectedItems.filter(it => deliveredNames.has((it.name || '').trim().toLowerCase())).length;
+          const pct = expectedCount > 0 ? Math.round((deliveredCount / expectedCount) * 100) : null;
+
+          return {
+            name: `${emp.first_name || ''} ${emp.last_name || ''}`.trim() || 'Empleado',
+            role: emp.role || 'Sin rol',
+            pct
+          };
+        });
+
+        renderEmployeeDeliveryCard(employeeStats);
+      } catch (err) {
+        console.error('Error cargando fichas de activos por rol/empleado:', err);
+        const errHtml = '<div style="color:#EF4444; font-size:0.8125rem; padding:1rem 0;">No se pudo cargar la información.</div>';
+        if (roleValueListEl) roleValueListEl.innerHTML = errHtml;
+        if (roleQtyListEl) roleQtyListEl.innerHTML = errHtml;
+        if (employeeDeliveryListEl) employeeDeliveryListEl.innerHTML = errHtml;
+      }
+    }
+
+    function renderRoleValueCard(roleStats) {
+      const el = document.getElementById('roleValueList');
+      if (!el) return;
+
+      const sorted = [...roleStats].sort((a, b) => b.totalValue - a.totalValue);
+      if (sorted.length === 0) {
+        el.innerHTML = '<div style="color:var(--color-text-muted); font-size:0.875rem; padding:1rem 0;">Aún no hay roles con activos asignados.</div>';
+        return;
+      }
+
+      el.innerHTML = sorted.map(r => `
+        <div class="insight-row" style="display:flex; justify-content:space-between; align-items:center; padding:0.75rem 0;">
+          <div>
+            <div style="font-weight:700; color:var(--color-navy); font-size:0.9rem;">${escapeDashHtml(r.roleName)}</div>
+            <div style="font-size:0.75rem; color:var(--color-text-muted);">${r.itemTypes} tipo${r.itemTypes !== 1 ? 's' : ''} de activo${r.itemTypes !== 1 ? 's' : ''}</div>
+          </div>
+          <div style="font-weight:800; color:var(--color-cyan); font-size:0.9rem; white-space:nowrap;">${formatCurrency(r.totalValue, userCountry)}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderRoleQtyCard(roleStats) {
+      const el = document.getElementById('roleQtyList');
+      if (!el) return;
+
+      const sorted = [...roleStats].sort((a, b) => b.totalQty - a.totalQty);
+      if (sorted.length === 0 || sorted.every(r => r.totalQty === 0)) {
+        el.innerHTML = '<div style="color:var(--color-text-muted); font-size:0.875rem; padding:1rem 0;">Aún no hay roles con activos asignados.</div>';
+        return;
+      }
+
+      const maxQty = Math.max(...sorted.map(r => r.totalQty), 1);
+      el.innerHTML = sorted.map(r => `
+        <div class="insight-row" style="padding:0.7rem 0;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.35rem;">
+            <span style="font-weight:700; color:var(--color-navy); font-size:0.875rem;">${escapeDashHtml(r.roleName)}</span>
+            <span style="font-weight:800; color:var(--color-navy); font-size:0.875rem;">${r.totalQty}</span>
+          </div>
+          <div style="height:6px; background:#F1F5F9; border-radius:99px; overflow:hidden;">
+            <div style="height:100%; width:${Math.max(4, Math.round((r.totalQty / maxQty) * 100))}%; background:linear-gradient(90deg, #3B82F6, #06B6D4); border-radius:99px;"></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderEmployeeDeliveryCard(employeeStats) {
+      const el = document.getElementById('employeeDeliveryList');
+      if (!el) return;
+
+      if (employeeStats.length === 0) {
+        el.innerHTML = '<div style="color:var(--color-text-muted); font-size:0.875rem; padding:1rem 0;">Aún no hay empleados activos registrados.</div>';
+        return;
+      }
+
+      const sorted = [...employeeStats].sort((a, b) => {
+        if (a.pct === null) return 1;
+        if (b.pct === null) return -1;
+        return a.pct - b.pct;
+      });
+
+      el.innerHTML = sorted.map(e => {
+        if (e.pct === null) {
+          return `
+            <div class="insight-row" style="display:flex; justify-content:space-between; align-items:center; padding:0.75rem 0;">
+              <div>
+                <span style="font-weight:700; color:var(--color-navy); font-size:0.875rem;">${escapeDashHtml(e.name)}</span>
+                <span style="font-size:0.75rem; color:var(--color-text-muted); margin-left:0.4rem;">${escapeDashHtml(e.role)}</span>
+              </div>
+              <span style="font-size:0.75rem; color:var(--color-text-muted); font-style:italic;">Sin activos físicos en el rol</span>
+            </div>
+          `;
+        }
+
+        const pendingPct = 100 - e.pct;
+        const barColor = e.pct >= 100 ? '#10B981' : e.pct >= 50 ? '#06B6D4' : '#F59E0B';
+        return `
+          <div class="insight-row" style="padding:0.75rem 0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; gap:0.5rem; flex-wrap:wrap;">
+              <div>
+                <span style="font-weight:700; color:var(--color-navy); font-size:0.875rem;">${escapeDashHtml(e.name)}</span>
+                <span style="font-size:0.75rem; color:var(--color-text-muted); margin-left:0.4rem;">${escapeDashHtml(e.role)}</span>
+              </div>
+              <span style="font-size:0.75rem; font-weight:700; color:${barColor}; white-space:nowrap;">${e.pct}% entregado · ${pendingPct}% pendiente</span>
+            </div>
+            <div style="height:6px; background:#FEF3C7; border-radius:99px; overflow:hidden;">
+              <div style="height:100%; width:${e.pct}%; background:${barColor}; border-radius:99px;"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     let monthlyPurchaseChartInstance = null;
