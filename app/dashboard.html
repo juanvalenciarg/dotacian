@@ -1160,18 +1160,23 @@
       const employeeDeliveryListEl = document.getElementById('employeeDeliveryList');
 
       try {
-        const [{ data: roleDefs }, { data: employees }, { data: catalogData }, { data: poData }, { data: quoteData }, { data: deliveries }] = await Promise.all([
+        const [{ data: roleDefs }, { data: employees }, { data: catalogData }, { data: poData }, { data: quoteData }, { data: storageData }, { data: deliveries }] = await Promise.all([
           _supabase.from('role_definition').select('role_name, items').eq('company_id', companyId),
           _supabase.from('company_employees').select('id, first_name, last_name, role').eq('company_id', companyId).neq('role_status', 'inactive'),
           _supabase.from('seller_catalog').select('name, base_price'),
           _supabase.from('company_purchase_orders').select('items').eq('company_id', companyId),
           _supabase.from('company_quotes_requests').select('product_name, unit_price').eq('company_id', companyId),
+          _supabase.from('company_storage').select('product_name, unit_cost').eq('company_id', companyId),
           _supabase.from('uniform_deliveries').select('employee_id, status, items, signed_at, created_at').eq('status', 'signed')
         ]);
 
         // Mismo criterio de precios que app/bodega.html (catálogo > POs >
         // cotizaciones > fallback estándar), para que "valor por rol" sea
-        // consistente con el valor de inventario que ya se muestra ahí.
+        // consistente con el valor de inventario que ya se muestra ahí. El
+        // costo real registrado en Bodega (company_storage.unit_cost) tiene
+        // la última palabra por encima de todo lo demás — es lo que la
+        // empresa de verdad pagó por ese activo, y bodega.html ya lo trata
+        // así (ver computeRemainingLotsByKey/calculateTotals).
         const priceMap = {
           'camisa oxford ejecutiva': 450, 'camisa oxford': 450,
           'pantalón cocina pro': 350, 'pantalón de cocina': 350,
@@ -1194,6 +1199,27 @@
           if (q.product_name && q.unit_price) priceMap[q.product_name.trim().toLowerCase()] = q.unit_price;
         });
 
+        // Costo real de Bodega: promedio de los lotes con unit_cost
+        // registrado para ese producto (no hace falta el detalle FIFO de
+        // bodega.html para esta ficha, solo una estimación razonable).
+        const storageCostSums = {};
+        (storageData || []).forEach(row => {
+          const hasCost = row.unit_cost !== null && row.unit_cost !== undefined && row.unit_cost !== '';
+          if (!row.product_name || !hasCost) return;
+          const key = row.product_name.trim().toLowerCase();
+          if (!storageCostSums[key]) storageCostSums[key] = { sum: 0, count: 0 };
+          storageCostSums[key].sum += Number(row.unit_cost);
+          storageCostSums[key].count += 1;
+        });
+        Object.keys(storageCostSums).forEach(key => {
+          const { sum, count } = storageCostSums[key];
+          if (count > 0) priceMap[key] = sum / count;
+        });
+
+        // Último fallback (igual que bodega.html): si de plano no hay
+        // costo registrado en ningún lado, no dejar el activo en $0.
+        const DEFAULT_ITEM_VALUE = 450;
+
         // ── Valor y cantidad de activos físicos por rol ──
         const roleStats = (roleDefs || []).map(rd => {
           const items = (rd.items || []).filter(it => it.name && it.category !== 'digital');
@@ -1201,7 +1227,7 @@
           let totalValue = 0;
           items.forEach(it => {
             const qty = it.qty || it.quantity || 1;
-            const price = priceMap[(it.name || '').trim().toLowerCase()] || 0;
+            const price = priceMap[(it.name || '').trim().toLowerCase()] || DEFAULT_ITEM_VALUE;
             totalQty += qty;
             totalValue += qty * price;
           });
