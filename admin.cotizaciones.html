@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dotacian | Gestión de Cotizaciones</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- PDF Generation Support Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    .search-container {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+
+    .search-input-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .search-input-group label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-navy);
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #E2E8F0;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: inherit;
+      background: white;
+      box-sizing: border-box;
+    }
+
+    .search-input:focus {
+      border-color: var(--color-brand-primary);
+    }
+
+    .drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(2px);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .drawer-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .user-card {
+      position: fixed;
+      top: 0;
+      right: -700px;
+      width: 100%;
+      max-width: 640px;
+      height: 100vh;
+      background: white;
+      z-index: 1000;
+      box-shadow: -4px 0 15px rgba(0, 0, 0, 0.05);
+      transition: right 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .user-card.active {
+      right: 0;
+    }
+
+    .drawer-header {
+      padding: 2rem 2rem 1.5rem 2rem;
+      border-bottom: 1px solid #F1F5F9;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: white;
+    }
+
+    .drawer-content {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+      background: #FFFFFF;
+    }
+
+    .drawer-footer {
+      padding: 1.5rem 2rem;
+      border-top: 1px solid #E2E8F0;
+      background: #F8FAFC;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .form-section {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-section-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .form-section-title-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .role-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+    }
+
+    .form-control {
+      padding: 0.75rem 1rem;
+      border: 1px solid #CBD5E1;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      color: #334155;
+      background: white;
+      transition: all 0.2s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--color-cyan);
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+    }
+
+    .toast-container {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 9999;
+    }
+
+    /* Table Styles */
+    .table-container {
+      background: white;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      overflow-x: auto;
+      margin-top: 2rem;
+    }
+
+    .users-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .users-table th {
+      background: #F8FAFC;
+      color: #475569;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #E2E8F0;
+    }
+
+    .users-table td {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #E2E8F0;
+      color: #334155;
+      font-size: 0.875rem;
+    }
+
+    .users-table tbody tr {
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .users-table tbody tr:hover {
+      background-color: #F1F5F9;
+    }
+
+    .users-table .user-name {
+      font-weight: 600;
+      color: #0F172A;
+    }
+
+    .quote-item-row {
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 0.85rem;
+      margin-bottom: 0.75rem;
+      background: white;
+    }
+
+    .quote-item-row-top {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .quote-item-remove-btn {
+      flex-shrink: 0;
+      width: 38px;
+      border: none;
+      background: #FEF2F2;
+      color: #EF4444;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    .quote-item-remove-btn:hover {
+      background: #FEE2E2;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-layout admin-dark">
+    <!-- Sidebar -->
+    <aside class="sidebar" style="background-color: #020617;">
+      <div class="sidebar-brand" style="padding: 1.5rem 2rem;">
+        <a href="admin.html">
+          <img src="assets/logos/logo_dotacian_admin.png" alt="dotacian admin"
+            style="width: 100%; max-width: 180px; height: auto; display: block;">
+        </a>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="admin.html" id="nav-dashboard" class="nav-item">Dashboard</a>
+        <a href="admin.empresas.html" id="nav-users" class="nav-item">Gestión de Empresas</a>
+        <a href="admin.sellers.html" id="nav-sellers" class="nav-item">Gestión de Fabricantes</a>
+        <a href="admin.cotizaciones.html" id="nav-cotizaciones" class="nav-item active">Gestión de Cotizaciones</a>
+        <a href="admin.leads.html" id="nav-leads" class="nav-item">Gestión de Leads</a>
+        <a href="admin.facturas.html" class="nav-item">Facturación</a>
+        <a href="admin.blog.html" id="nav-blog" class="nav-item">Gestión de Blog</a>
+        <a href="#" class="nav-item">Logs de Sistema</a>
+        <a href="#" class="nav-item">Seguridad</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="app-header">
+        <h1 id="pageTitle">Gestión de Cotizaciones</h1>
+        <div class="header-right" style="position: relative; display: flex; align-items: center;">
+          <div id="header-company-badge" onclick="toggleUserPopover(event)"
+            style="background: white; padding: 0.5rem 1rem; border-radius: 1.25rem; border: 1px solid #E2E8F0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 0.75rem; cursor: pointer; transition: all 0.3s ease; position: relative;">
+            <div id="badge-industry-icon"
+              style="width: 32px; height: 32px; background: #F1F5F9; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--color-cyan); font-size: 1.2rem;">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            <div style="display: flex; flex-direction: column;">
+              <span id="admin-name-display"
+                style="font-weight: 700; color: #0F172A; font-size: 0.85rem; line-height: 1.2;">Administrador</span>
+              <span style="font-size: 0.65rem; color: #64748B; font-weight: 600; text-transform: uppercase;">Panel Admin</span>
+            </div>
+            <div style="margin-left: 0.25rem; color: #64748B;">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </div>
+
+            <!-- Popover -->
+            <div id="user-popover" class="user-popover" style="top: calc(100% + 0.5rem); right: 0;">
+              <div class="popover-label">Usuario</div>
+              <div id="pop-user-name" class="popover-value" style="font-size: 0.9rem;">Administrador</div>
+              <div class="popover-label">Correo Electrónico</div>
+              <div id="pop-user-email" class="popover-value" style="margin-bottom: 0; font-size: 0.8rem;">Cargando...</div>
+              <hr style="margin: 1rem 0; border: none; border-top: 1px solid #E2E8F0;">
+              <a href="#" onclick="logoutUser(); return false;"
+                style="color: #EF4444; font-size: 0.85rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; transition: color 0.2s;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Cerrar Sesión
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="app-container">
+
+        <div id="quoteManagementView">
+          <!-- Buscador -->
+          <div class="search-container">
+            <div class="search-input-group">
+              <label for="searchQuoteCompany">Buscar por empresa</label>
+              <input type="text" id="searchQuoteCompany" class="search-input" placeholder="Nombre de la empresa..."
+                oninput="renderQuotesTable()">
+            </div>
+            <div class="search-input-group" style="flex: 0 0 220px;">
+              <label for="filterQuoteStatus">Estado</label>
+              <select id="filterQuoteStatus" class="search-input" onchange="renderQuotesTable()">
+                <option value="">Todos</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="generado">Generado</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Tabla de solicitudes -->
+          <div class="table-container" id="quotesTableContainer">
+            <table class="users-table">
+              <thead>
+                <tr>
+                  <th>Empresa</th>
+                  <th>Solicitado para</th>
+                  <th>Activo / Detalle</th>
+                  <th>Fecha</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="quotesTableBody">
+                <tr>
+                  <td colspan="5" style="text-align: center; color: #64748B; padding: 2rem;">Cargando solicitudes...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Drawer de detalle -->
+          <div id="drawerOverlay" class="drawer-overlay" onclick="closeDrawer()"></div>
+          <div id="quoteCard" class="user-card">
+            <div class="drawer-header">
+              <div>
+                <h2 id="cardTitle"
+                  style="margin: 0; font-family: var(--font-family-heading); color: var(--color-navy); font-size: 1.25rem;">
+                  Solicitud de Cotización</h2>
+                <p id="cardCompany"
+                  style="margin: 0.25rem 0 0 0; color: var(--color-text-secondary); font-size: 0.875rem;">-</p>
+              </div>
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <span id="cardStatus" class="role-badge" style="background: #FEF3C7; color: #92400E;">Pendiente</span>
+                <button onclick="closeDrawer()"
+                  style="background: none; border: none; font-size: 1.5rem; color: #94A3B8; cursor: pointer; line-height: 1;">&times;</button>
+              </div>
+            </div>
+
+            <div class="drawer-content">
+              <!-- Solicitud del cliente -->
+              <div class="form-section">
+                <div class="form-section-title">
+                  <div class="form-section-title-label">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                      viewBox="0 0 24 24">
+                      <path d="M12 2a5 5 0 0 0-5 5v2a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5z"></path>
+                      <path d="M8 14v1a4 4 0 0 0 8 0v-1"></path>
+                      <line x1="12" y1="19" x2="12" y2="22"></line>
+                    </svg>
+                    Solicitud del cliente (vía Dot)
+                  </div>
+                </div>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Para</label>
+                    <div id="viewQuoteTarget" style="font-weight: 600; color: #334155;">--</div>
+                  </div>
+                  <div class="form-group">
+                    <label>Fecha de solicitud</label>
+                    <div id="viewQuoteDate" style="font-weight: 600; color: #334155;">--</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Prompt del cliente</label>
+                  <div id="viewQuotePrompt"
+                    style="background: white; border: 1px solid #E2E8F0; border-radius: 8px; padding: 0.85rem 1rem; font-size: 0.875rem; color: #334155; white-space: pre-wrap; line-height: 1.5;">
+                    --</div>
+                </div>
+              </div>
+
+              <!-- Items para cotizar -->
+              <div class="form-section">
+                <div class="form-section-title">
+                  <div class="form-section-title-label">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                      viewBox="0 0 24 24">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    Items para cotizar
+                  </div>
+                  <button type="button" onclick="addQuoteItemRow()" class="btn btn-outline"
+                    style="padding: 0.35rem 0.75rem; font-size: 0.75rem; border-radius: 8px;">+ Agregar ítem</button>
+                </div>
+                <div id="quoteItemsRows"></div>
+              </div>
+            </div>
+
+            <div class="drawer-footer">
+              <button class="btn btn-outline" onclick="closeDrawer()">Cerrar</button>
+              <button class="btn btn-primary" id="btnGenerateQuotePDF" onclick="generateQuotePDF()"
+                style="display: flex; align-items: center; gap: 0.5rem;">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"
+                  viewBox="0 0 24 24">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                Generar PDF de cotización
+              </button>
+            </div>
+          </div>
+
+        </div>
+    </main>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="assets/js/utils.js?v=4"></script>
+  <script>
+    const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: 'dotacian-admin-token' } });
+
+    let allQuotes = [];
+    let currentQuote = null;
+    let quoteItemRowSeq = 0;
+
+    // Validación de sesión administrativa
+    async function checkAdminAuth() {
+      const { data: { session } } = await _supabase.auth.getSession();
+      if (!session) {
+        window.location.href = 'login.admin.html';
+        return;
+      }
+
+      const { data: adminData, error } = await _supabase
+        .from('admin_profile')
+        .select('id')
+        .eq('id', session.user.id)
+        .maybeSingle();
+
+      if (error || !adminData) {
+        await _supabase.auth.signOut();
+        window.location.href = 'login.admin.html?error=unauthorized';
+      } else {
+        loadAllQuotes();
+      }
+    }
+
+    checkAdminAuth();
+
+    async function loadAllQuotes() {
+      const tbody = document.getElementById('quotesTableBody');
+      try {
+        const { data, error } = await _supabase.rpc('admin_list_dot_quote_requests');
+        if (error) throw error;
+
+        allQuotes = data || [];
+        renderQuotesTable();
+      } catch (err) {
+        console.error('Error cargando solicitudes de cotización:', err);
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #EF4444; padding: 2rem;">Error al cargar solicitudes. Asegúrate de haber ejecutado la migración de Supabase.</td></tr>`;
+      }
+    }
+
+    function renderQuotesTable() {
+      const tbody = document.getElementById('quotesTableBody');
+      const search = (document.getElementById('searchQuoteCompany').value || '').toLowerCase().trim();
+      const statusFilter = document.getElementById('filterQuoteStatus').value;
+
+      let rows = allQuotes;
+      if (search) rows = rows.filter(q => (q.company_name || '').toLowerCase().includes(search));
+      if (statusFilter) rows = rows.filter(q => q.status === statusFilter);
+
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #64748B; padding: 2rem;">No hay solicitudes${search || statusFilter ? ' que coincidan con el filtro' : ' de cotización todavía'}.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = '';
+      rows.forEach(q => {
+        const target = q.target_mode === 'empleado'
+          ? escapeQuoteHtml(q.target_employee_name || 'Persona específica')
+          : `Rol: ${escapeQuoteHtml(q.target_role || '—')}`;
+        const detail = q.item_name
+          ? `${escapeQuoteHtml(q.item_name)}${q.item_qty ? ' ×' + q.item_qty : ''}`
+          : 'Kit completo (prompt libre)';
+        const statusBadge = q.status === 'generado'
+          ? '<span class="role-badge" style="background:#D1FAE5; color:#065F46;">Generado</span>'
+          : '<span class="role-badge" style="background:#FEF3C7; color:#92400E;">Pendiente</span>';
+
+        const tr = document.createElement('tr');
+        tr.onclick = () => openQuoteDrawer(q.id);
+        tr.innerHTML = `
+          <td><span class="user-name">${escapeQuoteHtml(q.company_name || 'Empresa')}</span></td>
+          <td>${target}</td>
+          <td>${detail}</td>
+          <td>${formatDateShort(q.created_at)}</td>
+          <td>${statusBadge}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function escapeQuoteHtml(str) {
+      return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function escapeQuoteAttr(str) {
+      return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function formatDateShort(isoString) {
+      if (!isoString) return '---';
+      return new Date(isoString).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function formatDate(isoString) {
+      if (!isoString) return '--';
+      return new Date(isoString).toLocaleString('es-MX', {
+        day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+    }
+
+    function openQuoteDrawer(id) {
+      const q = allQuotes.find(x => x.id === id);
+      if (!q) return;
+      currentQuote = q;
+
+      document.getElementById('cardCompany').textContent = q.company_name || 'Empresa';
+
+      const target = q.target_mode === 'empleado'
+        ? (q.target_employee_name || 'Persona específica')
+        : `Rol: ${q.target_role || '—'}`;
+      document.getElementById('viewQuoteTarget').textContent = target;
+      document.getElementById('viewQuoteDate').textContent = formatDate(q.created_at);
+      document.getElementById('viewQuotePrompt').textContent = q.prompt_text || '—';
+
+      const statusBadge = document.getElementById('cardStatus');
+      if (q.status === 'generado') {
+        statusBadge.textContent = 'Generado';
+        statusBadge.style.background = '#D1FAE5';
+        statusBadge.style.color = '#065F46';
+      } else {
+        statusBadge.textContent = 'Pendiente';
+        statusBadge.style.background = '#FEF3C7';
+        statusBadge.style.color = '#92400E';
+      }
+
+      document.getElementById('quoteItemsRows').innerHTML = '';
+      quoteItemRowSeq = 0;
+      if (q.item_name) {
+        addQuoteItemRow({ name: q.item_name, qty: q.item_qty || 1, size: q.item_size || '' });
+      } else {
+        addQuoteItemRow();
+      }
+
+      document.getElementById('drawerOverlay').classList.add('active');
+      document.getElementById('quoteCard').classList.add('active');
+    }
+
+    function closeDrawer() {
+      document.getElementById('drawerOverlay').classList.remove('active');
+      document.getElementById('quoteCard').classList.remove('active');
+      currentQuote = null;
+    }
+
+    function addQuoteItemRow(prefill) {
+      const rowId = 'qi' + (quoteItemRowSeq++);
+      const wrap = document.getElementById('quoteItemsRows');
+      const row = document.createElement('div');
+      row.className = 'quote-item-row';
+      row.dataset.rowId = rowId;
+      row.innerHTML = `
+        <div class="quote-item-row-top">
+          <input type="text" class="form-control quote-item-name" placeholder="Nombre del activo" style="flex:2;" value="${escapeQuoteAttr(prefill && prefill.name || '')}">
+          <input type="number" min="1" class="form-control quote-item-qty" placeholder="Cant." style="flex:0.6; text-align:center;" value="${prefill && prefill.qty || 1}">
+          <input type="text" class="form-control quote-item-size" placeholder="Talla" style="flex:0.6; text-align:center;" value="${escapeQuoteAttr(prefill && prefill.size || '')}">
+          <button type="button" class="quote-item-remove-btn" onclick="removeQuoteItemRow(this)" title="Quitar ítem">&times;</button>
+        </div>
+        <input type="text" class="form-control quote-item-specs" placeholder="Especificaciones / marca / proveedor sugerido (opcional)" style="width:100%; box-sizing:border-box;">
+      `;
+      wrap.appendChild(row);
+    }
+
+    function removeQuoteItemRow(btn) {
+      const wrap = document.getElementById('quoteItemsRows');
+      const row = btn.closest('.quote-item-row');
+      if (wrap.children.length <= 1) {
+        row.querySelectorAll('input').forEach(input => { input.value = input.type === 'number' ? 1 : ''; });
+        return;
+      }
+      row.remove();
+    }
+
+    function collectQuoteItems() {
+      const rows = document.querySelectorAll('#quoteItemsRows .quote-item-row');
+      const items = [];
+      rows.forEach(row => {
+        const name = row.querySelector('.quote-item-name').value.trim();
+        if (!name) return;
+        const qty = parseInt(row.querySelector('.quote-item-qty').value) || 1;
+        const size = row.querySelector('.quote-item-size').value.trim();
+        const specs = row.querySelector('.quote-item-specs').value.trim();
+        items.push({ name, qty, size, specs });
+      });
+      return items;
+    }
+
+    async function generateQuotePDF() {
+      if (!currentQuote) return;
+      const items = collectQuoteItems();
+      if (items.length === 0) {
+        showToast('Faltan ítems', 'Agrega al menos un activo con nombre para generar el PDF.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('btnGenerateQuotePDF');
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.textContent = 'Generando...';
+
+      try {
+        const roleName = currentQuote.target_role || '';
+        const employeeName = currentQuote.target_mode === 'empleado' ? (currentQuote.target_employee_name || '') : '';
+
+        buildAdminCotizacionPDF({
+          company: currentQuote,
+          roleName,
+          employeeName,
+          promptText: currentQuote.prompt_text,
+          items
+        });
+
+        const { error } = await _supabase.rpc('admin_mark_dot_quote_generated', { p_id: currentQuote.id });
+        if (error) throw error;
+
+        currentQuote.status = 'generado';
+        currentQuote.pdf_generated_at = new Date().toISOString();
+        const idx = allQuotes.findIndex(q => q.id === currentQuote.id);
+        if (idx >= 0) allQuotes[idx] = { ...allQuotes[idx], status: 'generado', pdf_generated_at: currentQuote.pdf_generated_at };
+
+        const statusBadge = document.getElementById('cardStatus');
+        statusBadge.textContent = 'Generado';
+        statusBadge.style.background = '#D1FAE5';
+        statusBadge.style.color = '#065F46';
+        renderQuotesTable();
+
+        showToast('PDF generado', 'La cotización se descargó y se marcó como generada.', 'success');
+      } catch (err) {
+        console.error('Error generando PDF de cotización:', err);
+        showToast('Error', 'No se pudo generar el PDF de cotización.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+      }
+    }
+
+    function buildAdminCotizacionPDF({ company, roleName, employeeName, promptText, items }) {
+      let jsPDFClass = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+      if (!jsPDFClass) {
+        showToast('Error', 'Librería PDF no disponible. Recarga la página.', 'error');
+        return;
+      }
+
+      const doc = new jsPDFClass({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const pageW = doc.internal.pageSize.getWidth();
+      const pageH = doc.internal.pageSize.getHeight();
+      const margin = 18;
+      let y = 0;
+
+      // ── Header bar ──────────────────────────────────────────
+      doc.setFillColor(14, 23, 44);
+      doc.rect(0, 0, pageW, 32, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(20);
+      doc.text('dotacian', margin, 20);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text('Cotización generada por Dot', margin, 27);
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('Solicitud de Cotización', pageW - margin, 18, { align: 'right' });
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text(new Date().toLocaleDateString('es-MX'), pageW - margin, 25, { align: 'right' });
+
+      y = 44;
+
+      // ── Company info block ──────────────────────────────────
+      const taxStr = company.tax_id ? `${company.tax_id}${company.dv ? '-' + company.dv : ''}` : '';
+      const addressStr = [company.delivery_address, company.delivery_state, company.country].filter(Boolean).join(', ');
+      const contactStr = [company.delivery_contact_1_name, company.delivery_contact_1_phone, company.delivery_contact_1_email].filter(Boolean).join(' · ');
+
+      const blockH = contactStr ? 34 : 26;
+      doc.setFillColor(240, 249, 255);
+      doc.roundedRect(margin, y, pageW - margin * 2, blockH, 3, 3, 'F');
+      doc.setDrawColor(6, 182, 212);
+      doc.setLineWidth(0.4);
+      doc.roundedRect(margin, y, pageW - margin * 2, blockH, 3, 3, 'S');
+      doc.setLineWidth(0.1);
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10.5);
+      doc.setTextColor(14, 23, 44);
+      doc.text(company.company_name || 'Empresa', margin + 6, y + 9);
+
+      let infoLine = '';
+      if (company.legal_name && company.legal_name !== company.company_name) infoLine += company.legal_name;
+      if (taxStr) infoLine += (infoLine ? '  ·  ' : '') + taxStr;
+      if (infoLine) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(71, 85, 105);
+        doc.text(infoLine, margin + 6, y + 15.5);
+      }
+      if (addressStr) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.5);
+        doc.setTextColor(100, 116, 139);
+        doc.text(addressStr, margin + 6, infoLine ? y + 21 : y + 16);
+      }
+      if (contactStr) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.5);
+        doc.setTextColor(100, 116, 139);
+        const nextY = addressStr ? (infoLine ? y + 26 : y + 22) : (infoLine ? y + 21 : y + 16);
+        doc.text(contactStr, margin + 6, nextY);
+      }
+      y += blockH + 8;
+
+      // ── Para quién es ─────────────────────────────────────────
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(14, 23, 44);
+      doc.text(employeeName ? `Dotación para: ${employeeName}${roleName ? '  (' + roleName + ')' : ''}` : `Dotación para el rol: ${roleName || '—'}`, margin, y);
+      y += 7;
+
+      // ── Solicitud original (prompt libre capturado por Dot) ────
+      if (promptText) {
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(8);
+        doc.setTextColor(100, 116, 139);
+        const wrapped = doc.splitTextToSize(`Solicitud original: "${promptText}"`, pageW - margin * 2);
+        doc.text(wrapped, margin, y);
+        y += wrapped.length * 4 + 5;
+      }
+
+      // ── Table header ──────────────────────────────────────────
+      const cols = { name: margin + 2, specs: margin + 70, qty: margin + 158 };
+      const drawTableHeader = () => {
+        doc.setFillColor(6, 182, 212);
+        doc.rect(margin, y, pageW - margin * 2, 8, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.text('ACTIVO', cols.name, y + 5.5);
+        doc.text('ESPECIFICACIONES', cols.specs, y + 5.5);
+        doc.text('CANT.', cols.qty, y + 5.5);
+        y += 8;
+      };
+      drawTableHeader();
+
+      items.forEach((item, idx) => {
+        const specParts = [];
+        if (item.size) specParts.push(`Talla: ${item.size}`);
+        if (item.specs) specParts.push(item.specs);
+        const specsText = specParts.join(' · ') || '—';
+
+        const nameLines = doc.splitTextToSize(item.name, cols.specs - cols.name - 4);
+        const specsLines = doc.splitTextToSize(specsText, cols.qty - cols.specs - 4);
+        const rowLines = Math.max(nameLines.length, specsLines.length, 1);
+        const rowH = rowLines * 4.6 + 4;
+
+        if (y + rowH > pageH - 20) {
+          doc.addPage();
+          y = 20;
+          drawTableHeader();
+        }
+
+        if (idx % 2 === 0) {
+          doc.setFillColor(248, 250, 252);
+          doc.rect(margin, y, pageW - margin * 2, rowH, 'F');
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(15, 23, 42);
+        doc.text(nameLines, cols.name, y + 5.5);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.5);
+        doc.setTextColor(71, 85, 105);
+        doc.text(specsLines, cols.specs, y + 5.5);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(15, 23, 42);
+        doc.text(String(item.qty || 1), cols.qty, y + 5.5);
+
+        y += rowH;
+      });
+
+      // ── Footer note ──────────────────────────────────────────
+      y += 8;
+      doc.setFont('helvetica', 'italic');
+      doc.setFontSize(7.5);
+      doc.setTextColor(148, 163, 184);
+      doc.text('Generado desde el panel de administración de dotacian — Gestión de Cotizaciones.', margin, Math.min(y, pageH - 10));
+
+      const fileSlug = (company.company_name || 'empresa').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      doc.save(`cotizacion-dot-${fileSlug}-${Date.now()}.pdf`);
+    }
+
+    function showToast(title, message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.style.cssText = "background: white; border-left: 4px solid " + (type === 'error' ? '#EF4444' : '#10B981') + "; padding: 1rem 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 1rem; min-width: 300px;";
+      toast.innerHTML = `
+        <div>
+          <div style="font-weight: 700; font-size: 0.9rem; color: #0F172A;">${title}</div>
+          <div style="font-size: 0.875rem; color: #64748B;">${message}</div>
+        </div>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => { toast.remove(); }, 4000);
+    }
+  </script>
+</body>
+
+</html>

@@ -275,6 +275,172 @@
         margin-left: 0;
       }
     }
+
+    /* Cotizar con Dot — chat */
+    .dot-chat-modal-content {
+      max-width: 460px;
+      display: flex;
+      flex-direction: column;
+      height: 640px;
+      max-height: 85vh;
+      padding: 1.75rem 1.75rem 1.25rem;
+      position: relative;
+    }
+
+    .dot-chat-close {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      background: none;
+      border: none;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+
+    .dot-chat-close:hover {
+      color: var(--color-navy);
+    }
+
+    .dot-chat-header {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin-bottom: 0.25rem;
+      padding-right: 2rem;
+      flex-shrink: 0;
+    }
+
+    .dot-chat-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .dot-chat-title {
+      font-family: var(--font-family-heading);
+      color: var(--color-navy);
+      font-size: 1.125rem;
+      font-weight: 800;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .dot-chat-subtitle {
+      color: var(--color-text-muted);
+      font-size: 0.75rem;
+      margin: 0;
+    }
+
+    .dot-chat-history {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      padding: 1rem 0.25rem;
+    }
+
+    .dot-chat-bubble {
+      max-width: 88%;
+      padding: 0.7rem 0.95rem;
+      border-radius: 1rem;
+      font-size: 0.8125rem;
+      line-height: 1.45;
+    }
+
+    .dot-chat-bubble.assistant {
+      background: #F1F5F9;
+      color: var(--color-navy);
+      align-self: flex-start;
+      border-top-left-radius: 0.3rem;
+    }
+
+    .dot-chat-bubble.user {
+      background: var(--color-navy);
+      color: white;
+      align-self: flex-end;
+      border-top-right-radius: 0.3rem;
+      white-space: pre-wrap;
+    }
+
+    .dot-typing-dots {
+      display: inline-flex;
+      gap: 3px;
+      align-items: center;
+      padding: 0.15rem 0;
+    }
+
+    .dot-typing-dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #94A3B8;
+      animation: dotTypingBounce 1.2s infinite ease-in-out;
+    }
+
+    .dot-typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+    .dot-typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes dotTypingBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+      30% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    .dot-chat-input-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-end;
+      border-top: 1px solid var(--color-border);
+      padding-top: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .dot-chat-textarea {
+      flex: 1;
+      resize: none;
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 0.7rem 0.9rem;
+      font-size: 0.8125rem;
+      font-family: inherit;
+      outline: none;
+      max-height: 100px;
+      color: var(--color-navy);
+    }
+
+    .dot-chat-textarea:focus {
+      border-color: var(--color-cyan);
+    }
+
+    .dot-chat-send-btn {
+      width: 42px;
+      height: 42px;
+      flex-shrink: 0;
+      border: none;
+      border-radius: 12px;
+      background: var(--color-navy);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .dot-chat-send-btn:hover {
+      background: var(--color-navy-mid);
+    }
+
+    .dot-chat-send-btn:disabled {
+      background: #CBD5E1;
+      cursor: not-allowed;
+    }
   </style>
   <!-- PDF Generation Support Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -1183,6 +1349,42 @@
 
       <button onclick="document.getElementById('sizeLinkModal').classList.remove('active')" class="btn btn-outline"
         style="width: 100%; padding: 0.75rem; border-radius: 10px; font-weight: 600;">Cerrar</button>
+    </div>
+  </div>
+
+  <!-- ── Cotizar con Dot ──────────────────────────────────── -->
+  <div class="modal-overlay" id="dotChatModal">
+    <div class="modal-content-lg dot-chat-modal-content">
+      <button class="dot-chat-close" onclick="closeDotChatModal()">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </button>
+
+      <div class="dot-chat-header">
+        <div class="dot-chat-avatar">
+          <svg width="18" height="18" fill="none" stroke="#22D3EE" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 2a5 5 0 0 0-5 5v2a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5z"/><path d="M8 14v1a4 4 0 0 0 8 0v-1"/><line x1="12" y1="19" x2="12" y2="22"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="dot-chat-title">Cotizar con Dot</h2>
+          <p class="dot-chat-subtitle">Cuéntale qué necesitas y arma tu solicitud</p>
+        </div>
+      </div>
+
+      <div class="dot-chat-history" id="dotChatHistory"></div>
+
+      <div class="dot-chat-input-row" id="dotChatInputRow">
+        <textarea id="dotChatInput" class="dot-chat-textarea" rows="1"
+          placeholder="Agrega marca, especificaciones u otro detalle..."
+          onkeydown="handleDotChatKeydown(event)" oninput="autoGrowDotChatInput(this)"></textarea>
+        <button type="button" class="dot-chat-send-btn" onclick="handleDotChatSend()" title="Enviar">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M22 2L11 13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -2365,7 +2567,7 @@
       return { name, qty, size, specs, providers, hasAsset };
     }
 
-    async function cotizarActivoFaltante(btn) {
+    function cotizarActivoFaltante(btn) {
       const row = btn.closest('[data-delivery-item-id]');
       if (!row) return;
       const id = row.dataset.deliveryItemId;
@@ -2376,28 +2578,139 @@
       const qtyInput = row.querySelector('input[type="number"]');
       const name = nameInput ? nameInput.value.trim() : meta.name;
       const qty = qtyInput ? (parseInt(qtyInput.value) || 1) : 1;
+      const employeeName = document.getElementById('detailName')?.textContent || '';
 
-      const originalLabel = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = 'Generando...';
+      openDotChatModal({ itemName: name, qty, size: meta.size || '', employeeName });
+    }
 
+    // ── Chat simulado de "Cotizar con Dot" ─────────────────────────
+    // Por ahora es una simulación: no hay IA real detrás todavía. A
+    // diferencia de app/bodega.html, acá ya se sabe para quién es la
+    // cotización (el empleado del detalle abierto), así que se salta la
+    // pregunta de "¿rol o persona?" y va directo del prompt libre a la
+    // confirmación. La generación real del PDF se hará después desde el
+    // panel de administración.
+    let dotChatState = 'idle';
+    let dotChatContext = null;
+
+    function openDotChatModal(context) {
+      dotChatContext = context || null;
+      document.getElementById('dotChatModal').classList.add('active');
+      resetDotChatUI();
+    }
+
+    function closeDotChatModal() {
+      document.getElementById('dotChatModal').classList.remove('active');
+    }
+
+    function resetDotChatUI() {
+      dotChatState = 'awaiting_prompt';
+
+      const history = document.getElementById('dotChatHistory');
+      history.innerHTML = '';
+
+      let greeting = '¡Hola! Cuéntame qué necesitas cotizar. Entre más detalles me des —cantidad, tallas, especificaciones, marca, urgencia— mejor armo tu solicitud.';
+      if (dotChatContext && dotChatContext.itemName) {
+        const details = [`cantidad: ${dotChatContext.qty || 1}`];
+        if (dotChatContext.size) details.push(`talla: ${dotChatContext.size}`);
+        const forWho = dotChatContext.employeeName ? ` para <strong>${escapeAttr(dotChatContext.employeeName)}</strong>` : '';
+        greeting = `¡Hola! Vas a cotizar <strong>${escapeAttr(dotChatContext.itemName)}</strong> (${details.join(' · ')})${forWho}. Cuéntame si quieres agregar marca, especificaciones u otro detalle — o escribe "listo" para continuar así.`;
+      }
+      appendDotBubble('assistant', greeting);
+
+      const inputRow = document.getElementById('dotChatInputRow');
+      inputRow.style.display = 'flex';
+      const input = document.getElementById('dotChatInput');
+      input.value = '';
+      input.style.height = '';
+      input.disabled = false;
+      setTimeout(() => input.focus(), 50);
+    }
+
+    function appendDotBubble(role, html) {
+      const history = document.getElementById('dotChatHistory');
+      const bubble = document.createElement('div');
+      bubble.className = 'dot-chat-bubble ' + role;
+      bubble.innerHTML = html;
+      history.appendChild(bubble);
+      history.scrollTop = history.scrollHeight;
+      return bubble;
+    }
+
+    function showDotTyping() {
+      const history = document.getElementById('dotChatHistory');
+      const bubble = document.createElement('div');
+      bubble.className = 'dot-chat-bubble assistant';
+      bubble.id = 'dotChatTyping';
+      bubble.innerHTML = '<span class="dot-typing-dots"><span></span><span></span><span></span></span>';
+      history.appendChild(bubble);
+      history.scrollTop = history.scrollHeight;
+    }
+
+    function hideDotTyping() {
+      const typing = document.getElementById('dotChatTyping');
+      if (typing) typing.remove();
+    }
+
+    function autoGrowDotChatInput(el) {
+      el.style.height = '';
+      el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+    }
+
+    function handleDotChatKeydown(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        handleDotChatSend();
+      }
+    }
+
+    async function handleDotChatSend() {
+      const input = document.getElementById('dotChatInput');
+      const text = input.value.trim();
+      if (!text || dotChatState !== 'awaiting_prompt') return;
+
+      input.value = '';
+      input.style.height = '';
+      appendDotBubble('user', escapeAttr(text).replace(/\n/g, '<br>'));
+
+      dotChatState = 'thinking';
+      document.getElementById('dotChatInputRow').style.display = 'none';
+      showDotTyping();
+
+      const minDelay = new Promise(resolve => setTimeout(resolve, 1300));
+      const [saved] = await Promise.all([saveDotQuoteRequest(text), minDelay]);
+
+      hideDotTyping();
+      const forWho = dotChatContext && dotChatContext.employeeName ? ` para <strong>${escapeAttr(dotChatContext.employeeName)}</strong>` : '';
+      appendDotBubble('assistant', saved
+        ? `¡Listo! ✅ Ya estoy armando tu solicitud de cotización${forWho}. En un momento vas a poder verla y generar el PDF desde el panel de administración.`
+        : 'Se me complicó guardar tu solicitud 😕. Intenta de nuevo en un momento.');
+      dotChatState = 'done';
+    }
+
+    async function saveDotQuoteRequest(promptText) {
       try {
         const { data: sessionData } = await _supabase.auth.getSession();
         const companyId = await resolveCompanyId(_supabase, sessionData?.session?.user?.id);
-        if (!companyId) throw new Error('No session found');
+        if (!companyId) return false;
 
-        const itemData = await buildQuoteItemData(companyId, name, qty, meta.size, meta.roleSpecs);
-        const employeeName = document.getElementById('detailName')?.textContent || '';
-        const role = (window.currentEmployeeObj && window.currentEmployeeObj.assignedRole) || '';
-
-        await buildCotizacionDotPDF({ roleName: role, employeeName, items: [itemData] });
-        if (window.showToast) showToast('PDF generado', 'Descarga lista para reenviar al proveedor.');
+        const emp = window.currentEmployeeObj || null;
+        const { error } = await _supabase.from('company_dot_quote_requests').insert({
+          company_id: companyId,
+          prompt_text: promptText,
+          target_mode: 'empleado',
+          target_role: (emp && emp.assignedRole) || null,
+          target_employee_id: (emp && emp.db_id) || null,
+          target_employee_name: (dotChatContext && dotChatContext.employeeName) || null,
+          item_name: (dotChatContext && dotChatContext.itemName) || null,
+          item_qty: (dotChatContext && dotChatContext.qty) || null,
+          item_size: (dotChatContext && dotChatContext.size) || null
+        });
+        if (error) throw error;
+        return true;
       } catch (err) {
-        console.error('Error generando cotización con Dot:', err);
-        if (window.showToast) showToast('Error', 'No se pudo generar la cotización.', 'error');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = originalLabel;
+        console.error('Error guardando solicitud de cotización con Dot:', err);
+        return false;
       }
     }
 
