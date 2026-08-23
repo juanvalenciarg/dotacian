@@ -2528,6 +2528,26 @@
       return getAvailableLots(name, size).filter(l => l.id !== excludeLotId);
     }
 
+    // Costo real de la unidad física que efectivamente se va a entregar:
+    // respeta el lote elegido a mano (preferredLotId) y si no hay uno, el
+    // más antiguo (mismo FIFO que ya usa Bodega). A diferencia de
+    // getOldestLotSpecs(), no depende de que el lote tenga specs
+    // registradas — solo necesita el costo. Se usa al generar la entrega
+    // para que "Valor de Activos por Rol" en el Home refleje lo que
+    // realmente costó ese activo puntual, no un promedio genérico.
+    function getDeliveryUnitCost(name, size, preferredLotId) {
+      const available = getAvailableLots(name, size);
+      if (available.length === 0) return null;
+
+      let lot = null;
+      if (preferredLotId != null) {
+        lot = available.find(l => l.id === preferredLotId) || null;
+      }
+      if (!lot) lot = available[0];
+
+      return (lot && lot.cost !== null && lot.cost !== undefined) ? lot.cost : null;
+    }
+
     function describeLot(lot) {
       const specs = lot.specs || {};
       const label = [specs.marca, specs.referencia].filter(Boolean).join(' ');
@@ -3621,7 +3641,13 @@
             console.warn(`Insufficient stock detected for ${name}! Required: ${qty}, Stock Map: ${stock}`);
             stockErrors.push({ name, size, qty, stock });
           }
-          itemsToDeliver.push({ name, qty, size });
+
+          const meta = window._deliveryItemMeta ? window._deliveryItemMeta[row.dataset.deliveryItemId] : null;
+          const unitCost = getDeliveryUnitCost(name, size, meta ? meta.preferredLotId : null);
+
+          const deliveredItem = { name, qty, size };
+          if (unitCost !== null) deliveredItem.unit_cost = unitCost;
+          itemsToDeliver.push(deliveredItem);
         } else {
           console.log("Row skipped (empty garment name).");
         }

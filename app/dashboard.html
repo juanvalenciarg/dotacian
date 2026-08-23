@@ -1277,7 +1277,12 @@
           deliveredItems.forEach(it => {
             if (!it.name) return;
             const qty = it.qty || it.quantity || 1;
-            const price = priceMap[it.name.trim().toLowerCase()] || DEFAULT_ITEM_VALUE;
+            // El costo real del lote entregado (capturado desde
+            // generateDeliveryLink en app/empleados.html) manda sobre el
+            // promedio genérico por nombre — así dos empleados con el
+            // mismo "Laptop" pero marcas/costos distintos no se ven igual.
+            const hasUnitCost = it.unit_cost !== null && it.unit_cost !== undefined && it.unit_cost !== '';
+            const price = hasUnitCost ? Number(it.unit_cost) : (priceMap[it.name.trim().toLowerCase()] || DEFAULT_ITEM_VALUE);
             bucket.totalValue += qty * price;
             bucket.itemNames.add(it.name.trim().toLowerCase());
           });
