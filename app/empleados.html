@@ -2334,6 +2334,12 @@
             detailNextDelivery.textContent = nextDelDate.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
             detailNextDelivery.style.color = '#F59E0B';
 
+            // Los activos que ya se entregaron y todavía no les toca renovar
+            // no deberían ofrecerse de nuevo en el checklist (ni para
+            // entregar otra vez ni para "Cotizar con Dot" por falta de
+            // stock): ya los tiene el empleado.
+            removeAlreadyDeliveredRows(lastSigned.items, nextDelDate);
+
             if (lastSigned.items && Array.isArray(lastSigned.items)) {
               kitList.innerHTML = lastSigned.items.map(item => `
                 <div style="display: flex; align-items: center; gap: 0.75rem; background: white; padding: 0.5rem; border-radius: 8px; border: 1px solid var(--color-border);">
@@ -2920,6 +2926,42 @@
       // Update the button state dynamically!
       updateGenerateButtonState();
     }
+    // Un activo que ya se entregó (aparece en la última firma) y cuya
+    // renovación todavía no llega no debe seguir ofreciéndose en el
+    // checklist de "Entregar Activos" — ni marcado para entregar de nuevo
+    // ni con el aviso de "Sin stock / Cotizar con Dot", porque el
+    // empleado ya lo tiene. Si ya toca renovar (nextDelDate ya pasó), se
+    // deja todo el kit visible como de costumbre.
+    function removeAlreadyDeliveredRows(deliveredItems, nextDelDate) {
+      if (!deliveredItems || !Array.isArray(deliveredItems)) return;
+      if (new Date() >= nextDelDate) return;
+
+      const deliveredNames = new Set(
+        deliveredItems.map(it => (it.name || '').trim().toLowerCase()).filter(Boolean)
+      );
+
+      const list = document.getElementById('deliveryItemsList');
+      if (!list) return;
+
+      Array.from(list.querySelectorAll('[data-delivery-item-id]')).forEach(row => {
+        const id = row.dataset.deliveryItemId;
+        const meta = window._deliveryItemMeta[id];
+        if (!meta) return;
+        const nameKey = (meta.name || '').trim().toLowerCase();
+        if (deliveredNames.has(nameKey)) {
+          delete window._deliveryItemMeta[id];
+          row.remove();
+        }
+      });
+
+      if (list.children.length === 0) {
+        const dateStr = nextDelDate.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
+        list.innerHTML = `<div style="text-align:center; padding:1.5rem; color:var(--color-text-muted); font-size:0.875rem;">Ya se entregó todo el kit vigente. Próxima renovación estimada: ${dateStr}.</div>`;
+      }
+
+      updateGenerateButtonState();
+    }
+
     function checkStockShortage() {
       const rows = document.querySelectorAll('#deliveryItemsList [data-delivery-item-id]');
       let shortage = false;
