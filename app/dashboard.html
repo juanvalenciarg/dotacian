@@ -839,8 +839,8 @@
               <div class="app-card" style="padding: 1.75rem;">
                 <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.25rem;">
                   Valor de Activos por Rol</h3>
-                <p style="color: #64748B; font-size: 0.875rem; margin-bottom: 1rem;">Valor estimado del kit
-                  asignado a cada rol.</p>
+                <p style="color: #64748B; font-size: 0.875rem; margin-bottom: 1rem;">Valor estimado de los
+                  activos ya entregados a los empleados de cada rol.</p>
                 <div id="roleValueList">
                   <div style="color: var(--color-text-muted); font-size: 0.875rem; padding: 1rem 0;">Cargando...
                   </div>
@@ -1220,27 +1220,19 @@
         // costo registrado en ningún lado, no dejar el activo en $0.
         const DEFAULT_ITEM_VALUE = 450;
 
-        // ── Valor y cantidad de activos físicos por rol ──
-        const roleStats = (roleDefs || []).map(rd => {
+        // ── Cantidad de activos físicos definidos por rol (kit completo) ──
+        // Esta ficha sigue siendo sobre el kit asignado: cuántas unidades
+        // implica sostener ese rol, sin importar si ya se entregaron.
+        const roleQtyStats = (roleDefs || []).map(rd => {
           const items = (rd.items || []).filter(it => it.name && it.category !== 'digital');
           let totalQty = 0;
-          let totalValue = 0;
-          items.forEach(it => {
-            const qty = it.qty || it.quantity || 1;
-            const price = priceMap[(it.name || '').trim().toLowerCase()] || DEFAULT_ITEM_VALUE;
-            totalQty += qty;
-            totalValue += qty * price;
-          });
-          return { roleName: rd.role_name || 'Sin nombre', itemTypes: items.length, totalQty, totalValue };
+          items.forEach(it => { totalQty += it.qty || it.quantity || 1; });
+          return { roleName: rd.role_name || 'Sin nombre', totalQty };
         });
+        renderRoleQtyCard(roleQtyStats);
 
-        renderRoleValueCard(roleStats);
-        renderRoleQtyCard(roleStats);
-
-        // ── % de activos entregados por empleado ──
-        // Se compara el kit físico vigente del rol contra los ítems de la
-        // última entrega FIRMADA de cada empleado (mismo criterio que ya
-        // usa el checklist de "Entregar Activos" en app/empleados.html).
+        // Última entrega FIRMADA por empleado (mismo criterio que ya usa el
+        // checklist de "Entregar Activos" en app/empleados.html).
         const lastDeliveryByEmployee = {};
         (deliveries || []).forEach(d => {
           const date = new Date(d.signed_at || d.created_at);
@@ -1255,15 +1247,40 @@
           roleItemsMap[(rd.role_name || '').toLowerCase().trim()] = (rd.items || []).filter(it => it.name && it.category !== 'digital');
         });
 
+        // ── Valor de activos por rol, sobre lo REALMENTE entregado ──
+        // A diferencia de la cantidad (arriba), el valor se calcula sumando
+        // lo que cada empleado de ese rol ya recibió en su última entrega
+        // firmada — no el valor del kit completo asignado, que puede
+        // incluir activos todavía pendientes.
+        const roleValueBuckets = {};
+        (roleDefs || []).forEach(rd => {
+          roleValueBuckets[(rd.role_name || '').toLowerCase().trim()] = {
+            roleName: rd.role_name || 'Sin nombre', totalValue: 0, itemNames: new Set()
+          };
+        });
+
         const employeeStats = (employees || []).map(emp => {
           const roleKey = (emp.role || '').toLowerCase().trim();
           const expectedItems = roleItemsMap[roleKey] || [];
           const delivered = lastDeliveryByEmployee[emp.id];
-          const deliveredNames = new Set((delivered ? delivered.items : []).map(it => (it.name || '').trim().toLowerCase()));
+          const deliveredItems = delivered ? delivered.items : [];
+          const deliveredNames = new Set(deliveredItems.map(it => (it.name || '').trim().toLowerCase()));
 
           const expectedCount = expectedItems.length;
           const deliveredCount = expectedItems.filter(it => deliveredNames.has((it.name || '').trim().toLowerCase())).length;
           const pct = expectedCount > 0 ? Math.round((deliveredCount / expectedCount) * 100) : null;
+
+          if (!roleValueBuckets[roleKey]) {
+            roleValueBuckets[roleKey] = { roleName: emp.role || 'Sin rol', totalValue: 0, itemNames: new Set() };
+          }
+          const bucket = roleValueBuckets[roleKey];
+          deliveredItems.forEach(it => {
+            if (!it.name) return;
+            const qty = it.qty || it.quantity || 1;
+            const price = priceMap[it.name.trim().toLowerCase()] || DEFAULT_ITEM_VALUE;
+            bucket.totalValue += qty * price;
+            bucket.itemNames.add(it.name.trim().toLowerCase());
+          });
 
           return {
             name: `${emp.first_name || ''} ${emp.last_name || ''}`.trim() || 'Empleado',
@@ -1271,6 +1288,11 @@
             pct
           };
         });
+
+        const roleValueStats = Object.values(roleValueBuckets).map(b => ({
+          roleName: b.roleName, itemTypes: b.itemNames.size, totalValue: b.totalValue
+        }));
+        renderRoleValueCard(roleValueStats);
 
         renderEmployeeDeliveryCard(employeeStats);
       } catch (err) {
@@ -1296,7 +1318,7 @@
         <div class="insight-row" style="display:flex; justify-content:space-between; align-items:center; padding:0.75rem 0;">
           <div>
             <div style="font-weight:700; color:var(--color-navy); font-size:0.9rem;">${escapeDashHtml(r.roleName)}</div>
-            <div style="font-size:0.75rem; color:var(--color-text-muted);">${r.itemTypes} tipo${r.itemTypes !== 1 ? 's' : ''} de activo${r.itemTypes !== 1 ? 's' : ''}</div>
+            <div style="font-size:0.75rem; color:var(--color-text-muted);">${r.itemTypes > 0 ? `${r.itemTypes} tipo${r.itemTypes !== 1 ? 's' : ''} de activo${r.itemTypes !== 1 ? 's' : ''} entregado${r.itemTypes !== 1 ? 's' : ''}` : 'Aún sin entregas registradas'}</div>
           </div>
           <div style="font-weight:800; color:var(--color-cyan); font-size:0.9rem; white-space:nowrap;">${formatCurrency(r.totalValue, userCountry)}</div>
         </div>
