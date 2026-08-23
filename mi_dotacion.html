@@ -684,10 +684,11 @@
               const row = document.createElement('div');
               row.className = 'delivery-item-row';
               row.innerHTML = `
-                <input type="checkbox" onchange="checkItems()" checked style="width:20px; height:20px; accent-color:var(--color-cyan);"> 
+                <input type="checkbox" onchange="checkItems()" checked style="width:20px; height:20px; accent-color:var(--color-cyan);">
                 <div style="flex:1;">
-                  <div style="font-size:0.9rem; font-weight:700; color:var(--color-navy);">${item.name}</div>
-                  <div style="font-size:0.75rem; color:#64748B;">Cantidad: ${item.qty} | Talla: ${item.size}</div>
+                  <div style="font-size:0.9rem; font-weight:700; color:var(--color-navy);">${escapeMiDotacionHtml(item.name)}</div>
+                  <div style="font-size:0.75rem; color:#64748B;">Cantidad: ${item.qty} | Talla: ${escapeMiDotacionHtml(item.size)}</div>
+                  ${buildDeliveryItemSpecsHtml(item.specs)}
                 </div>
               `;
               checklist.appendChild(row);
@@ -702,6 +703,26 @@
             <span style="font-family: monospace; font-size: 0.75rem; word-break: break-all;">${err.message || err.details || JSON.stringify(err)}</span>
           </div>`;
         }
+      }
+
+      function escapeMiDotacionHtml(str) {
+        return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      function prettifySpecKey(key) {
+        return String(key).replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      }
+
+      // Detalle del lote real que se entregó (marca, referencia, y demás
+      // specs capturadas en Bodega) — la talla ya se muestra aparte, así
+      // que se excluye acá para no repetirla.
+      function buildDeliveryItemSpecsHtml(specs) {
+        if (!specs || typeof specs !== 'object') return '';
+        const parts = Object.entries(specs)
+          .filter(([key, value]) => key !== 'talla' && value)
+          .map(([key, value]) => `${prettifySpecKey(key)}: ${escapeMiDotacionHtml(value)}`);
+        if (parts.length === 0) return '';
+        return `<div style="font-size:0.75rem; color:#94A3B8; margin-top:2px;">${parts.join(' · ')}</div>`;
       }
 
       function clearSignature() {

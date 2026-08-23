@@ -3660,9 +3660,14 @@
 
           const meta = window._deliveryItemMeta ? window._deliveryItemMeta[row.dataset.deliveryItemId] : null;
           const unitCost = getDeliveryUnitCost(name, size, meta ? meta.preferredLotId : null);
+          const lotInfo = getOldestLotSpecs(name, size, meta ? meta.roleSpecs : null, meta ? meta.preferredLotId : null);
 
           const deliveredItem = { name, qty, size };
           if (unitCost !== null) deliveredItem.unit_cost = unitCost;
+          // Specs del lote real (marca, referencia, etc.) para que la
+          // persona que firma en mi_dotacion.html vea qué exactamente le
+          // están dando, no solo el nombre genérico del rol.
+          if (lotInfo && lotInfo.specs) deliveredItem.specs = lotInfo.specs;
           itemsToDeliver.push(deliveredItem);
         } else {
           console.log("Row skipped (empty garment name).");
