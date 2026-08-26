@@ -123,6 +123,77 @@
       border-radius: 999px;
     }
 
+    .asset-subcat-icon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .asset-subcat-tile {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 1.25rem;
+      padding: 1.25rem 0.75rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+      cursor: pointer;
+      font-family: inherit;
+      text-align: center;
+      transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .asset-subcat-tile:hover {
+      border-color: var(--color-cyan);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    .asset-subcat-tile.active {
+      border-color: var(--color-cyan);
+      background: var(--color-cyan-dim);
+    }
+
+    .asset-subcat-tile-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: #F1F5F9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-navy);
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .asset-subcat-tile.active .asset-subcat-tile-icon {
+      background: var(--color-cyan);
+      color: white;
+    }
+
+    .asset-subcat-tile-label {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--color-navy);
+      line-height: 1.2;
+    }
+
+    .asset-subcat-tile-count {
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      font-weight: 600;
+    }
+
+    .asset-subcat-panel {
+      display: none;
+    }
+
+    .asset-subcat-panel.open {
+      display: block;
+    }
+
     .asset-subcat-card {
       background: white;
       border-radius: 1.25rem;
@@ -605,6 +676,16 @@
       }
     };
 
+    const SUBCAT_ICONS = {
+      computo: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="10" rx="1"></rect><line x1="2" y1="18" x2="22" y2="18"></line></svg>',
+      uniforme: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path></svg>',
+      acceso: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="7" cy="15" r="4"></circle><path d="M10.5 11.5 19 3"></path><path d="M15.5 7 18 9.5"></path><path d="M18 4.5 20.5 7"></path></svg>',
+      vehiculo: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"></path><circle cx="6.5" cy="16.5" r="2.5"></circle><circle cx="16.5" cy="16.5" r="2.5"></circle></svg>',
+      equipo: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"></path></svg>',
+      licencia: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z"></path></svg>',
+      default: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>'
+    };
+
     let currentCompanyId = null;
     let assetRowsByKey = {}; // "tipo|nombre" -> row de company_assets
     let assetProvidersByAssetId = {}; // company_asset_id -> [{id, nombre, correo, telefono}]
@@ -673,23 +754,56 @@
 
         section.innerHTML = `<div class="asset-category-title">${cat.label} <span class="badge-count">0 activos</span></div>`;
 
+        const grid = document.createElement('div');
+        grid.className = 'asset-subcat-icon-grid';
+
+        const panelsWrap = document.createElement('div');
+        panelsWrap.className = 'asset-subcat-panels';
+
         Object.keys(cat.subcats).forEach(subKey => {
           const sub = cat.subcats[subKey];
+
+          const tile = document.createElement('button');
+          tile.type = 'button';
+          tile.className = 'asset-subcat-tile';
+          tile.dataset.cat = catKey;
+          tile.dataset.subcat = subKey;
+          tile.onclick = () => toggleSubcatPanel(catKey, subKey);
+          tile.innerHTML = `
+            <div class="asset-subcat-tile-icon">${SUBCAT_ICONS[subKey] || SUBCAT_ICONS.default}</div>
+            <div class="asset-subcat-tile-label">${sub.label}</div>
+            <div class="asset-subcat-tile-count" id="subcat-count-${catKey}-${subKey}">0/${sub.items.length}</div>
+          `;
+          grid.appendChild(tile);
+
           const card = document.createElement('div');
-          card.className = 'asset-subcat-card';
+          card.className = 'asset-subcat-card asset-subcat-panel';
+          card.id = `subcat-panel-${catKey}-${subKey}`;
+          card.dataset.cat = catKey;
+          card.dataset.subcat = subKey;
           card.innerHTML = `<div class="asset-subcat-header">${sub.label}</div>`;
 
           sub.items.forEach(name => {
             card.appendChild(renderAssetRow(catKey, subKey, name));
           });
 
-          section.appendChild(card);
+          panelsWrap.appendChild(card);
         });
 
+        section.appendChild(grid);
+        section.appendChild(panelsWrap);
         root.appendChild(section);
       });
 
       updateCategoryCounts();
+    }
+
+    function toggleSubcatPanel(catKey, subKey) {
+      const panel = document.getElementById(`subcat-panel-${catKey}-${subKey}`);
+      const tile = document.querySelector(`.asset-subcat-tile[data-cat="${catKey}"][data-subcat="${subKey}"]`);
+      if (!panel) return;
+      const isOpen = panel.classList.toggle('open');
+      if (tile) tile.classList.toggle('active', isOpen);
     }
 
     function renderAssetRow(category, tipo, nombre) {
@@ -856,12 +970,32 @@
 
     function filterAssets(query) {
       const q = query.trim().toLowerCase();
-      document.querySelectorAll('.asset-row').forEach(row => {
-        row.style.display = !q || row.dataset.name.includes(q) ? '' : 'none';
-      });
-      document.querySelectorAll('.asset-subcat-card').forEach(card => {
-        const visible = Array.from(card.querySelectorAll('.asset-row')).some(r => r.style.display !== 'none');
-        card.style.display = visible ? '' : 'none';
+      document.querySelectorAll('.asset-subcat-panel').forEach(panel => {
+        const rows = Array.from(panel.querySelectorAll('.asset-row'));
+        let anyVisible = false;
+        rows.forEach(row => {
+          const match = !q || row.dataset.name.includes(q);
+          row.style.display = match ? '' : 'none';
+          if (match) anyVisible = true;
+        });
+
+        const catKey = panel.dataset.cat;
+        const subKey = panel.dataset.subcat;
+        const tile = document.querySelector(`.asset-subcat-tile[data-cat="${catKey}"][data-subcat="${subKey}"]`);
+
+        if (q) {
+          panel.classList.toggle('open', anyVisible);
+          if (tile) {
+            tile.style.display = anyVisible ? '' : 'none';
+            tile.classList.toggle('active', anyVisible);
+          }
+        } else {
+          panel.classList.remove('open');
+          if (tile) {
+            tile.style.display = '';
+            tile.classList.remove('active');
+          }
+        }
       });
     }
 
@@ -991,10 +1125,13 @@
         const cat = ASSET_CATALOG[catKey];
         let count = 0;
         Object.keys(cat.subcats).forEach(subKey => {
+          let subCount = 0;
           cat.subcats[subKey].items.forEach(name => {
             const row = assetRowsByKey[assetKey(subKey, name)];
-            if (row && row.activo) count++;
+            if (row && row.activo) { subCount++; count++; }
           });
+          const countEl = document.getElementById(`subcat-count-${catKey}-${subKey}`);
+          if (countEl) countEl.textContent = `${subCount}/${cat.subcats[subKey].items.length}`;
         });
         const badge = section.querySelector('.badge-count');
         if (badge) badge.textContent = `${count} activos`;
