@@ -1208,7 +1208,9 @@
                 quantity: qty,
                 sizes: item.sizes || (item.size ? { [item.size]: qty } : { 'Única': qty }),
                 unit_price: price,
-                seller_id: selectedQuote.seller_id
+                seller_id: selectedQuote.seller_id,
+                role_id: item.role_id || null,
+                role_name: item.role_name || null
               });
             });
           } else {

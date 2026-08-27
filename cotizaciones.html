@@ -438,6 +438,7 @@
                   <thead>
                     <tr>
                       <th>Prenda</th>
+                      <th>Rol</th>
                       <th>Talla</th>
                       <th style="text-align: center;">Requerido (Empleados)</th>
                       <th style="text-align: center;">En Bodega</th>
@@ -1798,7 +1799,7 @@
         // 1.2 Fetch Role Definitions (garments and renewal frequency)
         const { data: roleDefinitions, error: defErr } = await window._supabase
           .from('role_definition')
-          .select('role_name, items, renewal_frequency')
+          .select('id, role_name, items, renewal_frequency')
           .eq('company_id', companyId);
 
         if (defErr) throw defErr;
@@ -1806,6 +1807,8 @@
         const roleDefMap = {};
         (roleDefinitions || []).forEach(rd => {
           roleDefMap[rd.role_name.toLowerCase().trim()] = {
+            id: rd.id,
+            role_name: rd.role_name,
             items: rd.items || [],
             renewal_frequency: rd.renewal_frequency || 6
           };
@@ -1846,18 +1849,21 @@
 
         // 2. Fetch Storage
         const { data: storage, error: storErr } = await window._supabase.from('company_storage')
-          .select('product_name, size, quantity, status')
+          .select('product_name, size, quantity, status, role_id')
           .eq('company_id', companyId);
 
         if (storErr) throw storErr;
 
-        // Calculate Stock grouped by product + size (only counting new, not used)
+        // Calculate Stock grouped by product + size + role (only counting new,
+        // not used) — dos roles pueden compartir el nombre de una prenda pero
+        // ser prendas físicamente distintas, así que el stock de cada rol se
+        // descuenta por separado.
         const stockMap = {};
         (storage || []).forEach(item => {
           if (item.status === 'seminuevo') return; // Ignorar usados
           const normalizedProd = (item.product_name || '').trim().toLowerCase();
           const normalizedSz = (item.size || 'M').trim().toUpperCase();
-          const key = `${normalizedProd}_${normalizedSz}`;
+          const key = `${normalizedProd}_${normalizedSz}_${item.role_id || 'none'}`;
           stockMap[key] = (stockMap[key] || 0) + (item.quantity || 0);
         });
 
@@ -1879,8 +1885,8 @@
         // Rebuild stockMap with normalized keys
         const stockMapNorm = {};
         Object.keys(stockMap).forEach(k => {
-          const [prod, sz] = k.split('_');
-          const normKey = `${normalizeKey(prod)}_${(sz || 'M').toUpperCase()}`;
+          const [prod, sz, roleId] = k.split('_');
+          const normKey = `${normalizeKey(prod)}_${(sz || 'M').toUpperCase()}_${roleId || 'none'}`;
           stockMapNorm[normKey] = (stockMapNorm[normKey] || 0) + stockMap[k];
         });
 
@@ -1948,9 +1954,9 @@
 
               const normProd = normalizeKey(it.name);
               const normSz = size.trim().toUpperCase();
-              const key = `${normProd}_${normSz}`;
+              const key = `${normProd}_${normSz}_${roleDef.id}`;
 
-              if (!neededMap[key]) neededMap[key] = { name: it.name, size, qty: 0, logo_config: it.logo_config || null };
+              if (!neededMap[key]) neededMap[key] = { name: it.name, size, role_id: roleDef.id, role_name: roleDef.role_name, qty: 0, logo_config: it.logo_config || null };
               neededMap[key].qty += parseInt(it.qty || it.quantity || 1);
             });
           }
@@ -1967,6 +1973,8 @@
             toOrder.push({
               name: needed.name,
               size: needed.size,
+              role_id: needed.role_id,
+              role_name: needed.role_name,
               req: needed.qty,
               stock: inStock,
               order: diff,
@@ -1982,7 +1990,7 @@
           const skipMsg = skippedCount > 0
             ? `<br><span style="font-size:0.78rem; color:#F59E0B;">⚠ ${skippedCount} empleado(s) omitidos por no tener prendas configuradas en su rol.</span>`
             : '';
-          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 2rem; color: var(--color-text-muted);">
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--color-text-muted);">
             ${processedCount === 0
               ? 'No hay empleados activos con rol y dotación configurada. Configura las prendas de cada rol en la sección <strong>Roles</strong>.'
               : 'Todo tu personal está cubierto con el inventario actual. No necesitas pedir más prendas.'}
@@ -1994,6 +2002,7 @@
             const tr = document.createElement('tr');
             tr.innerHTML = `
               <td style="font-weight: 600; color: var(--color-navy);">${item.name}</td>
+              <td>${item.role_name || 'Sin rol'}</td>
               <td style="text-align: center;"><span style="background: #F1F5F9; padding: 2px 8px; border-radius: 6px;">${item.size}</span></td>
               <td style="text-align: center;">${item.req}</td>
               <td style="text-align: center;">${item.stock}</td>
@@ -2031,6 +2040,8 @@
           name: it.name,
           qty: it.order,
           size: it.size,
+          role_id: it.role_id || null,
+          role_name: it.role_name || null,
           logo_config: it.logo_config || null
         }));
 

@@ -380,6 +380,7 @@
 
       let currentDeliveryId = null;
       let currentDelivery = null;
+      let currentEmployeeRoleId = null;
       let currentMode = null;
       const canvas = document.getElementById('signaturePad');
       const ctx = canvas.getContext('2d');
@@ -678,6 +679,22 @@
           canvas.dataset.companyId = emp.company_id;
           canvas.dataset.employeeId = emp.id;
 
+          // Resolver el role_definition.id del rol del empleado, para que
+          // el descuento de stock al firmar salga del bucket de ese rol
+          // específico y no de uno compartido entre todos los roles.
+          try {
+            const { data: roleDef } = await _supabase
+              .from('role_definition')
+              .select('id')
+              .eq('company_id', emp.company_id)
+              .ilike('role_name', (emp.role || '').trim())
+              .maybeSingle();
+            currentEmployeeRoleId = roleDef ? roleDef.id : null;
+          } catch (e) {
+            console.warn('No se pudo resolver el rol del empleado para ligar el stock:', e);
+            currentEmployeeRoleId = null;
+          }
+
           checklist.innerHTML = '';
           if (del.items && Array.isArray(del.items)) {
             del.items.forEach(item => {
@@ -810,7 +827,8 @@
                   category: 'Entrega de Uniformes',
                   size: item.size || 'N/A',
                   quantity: -Math.abs(item.qty || 1), // Negative quantity to deduct from stock
-                  status: 'available'
+                  status: 'available',
+                  role_id: currentEmployeeRoleId || null
                 });
               }
             });

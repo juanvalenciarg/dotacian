@@ -1034,6 +1034,7 @@
               <thead>
                 <tr>
                   <th>Producto</th>
+                  <th>Rol</th>
                   <th>Talla</th>
                   <th>Estado</th>
                   <th>Cantidad</th>
@@ -1127,6 +1128,19 @@
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+            <div>
+              <label
+                style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Rol</label>
+              <select id="adjustRole" onchange="onAdjustRoleChange()"
+                style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem; background: white; color: var(--color-navy); font-weight: 600;">
+                <option value="">Cargando roles...</option>
+              </select>
+              <span
+                style="font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-top: 0.3rem;">Cada
+                rol puede tener specs distintas para el mismo tipo de prenda, así que el stock se lleva por
+                separado.</span>
+            </div>
+
             <div>
               <label
                 style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Producto</label>
@@ -1230,6 +1244,7 @@
               <thead>
                 <tr>
                   <th>Producto</th>
+                  <th>Rol</th>
                   <th>Talla</th>
                   <th>Stock Actual</th>
                   <th>Stock Mínimo</th>
@@ -1237,7 +1252,7 @@
               </thead>
               <tbody id="minimosTableBody">
                 <tr>
-                  <td colspan="4" style="text-align:center; padding: 1.5rem; color: var(--color-text-muted);">Cargando...</td>
+                  <td colspan="5" style="text-align:center; padding: 1.5rem; color: var(--color-text-muted);">Cargando...</td>
                 </tr>
               </tbody>
             </table>
@@ -1391,6 +1406,27 @@
     let inventoryData = [];
     let currentCompanyId = null;
 
+    // Roles activos de la empresa con su role_definition.id (identificador
+    // estable, a diferencia de role_name que solo sirve para mostrar). Se
+    // usa para ligar cada lote de bodega a un rol específico, ya que dos
+    // roles pueden tener un ítem con el mismo nombre pero specs distintas.
+    async function fetchActiveRolesWithId(companyId) {
+      const { data: activeRoles, error: roleErr } = await _supabase
+        .from('company_roles')
+        .select('role_name')
+        .eq('company_id', companyId);
+      if (roleErr) throw roleErr;
+      const activeNames = (activeRoles || []).map(r => r.role_name.toLowerCase().trim());
+
+      const { data: defs, error: defErr } = await _supabase
+        .from('role_definition')
+        .select('id, role_name, items')
+        .eq('company_id', companyId);
+      if (defErr) throw defErr;
+
+      return (defs || []).filter(rd => activeNames.includes(rd.role_name.toLowerCase().trim()));
+    }
+
     async function initBodega() {
       try {
         const { data: sessionData } = await _supabase.auth.getSession();
@@ -1404,6 +1440,15 @@
         if (document.getElementById('pop-user-email')) {
           document.getElementById('pop-user-email').textContent = sessionData.session.user.email;
         }
+
+        try {
+          window._activeRoleDefs = await fetchActiveRolesWithId(currentCompanyId);
+        } catch (err) {
+          console.error('Error cargando roles activos:', err);
+          window._activeRoleDefs = [];
+        }
+        window._rolesById = {};
+        window._activeRoleDefs.forEach(rd => { window._rolesById[rd.id] = rd.role_name; });
 
         await loadInventory();
       } catch (err) {
@@ -1505,16 +1550,27 @@
 
       window.inventoryPriceMap = { ...fallbackPrices, ...priceMap };
 
-      // Group items by product_name, size
+      // Group items by product_name, size, role_id — dos roles pueden tener
+      // un ítem con el mismo nombre pero ser prendas físicamente distintas,
+      // así que cada rol lleva su propio conteo.
+      const rolesById = window._rolesById || {};
       const grouped = {};
       data.forEach(item => {
         const product = item.product_name || 'Desconocido';
         const size = item.size || 'N/A';
+        const roleId = item.role_id || null;
         const isUsed = item.status === 'seminuevo' || item.category === 'seminuevo'; // or any criteria for used
 
-        const key = `${product}_${size}`;
+        const key = `${product}_${size}_${roleId || 'none'}`;
         if (!grouped[key]) {
-          grouped[key] = { activo: product, talla: size, nuevos: 0, seminuevos: 0 };
+          grouped[key] = {
+            activo: product,
+            talla: size,
+            roleId,
+            roleName: roleId ? (rolesById[roleId] || 'Rol eliminado') : 'Sin rol asignado',
+            nuevos: 0,
+            seminuevos: 0
+          };
         }
 
         // Sum quantity. By default, assume 'nuevo' unless specified.
@@ -1556,7 +1612,7 @@
         const product = item.product_name || 'Desconocido';
         const size = item.size || 'N/A';
         const isUsed = item.status === 'seminuevo' || item.category === 'seminuevo';
-        const key = `${product}__${size}__${isUsed ? 'usado' : 'nuevo'}`;
+        const key = `${product}__${size}__${isUsed ? 'usado' : 'nuevo'}__${item.role_id || 'none'}`;
         if (!lotsByKey[key]) lotsByKey[key] = [];
         const lots = lotsByKey[key];
         const qty = item.quantity || 0;
@@ -1657,6 +1713,7 @@
           </span>
           <span style="font-weight: 600; color: var(--color-navy);">${item.activo}</span>
         </td>
+        <td>${item.roleName || 'Sin rol asignado'}</td>
         <td>${item.talla}</td>
         <td>${badge}</td>
         <td><span style="font-weight: 700; color: var(--color-navy);">${qty}</span></td>
@@ -1667,7 +1724,7 @@
       detailTr.className = 'inventory-detail-row';
       detailTr.style.display = 'none';
       const detailTd = document.createElement('td');
-      detailTd.colSpan = 4;
+      detailTd.colSpan = 5;
       detailTd.style.cssText = 'background: #F8FAFC; padding: 0.75rem 1.25rem;';
       detailTd.innerHTML = renderLotDetailCell(key);
       detailTr.appendChild(detailTd);
@@ -1690,12 +1747,12 @@
         totalSeminuevos += item.seminuevos;
 
         if (item.nuevos > 0) {
-          const key = `${item.activo}__${item.talla}__nuevo`;
+          const key = `${item.activo}__${item.talla}__nuevo__${item.roleId || 'none'}`;
           buildInventoryRow(item, 'nuevo', key).forEach(row => tbody.appendChild(row));
         }
 
         if (item.seminuevos > 0) {
-          const key = `${item.activo}__${item.talla}__usado`;
+          const key = `${item.activo}__${item.talla}__usado__${item.roleId || 'none'}`;
           buildInventoryRow(item, 'seminuevo', key).forEach(row => tbody.appendChild(row));
         }
       });
@@ -1722,10 +1779,10 @@
         if (q && !item.activo.toLowerCase().includes(q) && !item.talla.toLowerCase().includes(q)) return;
 
         if (item.nuevos > 0) {
-          exportData.push({ Producto: item.activo, Talla: item.talla, Estado: 'Nuevo', Cantidad: item.nuevos });
+          exportData.push({ Producto: item.activo, Rol: item.roleName || 'Sin rol asignado', Talla: item.talla, Estado: 'Nuevo', Cantidad: item.nuevos });
         }
         if (item.seminuevos > 0) {
-          exportData.push({ Producto: item.activo, Talla: item.talla, Estado: 'Seminuevo', Cantidad: item.seminuevos });
+          exportData.push({ Producto: item.activo, Rol: item.roleName || 'Sin rol asignado', Talla: item.talla, Estado: 'Seminuevo', Cantidad: item.seminuevos });
         }
       });
 
@@ -1750,10 +1807,10 @@
         if (q && !item.activo.toLowerCase().includes(q) && !item.talla.toLowerCase().includes(q)) return;
 
         if (item.nuevos > 0) {
-          rowsHtml += `<tr><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.activo}</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.talla}</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">Nuevo</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.nuevos}</td></tr>`;
+          rowsHtml += `<tr><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.activo}</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.roleName || 'Sin rol asignado'}</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.talla}</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">Nuevo</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.nuevos}</td></tr>`;
         }
         if (item.seminuevos > 0) {
-          rowsHtml += `<tr><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.activo}</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.talla}</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">Seminuevo</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.seminuevos}</td></tr>`;
+          rowsHtml += `<tr><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.activo}</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.roleName || 'Sin rol asignado'}</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.talla}</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">Seminuevo</td><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${item.seminuevos}</td></tr>`;
         }
       });
 
@@ -1791,6 +1848,7 @@
               <thead>
                 <tr>
                   <th>Producto</th>
+                  <th>Rol</th>
                   <th>Talla</th>
                   <th>Estado</th>
                   <th>Cantidad</th>
@@ -2588,9 +2646,10 @@
           .eq('company_id', currentCompanyId);
         if (error) throw error;
 
+        const rolesById = window._rolesById || {};
         const minimoMap = {};
         (minimosData || []).forEach(m => {
-          minimoMap[`${m.product_name}_${m.talla}`] = m.minimo;
+          minimoMap[`${m.product_name}_${m.talla}_${m.role_id || 'none'}`] = m.minimo;
         });
 
         // Unión: productos con stock real hoy + productos que ya tienen un
@@ -2598,28 +2657,43 @@
         // inventoryData, que filtra filas con stock 0).
         const rowsMap = {};
         (inventoryData || []).forEach(item => {
-          const key = `${item.activo}_${item.talla}`;
-          rowsMap[key] = { producto: item.activo, talla: item.talla, stock: (item.nuevos || 0) + (item.seminuevos || 0) };
+          const key = `${item.activo}_${item.talla}_${item.roleId || 'none'}`;
+          rowsMap[key] = {
+            producto: item.activo,
+            talla: item.talla,
+            roleId: item.roleId || null,
+            roleName: item.roleName || 'Sin rol asignado',
+            stock: (item.nuevos || 0) + (item.seminuevos || 0)
+          };
         });
         (minimosData || []).forEach(m => {
-          const key = `${m.product_name}_${m.talla}`;
-          if (!rowsMap[key]) rowsMap[key] = { producto: m.product_name, talla: m.talla, stock: 0 };
+          const key = `${m.product_name}_${m.talla}_${m.role_id || 'none'}`;
+          if (!rowsMap[key]) {
+            rowsMap[key] = {
+              producto: m.product_name,
+              talla: m.talla,
+              roleId: m.role_id || null,
+              roleName: m.role_id ? (rolesById[m.role_id] || 'Rol eliminado') : 'Sin rol asignado',
+              stock: 0
+            };
+          }
         });
 
-        const rows = Object.values(rowsMap).sort((a, b) => a.producto.localeCompare(b.producto) || a.talla.localeCompare(b.talla));
+        const rows = Object.values(rowsMap).sort((a, b) => a.producto.localeCompare(b.producto) || a.talla.localeCompare(b.talla) || a.roleName.localeCompare(b.roleName));
 
         if (rows.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 1.5rem; color: var(--color-text-muted);">Aún no hay activos en bodega para configurar.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 1.5rem; color: var(--color-text-muted);">Aún no hay activos en bodega para configurar.</td></tr>';
           return;
         }
 
         tbody.innerHTML = rows.map(r => {
-          const key = `${r.producto}_${r.talla}`;
+          const key = `${r.producto}_${r.talla}_${r.roleId || 'none'}`;
           const minimo = minimoMap[key] != null ? minimoMap[key] : 0;
           const badgeClass = r.stock > 0 ? 'badge-listo' : 'badge-en-transito';
           return `
-            <tr data-product="${escapeBodegaAttr(r.producto)}" data-talla="${escapeBodegaAttr(r.talla)}">
+            <tr data-product="${escapeBodegaAttr(r.producto)}" data-talla="${escapeBodegaAttr(r.talla)}" data-role-id="${escapeBodegaAttr(r.roleId || '')}">
               <td style="font-weight: 600; color: var(--color-navy);">${r.producto}</td>
+              <td>${r.roleName}</td>
               <td>${r.talla}</td>
               <td><span class="bodega-badge ${badgeClass}" style="font-size: 0.65rem;">${r.stock} unid.</span></td>
               <td><input type="number" class="minimo-input" min="0" value="${minimo}"
@@ -2630,7 +2704,7 @@
         }).join('');
       } catch (err) {
         console.error('Error cargando mínimos:', err);
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 1.5rem; color: #EF4444;">No se pudieron cargar los mínimos.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 1.5rem; color: #EF4444;">No se pudieron cargar los mínimos.</td></tr>';
       }
     }
 
@@ -2645,6 +2719,7 @@
         company_id: currentCompanyId,
         product_name: row.dataset.product,
         talla: row.dataset.talla,
+        role_id: row.dataset.roleId || null,
         minimo: parseInt(row.querySelector('.minimo-input').value) || 0,
         updated_at: new Date().toISOString()
       }));
@@ -2657,7 +2732,7 @@
       try {
         const { error } = await _supabase
           .from('company_stock_minimums')
-          .upsert(upserts, { onConflict: 'company_id,product_name,talla' });
+          .upsert(upserts, { onConflict: 'company_id,role_id,product_name,talla' });
         if (error) throw error;
         if (window.showToast) showToast('Éxito', 'Se han guardado los mínimos de operación.');
         closeMinimosModal();
@@ -2881,8 +2956,8 @@
         stockIndicator.style.display = 'none';
         btnGuardar.style.background = '';
         document.getElementById('adjustCostWrap').style.display = 'block';
-        // Restore full garments list for add mode
-        repopulateProductSelectForAdd(productSelect);
+        // Restore full garments list for add mode, scoped to the selected role
+        onAdjustRoleChange();
       } else {
         btnRemove.style.background = '#EF4444';
         btnRemove.style.color = 'white';
@@ -2896,17 +2971,44 @@
         btnGuardar.style.background = '#EF4444';
         document.getElementById('adjustCostWrap').style.display = 'none';
 
-        // Rebuild snapshot keyed by "product:::size" for accurate per-size validation
+        // Snapshot keyed por "product:::size", filtrado por el rol elegido —
+        // se reconstruye en onAdjustRoleChange() según el rol seleccionado.
+        onAdjustRoleChange();
+      }
+    }
+
+    // Se dispara al elegir un Rol en el modal de Ajuste. El stock/producto
+    // disponible siempre está acotado a un rol, ya que dos roles pueden
+    // tener un ítem con el mismo nombre pero specs físicamente distintas.
+    function onAdjustRoleChange() {
+      const productSelect = document.getElementById('adjustProduct');
+      const raw = document.getElementById('adjustRole').value; // '', 'none', o role_definition.id
+      window._adjustSelectedRoleId = raw === '' ? '' : (raw === 'none' ? null : raw);
+
+      if (raw === '') {
+        productSelect.innerHTML = '<option value="">Selecciona un rol primero...</option>';
+        productSelect.onchange = null;
+        window._adjustGarments = [];
+        window._adjustGarmentTipos = {};
+        if (adjustMode === 'remove') currentStockSnapshot = {};
+        updateAdjustSizeVisibility();
+        return;
+      }
+
+      window._adjustGarments = (window._adjustGarmentsByRole || {})[raw] || [];
+      window._adjustGarmentTipos = (window._adjustGarmentTiposByRole || {})[raw] || {};
+
+      if (adjustMode === 'add') {
+        repopulateProductSelectForAdd(productSelect);
+      } else {
+        const effectiveRoleId = window._adjustSelectedRoleId;
         currentStockSnapshot = {};
         inventoryData.forEach(item => {
+          if ((item.roleId || null) !== effectiveRoleId) return;
           const key = `${item.activo}:::${item.talla}`;
           const available = (item.nuevos || 0) + (item.seminuevos || 0);
-          if (available > 0) {
-            currentStockSnapshot[key] = (currentStockSnapshot[key] || 0) + available;
-          }
+          if (available > 0) currentStockSnapshot[key] = (currentStockSnapshot[key] || 0) + available;
         });
-
-        // Populate only items that have stock
         repopulateProductSelectForRemove(productSelect);
       }
     }
@@ -3005,9 +3107,12 @@
 
     async function openAdjustModal() {
       adjustMode = 'add';
+      const roleSelect = document.getElementById('adjustRole');
       const productSelect = document.getElementById('adjustProduct');
-      productSelect.innerHTML = '<option value="">Cargando activos autorizados...</option>';
+      roleSelect.innerHTML = '<option value="">Cargando roles...</option>';
+      productSelect.innerHTML = '<option value="">Selecciona un rol primero...</option>';
       productSelect.onchange = null;
+      window._adjustSelectedRoleId = '';
       document.getElementById('adjustSize').value = '';
       document.getElementById('adjustSizeWrap').style.display = 'none';
       document.getElementById('adjustSpecsWrap').style.display = 'none';
@@ -3042,45 +3147,57 @@
           currentStockSnapshot[key] = (currentStockSnapshot[key] || 0) + item.nuevos;
         });
 
-        // Fetch authorized garments from active roles
-        const { data: activeRolesData, error: roleErr } = await _supabase
-          .from('company_roles')
-          .select('role_name')
-          .eq('company_id', currentCompanyId);
-
-        if (roleErr) throw roleErr;
-        const activeRoleNames = (activeRolesData || []).map(r => r.role_name.toLowerCase().trim());
-
-        const { data: roleDefs, error: defErr } = await _supabase
-          .from('role_definition')
-          .select('role_name, items')
-          .eq('company_id', currentCompanyId);
-
-        if (defErr) throw defErr;
-
-        const garmentsSet = new Set();
-        const garmentTipos = {};
-        (roleDefs || []).forEach(rd => {
-          if (activeRoleNames.includes(rd.role_name.toLowerCase().trim())) {
-            const items = rd.items || [];
-            items.forEach(it => {
-              // Los activos digitales (licencias, accesos) no se manejan en
-              // bodega: no ocupan espacio físico ni se cotizan a proveedor.
-              if (it.name && it.category !== 'digital') {
-                const trimmed = it.name.trim();
-                garmentsSet.add(trimmed);
-                if (it.tipo) garmentTipos[trimmed] = it.tipo;
-              }
-            });
-          }
+        // Roles activos con su role_definition.id, para poder ligar el
+        // ajuste a un rol específico (dos roles pueden compartir el nombre
+        // de un ítem pero ser prendas físicamente distintas).
+        const roleDefs = await fetchActiveRolesWithId(currentCompanyId);
+        window._activeRoleDefs = roleDefs;
+        window._rolesById = {};
+        const garmentsByRole = {};
+        const garmentTiposByRole = {};
+        roleDefs.forEach(rd => {
+          window._rolesById[rd.id] = rd.role_name;
+          const garmentsSet = new Set();
+          const garmentTipos = {};
+          (rd.items || []).forEach(it => {
+            // Los activos digitales (licencias, accesos) no se manejan en
+            // bodega: no ocupan espacio físico ni se cotizan a proveedor.
+            if (it.name && it.category !== 'digital') {
+              const trimmed = it.name.trim();
+              garmentsSet.add(trimmed);
+              if (it.tipo) garmentTipos[trimmed] = it.tipo;
+            }
+          });
+          garmentsByRole[rd.id] = Array.from(garmentsSet).sort();
+          garmentTiposByRole[rd.id] = garmentTipos;
         });
+        window._adjustGarmentsByRole = garmentsByRole;
+        window._adjustGarmentTiposByRole = garmentTiposByRole;
 
-        window._adjustGarments = Array.from(garmentsSet).sort();
-        window._adjustGarmentTipos = garmentTipos;
-        repopulateProductSelectForAdd(productSelect);
+        roleSelect.innerHTML = '';
+        if (roleDefs.length === 0) {
+          roleSelect.innerHTML = '<option value="">Sin roles activos</option>';
+          productSelect.innerHTML = '<option value="">Sin activos configurados en los roles activos</option>';
+          return;
+        }
+        const defRoleOpt = document.createElement('option');
+        defRoleOpt.value = '';
+        defRoleOpt.textContent = 'Selecciona un rol...';
+        roleSelect.appendChild(defRoleOpt);
+        roleDefs.slice().sort((a, b) => a.role_name.localeCompare(b.role_name)).forEach(rd => {
+          const opt = document.createElement('option');
+          opt.value = rd.id;
+          opt.textContent = rd.role_name;
+          roleSelect.appendChild(opt);
+        });
+        const noRoleOpt = document.createElement('option');
+        noRoleOpt.value = 'none';
+        noRoleOpt.textContent = 'Sin rol asignado (stock histórico)';
+        roleSelect.appendChild(noRoleOpt);
 
       } catch (err) {
         console.error('Error loading authorized garments:', err);
+        roleSelect.innerHTML = '<option value="">Error al cargar roles</option>';
         productSelect.innerHTML = '<option value="">Error al cargar activos</option>';
       }
     }
@@ -3091,6 +3208,19 @@
 
     async function saveInventoryAdjustment() {
       if (!currentCompanyId) return;
+
+      const roleSelectValue = document.getElementById('adjustRole').value;
+      if (!roleSelectValue) {
+        if (window.showToast) showToast('Error', 'Selecciona un rol antes de continuar.', 'error');
+        else alert('Selecciona un rol antes de continuar.');
+        return;
+      }
+      const roleId = roleSelectValue === 'none' ? null : roleSelectValue;
+      if (adjustMode === 'add' && !roleId) {
+        if (window.showToast) showToast('Error', 'Para agregar stock nuevo debes elegir un rol específico.', 'error');
+        else alert('Para agregar stock nuevo debes elegir un rol específico.');
+        return;
+      }
 
       // In remove mode the select value is "product:::size"; in add mode it's just the product name
       let product, size;
@@ -3160,7 +3290,8 @@
           category: adjustMode === 'remove' ? 'Baja Manual' : 'Ajuste Manual',
           size: size,
           quantity: qty,
-          status: state === 'seminuevo' ? 'seminuevo' : 'available'
+          status: state === 'seminuevo' ? 'seminuevo' : 'available',
+          role_id: roleId
         };
         if (specs) payload.specs = specs;
         if (unitCost !== null) payload.unit_cost = unitCost;
@@ -3233,16 +3364,18 @@
           .eq('company_id', currentCompanyId);
         if (minErr) throw minErr;
 
+        const rolesById = window._rolesById || {};
         const stockMap = {};
         (inventoryData || []).forEach(item => {
-          stockMap[`${item.activo}_${item.talla}`] = (item.nuevos || 0) + (item.seminuevos || 0);
+          stockMap[`${item.activo}_${item.talla}_${item.roleId || 'none'}`] = (item.nuevos || 0) + (item.seminuevos || 0);
         });
 
         const belowMin = (minimosData || [])
           .map(m => ({
             producto: m.product_name,
             talla: m.talla,
-            stock: stockMap[`${m.product_name}_${m.talla}`] || 0,
+            roleName: m.role_id ? (rolesById[m.role_id] || 'Rol eliminado') : 'Sin rol asignado',
+            stock: stockMap[`${m.product_name}_${m.talla}_${m.role_id || 'none'}`] || 0,
             minimo: m.minimo
           }))
           .filter(m => m.stock < m.minimo);
@@ -3266,6 +3399,7 @@
               </div>
               <div style="flex:1;min-width:0;">
                 <div style="font-size:0.875rem;font-weight:700;color:var(--color-navy);margin-bottom:2px;">${item.producto}${item.talla && item.talla !== 'N/A' ? ` · Talla ${item.talla}` : ''}</div>
+                <div style="font-size:0.75rem;color:var(--color-text-muted);margin-bottom:2px;">${item.roleName}</div>
                 <div style="font-size:0.75rem;color:#DC2626;font-weight:600;">Stock: ${item.stock} · Mínimo: ${item.minimo}</div>
               </div>
               <button type="button" onclick="cotizarActivo('${escapeBodegaAttr(item.producto)}', '${escapeBodegaAttr(item.talla)}', ${Math.max(item.minimo - item.stock, 1)})"
@@ -3375,11 +3509,13 @@
           });
         }
 
-        // ── 2. Damage Alerts ─────────────────────────────────────
+        // ── 2. Damage Alerts (reposiciones + reportes de pérdida/daño desde mi.dotacian) ──
         const { data: damageData } = await _supabase
-          .from('uniform_deliveries')
-          .select('id, employee_id, status, created_at, notes, items')
-          .in('status', ['damaged', 'damage_request', 'reposicion', 'reponer', 'dañado'])
+          .from('employee_asset_requests')
+          .select('id, tipo, asset_nombre, motivo, foto_url, created_at, company_employees(first_name, last_name, role)')
+          .eq('company_id', currentCompanyId)
+          .eq('estado', 'pendiente')
+          .order('created_at', { ascending: false })
           .limit(30);
 
         if (!damageData || damageData.length === 0) {
@@ -3390,8 +3526,11 @@
             </div>`;
         } else {
           damageList.innerHTML = '';
+          const tipoLabel = { reposicion: 'Reposición', perdida_dano: 'Pérdida/Daño' };
           damageData.forEach(req => {
             const date = new Date(req.created_at).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
+            const emp = req.company_employees || {};
+            const empName = [emp.first_name, emp.last_name].filter(Boolean).join(' ') || 'Empleado';
             const item = document.createElement('div');
             item.className = 'alert-item alert-danger';
             item.innerHTML = `
@@ -3402,11 +3541,16 @@
                 </svg>
               </div>
               <div style="flex:1;min-width:0;">
-                <div style="font-size:0.875rem;font-weight:700;color:var(--color-navy);margin-bottom:2px;">Solicitud de Reposición</div>
-                <div style="font-size:0.75rem;color:var(--color-text-secondary);">${req.notes || 'Sin descripción'}</div>
+                <div style="font-size:0.875rem;font-weight:700;color:var(--color-navy);margin-bottom:2px;">${tipoLabel[req.tipo] || req.tipo} · ${escapeBodegaAttr(req.asset_nombre)}</div>
+                <div style="font-size:0.75rem;color:var(--color-text-secondary);">${escapeBodegaAttr(empName)} · ${escapeBodegaAttr(emp.role || 'Sin rol')}</div>
+                <div style="font-size:0.75rem;margin-top:2px;color:var(--color-text-secondary);">${escapeBodegaAttr(req.motivo || 'Sin descripción')}</div>
+                ${req.foto_url ? `<a href="${req.foto_url}" target="_blank" rel="noopener" style="font-size:0.7rem;color:var(--color-cyan);font-weight:600;">Ver foto</a><br>` : ''}
                 <div style="font-size:0.75rem;margin-top:4px;color:var(--color-text-muted);">${date}</div>
               </div>
-              <a href="/cotizaciones.html" style="flex-shrink:0;font-size:0.7rem;font-weight:700;color:var(--color-cyan);text-decoration:none;padding:0.3rem 0.6rem;border:1px solid var(--color-cyan);border-radius:6px;white-space:nowrap;">Cotizar</a>`;
+              <div style="flex-shrink:0;display:flex;flex-direction:column;gap:0.3rem;">
+                <button type="button" onclick="reviewEmployeeAssetRequest('${req.id}', 'aprobado')" style="font-size:0.7rem;font-weight:700;color:#16A34A;background:none;cursor:pointer;padding:0.3rem 0.6rem;border:1px solid #16A34A;border-radius:6px;white-space:nowrap;">Aprobar</button>
+                <button type="button" onclick="reviewEmployeeAssetRequest('${req.id}', 'rechazado')" style="font-size:0.7rem;font-weight:700;color:#DC2626;background:none;cursor:pointer;padding:0.3rem 0.6rem;border:1px solid #DC2626;border-radius:6px;white-space:nowrap;">Rechazar</button>
+              </div>`;
             damageList.appendChild(item);
           });
         }
@@ -3423,6 +3567,32 @@
         subtitle.textContent = 'Error al cargar alertas';
         renewalList.innerHTML = '<div style="color:#EF4444;font-size:0.875rem;padding:1rem;">No se pudieron cargar las alertas.</div>';
         damageList.innerHTML = '';
+      }
+    }
+
+    async function reviewEmployeeAssetRequest(id, estado) {
+      try {
+        const { data: sessionData } = await _supabase.auth.getSession();
+        const reviewerId = sessionData && sessionData.session ? sessionData.session.user.id : null;
+
+        const { error } = await _supabase
+          .from('employee_asset_requests')
+          .update({ estado, reviewed_by: reviewerId, reviewed_at: new Date().toISOString() })
+          .eq('id', id);
+
+        if (error) throw error;
+
+        if (window.showToast) {
+          showToast(
+            estado === 'aprobado' ? 'Solicitud aprobada' : 'Solicitud rechazada',
+            estado === 'aprobado' ? 'Ve al detalle del empleado en Empleados para entregarle el activo.' : 'Se notificó como rechazada.'
+          );
+        }
+
+        loadAlertsData();
+      } catch (err) {
+        console.error('Error actualizando solicitud:', err);
+        if (window.showToast) showToast('Error', 'No se pudo actualizar la solicitud.', 'error');
       }
     }
 

@@ -1820,7 +1820,8 @@
                     category: item.category || 'Uniforme',
                     size: talla,
                     quantity: cant,
-                    status: 'available'
+                    status: 'available',
+                    role_id: item.role_id || null
                   });
                 }
               }
@@ -1833,7 +1834,8 @@
                 category: item.category || 'Uniforme',
                 size: item.size || 'N/A',
                 quantity: item.quantity || 1,
-                status: 'available'
+                status: 'available',
+                role_id: item.role_id || null
               });
             }
           });
