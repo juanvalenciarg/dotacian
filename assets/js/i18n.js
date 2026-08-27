@@ -114,7 +114,8 @@ const I18N = {
     'catalog.uniforme.label': 'Uniformes',
     'catalog.acceso.label': 'Acceso',
     'catalog.vehiculo.label': 'Vehículos',
-    'catalog.equipo.label': 'Herramientas / EPP',
+    'catalog.herramienta.label': 'Herramientas',
+    'catalog.epp.label': 'EPP',
     'catalog.licencia.label': 'Licencias / Software',
     'catalog.acceso_digital.label': 'Accesos digitales',
 
@@ -293,7 +294,8 @@ const I18N = {
     'catalog.uniforme.label': 'Uniforms',
     'catalog.acceso.label': 'Access',
     'catalog.vehiculo.label': 'Vehicles',
-    'catalog.equipo.label': 'Tools / PPE',
+    'catalog.herramienta.label': 'Tools',
+    'catalog.epp.label': 'PPE',
     'catalog.licencia.label': 'Licenses / Software',
     'catalog.acceso_digital.label': 'Digital access',
 
