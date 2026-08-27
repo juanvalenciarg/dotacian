@@ -1002,6 +1002,16 @@
             </svg>
             Historial (PDF)
           </button>
+          <button class="btn btn-outline"
+            style="padding: 0.4rem 0.8rem; font-size: 0.75rem; display: flex; align-items: center; gap: 0.5rem;"
+            onclick="downloadAssignmentHistoryExcel()">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" x2="12" y1="15" y2="3" />
+            </svg>
+            Historial (Excel)
+          </button>
         </div>
         <button class="btn-close" onclick="closeDetailModal()">✕</button>
       </div>
@@ -1477,6 +1487,60 @@
         console.error("Error pre-loading image as base64:", err, url);
         return null; // Graceful fallback
       }
+    }
+
+    function downloadAssignmentHistoryExcel() {
+      const emp = window.currentEmployeeObj;
+      const deliveries = window.currentEmployeeDeliveries || [];
+
+      if (!emp) {
+        showNotification("No hay información del empleado disponible.");
+        return;
+      }
+
+      const signedDeliveries = deliveries.filter(d => d.status === 'signed');
+      if (signedDeliveries.length === 0) {
+        showNotification("No hay entregas firmadas para exportar.");
+        return;
+      }
+
+      const exportData = [];
+      signedDeliveries.forEach(delivery => {
+        const delDate = new Date(delivery.signed_at || delivery.created_at).toLocaleDateString('es-MX', {
+          day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+        const items = Array.isArray(delivery.items) ? delivery.items : [];
+
+        if (items.length === 0) {
+          exportData.push({
+            Empleado: emp.name,
+            'ID de Entrega': delivery.id.substring(0, 8),
+            'Fecha de Firma': delDate,
+            Producto: '—',
+            Cantidad: '',
+            Talla: ''
+          });
+        } else {
+          items.forEach(item => {
+            exportData.push({
+              Empleado: emp.name,
+              'ID de Entrega': delivery.id.substring(0, 8),
+              'Fecha de Firma': delDate,
+              Producto: item.name,
+              Cantidad: item.qty,
+              Talla: item.size
+            });
+          });
+        }
+      });
+
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Historial");
+
+      const dateStr = new Date().toLocaleDateString('es-MX').replace(/\//g, '-');
+      const fileTag = (emp.name || 'Empleado').replace(/[^a-zA-Z0-9]/g, '_');
+      XLSX.writeFile(wb, `Historial_${fileTag}_${dateStr}.xlsx`);
     }
 
     async function downloadAssignmentHistory() {
