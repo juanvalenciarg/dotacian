@@ -744,23 +744,27 @@
       }
     }
 
+    // Una sola sección sin encabezado: catKey ('fisico'/'digital') se sigue
+    // guardando en company_assets.category para no romper la lógica que
+    // depende de eso (ej. bodega.html excluye los activos "digital"), pero
+    // ya no se agrupa visualmente por esa categoría.
     function renderCatalog() {
       const root = document.getElementById('assetCatalogRoot');
       root.innerHTML = '';
 
+      const section = document.createElement('div');
+      section.className = 'asset-category-section';
+
+      section.innerHTML = `<div class="asset-category-title"><span class="badge-count">0 activos</span></div>`;
+
+      const grid = document.createElement('div');
+      grid.className = 'asset-subcat-icon-grid';
+
+      const panelsWrap = document.createElement('div');
+      panelsWrap.className = 'asset-subcat-panels';
+
       Object.keys(ASSET_CATALOG).forEach(catKey => {
         const cat = ASSET_CATALOG[catKey];
-        const section = document.createElement('div');
-        section.className = 'asset-category-section';
-        section.dataset.category = catKey;
-
-        section.innerHTML = `<div class="asset-category-title">${cat.label} <span class="badge-count">0 activos</span></div>`;
-
-        const grid = document.createElement('div');
-        grid.className = 'asset-subcat-icon-grid';
-
-        const panelsWrap = document.createElement('div');
-        panelsWrap.className = 'asset-subcat-panels';
 
         Object.keys(cat.subcats).forEach(subKey => {
           const sub = cat.subcats[subKey];
@@ -791,11 +795,11 @@
 
           panelsWrap.appendChild(card);
         });
-
-        section.appendChild(grid);
-        section.appendChild(panelsWrap);
-        root.appendChild(section);
       });
+
+      section.appendChild(grid);
+      section.appendChild(panelsWrap);
+      root.appendChild(section);
 
       updateCategoryCounts();
     }
@@ -1122,22 +1126,21 @@
     }
 
     function updateCategoryCounts() {
-      document.querySelectorAll('.asset-category-section').forEach(section => {
-        const catKey = section.dataset.category;
+      let total = 0;
+      Object.keys(ASSET_CATALOG).forEach(catKey => {
         const cat = ASSET_CATALOG[catKey];
-        let count = 0;
         Object.keys(cat.subcats).forEach(subKey => {
           let subCount = 0;
           cat.subcats[subKey].items.forEach(name => {
             const row = assetRowsByKey[assetKey(subKey, name)];
-            if (row && row.activo) { subCount++; count++; }
+            if (row && row.activo) { subCount++; total++; }
           });
           const countEl = document.getElementById(`subcat-count-${catKey}-${subKey}`);
           if (countEl) countEl.textContent = `${subCount}/${cat.subcats[subKey].items.length}`;
         });
-        const badge = section.querySelector('.badge-count');
-        if (badge) badge.textContent = `${count} activos`;
       });
+      const badge = document.querySelector('.asset-category-section .badge-count');
+      if (badge) badge.textContent = `${total} activos`;
     }
 
     async function saveAssetDetails(category, tipo, nombre) {
