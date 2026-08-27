@@ -356,17 +356,6 @@
           </div>
         </div>
 
-        <!-- Partial Receipt Toggle -->
-        <label
-          style="display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 0.75rem; cursor: pointer; margin-top: 1.5rem;">
-          <input type="checkbox" id="partialReceipt" onchange="checkItems()"
-            style="width: 18px; height: 18px; accent-color: #f59e0b;">
-          <div>
-            <div style="font-size: 0.875rem; font-weight: 600; color: #92400e;">Recepción parcial</div>
-            <div style="font-size: 0.75rem; color: #b45309;">No se entregaron todos los artículos</div>
-          </div>
-        </label>
-
         <button class="confirm-btn" id="startConfirmBtn" onclick="submitConfirmation()" disabled>
           <span>✍️</span> Confirmar y Firmar
         </button>
@@ -493,10 +482,7 @@
           document.querySelector('.mi-card-title').textContent = 'Confirmación de Tallas';
           document.querySelector('.kit-info-title').innerHTML = '<span>📏</span> Por favor selecciona tus tallas';
           document.querySelector('.signature-area').style.display = 'none';
-          
-          const partialReceipt = document.getElementById('partialReceipt');
-          if (partialReceipt) partialReceipt.parentElement.style.display = 'none';
-          
+
           let sizes = {
             'Camisa': emp.shirt_size || '',
             'Pantalón': emp.pants_size || '',
@@ -752,14 +738,11 @@
 
         const checkboxes = document.querySelectorAll('#delivery-checklist input[type="checkbox"]');
         const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-        const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
-        const isPartial = document.getElementById('partialReceipt');
-        const isPartialChecked = isPartial ? isPartial.checked : false;
         const isSigned = !isCanvasBlank();
 
         const confirmBtn = document.getElementById('startConfirmBtn');
         if (confirmBtn) {
-          confirmBtn.disabled = !(isSigned && (allChecked || (isPartialChecked && anyChecked)));
+          confirmBtn.disabled = !(isSigned && allChecked);
         }
       }
 
