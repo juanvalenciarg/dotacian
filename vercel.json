@@ -1,4 +1,7 @@
 {
+  "redirects": [
+    { "source": "/index.es.html", "destination": "/", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/app", "destination": "/app/dashboard.html" },
     { "source": "/app/home", "destination": "/app/dashboard.html" },

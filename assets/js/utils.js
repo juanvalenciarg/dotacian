@@ -357,7 +357,7 @@ async function logoutUser() {
 
 function setupAutoLogout() {
   const path = window.location.pathname;
-  if (path.includes('login') || path.endsWith('index.html') || path === '/' || path.endsWith('dotacian/')) {
+  if (path.includes('login') || path.endsWith('index.html') || path.endsWith('index.en.html') || path === '/' || path.endsWith('dotacian/')) {
     return;
   }
   
