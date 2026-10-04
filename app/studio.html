@@ -297,13 +297,33 @@
       margin-bottom: 0.75rem;
     }
 
+    .studio-garments {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
     .studio-garment {
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 0.85rem;
       padding: 0.75rem;
-      border: 1.5px solid var(--color-cyan);
+      border: 1.5px solid var(--color-border);
       border-radius: 0.9rem;
+      background: white;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .studio-garment:hover {
+      border-color: #94A3B8;
+    }
+
+    .studio-garment.active {
+      border-color: var(--color-cyan);
       background: #F0FDFF;
     }
 
@@ -318,6 +338,11 @@
       justify-content: center;
       color: var(--color-navy);
       flex-shrink: 0;
+    }
+
+    .studio-garment-name,
+    .studio-garment-meta {
+      display: block;
     }
 
     .studio-garment-name {
@@ -490,6 +515,11 @@
       color: #475569;
       cursor: pointer;
       transition: border-color 0.2s, background 0.2s, color 0.2s;
+    }
+
+    .studio-placement:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
     }
 
     .studio-placement.active {
@@ -696,18 +726,28 @@
           <aside class="studio-panel">
             <div class="studio-card">
               <div class="studio-card-label">Prenda</div>
-              <div class="studio-garment">
-                <div class="studio-garment-icon">
-                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path></svg>
-                </div>
-                <div>
-                  <div class="studio-garment-name">Camiseta básica</div>
-                  <div class="studio-garment-meta">Cuello redondo · Manga corta</div>
-                </div>
+              <div class="studio-garments" role="group" aria-label="Prenda">
+                <button type="button" class="studio-garment studio-garment-option active" data-garment="camiseta" aria-pressed="true">
+                  <span class="studio-garment-icon">
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path></svg>
+                  </span>
+                  <span>
+                    <span class="studio-garment-name">Camiseta básica</span>
+                    <span class="studio-garment-meta">Cuello redondo · Manga corta</span>
+                  </span>
+                </button>
+                <button type="button" class="studio-garment studio-garment-option" data-garment="camisa" aria-pressed="false">
+                  <span class="studio-garment-icon">
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 2.5 12 6l3-3.5"></path><path d="M9 2.5 4 4.5 2.5 21h4L8 9v13h8V9l1.5 12h4L20 4.5l-5-2"></path><line x1="12" y1="6" x2="12" y2="22"></line></svg>
+                  </span>
+                  <span>
+                    <span class="studio-garment-name">Camisa manga larga</span>
+                    <span class="studio-garment-meta">Cuello camisero · Botones · Bolsillo</span>
+                  </span>
+                </button>
               </div>
               <div class="studio-soon">
                 <span>Polo · pronto</span>
-                <span>Camisa · pronto</span>
                 <span>Chaqueta · pronto</span>
               </div>
             </div>
@@ -753,9 +793,10 @@
             <div class="studio-card">
               <div class="studio-card-label">Resumen del diseño</div>
               <div class="studio-summary">
-                <div><span>Prenda</span><span>Camiseta básica</span></div>
-                <div><span>Cuello</span><span>Redondo</span></div>
-                <div><span>Manga</span><span>Corta</span></div>
+                <div><span>Prenda</span><span id="studioSummaryGarment">Camiseta básica</span></div>
+                <div><span>Cuello</span><span id="studioSummaryCollar">Redondo</span></div>
+                <div><span>Manga</span><span id="studioSummarySleeve">Corta</span></div>
+                <div id="studioSummaryPocketRow" hidden><span>Bolsillo</span><span id="studioSummaryPocket"></span></div>
                 <div><span>Color</span><span id="studioSummaryColor">Blanco</span></div>
                 <div><span>Logo</span><span id="studioSummaryLogo">Sin logo</span></div>
               </div>
@@ -798,12 +839,13 @@
       rojo: { label: 'Rojo', hex: '#B4232C' }
     };
 
-    // Ubicaciones del logo sobre el torso: punto (x, y) y lado de la prenda.
+    // Ubicaciones del logo. Las coordenadas (x, y) y el tamaño sugerido de
+    // cada una dependen de la prenda (ver logoPlacements en GARMENTS).
     // El pecho izquierdo es el de quien la usa (a la derecha vista de frente).
     const LOGO_PLACEMENTS = {
-      pechoIzq: { label: 'Pecho izquierdo', x: 0.15, y: 0.17, side: 'front', defaultCm: 9 },
-      pechoCentro: { label: 'Centro del pecho', x: 0, y: 0.1, side: 'front', defaultCm: 22 },
-      espalda: { label: 'Espalda', x: 0, y: 0.08, side: 'back', defaultCm: 26 }
+      pechoIzq: { label: 'Pecho izquierdo', side: 'front' },
+      pechoCentro: { label: 'Centro del pecho', side: 'front' },
+      espalda: { label: 'Espalda', side: 'back' }
     };
 
     // Ancho del torso modelado (≈0.68 unidades) equivale a ~52 cm de una talla M.
@@ -827,32 +869,110 @@
     }
 
 
-    // --- Geometría de la camiseta ---------------------------------------
-    // La prenda se arma por código (sin archivos de modelo): un torso de
-    // secciones "superelipse" que se cierra hacia el cuello, dos mangas
-    // cónicas que salen del hombro y ribetes (cuello, ruedo y bocamangas).
+    // --- Geometría de las prendas ---------------------------------------
+    // Las prendas se arman por código (sin archivos de modelo): un torso de
+    // secciones "superelipse" que se cierra hacia el cuello, dos mangas que
+    // salen del hombro y detalles (cuello, ribetes, tapeta, botones, bolsillo).
+    // Cada prenda es una configuración en GARMENTS.
+
+    const deg = THREE.MathUtils.degToRad;
+
+    const GARMENTS = {
+      camiseta: {
+        label: 'Camiseta básica',
+        meta: 'Cuello redondo · Manga corta',
+        summary: { cuello: 'Redondo', manga: 'Corta', bolsillo: null },
+        // Perfil del torso de abajo (ruedo) hacia arriba (cuello):
+        // y = altura, a = medio ancho, b = media profundidad, n = exponente de la superelipse.
+        profile: [
+          { y: -0.72, a: 0.338, b: 0.166, n: 2.7 },
+          { y: -0.45, a: 0.333, b: 0.158, n: 2.7 },
+          { y: -0.15, a: 0.337, b: 0.165, n: 2.7 },
+          { y: 0.08, a: 0.347, b: 0.178, n: 2.6 },
+          { y: 0.24, a: 0.352, b: 0.178, n: 2.5 },
+          { y: 0.325, a: 0.318, b: 0.158, n: 2.4 },
+          { y: 0.38, a: 0.245, b: 0.130, n: 2.2 },
+          { y: 0.415, a: 0.170, b: 0.106, n: 2.0 },
+          { y: 0.430, a: 0.125, b: 0.096, n: 2.0 }
+        ],
+        neckStart: 5,   // índice del perfil donde empieza a cerrarse hacia el cuello
+        neckDip: 0.07,  // cuánto cae el escote adelante
+        hemCurve: 0,    // faldón: cuánto suben los costados del ruedo
+        waistFold: 0.0035,
+        sleeve: {
+          angleStart: deg(50),  // caída de la manga respecto a la horizontal (en el hombro)
+          angleEnd: deg(50),    // caída en el extremo (igual = manga recta)
+          length: 0.27,
+          hemTilt: 0.085,       // la bocamanga se corta en diagonal: más larga arriba que en la axila
+          forward: deg(12),     // giro de la manga hacia el frente
+          start: -0.18,         // parte que queda dentro del torso para ocultar la unión
+          rBase: [0.160, 0.152],// radios (vertical, profundidad) en la sisa
+          rEnd: [0.132, 0.118], // radios en la bocamanga
+          flare: true,
+          shoulder: new THREE.Vector3(0.335, 0.332, 0), // punto del hombro donde arranca el borde superior
+          cuff: null
+        },
+        collar: 'rib',
+        placket: false,
+        pocket: null,
+        groundY: -0.80,
+        logoPlacements: {
+          pechoIzq: { x: 0.15, y: 0.17, defaultCm: 9 },
+          pechoCentro: { x: 0, y: 0.1, defaultCm: 22 },
+          espalda: { x: 0, y: 0.08, defaultCm: 26 }
+        }
+      },
+
+      camisa: {
+        label: 'Camisa manga larga',
+        meta: 'Cuello camisero · Botones · Bolsillo',
+        summary: { cuello: 'Camisero', manga: 'Larga con puño', bolsillo: 'Pecho izquierdo' },
+        profile: [
+          { y: -0.80, a: 0.330, b: 0.160, n: 2.6 },
+          { y: -0.50, a: 0.322, b: 0.152, n: 2.6 },
+          { y: -0.18, a: 0.326, b: 0.160, n: 2.6 },
+          { y: 0.08, a: 0.340, b: 0.175, n: 2.5 },
+          { y: 0.24, a: 0.345, b: 0.175, n: 2.4 },
+          { y: 0.33, a: 0.312, b: 0.156, n: 2.3 },
+          { y: 0.39, a: 0.232, b: 0.128, n: 2.1 },
+          { y: 0.425, a: 0.158, b: 0.112, n: 2.0 },
+          { y: 0.440, a: 0.112, b: 0.104, n: 2.0 }
+        ],
+        neckStart: 5,
+        neckDip: 0.025,
+        hemCurve: 0.085,
+        waistFold: 0.0025,
+        sleeve: {
+          angleStart: deg(50),
+          angleEnd: deg(84),    // la manga larga se curva y cae casi vertical hacia la muñeca
+          length: 0.88,
+          hemTilt: 0,
+          forward: deg(9),
+          start: -0.18,
+          rBase: [0.150, 0.142],
+          rEnd: [0.064, 0.060],
+          flare: false,
+          shoulder: new THREE.Vector3(0.330, 0.336, 0),
+          cuff: { length: 0.075, scale: 1.1 }
+        },
+        collar: 'shirt',
+        placket: { halfWidth: 0.021, buttons: 7, spacing: 0.108 },
+        pocket: { x0: 0.078, x1: 0.205, yTop: 0.165, yBottom: 0.02 },
+        groundY: -0.86,
+        logoPlacements: {
+          pechoIzq: { x: 0.1415, y: 0.095, defaultCm: 7 },
+          espalda: { x: 0, y: 0.06, defaultCm: 26 }
+        }
+      }
+    };
 
     function catmull(p0, p1, p2, p3, t) {
       const t2 = t * t, t3 = t2 * t;
       return 0.5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3);
     }
 
-    // Perfil del torso de abajo (ruedo) hacia arriba (cuello):
-    // y = altura, a = medio ancho, b = media profundidad, n = exponente de la superelipse.
-    const TORSO_PROFILE = [
-      { y: -0.72, a: 0.338, b: 0.166, n: 2.7 },
-      { y: -0.45, a: 0.333, b: 0.158, n: 2.7 },
-      { y: -0.15, a: 0.337, b: 0.165, n: 2.7 },
-      { y: 0.08, a: 0.347, b: 0.178, n: 2.6 },
-      { y: 0.24, a: 0.352, b: 0.178, n: 2.5 },
-      { y: 0.325, a: 0.318, b: 0.158, n: 2.4 },
-      { y: 0.38, a: 0.245, b: 0.130, n: 2.2 },
-      { y: 0.415, a: 0.170, b: 0.106, n: 2.0 },
-      { y: 0.430, a: 0.125, b: 0.096, n: 2.0 }
-    ];
-
-    function torsoProfile(t) {
-      const k = TORSO_PROFILE;
+    function torsoProfile(cfg, t) {
+      const k = cfg.profile;
       const last = k.length - 1;
       const i = Math.min(Math.floor(t), last - 1);
       const f = t - i;
@@ -903,109 +1023,323 @@
 
     const TORSO_ROWS = 140;
     const TORSO_COLS = 160;
-    const NECK_START = 5; // índice del perfil donde empieza a cerrarse hacia el cuello
 
-    function torsoPoint(v, u) {
-      const t = v * (TORSO_PROFILE.length - 1);
-      const p = torsoProfile(t);
+    // v: 0 (ruedo) → 1 (cuello); u: vuelta completa (0.25 = centro del frente).
+    function torsoPoint(cfg, v, u) {
+      const last = cfg.profile.length - 1;
+      const t = v * last;
+      const p = torsoProfile(cfg, t);
       const angle = u * Math.PI * 2;
       const q = superellipse(angle, p.a, p.b, p.n);
       let y = p.y;
       // El escote cae más adelante que atrás.
-      const neckW = Math.max(0, (t - NECK_START) / (TORSO_PROFILE.length - 1 - NECK_START));
+      const neckW = Math.max(0, (t - cfg.neckStart) / (last - cfg.neckStart));
       const front = Math.max(0, Math.sin(angle));
       const back = Math.max(0, -Math.sin(angle));
-      y -= 0.07 * neckW * neckW * front * front;
+      y -= cfg.neckDip * neckW * neckW * front * front;
       y += 0.008 * neckW * back;
+      // Faldón: los costados del ruedo suben y el frente/espalda bajan en curva.
+      if (cfg.hemCurve) {
+        const hemW = Math.max(0, 1 - t / 1.2);
+        y += cfg.hemCurve * hemW * hemW * Math.pow(Math.abs(Math.cos(angle)), 3);
+      }
       // Arrugas suaves de la tela en la cintura.
       const waist = Math.exp(-Math.pow((p.y + 0.38) / 0.24, 2));
-      const fold = 0.0035 * waist * Math.sin(angle * 9 + p.y * 14);
+      const fold = cfg.waistFold * waist * Math.sin(angle * 9 + p.y * 14);
       const len = Math.hypot(q.x, q.z) || 1;
       return new THREE.Vector3(q.x + fold * q.x / len, y, q.z + fold * q.z / len);
     }
 
-    function buildTorso() {
-      return buildGrid(TORSO_ROWS, TORSO_COLS, (v, u) => torsoPoint(v, u), (v, u, p) => ({ u: u * 2.2, v: p.y }));
+    function buildTorso(cfg) {
+      return buildGrid(TORSO_ROWS, TORSO_COLS, (v, u) => torsoPoint(cfg, v, u), (v, u, p) => ({ u: u * 2.2, v: p.y }));
     }
 
-    // Manga: tubo cónico que sale del hombro hacia afuera y abajo.
-    const SLEEVE = {
-      angle: THREE.MathUtils.degToRad(50), // caída de la manga respecto a la horizontal
-      length: 0.27,
-      hemTilt: 0.085, // la bocamanga se corta en diagonal: más larga arriba que en la axila
-      forward: THREE.MathUtils.degToRad(12), // giro de la manga hacia el frente
-      start: -0.18,       // parte que queda dentro del torso para ocultar la unión
-      rBase: [0.160, 0.152], // radios (vertical, profundidad) en la sisa
-      rEnd: [0.132, 0.118],  // radios en la bocamanga
-      shoulder: new THREE.Vector3(0.335, 0.332, 0) // punto del hombro donde arranca el borde superior
-    };
+    // Punto del frente del torso a una altura y y posición horizontal x dadas
+    // (para tapeta, botones y bolsillo). Devuelve también la normal aproximada.
+    function frontV(cfg, y) {
+      let lo = 0, hi = 1;
+      for (let k = 0; k < 30; k++) {
+        const mid = (lo + hi) / 2;
+        if (torsoPoint(cfg, mid, 0.25).y < y) lo = mid; else hi = mid;
+      }
+      return (lo + hi) / 2;
+    }
 
-    function sleeveFrame(side) {
-      // La manga cae hacia afuera y abajo, con un leve giro hacia adelante.
-      const fwd = SLEEVE.forward;
-      const dir = new THREE.Vector3(Math.cos(SLEEVE.angle) * side, -Math.sin(SLEEVE.angle), 0);
-      dir.applyAxisAngle(new THREE.Vector3(0, 1, 0), -fwd * side).normalize();
-      const up = new THREE.Vector3(Math.sin(SLEEVE.angle) * side, Math.cos(SLEEVE.angle), 0);
-      up.applyAxisAngle(new THREE.Vector3(0, 1, 0), -fwd * side).normalize();
+    function frontPointAt(cfg, v, x) {
+      const p = torsoProfile(cfg, v * (cfg.profile.length - 1));
+      const c = Math.sign(x) * Math.pow(Math.min(1, Math.abs(x) / p.a), p.n / 2);
+      const angle = Math.acos(Math.max(-1, Math.min(1, c)));
+      const pt = torsoPoint(cfg, v, angle / (Math.PI * 2));
+      // Gradiente de la superelipse → normal horizontal de la tela.
+      const nx = Math.sign(pt.x) * Math.pow(Math.abs(pt.x) / p.a, p.n - 1) / p.a;
+      const nz = Math.pow(Math.abs(pt.z) / p.b, p.n - 1) / p.b;
+      const normal = new THREE.Vector3(nx, 0, nz).normalize();
+      return { point: pt, normal };
+    }
+
+    // --- Mangas ---
+    // El eje de la manga puede curvarse (manga larga): el ángulo de caída va de
+    // angleStart en el hombro a angleEnd en el extremo.
+    function sleeveAngleAt(sl, a) {
+      const k = Math.max(0, Math.min(1, a / sl.length));
+      const e = k * k * (3 - 2 * k);
+      return THREE.MathUtils.lerp(sl.angleStart, sl.angleEnd, e);
+    }
+
+    function sleeveBasis(sl, side, theta) {
+      const yAxis = new THREE.Vector3(0, 1, 0);
+      const dir = new THREE.Vector3(Math.cos(theta) * side, -Math.sin(theta), 0)
+        .applyAxisAngle(yAxis, -sl.forward * side).normalize();
+      const up = new THREE.Vector3(Math.sin(theta) * side, Math.cos(theta), 0)
+        .applyAxisAngle(yAxis, -sl.forward * side).normalize();
       const depth = new THREE.Vector3().crossVectors(dir, up).multiplyScalar(side).normalize();
-      const top = SLEEVE.shoulder.clone();
-      top.x *= side;
-      const center = top.clone().addScaledVector(up, -SLEEVE.rBase[0]);
-      return { dir, up, depth, center };
+      return { dir, up, depth };
     }
 
-    function sleeveRadii(s) {
+    // Tabla del eje de la manga (centro y orientación cada pocos milímetros).
+    function buildSleeveAxis(sl, side) {
+      const steps = 240;
+      const maxA = sl.length + sl.hemTilt + 0.02;
+      const da = maxA / steps;
+      const b0 = sleeveBasis(sl, side, sl.angleStart);
+      const top = sl.shoulder.clone();
+      top.x *= side;
+      const c0 = top.addScaledVector(b0.up, -sl.rBase[0]);
+      const centers = [c0.clone()];
+      let c = c0.clone();
+      for (let i = 1; i <= steps; i++) {
+        const b = sleeveBasis(sl, side, sleeveAngleAt(sl, (i - 0.5) * da));
+        c = c.clone().addScaledVector(b.dir, da);
+        centers.push(c);
+      }
+      return { c0, b0, centers, da, steps };
+    }
+
+    function sleeveRadii(sl, s) {
       if (s <= 0) {
         // Dentro del torso la manga se angosta para no asomarse por el hombro.
         const k = 1 + s * 1.6;
-        return [SLEEVE.rBase[0] * k, SLEEVE.rBase[1] * k];
+        return [sl.rBase[0] * k, sl.rBase[1] * k];
       }
       const e = s * s * (3 - 2 * s);
       return [
-        THREE.MathUtils.lerp(SLEEVE.rBase[0], SLEEVE.rEnd[0], e),
-        THREE.MathUtils.lerp(SLEEVE.rBase[1], SLEEVE.rEnd[1], e)
+        THREE.MathUtils.lerp(sl.rBase[0], sl.rEnd[0], e),
+        THREE.MathUtils.lerp(sl.rBase[1], sl.rEnd[1], e)
       ];
     }
 
-    function sleevePoint(side, s, phi) {
-      const f = sleeveFrame(side);
-      const [r1, r2] = sleeveRadii(s);
-      const q = superellipse(phi, r1, r2, 2.3);
-      // Leve campana al final de la manga.
-      const flare = s > 0.85 ? 1 + (s - 0.85) * 0.25 : 1;
-      const axial = s > 0 ? s * (SLEEVE.length + SLEEVE.hemTilt * Math.cos(phi)) : s * SLEEVE.length;
-      return f.center.clone()
-        .addScaledVector(f.dir, axial)
-        .addScaledVector(f.up, q.x * flare)
-        .addScaledVector(f.depth, q.z * flare);
+    function sleevePoint(sl, axis, side, s, phi, radiusScale = 1) {
+      const [r1, r2] = sleeveRadii(sl, s);
+      const q = superellipse(phi, r1 * radiusScale, r2 * radiusScale, 2.3);
+      // Leve campana al final de la manga corta.
+      const flare = sl.flare && s > 0.85 ? 1 + (s - 0.85) * 0.25 : 1;
+      const a = s > 0 ? s * (sl.length + sl.hemTilt * Math.cos(phi)) : s * sl.length;
+      let center, basis;
+      if (a <= 0) {
+        basis = axis.b0;
+        center = axis.c0.clone().addScaledVector(basis.dir, a);
+      } else {
+        const f = Math.min(axis.steps, a / axis.da);
+        const i = Math.min(axis.steps - 1, Math.floor(f));
+        center = axis.centers[i].clone().lerp(axis.centers[i + 1], f - i);
+        basis = sleeveBasis(sl, side, sleeveAngleAt(sl, a));
+      }
+      return center
+        .addScaledVector(basis.up, q.x * flare)
+        .addScaledVector(basis.depth, q.z * flare);
     }
 
-    function buildSleeve(side) {
-      const span = 1 - SLEEVE.start;
-      return buildGrid(60, 96,
-        (v, u) => sleevePoint(side, SLEEVE.start + v * span, u * Math.PI * 2),
-        (v, u) => ({ u: u * 1.0, v: v * span * SLEEVE.length }));
+    function buildSleeve(sl, axis, side, from, to, radiusScale = 1, rows = 60) {
+      const span = to - from;
+      return buildGrid(rows, 96,
+        (v, u) => sleevePoint(sl, axis, side, from + v * span, u * Math.PI * 2, radiusScale),
+        (v, u) => ({ u: u * 1.0, v: v * span * sl.length }));
     }
 
-    // Ribete: tubo cerrado que sigue un anillo de puntos (cuello, ruedo, bocamanga).
-    function buildRim(points, radius) {
-      const curve = new THREE.CatmullRomCurve3(points, true);
-      return new THREE.TubeGeometry(curve, points.length * 2, radius, 12, true);
+    function sleeveRing(sl, axis, side, s, radiusScale = 1) {
+      const pts = [];
+      for (let j = 0; j < 72; j++) pts.push(sleevePoint(sl, axis, side, s, (j / 72) * Math.PI * 2, radiusScale));
+      return pts;
     }
 
-    function torsoRing(v, offsetY = 0, scale = 1) {
+    // Ribete: tubo que sigue una línea de puntos (cuello, ruedo, bocamanga, bordes).
+    function buildRim(points, radius, closed = true) {
+      const curve = new THREE.CatmullRomCurve3(points, closed);
+      return new THREE.TubeGeometry(curve, points.length * 2, radius, 10, closed);
+    }
+
+    function torsoRing(cfg, v, offsetY = 0, scale = 1) {
       const pts = [];
       for (let j = 0; j < 96; j++) {
-        const p = torsoPoint(v, j / 96);
+        const p = torsoPoint(cfg, v, j / 96);
         pts.push(new THREE.Vector3(p.x * scale, p.y + offsetY, p.z * scale));
       }
       return pts;
     }
 
-    function sleeveRing(side, s) {
-      const pts = [];
-      for (let j = 0; j < 72; j++) pts.push(sleevePoint(side, s, (j / 72) * Math.PI * 2));
-      return pts;
+    // --- Cuello camisero: pie de cuello + solapa con puntas al frente ---
+    const COLLAR_STAND_H = 0.036;
+
+    function collarStandPoint(cfg, h, u) {
+      const p = torsoPoint(cfg, 1, u);
+      const scale = 1.02 - 0.05 * h; // el pie de cuello se inclina un poco hacia el cuello
+      return new THREE.Vector3(p.x * scale, p.y - 0.004 + h * COLLAR_STAND_H, p.z * scale);
+    }
+
+    const COLLAR_GAP = 0.018; // separación (en vueltas) entre las dos puntas al frente
+
+    function collarLeafPoint(cfg, r, w) {
+      // w: 0 → 1 recorre la solapa desde una punta, por la espalda, hasta la otra.
+      const u = 0.25 + COLLAR_GAP + w * (1 - 2 * COLLAR_GAP);
+      const fold = collarStandPoint(cfg, 1, u);
+      fold.y += 0.002;
+      const radial = new THREE.Vector3(fold.x, 0, fold.z).normalize();
+      const endDist = Math.min(w, 1 - w);
+      const tip = Math.max(0, 1 - endDist / 0.13);
+      const out = (0.018 + 0.045 * tip) * Math.sin(r * Math.PI / 2) + 0.012 * r;
+      const drop = (0.050 + 0.062 * tip * tip) * r;
+      // En las puntas el borde exterior se abre hacia los lados del frente.
+      const spread = 0.03 * tip * tip * r;
+      const sideDir = new THREE.Vector3(Math.sign(fold.x) || (w < 0.5 ? 1 : -1), 0, 0);
+      return fold.addScaledVector(radial, out).addScaledVector(sideDir, spread).add(new THREE.Vector3(0, -drop, 0));
+    }
+
+    function buildShirtCollar(cfg) {
+      const stand = buildGrid(6, 120, (v, u) => collarStandPoint(cfg, v, u), (v, u) => ({ u: u * 2, v }));
+      const leaf = buildGrid(12, 140, (v, u) => collarLeafPoint(cfg, v, u), (v, u) => ({ u: u * 2, v }));
+      const edge = [];
+      for (let i = 0; i <= 12; i++) edge.push(collarLeafPoint(cfg, i / 12, 0));
+      for (let j = 1; j < 140; j++) edge.push(collarLeafPoint(cfg, 1, j / 140));
+      for (let i = 12; i >= 0; i--) edge.push(collarLeafPoint(cfg, i / 12, 1));
+      const standTop = [];
+      for (let j = 0; j < 96; j++) standTop.push(collarStandPoint(cfg, 1, j / 96));
+      return [stand, leaf, buildRim(edge, 0.0028, false), buildRim(standTop, 0.0035)];
+    }
+
+    // --- Tapeta con botones ---
+    function buildPlacket(cfg) {
+      const pl = cfg.placket;
+      const vTop = 1;
+      const offset = 0.0035;
+      const geo = buildGrid(120, 6, (v, u) => {
+        const x = -pl.halfWidth + u * pl.halfWidth * 2;
+        const { point, normal } = frontPointAt(cfg, v * vTop, x);
+        return point.addScaledVector(normal, offset);
+      }, (v, u) => ({ u, v: v * 1.2 }));
+      const edges = [-1, 1].map(sideSign => {
+        const pts = [];
+        for (let i = 0; i <= 60; i++) {
+          const { point, normal } = frontPointAt(cfg, i / 60, sideSign * pl.halfWidth);
+          pts.push(point.addScaledVector(normal, offset));
+        }
+        return buildRim(pts, 0.0018, false);
+      });
+      return [geo, ...edges];
+    }
+
+    function buttonPositions(cfg) {
+      const pl = cfg.placket;
+      const neckY = torsoPoint(cfg, 1, 0.25).y;
+      const out = [];
+      // Botón del pie de cuello.
+      const top = collarStandPoint(cfg, 0.5, 0.25);
+      out.push({ point: top.clone().add(new THREE.Vector3(0, 0, 0.004)), normal: new THREE.Vector3(0, 0, 1) });
+      for (let i = 0; i < pl.buttons; i++) {
+        const y = neckY - 0.075 - i * pl.spacing;
+        const { point, normal } = frontPointAt(cfg, frontV(cfg, y), 0);
+        out.push({ point: point.addScaledVector(normal, 0.0075), normal });
+      }
+      return out;
+    }
+
+    // --- Bolsillo de parche ---
+    function buildPocket(cfg) {
+      const pk = cfg.pocket;
+      const offset = 0.0045;
+      const chamfer = 0.018; // esquinas inferiores en diagonal
+      const rows = 30, cols = 30;
+      const vRows = [];
+      for (let i = 0; i <= rows; i++) vRows.push(frontV(cfg, THREE.MathUtils.lerp(pk.yBottom, pk.yTop, i / rows)));
+      const pointAt = (i, j) => {
+        const y = THREE.MathUtils.lerp(pk.yBottom, pk.yTop, i / rows);
+        let x0 = pk.x0, x1 = pk.x1;
+        const dy = y - pk.yBottom;
+        if (dy < chamfer) {
+          x0 += chamfer - dy;
+          x1 -= chamfer - dy;
+        }
+        const x = THREE.MathUtils.lerp(x0, x1, j / cols);
+        const { point, normal } = frontPointAt(cfg, vRows[i], x);
+        return point.addScaledVector(normal, offset);
+      };
+      const geo = buildGrid(rows, cols, (v, u) => pointAt(Math.round(v * rows), Math.round(u * cols)), (v, u) => ({ u, v }));
+      const border = [];
+      for (let j = 0; j <= cols; j++) border.push(pointAt(rows, j));
+      for (let i = rows - 1; i >= 0; i--) border.push(pointAt(i, cols));
+      for (let j = cols - 1; j >= 1; j--) border.push(pointAt(0, j));
+      for (let i = 0; i < rows; i++) border.push(pointAt(i, 0));
+      const hemLine = [];
+      const hemRow = rows - 4;
+      for (let j = 0; j <= cols; j++) hemLine.push(pointAt(hemRow, j));
+      return { pocket: geo, details: [buildRim(border, 0.0026), buildRim(hemLine, 0.0015, false)] };
+    }
+
+    // Arma todas las piezas de una prenda.
+    function buildGarmentParts(cfg) {
+      const fabricParts = [];
+      const buttonParts = [];
+      const torso = buildTorso(cfg);
+      fabricParts.push(torso);
+
+      const sl = cfg.sleeve;
+      [1, -1].forEach(side => {
+        const axis = buildSleeveAxis(sl, side);
+        if (sl.cuff) {
+          const cuffStart = 1 - sl.cuff.length / sl.length;
+          fabricParts.push(buildSleeve(sl, axis, side, sl.start, cuffStart + 0.01, 1, 90));
+          fabricParts.push(buildSleeve(sl, axis, side, cuffStart, 1, sl.cuff.scale, 8));
+          fabricParts.push(buildRim(sleeveRing(sl, axis, side, cuffStart, sl.cuff.scale), 0.0035));
+          fabricParts.push(buildRim(sleeveRing(sl, axis, side, 1, sl.cuff.scale), 0.0045));
+          // Botón del puño, del lado de afuera.
+          const s = 1 - (sl.cuff.length * 0.5) / sl.length;
+          const p = sleevePoint(sl, axis, side, s, 0, sl.cuff.scale + 0.06);
+          const center = sleevePoint(sl, axis, side, s, Math.PI, 1);
+          const pOut = sleevePoint(sl, axis, side, s, 0, 1);
+          const normal = pOut.clone().sub(center).normalize();
+          buttonParts.push({ point: p, normal, radius: 0.008 });
+        } else {
+          fabricParts.push(buildSleeve(sl, axis, side, sl.start, 1));
+          fabricParts.push(buildRim(sleeveRing(sl, axis, side, 1), 0.0055));
+        }
+      });
+
+      if (cfg.collar === 'rib') {
+        fabricParts.push(buildRim(torsoRing(cfg, 1, -0.004, 1.06), 0.016));
+      } else {
+        fabricParts.push(...buildShirtCollar(cfg));
+      }
+      fabricParts.push(buildRim(torsoRing(cfg, 0, 0.002, 1.004), cfg.hemCurve ? 0.004 : 0.0055));
+
+      if (cfg.placket) {
+        fabricParts.push(...buildPlacket(cfg));
+        buttonPositions(cfg).forEach(b => buttonParts.push({ ...b, radius: 0.0105 }));
+      }
+
+      let pocket = null;
+      if (cfg.pocket) {
+        const built = buildPocket(cfg);
+        pocket = built.pocket;
+        fabricParts.push(pocket, ...built.details);
+      }
+
+      return { torso, pocket, fabricParts, buttonParts };
+    }
+
+    function buildButtonGeometry(radius) {
+      // Botón: disco con borde redondeado y cuatro agujeros sugeridos por el relieve.
+      const geo = new THREE.CylinderGeometry(radius, radius * 0.92, 0.0035, 24);
+      geo.rotateX(Math.PI / 2);
+      return geo;
     }
 
     // Textura de tejido (punto jersey) generada en un canvas para el relieve.
@@ -1099,23 +1433,43 @@
         side: THREE.DoubleSide
       });
 
+      // Botones: mismo tono de la tela, un poco más oscuros y con brillo.
+      const buttonMaterial = new THREE.MeshStandardMaterial({ roughness: 0.35, metalness: 0, envMapIntensity: 0.8 });
+
       const shirt = new THREE.Group();
-      const parts = [
-        buildTorso(),
-        buildSleeve(1),
-        buildSleeve(-1),
-        buildRim(torsoRing(1, -0.004, 1.06), 0.016),        // cuello en rib
-        buildRim(torsoRing(0, 0.002, 1.004), 0.0055),       // ruedo
-        buildRim(sleeveRing(1, 1), 0.0055),                 // bocamanga derecha
-        buildRim(sleeveRing(-1, 1), 0.0055)                 // bocamanga izquierda
-      ];
-      parts.forEach(geo => {
-        const mesh = new THREE.Mesh(geo, fabric);
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
-        shirt.add(mesh);
-      });
       scene.add(shirt);
+      const garment = { key: null, torsoMesh: null, pocketMesh: null };
+
+      function disposeShirt() {
+        [...shirt.children].forEach(child => {
+          shirt.remove(child);
+          if (child.geometry) child.geometry.dispose();
+        });
+      }
+
+      function buildShirt(key) {
+        const cfg = GARMENTS[key];
+        disposeShirt();
+        const built = buildGarmentParts(cfg);
+        built.fabricParts.forEach(geo => {
+          const mesh = new THREE.Mesh(geo, fabric);
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+          shirt.add(mesh);
+          if (geo === built.torso) garment.torsoMesh = mesh;
+          if (geo === built.pocket) garment.pocketMesh = mesh;
+        });
+        if (!built.pocket) garment.pocketMesh = null;
+        built.buttonParts.forEach(b => {
+          const mesh = new THREE.Mesh(buildButtonGeometry(b.radius), buttonMaterial);
+          mesh.position.copy(b.point);
+          mesh.lookAt(b.point.clone().add(b.normal));
+          mesh.castShadow = true;
+          shirt.add(mesh);
+        });
+        garment.key = key;
+        ground.position.y = cfg.groundY;
+      }
 
       // Sombra suave en el "piso" para dar sensación de volumen.
       const ground = new THREE.Mesh(
@@ -1126,6 +1480,8 @@
       ground.position.y = -0.80;
       ground.receiveShadow = true;
       scene.add(ground);
+
+      buildShirt('camiseta');
 
       function resize() {
         const w = viewer.clientWidth;
@@ -1209,6 +1565,7 @@
           if (k >= 1) viewAnim = null;
         }
         fabric.color.lerp(targetColor, 0.12);
+        buttonMaterial.color.copy(fabric.color).multiplyScalar(0.82);
         controls.update();
         renderer.render(scene, camera);
         requestAnimationFrame(tick);
@@ -1219,8 +1576,7 @@
       // --- Logo ---
       // La imagen se procesa solo en el navegador: se dibuja en un canvas y se
       // proyecta sobre el torso con un "decal" que sigue la curvatura de la tela.
-      const torsoMesh = shirt.children[0];
-      const logoState = { texture: null, aspect: 1, placement: 'pechoIzq', sizeCm: LOGO_PLACEMENTS.pechoIzq.defaultCm, name: '' };
+      const logoState = { texture: null, aspect: 1, placement: 'pechoIzq', sizeCm: GARMENTS.camiseta.logoPlacements.pechoIzq.defaultCm, name: '' };
       const logoMaterial = new THREE.MeshStandardMaterial({
         transparent: true,
         depthWrite: false,
@@ -1228,9 +1584,10 @@
         polygonOffsetFactor: -4,
         roughness: 0.85,
         metalness: 0,
-        envMapIntensity: 0.4
+        envMapIntensity: 0.4,
+        side: THREE.DoubleSide
       });
-      let logoMesh = null;
+      let logoMeshes = [];
       const raycaster = new THREE.Raycaster();
 
       const logoInput = document.getElementById('studioLogoInput');
@@ -1254,23 +1611,26 @@
       }
 
       function placeLogo() {
-        if (logoMesh) {
-          shirt.remove(logoMesh);
-          logoMesh.geometry.dispose();
-          logoMesh = null;
-        }
+        logoMeshes.forEach(m => {
+          shirt.remove(m);
+          m.geometry.dispose();
+        });
+        logoMeshes = [];
         if (!logoState.texture) return;
 
-        const spot = LOGO_PLACEMENTS[logoState.placement];
-        const front = spot.side === 'front';
+        const spot = GARMENTS[garment.key].logoPlacements[logoState.placement];
+        if (!spot) return;
+        const front = LOGO_PLACEMENTS[logoState.placement].side === 'front';
         const origin = new THREE.Vector3(spot.x, spot.y, front ? 2 : -2);
         const dir = new THREE.Vector3(0, 0, front ? -1 : 1);
-        torsoMesh.updateMatrixWorld();
+        // El logo se proyecta sobre el torso y, si existe, sobre el bolsillo.
+        const targets = [garment.torsoMesh, garment.pocketMesh].filter(Boolean);
+        targets.forEach(m => m.updateMatrixWorld());
         raycaster.set(origin, dir);
-        const hit = raycaster.intersectObject(torsoMesh, false)[0];
+        const hit = raycaster.intersectObjects(targets, false)[0];
         if (!hit) return;
 
-        const normal = hit.face.normal.clone().transformDirection(torsoMesh.matrixWorld);
+        const normal = hit.face.normal.clone().transformDirection(hit.object.matrixWorld);
         if (normal.dot(dir) > 0) normal.negate();
         // Promediamos con la dirección del rayo para que el logo no se incline
         // por la curvatura local de la tela.
@@ -1282,10 +1642,17 @@
 
         const width = logoState.sizeCm / CM_PER_UNIT;
         const height = width / logoState.aspect;
-        const geo = new DecalGeometry(torsoMesh, hit.point, helper.rotation, new THREE.Vector3(width, height, 0.2));
-        logoMesh = new THREE.Mesh(geo, logoMaterial);
-        logoMesh.renderOrder = 1;
-        shirt.add(logoMesh);
+        targets.forEach(target => {
+          const geo = new DecalGeometry(target, hit.point, helper.rotation, new THREE.Vector3(width, height, 0.2));
+          if (!geo.attributes.position || geo.attributes.position.count === 0) {
+            geo.dispose();
+            return;
+          }
+          const mesh = new THREE.Mesh(geo, logoMaterial);
+          mesh.renderOrder = target === garment.pocketMesh ? 2 : 1;
+          shirt.add(mesh);
+          logoMeshes.push(mesh);
+        });
       }
 
       function loadLogoFile(file) {
@@ -1373,8 +1740,10 @@
         btn.addEventListener('click', () => {
           const key = btn.dataset.placement;
           if (!LOGO_PLACEMENTS[key]) return;
+          const spot = GARMENTS[garment.key].logoPlacements[key];
+          if (!spot) return;
           logoState.placement = key;
-          logoState.sizeCm = LOGO_PLACEMENTS[key].defaultCm;
+          logoState.sizeCm = spot.defaultCm;
           logoSize.value = logoState.sizeCm;
           logoSizeLabel.textContent = `${logoState.sizeCm} cm`;
           document.querySelectorAll('.studio-placement').forEach(b => b.classList.toggle('active', b === btn));
@@ -1391,7 +1760,50 @@
         updateLogoSummary();
       });
 
-      window.dotacianStudio = { scene, camera, controls, shirt, fabric, logoState };
+      // --- Prenda ---
+      function syncPlacementButtons() {
+        const available = GARMENTS[garment.key].logoPlacements;
+        document.querySelectorAll('.studio-placement').forEach(btn => {
+          const ok = !!available[btn.dataset.placement];
+          btn.disabled = !ok;
+          btn.title = ok ? '' : 'No disponible en esta prenda';
+          btn.classList.toggle('active', btn.dataset.placement === logoState.placement);
+        });
+      }
+
+      function setGarment(key) {
+        const cfg = GARMENTS[key];
+        if (!cfg || key === garment.key) return;
+        buildShirt(key);
+        // Si la ubicación del logo no existe en esta prenda, volvemos al pecho izquierdo.
+        if (!cfg.logoPlacements[logoState.placement]) logoState.placement = 'pechoIzq';
+        logoState.sizeCm = cfg.logoPlacements[logoState.placement].defaultCm;
+        logoSize.value = logoState.sizeCm;
+        logoSizeLabel.textContent = `${logoState.sizeCm} cm`;
+        syncPlacementButtons();
+        placeLogo();
+        updateLogoSummary();
+
+        document.querySelectorAll('.studio-garment-option').forEach(b => {
+          const on = b.dataset.garment === key;
+          b.classList.toggle('active', on);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        document.getElementById('studioSummaryGarment').textContent = cfg.label;
+        document.getElementById('studioSummaryCollar').textContent = cfg.summary.cuello;
+        document.getElementById('studioSummarySleeve').textContent = cfg.summary.manga;
+        const pocketRow = document.getElementById('studioSummaryPocketRow');
+        pocketRow.hidden = !cfg.summary.bolsillo;
+        document.getElementById('studioSummaryPocket').textContent = cfg.summary.bolsillo || '';
+        goToView('front');
+      }
+
+      document.querySelectorAll('.studio-garment-option').forEach(btn => {
+        btn.addEventListener('click', () => setGarment(btn.dataset.garment));
+      });
+      syncPlacementButtons();
+
+      window.dotacianStudio = { scene, camera, controls, shirt, fabric, logoState, setGarment, garment };
     }
 
     if (!webglAvailable()) {
