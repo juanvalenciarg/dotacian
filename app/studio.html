@@ -388,6 +388,134 @@
       box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.12);
     }
 
+    .studio-panel [hidden] {
+      display: none !important;
+    }
+
+    .studio-logo-drop {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 1.1rem 0.75rem;
+      border: 1.5px dashed #CBD5E1;
+      border-radius: 0.9rem;
+      background: #F8FAFC;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #475569;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+    }
+
+    .studio-logo-drop:hover,
+    .studio-logo-drop.dragover {
+      border-color: var(--color-cyan);
+      background: #F0FDFF;
+      color: #0891B2;
+    }
+
+    .studio-logo-drop small {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: #94A3B8;
+    }
+
+    .studio-logo-file {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem;
+      border: 1px solid var(--color-border);
+      border-radius: 0.9rem;
+    }
+
+    .studio-logo-thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: 0.6rem;
+      flex-shrink: 0;
+      object-fit: contain;
+      background: repeating-conic-gradient(#E2E8F0 0% 25%, #FFFFFF 0% 50%) 50% / 12px 12px;
+      border: 1px solid var(--color-border);
+    }
+
+    .studio-logo-name {
+      flex: 1;
+      min-width: 0;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--color-navy);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .studio-logo-remove {
+      border: none;
+      background: none;
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #EF4444;
+      cursor: pointer;
+      padding: 0.25rem 0.4rem;
+    }
+
+    .studio-field-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #475569;
+      margin: 1rem 0 0.5rem;
+    }
+
+    .studio-placements {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.35rem;
+    }
+
+    .studio-placement {
+      padding: 0.5rem 0.25rem;
+      border: 1.5px solid var(--color-border);
+      border-radius: 0.7rem;
+      background: white;
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #475569;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+    }
+
+    .studio-placement.active {
+      border-color: var(--color-cyan);
+      background: #F0FDFF;
+      color: var(--color-navy);
+    }
+
+    .studio-range {
+      width: 100%;
+      accent-color: var(--color-cyan);
+    }
+
+    .studio-logo-hint {
+      margin: 0.75rem 0 0;
+      font-size: 0.72rem;
+      color: #94A3B8;
+      line-height: 1.4;
+    }
+
+    .studio-logo-error {
+      margin: 0.5rem 0 0;
+      font-size: 0.75rem;
+      color: #EF4444;
+    }
+
     .studio-summary {
       display: flex;
       flex-direction: column;
@@ -595,12 +723,41 @@
             </div>
 
             <div class="studio-card">
+              <div class="studio-card-label">Logo</div>
+              <input type="file" id="studioLogoInput" accept="image/png,image/jpeg,image/svg+xml,image/webp" hidden>
+              <button type="button" class="studio-logo-drop" id="studioLogoDrop">
+                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                Subir logo del cliente
+                <small>PNG, JPG, SVG o WEBP · máx. 5 MB</small>
+              </button>
+              <div class="studio-logo-file" id="studioLogoFile" hidden>
+                <img class="studio-logo-thumb" id="studioLogoThumb" alt="Logo cargado">
+                <span class="studio-logo-name" id="studioLogoName"></span>
+                <button type="button" class="studio-logo-remove" id="studioLogoRemove">Quitar</button>
+              </div>
+              <p class="studio-logo-error" id="studioLogoError" hidden></p>
+
+              <div id="studioLogoControls" hidden>
+                <div class="studio-field-label"><span>Ubicación</span></div>
+                <div class="studio-placements" role="group" aria-label="Ubicación del logo">
+                  <button type="button" class="studio-placement active" data-placement="pechoIzq">Pecho izq.</button>
+                  <button type="button" class="studio-placement" data-placement="pechoCentro">Centro</button>
+                  <button type="button" class="studio-placement" data-placement="espalda">Espalda</button>
+                </div>
+                <div class="studio-field-label"><span>Ancho del logo</span><span id="studioLogoSizeLabel">9 cm</span></div>
+                <input type="range" class="studio-range" id="studioLogoSize" min="5" max="30" step="1" value="9">
+              </div>
+              <p class="studio-logo-hint">Para mejores resultados usa un PNG con fondo transparente.</p>
+            </div>
+
+            <div class="studio-card">
               <div class="studio-card-label">Resumen del diseño</div>
               <div class="studio-summary">
                 <div><span>Prenda</span><span>Camiseta básica</span></div>
                 <div><span>Cuello</span><span>Redondo</span></div>
                 <div><span>Manga</span><span>Corta</span></div>
                 <div><span>Color</span><span id="studioSummaryColor">Blanco</span></div>
+                <div><span>Logo</span><span id="studioSummaryLogo">Sin logo</span></div>
               </div>
             </div>
           </aside>
@@ -631,6 +788,7 @@
     import * as THREE from 'three';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
     import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+    import { DecalGeometry } from 'three/addons/geometries/DecalGeometry.js';
 
     // Colores de tela disponibles para la camiseta básica.
     const SHIRT_COLORS = {
@@ -639,6 +797,18 @@
       azul: { label: 'Azul', hex: '#1E3F8A' },
       rojo: { label: 'Rojo', hex: '#B4232C' }
     };
+
+    // Ubicaciones del logo sobre el torso: punto (x, y) y lado de la prenda.
+    // El pecho izquierdo es el de quien la usa (a la derecha vista de frente).
+    const LOGO_PLACEMENTS = {
+      pechoIzq: { label: 'Pecho izquierdo', x: 0.15, y: 0.17, side: 'front', defaultCm: 9 },
+      pechoCentro: { label: 'Centro del pecho', x: 0, y: 0.1, side: 'front', defaultCm: 22 },
+      espalda: { label: 'Espalda', x: 0, y: 0.08, side: 'back', defaultCm: 26 }
+    };
+
+    // Ancho del torso modelado (≈0.68 unidades) equivale a ~52 cm de una talla M.
+    const CM_PER_UNIT = 76;
+    const MAX_LOGO_BYTES = 5 * 1024 * 1024;
 
     // Ángulo de la cámara (azimut) para cada vista fija.
     const VIEW_ANGLES = { front: 0, right: Math.PI / 2, back: Math.PI, left: -Math.PI / 2 };
@@ -1045,7 +1215,183 @@
       }
       requestAnimationFrame(tick);
 
-      window.dotacianStudio = { scene, camera, controls, shirt, fabric };
+
+      // --- Logo ---
+      // La imagen se procesa solo en el navegador: se dibuja en un canvas y se
+      // proyecta sobre el torso con un "decal" que sigue la curvatura de la tela.
+      const torsoMesh = shirt.children[0];
+      const logoState = { texture: null, aspect: 1, placement: 'pechoIzq', sizeCm: LOGO_PLACEMENTS.pechoIzq.defaultCm, name: '' };
+      const logoMaterial = new THREE.MeshStandardMaterial({
+        transparent: true,
+        depthWrite: false,
+        polygonOffset: true,
+        polygonOffsetFactor: -4,
+        roughness: 0.85,
+        metalness: 0,
+        envMapIntensity: 0.4
+      });
+      let logoMesh = null;
+      const raycaster = new THREE.Raycaster();
+
+      const logoInput = document.getElementById('studioLogoInput');
+      const logoDrop = document.getElementById('studioLogoDrop');
+      const logoFileRow = document.getElementById('studioLogoFile');
+      const logoControls = document.getElementById('studioLogoControls');
+      const logoError = document.getElementById('studioLogoError');
+      const logoSize = document.getElementById('studioLogoSize');
+      const logoSizeLabel = document.getElementById('studioLogoSizeLabel');
+
+      function showLogoError(msg) {
+        logoError.textContent = msg;
+        logoError.hidden = !msg;
+      }
+
+      function updateLogoSummary() {
+        const el = document.getElementById('studioSummaryLogo');
+        el.textContent = logoState.texture
+          ? `${LOGO_PLACEMENTS[logoState.placement].label} · ${logoState.sizeCm} cm`
+          : 'Sin logo';
+      }
+
+      function placeLogo() {
+        if (logoMesh) {
+          shirt.remove(logoMesh);
+          logoMesh.geometry.dispose();
+          logoMesh = null;
+        }
+        if (!logoState.texture) return;
+
+        const spot = LOGO_PLACEMENTS[logoState.placement];
+        const front = spot.side === 'front';
+        const origin = new THREE.Vector3(spot.x, spot.y, front ? 2 : -2);
+        const dir = new THREE.Vector3(0, 0, front ? -1 : 1);
+        torsoMesh.updateMatrixWorld();
+        raycaster.set(origin, dir);
+        const hit = raycaster.intersectObject(torsoMesh, false)[0];
+        if (!hit) return;
+
+        const normal = hit.face.normal.clone().transformDirection(torsoMesh.matrixWorld);
+        if (normal.dot(dir) > 0) normal.negate();
+        // Promediamos con la dirección del rayo para que el logo no se incline
+        // por la curvatura local de la tela.
+        normal.lerp(dir.clone().negate(), 0.5).normalize();
+
+        const helper = new THREE.Object3D();
+        helper.position.copy(hit.point);
+        helper.lookAt(hit.point.clone().add(normal));
+
+        const width = logoState.sizeCm / CM_PER_UNIT;
+        const height = width / logoState.aspect;
+        const geo = new DecalGeometry(torsoMesh, hit.point, helper.rotation, new THREE.Vector3(width, height, 0.2));
+        logoMesh = new THREE.Mesh(geo, logoMaterial);
+        logoMesh.renderOrder = 1;
+        shirt.add(logoMesh);
+      }
+
+      function loadLogoFile(file) {
+        showLogoError('');
+        if (!file) return;
+        if (!/^image\/(png|jpeg|svg\+xml|webp)$/.test(file.type)) {
+          showLogoError('Formato no compatible. Usa PNG, JPG, SVG o WEBP.');
+          return;
+        }
+        if (file.size > MAX_LOGO_BYTES) {
+          showLogoError('El archivo pesa más de 5 MB.');
+          return;
+        }
+
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+          // Los SVG pueden no traer tamaño propio: les damos uno cuadrado.
+          const w = img.naturalWidth || 512;
+          const h = img.naturalHeight || 512;
+          const scale = Math.min(1, 1024 / Math.max(w, h));
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.max(1, Math.round(w * scale));
+          canvas.height = Math.max(1, Math.round(h * scale));
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          if (logoState.texture) logoState.texture.dispose();
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.colorSpace = THREE.SRGBColorSpace;
+          tex.anisotropy = 8;
+          logoState.texture = tex;
+          logoState.aspect = canvas.width / canvas.height;
+          logoState.name = file.name;
+          logoMaterial.map = tex;
+          logoMaterial.needsUpdate = true;
+
+          document.getElementById('studioLogoThumb').src = url;
+          document.getElementById('studioLogoName').textContent = file.name;
+          logoDrop.hidden = true;
+          logoFileRow.hidden = false;
+          logoControls.hidden = false;
+
+          placeLogo();
+          updateLogoSummary();
+          goToView(LOGO_PLACEMENTS[logoState.placement].side === 'front' ? 'front' : 'back');
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          showLogoError('No pudimos leer la imagen. Prueba con otro archivo.');
+        };
+        img.src = url;
+      }
+
+      function removeLogo() {
+        const thumb = document.getElementById('studioLogoThumb');
+        if (thumb.src) URL.revokeObjectURL(thumb.src);
+        thumb.removeAttribute('src');
+        if (logoState.texture) logoState.texture.dispose();
+        logoState.texture = null;
+        logoMaterial.map = null;
+        placeLogo();
+        logoInput.value = '';
+        logoDrop.hidden = false;
+        logoFileRow.hidden = true;
+        logoControls.hidden = true;
+        showLogoError('');
+        updateLogoSummary();
+      }
+
+      logoDrop.addEventListener('click', () => logoInput.click());
+      logoInput.addEventListener('change', () => loadLogoFile(logoInput.files[0]));
+      document.getElementById('studioLogoRemove').addEventListener('click', removeLogo);
+
+      ['dragenter', 'dragover'].forEach(evt => logoDrop.addEventListener(evt, e => {
+        e.preventDefault();
+        logoDrop.classList.add('dragover');
+      }));
+      ['dragleave', 'drop'].forEach(evt => logoDrop.addEventListener(evt, e => {
+        e.preventDefault();
+        logoDrop.classList.remove('dragover');
+      }));
+      logoDrop.addEventListener('drop', e => loadLogoFile(e.dataTransfer.files[0]));
+
+      document.querySelectorAll('.studio-placement').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const key = btn.dataset.placement;
+          if (!LOGO_PLACEMENTS[key]) return;
+          logoState.placement = key;
+          logoState.sizeCm = LOGO_PLACEMENTS[key].defaultCm;
+          logoSize.value = logoState.sizeCm;
+          logoSizeLabel.textContent = `${logoState.sizeCm} cm`;
+          document.querySelectorAll('.studio-placement').forEach(b => b.classList.toggle('active', b === btn));
+          placeLogo();
+          updateLogoSummary();
+          goToView(LOGO_PLACEMENTS[key].side === 'front' ? 'front' : 'back');
+        });
+      });
+
+      logoSize.addEventListener('input', () => {
+        logoState.sizeCm = parseInt(logoSize.value, 10);
+        logoSizeLabel.textContent = `${logoState.sizeCm} cm`;
+        placeLogo();
+        updateLogoSummary();
+      });
+
+      window.dotacianStudio = { scene, camera, controls, shirt, fabric, logoState };
     }
 
     if (!webglAvailable()) {
