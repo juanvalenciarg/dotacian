@@ -10,6 +10,8 @@
     { "source": "/app/empleados", "destination": "/app/empleados.html" },
     { "source": "/app/activos", "destination": "/app/activos.html" },
     { "source": "/app/uniformes", "destination": "/app/activos.html" },
+    { "source": "/app/uniformes/studio", "destination": "/app/studio.html" },
+    { "source": "/app/studio", "destination": "/app/studio.html" },
     { "source": "/app/bodega", "destination": "/app/bodega.html" }
   ]
 }

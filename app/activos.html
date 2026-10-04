@@ -100,6 +100,37 @@
       }
     }
 
+    /* Pestañas de la sección Uniformes (Catálogo / Dotacian Studio) */
+    .uniform-tabs {
+      display: inline-flex;
+      gap: 0.25rem;
+      padding: 0.3rem;
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      margin-bottom: 1.75rem;
+    }
+
+    .uniform-tab {
+      padding: 0.5rem 1.1rem;
+      border-radius: 999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #64748B;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .uniform-tab:hover {
+      color: var(--color-navy);
+    }
+
+    .uniform-tab.active {
+      background: var(--color-navy);
+      color: white;
+    }
+
+
     .asset-category-section {
       margin-bottom: 2rem;
     }
@@ -609,10 +640,15 @@
       </header>
 
       <div class="dashboard-content-wrapper" style="padding-top: 5rem;">
-        <div style="margin-bottom: 2rem;">
+        <div style="margin-bottom: 1.5rem;">
           <h1 class="dot-greeting" style="text-align: left; margin-bottom: 0.5rem; font-size: 3rem; background: linear-gradient(90deg, #94A3B8 0%, #1E293B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Catálogo de Uniformes</h1>
           <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;">Elige las prendas y el EPP que tu empresa entrega a cada rol y registra los proveedores con los que diseñas, compras y renuevas tu dotación.</p>
         </div>
+
+        <nav class="uniform-tabs" aria-label="Secciones de Uniformes">
+          <a href="/app/uniformes" class="uniform-tab active" aria-current="page">Catálogo</a>
+          <a href="/app/uniformes/studio" class="uniform-tab">Dotacian Studio</a>
+        </nav>
 
         <div class="app-container">
           <!-- Search -->

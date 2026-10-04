@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <link rel="icon" type="image/svg+xml" href="/assets/logos/favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dotacian | Dotacian Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 0.5rem;
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 1001;
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.5);
+      z-index: 900;
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .app-layout.sidebar-open .sidebar-overlay {
+      display: block;
+      opacity: 1;
+    }
+
+    @media (max-width: 992px) {
+      .main-content {
+        margin-left: 0;
+      }
+
+      .mobile-menu-toggle {
+        display: none;
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        padding: 0.5rem;
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        z-index: 1001;
+      }
+
+      .sidebar {
+        z-index: 1000;
+      }
+    }
+
+    /* Main Content Refinement */
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      padding: 0;
+      background: #F8FAFC;
+    }
+
+    .app-header {
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: transparent;
+      border: none;
+      position: absolute;
+      top: 0;
+      left: var(--sidebar-width);
+      right: 0;
+      z-index: 10;
+    }
+
+    @media (max-width: 992px) {
+      .app-header {
+        left: 0;
+        padding: 1rem 1.5rem;
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+    }
+
+    /* Pestañas de la sección Uniformes (Catálogo / Dotacian Studio) */
+    .uniform-tabs {
+      display: inline-flex;
+      gap: 0.25rem;
+      padding: 0.3rem;
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      margin-bottom: 1.75rem;
+    }
+
+    .uniform-tab {
+      padding: 0.5rem 1.1rem;
+      border-radius: 999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #64748B;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .uniform-tab:hover {
+      color: var(--color-navy);
+    }
+
+    .uniform-tab.active {
+      background: var(--color-navy);
+      color: white;
+    }
+
+    /* Layout del Studio */
+    .studio-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    @media (max-width: 1100px) {
+      .studio-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .studio-viewer {
+      position: relative;
+      height: min(60vh, 600px);
+      min-height: 420px;
+      border-radius: 1.25rem;
+      border: 1px solid var(--color-border);
+      background: radial-gradient(ellipse at 50% 40%, #FFFFFF 0%, #F1F5F9 70%, #E8EDF3 100%);
+      overflow: hidden;
+    }
+
+    .studio-viewer canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .studio-viewer canvas:active {
+      cursor: grabbing;
+    }
+
+    .studio-badge {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.75rem;
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-navy);
+      backdrop-filter: blur(6px);
+      pointer-events: none;
+    }
+
+    .studio-hint {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 0.5rem 1rem;
+      background: rgba(15, 23, 42, 0.75);
+      color: white;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      pointer-events: none;
+      transition: opacity 0.4s;
+    }
+
+    .studio-hint.hidden {
+      opacity: 0;
+    }
+
+    .studio-toolbar {
+      position: absolute;
+      left: 50%;
+      bottom: 1rem;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: calc(100% - 2rem);
+    }
+
+    .studio-views {
+      display: inline-flex;
+      gap: 0.2rem;
+      padding: 0.25rem;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      backdrop-filter: blur(6px);
+    }
+
+    .studio-view-btn,
+    .studio-spin-btn {
+      border: none;
+      background: transparent;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #475569;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .studio-view-btn:hover {
+      color: var(--color-navy);
+    }
+
+    .studio-view-btn.active {
+      background: var(--color-navy);
+      color: white;
+    }
+
+    .studio-spin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--color-border);
+      backdrop-filter: blur(6px);
+    }
+
+    .studio-spin-btn.active {
+      color: var(--color-cyan);
+      border-color: var(--color-cyan);
+    }
+
+    .studio-fallback {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+      color: var(--color-text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .studio-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .studio-card {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 1.25rem;
+      padding: 1.25rem;
+    }
+
+    .studio-card-label {
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #94A3B8;
+      margin-bottom: 0.75rem;
+    }
+
+    .studio-garment {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.75rem;
+      border: 1.5px solid var(--color-cyan);
+      border-radius: 0.9rem;
+      background: #F0FDFF;
+    }
+
+    .studio-garment-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 0.7rem;
+      background: white;
+      border: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-navy);
+      flex-shrink: 0;
+    }
+
+    .studio-garment-name {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--color-navy);
+    }
+
+    .studio-garment-meta {
+      font-size: 0.75rem;
+      color: #64748B;
+    }
+
+    .studio-soon {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.75rem;
+    }
+
+    .studio-soon span {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #94A3B8;
+      background: #F1F5F9;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+    }
+
+    .studio-swatches {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+    }
+
+    .studio-swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.6rem 0.25rem;
+      border: 1.5px solid transparent;
+      border-radius: 0.9rem;
+      background: none;
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #475569;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .studio-swatch:hover {
+      background: #F8FAFC;
+    }
+
+    .studio-swatch.active {
+      border-color: var(--color-cyan);
+      background: #F0FDFF;
+      color: var(--color-navy);
+    }
+
+    .studio-swatch-dot {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(15, 23, 42, 0.15);
+      box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.12);
+    }
+
+    .studio-summary {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .studio-summary div {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .studio-summary span:first-child {
+      color: #64748B;
+    }
+
+    .studio-summary span:last-child {
+      font-weight: 600;
+      color: var(--color-navy);
+      text-align: right;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Custom Notification Container -->
+  <div id="notificationToast" class="notification-toast">
+    <div class="notification-icon">✓</div>
+    <div class="notification-text" id="notificationText">Mensaje guardado</div>
+  </div>
+
+  <div class="app-layout" id="app-layout-wrapper">
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" style="display: flex; flex-direction: column;">
+      <!-- TOP: dot AI -->
+      <div class="sidebar-header" style="position: relative; display: flex; justify-content: center; padding: 1.5rem 0.25rem 1rem 0.25rem !important; overflow: visible;">
+        <a href="/app/home" style="display: flex; align-items: center; justify-content: center; text-decoration: none; width: 100%;">
+          <img src="/assets/logos/logo_dotacian.png" alt="dotacian" style="width: 100%; max-width: 108px; height: auto; object-fit: contain; filter: brightness(0) invert(1);">
+        </a>
+      </div>
+
+      <!-- MIDDLE: Navigation -->
+      <nav class="sidebar-nav" style="flex: 1; display: flex; flex-direction: column; overflow-y: auto;">
+        <a href="/app/home" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
+          <span class="nav-label">Home</span>
+        </a>
+        <a href="/app/uniformes" class="nav-item active">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /><path d="m3.3 7 8.7 5 8.7-5" /><path d="M12 22V12" /></svg></span>
+          <span class="nav-label">Uniformes</span>
+        </a>
+        <a href="/app/roles" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+          <span class="nav-label">Roles</span>
+        </a>
+        <a href="/app/empleados" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          <span class="nav-label">Empleados</span>
+        </a>
+        <a href="/app/bodega" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg></span>
+          <span class="nav-label">Bodega</span>
+        </a>
+      </nav>
+
+      <!-- BOTTOM: Secondary Menu -->
+      <div class="sidebar-footer" style="padding: 1.5rem 0 1.5rem 1.75rem; display: flex; justify-content: flex-start; position: relative;">
+        <div class="header-right" style="position: relative; display: flex; justify-content: flex-start; width: 100%; padding: 0;">
+          <div id="header-company-badge" class="sidebar-avatar-badge" onclick="toggleUserPopover(event)">
+            <span id="header-badge-initials">?</span>
+            <span id="company-name-display" style="display: none;"></span>
+            <span id="dash-industry-val" style="display: none;"></span>
+          </div>
+
+          <!-- Popover (Abriendo hacia arriba y a la derecha) -->
+          <div id="user-popover" class="user-popover" style="left: 60px; bottom: 0; top: auto; right: auto; min-width: 260px;">
+            <div class="popover-profile-header">
+              <div class="popover-profile-avatar"><span id="popover-avatar-initials">?</span></div>
+              <div style="min-width: 0;">
+                <div id="pop-user-name" class="popover-profile-name">Cargando...</div>
+                <div id="pop-user-email" class="popover-profile-email">Cargando...</div>
+              </div>
+            </div>
+
+            <div class="popover-label">País</div>
+            <div id="version-tag" style="margin-top: 0.25rem; margin-bottom: 1rem; display: flex;"></div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.15rem;">
+              <a href="#" class="popover-menu-item">
+                <span class="popover-menu-icon">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                  </svg>
+                </span>
+                Alertas
+              </a>
+              <a href="/configuracion.html" class="popover-menu-item">
+                <span class="popover-menu-icon">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path
+                      d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0-2.73.73l.15-.08a2 2 0 0 1-2 0l.43.25a2 2 0 0 1-1-1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1-1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </span>
+                Configuración
+              </a>
+              <hr style="margin: 0.5rem 0; border: none; border-top: 1px solid var(--color-smoke-mid);">
+              <a href="/login.html" class="popover-menu-item popover-menu-item-danger">
+                <span class="popover-menu-icon">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                  </svg>
+                </span>
+                Cerrar Sesión
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="app-header">
+        <div class="header-left" style="display: flex; align-items: center;">
+          <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" viewBox="0 0 24 24">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="header-right" style="display: flex; align-items: center; justify-content: flex-end; width: 100%;"></div>
+      </header>
+
+      <div class="dashboard-content-wrapper" style="padding-top: 5rem;">
+        <div style="margin-bottom: 1.5rem;">
+          <h1 class="dot-greeting" style="text-align: left; margin-bottom: 0.5rem; font-size: 3rem; background: linear-gradient(90deg, #94A3B8 0%, #1E293B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Dotacian Studio</h1>
+          <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;">Diseña desde cero el uniforme de cada cliente y revísalo en 3D desde cualquier ángulo.</p>
+        </div>
+
+        <nav class="uniform-tabs" aria-label="Secciones de Uniformes">
+          <a href="/app/uniformes" class="uniform-tab">Catálogo</a>
+          <a href="/app/uniformes/studio" class="uniform-tab active" aria-current="page">Dotacian Studio</a>
+        </nav>
+
+        <div class="studio-layout">
+          <!-- Visor 3D -->
+          <div class="studio-viewer" id="studioViewer">
+            <div class="studio-badge">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"></path><polyline points="21 3 21 9 15 9"></polyline></svg>
+              Vista 3D · 360°
+            </div>
+            <div class="studio-hint" id="studioHint">Arrastra para girar la prenda</div>
+            <div class="studio-toolbar">
+              <div class="studio-views" role="group" aria-label="Vistas">
+                <button type="button" class="studio-view-btn active" data-view="front">Frente</button>
+                <button type="button" class="studio-view-btn" data-view="right">Lado der.</button>
+                <button type="button" class="studio-view-btn" data-view="back">Espalda</button>
+                <button type="button" class="studio-view-btn" data-view="left">Lado izq.</button>
+              </div>
+              <button type="button" class="studio-spin-btn" id="studioSpinBtn" aria-pressed="false">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"></path><polyline points="21 3 21 9 15 9"></polyline></svg>
+                Girar 360°
+              </button>
+            </div>
+          </div>
+
+          <!-- Panel de diseño -->
+          <aside class="studio-panel">
+            <div class="studio-card">
+              <div class="studio-card-label">Prenda</div>
+              <div class="studio-garment">
+                <div class="studio-garment-icon">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path></svg>
+                </div>
+                <div>
+                  <div class="studio-garment-name">Camiseta básica</div>
+                  <div class="studio-garment-meta">Cuello redondo · Manga corta</div>
+                </div>
+              </div>
+              <div class="studio-soon">
+                <span>Polo · pronto</span>
+                <span>Camisa · pronto</span>
+                <span>Chaqueta · pronto</span>
+              </div>
+            </div>
+
+            <div class="studio-card">
+              <div class="studio-card-label">Color</div>
+              <div class="studio-swatches" id="studioSwatches">
+                <button type="button" class="studio-swatch active" data-color="blanco"><span class="studio-swatch-dot" style="background: #F4F4F1;"></span>Blanco</button>
+                <button type="button" class="studio-swatch" data-color="negro"><span class="studio-swatch-dot" style="background: #1B1B1E;"></span>Negro</button>
+                <button type="button" class="studio-swatch" data-color="azul"><span class="studio-swatch-dot" style="background: #1E3F8A;"></span>Azul</button>
+                <button type="button" class="studio-swatch" data-color="rojo"><span class="studio-swatch-dot" style="background: #B4232C;"></span>Rojo</button>
+              </div>
+            </div>
+
+            <div class="studio-card">
+              <div class="studio-card-label">Resumen del diseño</div>
+              <div class="studio-summary">
+                <div><span>Prenda</span><span>Camiseta básica</span></div>
+                <div><span>Cuello</span><span>Redondo</span></div>
+                <div><span>Manga</span><span>Corta</span></div>
+                <div><span>Color</span><span id="studioSummaryColor">Blanco</span></div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const layout = document.getElementById('app-layout-wrapper');
+      if (layout) {
+        layout.classList.toggle('sidebar-open');
+      }
+    }
+  </script>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+    // Colores de tela disponibles para la camiseta básica.
+    const SHIRT_COLORS = {
+      blanco: { label: 'Blanco', hex: '#F4F4F1' },
+      negro: { label: 'Negro', hex: '#1B1B1E' },
+      azul: { label: 'Azul', hex: '#1E3F8A' },
+      rojo: { label: 'Rojo', hex: '#B4232C' }
+    };
+
+    // Ángulo de la cámara (azimut) para cada vista fija.
+    const VIEW_ANGLES = { front: 0, right: Math.PI / 2, back: Math.PI, left: -Math.PI / 2 };
+
+    const viewer = document.getElementById('studioViewer');
+    const hint = document.getElementById('studioHint');
+    const spinBtn = document.getElementById('studioSpinBtn');
+
+    function webglAvailable() {
+      try {
+        const c = document.createElement('canvas');
+        return !!(window.WebGLRenderingContext && (c.getContext('webgl2') || c.getContext('webgl')));
+      } catch (e) {
+        return false;
+      }
+    }
+
+
+    // --- Geometría de la camiseta ---------------------------------------
+    // La prenda se arma por código (sin archivos de modelo): un torso de
+    // secciones "superelipse" que se cierra hacia el cuello, dos mangas
+    // cónicas que salen del hombro y ribetes (cuello, ruedo y bocamangas).
+
+    function catmull(p0, p1, p2, p3, t) {
+      const t2 = t * t, t3 = t2 * t;
+      return 0.5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3);
+    }
+
+    // Perfil del torso de abajo (ruedo) hacia arriba (cuello):
+    // y = altura, a = medio ancho, b = media profundidad, n = exponente de la superelipse.
+    const TORSO_PROFILE = [
+      { y: -0.72, a: 0.338, b: 0.166, n: 2.7 },
+      { y: -0.45, a: 0.333, b: 0.158, n: 2.7 },
+      { y: -0.15, a: 0.337, b: 0.165, n: 2.7 },
+      { y: 0.08, a: 0.347, b: 0.178, n: 2.6 },
+      { y: 0.24, a: 0.352, b: 0.178, n: 2.5 },
+      { y: 0.325, a: 0.318, b: 0.158, n: 2.4 },
+      { y: 0.38, a: 0.245, b: 0.130, n: 2.2 },
+      { y: 0.415, a: 0.170, b: 0.106, n: 2.0 },
+      { y: 0.430, a: 0.125, b: 0.096, n: 2.0 }
+    ];
+
+    function torsoProfile(t) {
+      const k = TORSO_PROFILE;
+      const last = k.length - 1;
+      const i = Math.min(Math.floor(t), last - 1);
+      const f = t - i;
+      const get = (j) => k[Math.max(0, Math.min(last, j))];
+      const out = {};
+      ['y', 'a', 'b', 'n'].forEach(key => {
+        out[key] = catmull(get(i - 1)[key], get(i)[key], get(i + 1)[key], get(i + 2)[key], f);
+      });
+      return out;
+    }
+
+    function superellipse(angle, a, b, n) {
+      const c = Math.cos(angle), s = Math.sin(angle);
+      const e = 2 / n;
+      return {
+        x: a * Math.sign(c) * Math.pow(Math.abs(c), e),
+        z: b * Math.sign(s) * Math.pow(Math.abs(s), e)
+      };
+    }
+
+    // Construye una malla tipo "tubo" a partir de una función (fila, columna) → punto.
+    function buildGrid(rows, cols, pointAt, uvAt) {
+      const positions = [];
+      const uvs = [];
+      const indices = [];
+      for (let i = 0; i <= rows; i++) {
+        for (let j = 0; j <= cols; j++) {
+          const p = pointAt(i / rows, j / cols);
+          positions.push(p.x, p.y, p.z);
+          const uv = uvAt(i / rows, j / cols, p);
+          uvs.push(uv.u, uv.v);
+        }
+      }
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          const a = i * (cols + 1) + j;
+          const b = a + cols + 1;
+          indices.push(a, b, a + 1, b, b + 1, a + 1);
+        }
+      }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+      geo.setIndex(indices);
+      geo.computeVertexNormals();
+      return geo;
+    }
+
+    const TORSO_ROWS = 140;
+    const TORSO_COLS = 160;
+    const NECK_START = 5; // índice del perfil donde empieza a cerrarse hacia el cuello
+
+    function torsoPoint(v, u) {
+      const t = v * (TORSO_PROFILE.length - 1);
+      const p = torsoProfile(t);
+      const angle = u * Math.PI * 2;
+      const q = superellipse(angle, p.a, p.b, p.n);
+      let y = p.y;
+      // El escote cae más adelante que atrás.
+      const neckW = Math.max(0, (t - NECK_START) / (TORSO_PROFILE.length - 1 - NECK_START));
+      const front = Math.max(0, Math.sin(angle));
+      const back = Math.max(0, -Math.sin(angle));
+      y -= 0.07 * neckW * neckW * front * front;
+      y += 0.008 * neckW * back;
+      // Arrugas suaves de la tela en la cintura.
+      const waist = Math.exp(-Math.pow((p.y + 0.38) / 0.24, 2));
+      const fold = 0.0035 * waist * Math.sin(angle * 9 + p.y * 14);
+      const len = Math.hypot(q.x, q.z) || 1;
+      return new THREE.Vector3(q.x + fold * q.x / len, y, q.z + fold * q.z / len);
+    }
+
+    function buildTorso() {
+      return buildGrid(TORSO_ROWS, TORSO_COLS, (v, u) => torsoPoint(v, u), (v, u, p) => ({ u: u * 2.2, v: p.y }));
+    }
+
+    // Manga: tubo cónico que sale del hombro hacia afuera y abajo.
+    const SLEEVE = {
+      angle: THREE.MathUtils.degToRad(50), // caída de la manga respecto a la horizontal
+      length: 0.27,
+      hemTilt: 0.085, // la bocamanga se corta en diagonal: más larga arriba que en la axila
+      forward: THREE.MathUtils.degToRad(12), // giro de la manga hacia el frente
+      start: -0.18,       // parte que queda dentro del torso para ocultar la unión
+      rBase: [0.160, 0.152], // radios (vertical, profundidad) en la sisa
+      rEnd: [0.132, 0.118],  // radios en la bocamanga
+      shoulder: new THREE.Vector3(0.335, 0.332, 0) // punto del hombro donde arranca el borde superior
+    };
+
+    function sleeveFrame(side) {
+      // La manga cae hacia afuera y abajo, con un leve giro hacia adelante.
+      const fwd = SLEEVE.forward;
+      const dir = new THREE.Vector3(Math.cos(SLEEVE.angle) * side, -Math.sin(SLEEVE.angle), 0);
+      dir.applyAxisAngle(new THREE.Vector3(0, 1, 0), -fwd * side).normalize();
+      const up = new THREE.Vector3(Math.sin(SLEEVE.angle) * side, Math.cos(SLEEVE.angle), 0);
+      up.applyAxisAngle(new THREE.Vector3(0, 1, 0), -fwd * side).normalize();
+      const depth = new THREE.Vector3().crossVectors(dir, up).multiplyScalar(side).normalize();
+      const top = SLEEVE.shoulder.clone();
+      top.x *= side;
+      const center = top.clone().addScaledVector(up, -SLEEVE.rBase[0]);
+      return { dir, up, depth, center };
+    }
+
+    function sleeveRadii(s) {
+      if (s <= 0) {
+        // Dentro del torso la manga se angosta para no asomarse por el hombro.
+        const k = 1 + s * 1.6;
+        return [SLEEVE.rBase[0] * k, SLEEVE.rBase[1] * k];
+      }
+      const e = s * s * (3 - 2 * s);
+      return [
+        THREE.MathUtils.lerp(SLEEVE.rBase[0], SLEEVE.rEnd[0], e),
+        THREE.MathUtils.lerp(SLEEVE.rBase[1], SLEEVE.rEnd[1], e)
+      ];
+    }
+
+    function sleevePoint(side, s, phi) {
+      const f = sleeveFrame(side);
+      const [r1, r2] = sleeveRadii(s);
+      const q = superellipse(phi, r1, r2, 2.3);
+      // Leve campana al final de la manga.
+      const flare = s > 0.85 ? 1 + (s - 0.85) * 0.25 : 1;
+      const axial = s > 0 ? s * (SLEEVE.length + SLEEVE.hemTilt * Math.cos(phi)) : s * SLEEVE.length;
+      return f.center.clone()
+        .addScaledVector(f.dir, axial)
+        .addScaledVector(f.up, q.x * flare)
+        .addScaledVector(f.depth, q.z * flare);
+    }
+
+    function buildSleeve(side) {
+      const span = 1 - SLEEVE.start;
+      return buildGrid(60, 96,
+        (v, u) => sleevePoint(side, SLEEVE.start + v * span, u * Math.PI * 2),
+        (v, u) => ({ u: u * 1.0, v: v * span * SLEEVE.length }));
+    }
+
+    // Ribete: tubo cerrado que sigue un anillo de puntos (cuello, ruedo, bocamanga).
+    function buildRim(points, radius) {
+      const curve = new THREE.CatmullRomCurve3(points, true);
+      return new THREE.TubeGeometry(curve, points.length * 2, radius, 12, true);
+    }
+
+    function torsoRing(v, offsetY = 0, scale = 1) {
+      const pts = [];
+      for (let j = 0; j < 96; j++) {
+        const p = torsoPoint(v, j / 96);
+        pts.push(new THREE.Vector3(p.x * scale, p.y + offsetY, p.z * scale));
+      }
+      return pts;
+    }
+
+    function sleeveRing(side, s) {
+      const pts = [];
+      for (let j = 0; j < 72; j++) pts.push(sleevePoint(side, s, (j / 72) * Math.PI * 2));
+      return pts;
+    }
+
+    // Textura de tejido (punto jersey) generada en un canvas para el relieve.
+    function buildKnitTexture() {
+      const size = 256;
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const img = ctx.createImageData(size, size);
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          const col = Math.sin((x / size) * Math.PI * 2 * 48) * 0.5 + 0.5;
+          const row = Math.sin((y / size) * Math.PI * 2 * 64 + (x % 11)) * 0.5 + 0.5;
+          const noise = Math.random();
+          const val = 128 + (col * 0.45 + row * 0.25 + noise * 0.3 - 0.5) * 110;
+          const idx = (y * size + x) * 4;
+          img.data[idx] = img.data[idx + 1] = img.data[idx + 2] = val;
+          img.data[idx + 3] = 255;
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(9, 9);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    function initStudio() {
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.08;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      viewer.prepend(renderer.domElement);
+
+      const scene = new THREE.Scene();
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+
+      const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
+      const CAMERA_DISTANCE = 3.5;
+      camera.position.set(0, 0.0, CAMERA_DISTANCE);
+
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.target.set(0, -0.14, 0);
+      controls.enablePan = false;
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.08;
+      controls.minDistance = 1.8;
+      controls.maxDistance = 4.5;
+      controls.minPolarAngle = Math.PI * 0.22;
+      controls.maxPolarAngle = Math.PI * 0.62;
+      controls.autoRotateSpeed = 2.2;
+      controls.update();
+
+      // Luces: ambiente suave + luz principal con sombra + contraluz.
+      scene.add(new THREE.HemisphereLight(0xffffff, 0xdfe5ec, 0.5));
+      const key = new THREE.DirectionalLight(0xffffff, 1.6);
+      key.position.set(0.9, 5, 1.6);
+      key.castShadow = true;
+      key.shadow.mapSize.set(2048, 2048);
+      key.shadow.camera.left = -1.5;
+      key.shadow.camera.right = 1.5;
+      key.shadow.camera.top = 1.5;
+      key.shadow.camera.bottom = -1.5;
+      key.shadow.bias = -0.0004;
+      key.shadow.radius = 6;
+      scene.add(key);
+      const fill = new THREE.DirectionalLight(0xffffff, 0.6);
+      fill.position.set(-2.5, 1.2, 2.2);
+      scene.add(fill);
+      const rim = new THREE.DirectionalLight(0xffffff, 0.7);
+      rim.position.set(-1.5, 1.5, -2.8);
+      scene.add(rim);
+
+      const knit = buildKnitTexture();
+      const fabric = new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color(SHIRT_COLORS.blanco.hex),
+        roughness: 0.92,
+        metalness: 0,
+        sheen: 0.35,
+        sheenRoughness: 0.85,
+        sheenColor: new THREE.Color(0x9a9a9a),
+        specularIntensity: 0.25,
+        bumpMap: knit,
+        bumpScale: 0.6,
+        envMapIntensity: 0.4,
+        side: THREE.DoubleSide
+      });
+
+      const shirt = new THREE.Group();
+      const parts = [
+        buildTorso(),
+        buildSleeve(1),
+        buildSleeve(-1),
+        buildRim(torsoRing(1, -0.004, 1.06), 0.016),        // cuello en rib
+        buildRim(torsoRing(0, 0.002, 1.004), 0.0055),       // ruedo
+        buildRim(sleeveRing(1, 1), 0.0055),                 // bocamanga derecha
+        buildRim(sleeveRing(-1, 1), 0.0055)                 // bocamanga izquierda
+      ];
+      parts.forEach(geo => {
+        const mesh = new THREE.Mesh(geo, fabric);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        shirt.add(mesh);
+      });
+      scene.add(shirt);
+
+      // Sombra suave en el "piso" para dar sensación de volumen.
+      const ground = new THREE.Mesh(
+        new THREE.PlaneGeometry(6, 6),
+        new THREE.ShadowMaterial({ opacity: 0.08 })
+      );
+      ground.rotation.x = -Math.PI / 2;
+      ground.position.y = -0.80;
+      ground.receiveShadow = true;
+      scene.add(ground);
+
+      function resize() {
+        const w = viewer.clientWidth;
+        const h = viewer.clientHeight;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        // En pantallas angostas alejamos la cámara para que la prenda no se corte.
+        camera.fov = w / h < 0.9 ? 38 : 30;
+        camera.updateProjectionMatrix();
+      }
+      new ResizeObserver(resize).observe(viewer);
+      resize();
+
+      // --- Color ---
+      const targetColor = new THREE.Color(SHIRT_COLORS.blanco.hex);
+      document.querySelectorAll('#studioSwatches .studio-swatch').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const c = SHIRT_COLORS[btn.dataset.color];
+          if (!c) return;
+          targetColor.set(c.hex);
+          document.querySelectorAll('#studioSwatches .studio-swatch').forEach(b => b.classList.toggle('active', b === btn));
+          document.getElementById('studioSummaryColor').textContent = c.label;
+        });
+      });
+
+      // --- Vistas y giro ---
+      let viewAnim = null;
+      const viewButtons = document.querySelectorAll('.studio-view-btn');
+
+      function setActiveView(name) {
+        viewButtons.forEach(b => b.classList.toggle('active', b.dataset.view === name));
+      }
+
+      function currentAzimuth() {
+        const off = camera.position.clone().sub(controls.target);
+        return Math.atan2(off.x, off.z);
+      }
+
+      function goToView(name) {
+        setSpin(false);
+        const from = currentAzimuth();
+        let to = VIEW_ANGLES[name];
+        let delta = to - from;
+        delta = Math.atan2(Math.sin(delta), Math.cos(delta)); // camino más corto
+        viewAnim = { from, delta, start: performance.now(), duration: 700 };
+        setActiveView(name);
+      }
+
+      viewButtons.forEach(btn => btn.addEventListener('click', () => goToView(btn.dataset.view)));
+
+      function setSpin(on) {
+        controls.autoRotate = on;
+        spinBtn.classList.toggle('active', on);
+        spinBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        if (on) {
+          viewAnim = null;
+          setActiveView(null);
+        }
+      }
+      spinBtn.addEventListener('click', () => setSpin(!controls.autoRotate));
+
+      controls.addEventListener('start', () => {
+        hint.classList.add('hidden');
+        viewAnim = null;
+        setActiveView(null);
+      });
+      setTimeout(() => hint.classList.add('hidden'), 4000);
+
+      function applyAzimuth(angle) {
+        const off = camera.position.clone().sub(controls.target);
+        const radius = Math.hypot(off.x, off.z);
+        camera.position.x = controls.target.x + Math.sin(angle) * radius;
+        camera.position.z = controls.target.z + Math.cos(angle) * radius;
+      }
+
+      function tick(now) {
+        if (viewAnim) {
+          const k = Math.min(1, (now - viewAnim.start) / viewAnim.duration);
+          const e = 1 - Math.pow(1 - k, 3);
+          applyAzimuth(viewAnim.from + viewAnim.delta * e);
+          if (k >= 1) viewAnim = null;
+        }
+        fabric.color.lerp(targetColor, 0.12);
+        controls.update();
+        renderer.render(scene, camera);
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+
+      window.dotacianStudio = { scene, camera, controls, shirt, fabric };
+    }
+
+    if (!webglAvailable()) {
+      viewer.insertAdjacentHTML('beforeend', '<div class="studio-fallback">Tu navegador no permite mostrar la vista 3D. Prueba con una versión reciente de Chrome, Safari o Edge.</div>');
+      hint.remove();
+    } else {
+      initStudio();
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    if (typeof window._supabase === 'undefined') {
+      window.SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+      window.SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+      window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token', multiTab: false } });
+    }
+  </script>
+  <script src="/assets/js/utils.js?v=4"></script>
+</body>
+
+</html>
+
