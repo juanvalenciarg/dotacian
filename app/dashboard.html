@@ -676,9 +676,9 @@
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
           <span class="nav-label">Home</span>
         </a>
-        <a href="/app/activos" class="nav-item">
+        <a href="/app/uniformes" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /><path d="m3.3 7 8.7 5 8.7-5" /><path d="M12 22V12" /></svg></span>
-          <span class="nav-label">Activos</span>
+          <span class="nav-label">Uniformes</span>
         </a>
         <a href="/app/roles" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
@@ -819,7 +819,7 @@
                   </div>
                 </div>
                 <div class="stat-info">
-                  <span class="stat-label-p">No. de Activos</span>
+                  <span class="stat-label-p">No. de Prendas</span>
                   <span id="stat-assets" class="stat-value-p">0</span>
                 </div>
               </div>
@@ -827,8 +827,8 @@
 
             <div class="app-card" style="padding: 2rem; margin-top: 1.5rem;">
               <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.25rem;">
-                Activos comprados por mes</h3>
-              <p style="color: #64748B; font-size: 0.875rem; margin-bottom: 1.5rem;">Volumen de activos adquiridos en
+                Prendas compradas por mes</h3>
+              <p style="color: #64748B; font-size: 0.875rem; margin-bottom: 1.5rem;">Volumen de prendas adquiridas en
                 los últimos 6 meses.</p>
               <div style="position: relative; height: 280px;">
                 <canvas id="monthlyPurchaseChart"></canvas>
@@ -838,9 +838,9 @@
             <div class="insights-row">
               <div class="app-card" style="padding: 1.75rem;">
                 <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.25rem;">
-                  Valor de Activos por Rol</h3>
+                  Valor de Dotación por Rol</h3>
                 <p style="color: #64748B; font-size: 0.875rem; margin-bottom: 1rem;">Valor estimado de los
-                  activos ya entregados a los empleados de cada rol.</p>
+                  prendas ya entregadas a los empleados de cada rol.</p>
                 <div id="roleValueList">
                   <div style="color: var(--color-text-muted); font-size: 0.875rem; padding: 1rem 0;">Cargando...
                   </div>
@@ -849,7 +849,7 @@
 
               <div class="app-card" style="padding: 1.75rem;">
                 <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.25rem;">
-                  Roles con Mayor Cantidad de Activos</h3>
+                  Roles con Mayor Cantidad de Prendas</h3>
                 <p style="color: #64748B; font-size: 0.875rem; margin-bottom: 1rem;">Unidades físicas asignadas
                   por rol.</p>
                 <div id="roleQtyList">
@@ -862,7 +862,7 @@
             <div class="app-card" style="padding: 1.75rem; margin-top: 1.5rem;">
               <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.25rem;">
                 Entregas por Empleado</h3>
-              <p style="color: #64748B; font-size: 0.875rem; margin-bottom: 1rem;">% de activos entregados vs.
+              <p style="color: #64748B; font-size: 0.875rem; margin-bottom: 1rem;">% de prendas entregadas vs.
                 pendientes según el kit de su rol.</p>
               <div id="employeeDeliveryList">
                 <div style="color: var(--color-text-muted); font-size: 0.875rem; padding: 1rem 0;">Cargando...</div>
@@ -920,7 +920,7 @@
                       <div class="check-circle"
                         style="width: 22px; height: 22px; border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s ease;">
                       </div>
-                      <span style="font-weight: 500;">Configura roles de activos</span>
+                      <span style="font-weight: 500;">Configura la dotación de tus roles</span>
                     </div>
                     <a href="/app/roles" class="setup-btn-mini">Ir <svg width="12" height="12" fill="none"
                         stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -1315,7 +1315,7 @@
 
       const sorted = [...roleStats].sort((a, b) => b.totalValue - a.totalValue);
       if (sorted.length === 0) {
-        el.innerHTML = '<div style="color:var(--color-text-muted); font-size:0.875rem; padding:1rem 0;">Aún no hay roles con activos asignados.</div>';
+        el.innerHTML = '<div style="color:var(--color-text-muted); font-size:0.875rem; padding:1rem 0;">Aún no hay roles con dotación asignada.</div>';
         return;
       }
 
@@ -1323,7 +1323,7 @@
         <div class="insight-row" style="display:flex; justify-content:space-between; align-items:center; padding:0.75rem 0;">
           <div>
             <div style="font-weight:700; color:var(--color-navy); font-size:0.9rem;">${escapeDashHtml(r.roleName)}</div>
-            <div style="font-size:0.75rem; color:var(--color-text-muted);">${r.itemTypes > 0 ? `${r.itemTypes} tipo${r.itemTypes !== 1 ? 's' : ''} de activo${r.itemTypes !== 1 ? 's' : ''} entregado${r.itemTypes !== 1 ? 's' : ''}` : 'Aún sin entregas registradas'}</div>
+            <div style="font-size:0.75rem; color:var(--color-text-muted);">${r.itemTypes > 0 ? `${r.itemTypes} tipo${r.itemTypes !== 1 ? 's' : ''} de prenda entregado${r.itemTypes !== 1 ? 's' : ''}` : 'Aún sin entregas registradas'}</div>
           </div>
           <div style="font-weight:800; color:var(--color-cyan); font-size:0.9rem; white-space:nowrap;">${formatCurrency(r.totalValue, userCountry)}</div>
         </div>
@@ -1336,7 +1336,7 @@
 
       const sorted = [...roleStats].sort((a, b) => b.totalQty - a.totalQty);
       if (sorted.length === 0 || sorted.every(r => r.totalQty === 0)) {
-        el.innerHTML = '<div style="color:var(--color-text-muted); font-size:0.875rem; padding:1rem 0;">Aún no hay roles con activos asignados.</div>';
+        el.innerHTML = '<div style="color:var(--color-text-muted); font-size:0.875rem; padding:1rem 0;">Aún no hay roles con dotación asignada.</div>';
         return;
       }
 
@@ -1377,7 +1377,7 @@
                 <span style="font-weight:700; color:var(--color-navy); font-size:0.875rem;">${escapeDashHtml(e.name)}</span>
                 <span style="font-size:0.75rem; color:var(--color-text-muted); margin-left:0.4rem;">${escapeDashHtml(e.role)}</span>
               </div>
-              <span style="font-size:0.75rem; color:var(--color-text-muted); font-style:italic;">Sin activos físicos en el rol</span>
+              <span style="font-size:0.75rem; color:var(--color-text-muted); font-style:italic;">Sin dotación en el rol</span>
             </div>
           `;
         }
@@ -1448,7 +1448,7 @@
         data: {
           labels: labels,
           datasets: [{
-            label: 'Activos comprados',
+            label: 'Prendas compradas',
             data: volumes,
             backgroundColor: '#06b6d4',
             borderRadius: 6,

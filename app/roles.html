@@ -574,9 +574,9 @@
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
           <span class="nav-label" data-i18n="nav.dashboard">Dashboard</span>
         </a>
-        <a href="/app/activos" class="nav-item">
+        <a href="/app/uniformes" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /><path d="m3.3 7 8.7 5 8.7-5" /><path d="M12 22V12" /></svg></span>
-          <span class="nav-label" data-i18n="nav.activos">Activos</span>
+          <span class="nav-label" data-i18n="nav.activos">Uniformes</span>
         </a>
         <a href="/app/roles" class="nav-item active">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
@@ -694,9 +694,9 @@
           <div class="modal-content-lg" style="max-width: 550px;">
             <div class="modal-header">
               <div>
-                <h2 id="configRoleTitle" data-i18n="roleConfig.titleDefault">Configurar Activos</h2>
-                <p style="font-size: 0.8125rem; color: var(--color-text-secondary); margin: 0;" data-i18n="roleConfig.desc">Define los activos
-                  físicos y digitales que componen la plantilla base de este rol.</p>
+                <h2 id="configRoleTitle" data-i18n="roleConfig.titleDefault">Configurar dotación</h2>
+                <p style="font-size: 0.8125rem; color: var(--color-text-secondary); margin: 0;" data-i18n="roleConfig.desc">Define las prendas y
+                  el EPP que recibe cada persona con este rol.</p>
               </div>
               <button class="btn-close" onclick="closeRoleConfig()">✕</button>
             </div>
@@ -748,12 +748,12 @@
               </div>
 
               <button type="button" class="btn btn-outline" id="showAddAssetBtn" onclick="toggleAddAssetForm(true)"
-                style="width: 100%; margin-top: 0.5rem; font-size: 0.8rem; padding: 0.6rem;" data-i18n="roleConfig.addAsset">+ Agregar Activo</button>
+                style="width: 100%; margin-top: 0.5rem; font-size: 0.8rem; padding: 0.6rem;" data-i18n="roleConfig.addAsset">+ Agregar prenda o EPP</button>
 
               <div id="addAssetForm" style="display: none; margin-top: 1rem; padding: 1rem; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; flex-direction: column; gap: 0.75rem;">
                 <div style="display: flex; gap: 0.75rem;">
                   <div class="form-row" style="flex: 1;">
-                    <label>Activo</label>
+                    <label data-i18n="roleConfig.assetLabel">Prenda / EPP</label>
                     <select id="newAssetSelect"
                       style="width: 100%; padding: 0.65rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); background: white;">
                     </select>
@@ -765,8 +765,8 @@
                   </div>
                 </div>
                 <div id="noActiveAssetsHint" style="display: none; font-size: 0.8rem; color: #92400E; background: #FFFBEB; border: 1px solid #FDE68A; padding: 0.65rem 0.85rem; border-radius: 8px;">
-                  Ya agregaste todos los activos disponibles, o aún no has activado ninguno.
-                  <a href="/app/activos" target="_blank" style="color: #92400E; font-weight: 700;">Ir a Activos</a>
+                  Ya agregaste todas las prendas disponibles, o aún no has activado ninguna.
+                  <a href="/app/uniformes" target="_blank" style="color: #92400E; font-weight: 700;">Ir a Uniformes</a>
                 </div>
                 <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
                   <button type="button" class="btn btn-outline" style="font-size: 0.8rem;" onclick="toggleAddAssetForm(false)" data-i18n="roleConfig.cancel">Cancelar</button>
@@ -840,7 +840,7 @@
                 </div>
 
                 <div class="role-form-fullwidth" style="border-top: 1px solid var(--color-smoke); padding-top: 1.25rem;">
-                  <label style="display: block; font-weight: 700; font-size: 0.875rem; color: var(--color-navy); margin-bottom: 0.6rem;" data-i18n="newRole.assetTypesLabel">Activos a entregar</label>
+                  <label style="display: block; font-weight: 700; font-size: 0.875rem; color: var(--color-navy); margin-bottom: 0.6rem;" data-i18n="newRole.assetTypesLabel">Dotación a entregar</label>
                   <div id="newRoleAssetPicker" style="display: flex; flex-direction: column; gap: 1rem;"></div>
                 </div>
               </div>
@@ -1566,28 +1566,22 @@
       if (grid) grid.classList.toggle('open');
     }
 
-    // Catálogo jerárquico usado para armar rápidamente los activos de un rol
-    // nuevo (Categoría → Subcategoría → Ítems sugeridos). Aplica a cualquier
-    // industria; cada subcategoría también permite un ítem "Otro" libre. Es
+    // Catálogo jerárquico usado para armar rápidamente la dotación de un rol
+    // nuevo (Categoría → Subcategoría → Ítems sugeridos). Solo uniformes y EPP:
+    // los ítems de cómputo, licencias, etc. que un rol ya tenga guardados se
+    // siguen mostrando en su configuración, pero no se pueden agregar nuevos. Es
     // una función (no una constante) para que refleje el idioma activo cada
     // vez que se dibuja.
     function getAssetCatalogTree() {
       return {
         fisico: {
-          computo: { label: t('catalog.computo.label'), tipo: 'computo', items: [t('item.laptop'), t('item.monitor'), t('item.cargadorLaptop'), t('item.mouse'), t('item.teclado'), t('item.audifonos'), t('item.celular'), t('item.tablet')] },
           uniforme: { label: t('catalog.uniforme.label'), tipo: 'uniforme', items: [t('item.camiseta'), t('item.pantalon'), t('item.zapatos'), t('item.chaqueta'), t('item.delantal'), t('item.overol'), t('item.filipina'), t('item.gorro')] },
-          acceso: { label: t('catalog.acceso.label'), tipo: 'acceso', items: [t('item.tarjetaAcceso'), t('item.llaveOficina'), t('item.gafete')] },
-          vehiculo: { label: t('catalog.vehiculo.label'), tipo: 'vehiculo', items: [t('item.auto'), t('item.moto'), t('item.bicicleta')] },
-          herramienta: { label: t('catalog.herramienta.label'), tipo: 'herramienta', items: [t('item.kitHerramientas'), t('item.radio')] },
           epp: { label: t('catalog.epp.label'), tipo: 'epp', items: [t('item.casco'), t('item.zapatosSeguridad'), t('item.equipoAlturas'), t('item.gafasProteccion'), t('item.guantesSeguridad'), t('item.chalecoReflectivo'), t('item.proteccionAuditiva'), t('item.respirador'), t('item.lamparaCasco')] }
-        },
-        digital: {
-          licencia: { label: t('catalog.licencia.label'), tipo: 'licencia', items: [t('item.googleWorkspace'), t('item.microsoft365'), t('item.crm'), t('item.erp')] }
         }
       };
     }
 
-    // Catálogo de activos que la empresa activó en /app/activos (subconjunto
+    // Catálogo de prendas/EPP que la empresa activó en /app/uniformes (subconjunto
     // del catálogo completo). Se carga una vez y se reutiliza en los dos
     // flujos de Roles que permiten elegir activos.
     let activeAssetCatalog = null;
@@ -1653,7 +1647,7 @@
     async function renderNewRoleAssetPicker() {
       const container = document.getElementById('newRoleAssetPicker');
       if (!container) return;
-      container.innerHTML = `<div style="padding: 1rem; text-align: center; color: var(--color-text-secondary); font-size: 0.85rem;">Cargando activos...</div>`;
+      container.innerHTML = `<div style="padding: 1rem; text-align: center; color: var(--color-text-secondary); font-size: 0.85rem;">Cargando dotación...</div>`;
 
       const catalog = await ensureActiveAssetCatalog();
       const categoriesWithAssets = Object.keys(catalog).filter(catKey => Object.keys(catalog[catKey] || {}).length > 0);
@@ -1661,8 +1655,8 @@
       if (categoriesWithAssets.length === 0) {
         container.innerHTML = `
           <div style="padding: 1rem; text-align: center; background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 10px; color: #92400E; font-size: 0.85rem;">
-            Aún no has activado ningún activo.
-            <a href="/app/activos" target="_blank" style="color: #92400E; font-weight: 700;">Actívalos en Activos</a>.
+            Aún no has activado ninguna prenda ni EPP.
+            <a href="/app/uniformes" target="_blank" style="color: #92400E; font-weight: 700;">Actívalos en Uniformes</a>.
           </div>
         `;
         return;

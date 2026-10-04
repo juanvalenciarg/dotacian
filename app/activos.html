@@ -5,7 +5,7 @@
   <link rel="icon" type="image/svg+xml" href="/assets/logos/favicon.svg">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dotacian | Catálogo de Activos</title>
+  <title>Dotacian | Catálogo de Uniformes</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
@@ -515,9 +515,9 @@
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
           <span class="nav-label">Home</span>
         </a>
-        <a href="/app/activos" class="nav-item active">
+        <a href="/app/uniformes" class="nav-item active">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /><path d="m3.3 7 8.7 5 8.7-5" /><path d="M12 22V12" /></svg></span>
-          <span class="nav-label">Activos</span>
+          <span class="nav-label">Uniformes</span>
         </a>
         <a href="/app/roles" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
@@ -610,15 +610,15 @@
 
       <div class="dashboard-content-wrapper" style="padding-top: 5rem;">
         <div style="margin-bottom: 2rem;">
-          <h1 class="dot-greeting" style="text-align: left; margin-bottom: 0.5rem; font-size: 3rem; background: linear-gradient(90deg, #94A3B8 0%, #1E293B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Catálogo de Activos</h1>
-          <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;">Activa los tipos de activos que tu empresa puede asignar a los roles y, si quieres, registra tus proveedores y cómo se maneja el ciclo de vida de cada activo.</p>
+          <h1 class="dot-greeting" style="text-align: left; margin-bottom: 0.5rem; font-size: 3rem; background: linear-gradient(90deg, #94A3B8 0%, #1E293B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Catálogo de Uniformes</h1>
+          <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;">Elige las prendas y el EPP que tu empresa entrega a cada rol y registra los proveedores con los que diseñas, compras y renuevas tu dotación.</p>
         </div>
 
         <div class="app-container">
           <!-- Search -->
           <div class="app-card" style="margin-bottom: 1.5rem; padding: 1rem;">
             <div style="flex: 1; position: relative;">
-              <input type="text" id="assetSearchInput" placeholder="Buscar tipo de activo..." onkeyup="filterAssets(this.value)"
+              <input type="text" id="assetSearchInput" placeholder="Buscar prenda o EPP..." onkeyup="filterAssets(this.value)"
                 style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-md);">
               <span
                 style="position: absolute; left: 0.875rem; top: 50%; transform: translateY(-50%); color: var(--color-text-muted);">
@@ -654,25 +654,16 @@
   </div>
 
   <script>
-    // Catálogo estándar de tipos de activo (categoría → subcategoría → ítems).
-    // Es el mismo listado que Roles usa como sugerencia; aquí la empresa
-    // decide cuáles tiene disponibles y, opcionalmente, los parametriza.
+    // Catálogo de dotación (categoría → subcategoría → ítems). Dotacian se
+    // enfoca en uniformes y EPP; las demás subcategorías (cómputo, vehículos,
+    // licencias...) ya no se muestran, pero sus filas en company_assets no se
+    // borran. catKey 'fisico' se sigue guardando en company_assets.category.
     const ASSET_CATALOG = {
       fisico: {
         label: 'Físico',
         subcats: {
-          herramienta: { label: 'Herramientas', items: ['Kit de herramientas', 'Radio de comunicación'] },
-          epp: { label: 'EPP', items: ['Casco', 'Zapatos de seguridad', 'Equipo para trabajo en alturas', 'Gafas de protección', 'Guantes de seguridad', 'Chaleco reflectivo', 'Protección auditiva', 'Respirador/Mascarilla', 'Lámpara de casco'] },
           uniforme: { label: 'Uniformes', items: ['Camiseta/Camisa', 'Pantalón', 'Zapatos/Calzado', 'Chaqueta', 'Delantal', 'Overol', 'Filipina', 'Gorro'] },
-          acceso: { label: 'Acceso', items: ['Tarjeta de acceso', 'Llave de oficina', 'Gafete/Credencial'] },
-          vehiculo: { label: 'Vehículos', items: ['Auto', 'Moto', 'Bicicleta'] },
-          computo: { label: 'Cómputo', items: ['Laptop', 'Monitor', 'Cargador de laptop', 'Mouse', 'Teclado', 'Audífonos', 'Celular', 'Tablet'] }
-        }
-      },
-      digital: {
-        label: 'Digital',
-        subcats: {
-          licencia: { label: 'Licencias / Software', items: ['Google Workspace', 'Microsoft 365', 'CRM', 'ERP'] }
+          epp: { label: 'EPP', items: ['Casco', 'Zapatos de seguridad', 'Equipo para trabajo en alturas', 'Gafas de protección', 'Guantes de seguridad', 'Chaleco reflectivo', 'Protección auditiva', 'Respirador/Mascarilla', 'Lámpara de casco'] }
         }
       }
     };
@@ -739,7 +730,7 @@
         console.error('Error cargando catálogo de activos:', err);
         const root = document.getElementById('assetCatalogRoot');
         if (root) {
-          root.innerHTML = '<div style="text-align: center; padding: 3rem; color: #EF4444;">No se pudo cargar el catálogo de activos.</div>';
+          root.innerHTML = '<div style="text-align: center; padding: 3rem; color: #EF4444;">No se pudo cargar el catálogo de uniformes.</div>';
         }
       }
     }
@@ -755,7 +746,7 @@
       const section = document.createElement('div');
       section.className = 'asset-category-section';
 
-      section.innerHTML = `<div class="asset-category-title"><span class="badge-count">0 activos</span></div>`;
+      section.innerHTML = `<div class="asset-category-title"><span class="badge-count">0 activas</span></div>`;
 
       const grid = document.createElement('div');
       grid.className = 'asset-subcat-icon-grid';
@@ -1140,7 +1131,7 @@
         });
       });
       const badge = document.querySelector('.asset-category-section .badge-count');
-      if (badge) badge.textContent = `${total} activos`;
+      if (badge) badge.textContent = `${total} ${total === 1 ? 'activa' : 'activas'}`;
     }
 
     async function saveAssetDetails(category, tipo, nombre) {

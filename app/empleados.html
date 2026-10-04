@@ -474,9 +474,9 @@
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
           <span class="nav-label">Home</span>
         </a>
-        <a href="/app/activos" class="nav-item">
+        <a href="/app/uniformes" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /><path d="m3.3 7 8.7 5 8.7-5" /><path d="M12 22V12" /></svg></span>
-          <span class="nav-label">Activos</span>
+          <span class="nav-label">Uniformes</span>
         </a>
         <a href="/app/roles" class="nav-item">
           <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
@@ -1173,7 +1173,7 @@
                 <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                 <path d="M3 3v5h5" />
               </svg>
-              Recuperar Activo
+              Recuperar prenda
             </button>
           </div>
           <div class="app-card"
@@ -1208,7 +1208,7 @@
         <!-- Usage Bar Section -->
         <div style="margin-bottom: 2rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-            <label style="font-weight: 600; color: var(--color-navy);">Consumo de Activo Anterior</label>
+            <label style="font-weight: 600; color: var(--color-navy);">Desgaste de la dotación anterior</label>
             <span id="usageText" style="font-weight: 600; color: var(--color-coral);">85%</span>
           </div>
           <div class="usage-bar">
@@ -1219,13 +1219,13 @@
           </p>
         </div>
 
-        <!-- Section: Entregar Activos -->
+        <!-- Section: Entregar dotación -->
         <div
           style="border-top: 2px dashed var(--color-border); padding-top: 2rem; margin-top: 1rem; margin-bottom: 2rem;">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
             <div>
               <h4 style="color: var(--color-navy); font-size: 1.125rem; margin-bottom: 0.25rem; font-weight: 700;">
-                Entregar Activos</h4>
+                Entregar dotación</h4>
               <p style="font-size: 0.8125rem; color: var(--color-text-secondary);">Selecciona los artículos que vas a
                 entregar físicamente para generar el enlace de firma digital.</p>
             </div>
@@ -1248,7 +1248,7 @@
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            Agregar activo para entrega
+            Agregar prenda para entrega
           </button>
 
           <!-- Generate Link Button -->
@@ -1289,13 +1289,13 @@
           </div>
         </div>
 
-        <!-- Section: Activos Digitales -->
+        <!-- Section: Accesos digitales -->
         <div id="digitalAssetsSection"
           style="display: none; border-top: 2px dashed var(--color-border); padding-top: 2rem; margin-top: 1rem; margin-bottom: 2rem;">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
             <div>
               <h4 style="color: var(--color-navy); font-size: 1.125rem; margin-bottom: 0.25rem; font-weight: 700;">
-                Activos Digitales</h4>
+                Accesos digitales</h4>
               <p style="font-size: 0.8125rem; color: var(--color-text-secondary);">Licencias y accesos que trae el
                 rol de este empleado. No se cotizan ni se entregan físicamente: solicita al encargado que cree el
                 acceso.</p>
@@ -1676,7 +1676,7 @@
           } else {
             itemsTableRows = `
               <tr>
-                <td colspan="3" style="padding: 12px; font-size: 0.875rem; color: #64748b; font-style: italic; text-align: center;">No hay activos desglosados en esta entrega.</td>
+                <td colspan="3" style="padding: 12px; font-size: 0.875rem; color: #64748b; font-style: italic; text-align: center;">No hay prendas desglosadas en esta entrega.</td>
               </tr>
             `;
           }
@@ -1709,7 +1709,7 @@
               <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; text-align: left;">
                 <thead>
                   <tr style="background: #f1f5f9;">
-                    <th style="padding: 10px 12px; font-size: 0.75rem; text-transform: uppercase; color: #475569; font-weight: 700;">Activo / Artículo</th>
+                    <th style="padding: 10px 12px; font-size: 0.75rem; text-transform: uppercase; color: #475569; font-weight: 700;">Prenda / EPP</th>
                     <th style="padding: 10px 12px; font-size: 0.75rem; text-transform: uppercase; color: #475569; font-weight: 700; text-align: center; width: 80px;">Cant.</th>
                     <th style="padding: 10px 12px; font-size: 0.75rem; text-transform: uppercase; color: #475569; font-weight: 700; text-align: center; width: 80px;">Talla</th>
                   </tr>
@@ -1723,7 +1723,7 @@
               <div style="background: #fafafa; border: 1px solid #f1f5f9; border-radius: 8px; padding: 16px; display: flex; justify-content: space-between; align-items: center;">
                 <div style="max-width: 55%;">
                   <h6 style="margin: 0 0 4px 0; font-size: 0.8125rem; font-weight: 700; color: #334155;">Declaración de Conformidad</h6>
-                  <p style="margin: 0; font-size: 0.7rem; color: #64748b; line-height: 1.4;">El colaborador abajo firmante certifica haber recibido los activos listados a su entera satisfacción y de la talla adecuada para su operación.</p>
+                  <p style="margin: 0; font-size: 0.7rem; color: #64748b; line-height: 1.4;">El colaborador abajo firmante certifica haber recibido las prendas y el EPP listados a su entera satisfacción y de la talla adecuada para su operación.</p>
                 </div>
                 <div style="text-align: center; border-left: 1px solid #e2e8f0; padding-left: 24px; min-width: 180px;">
                   <div style="height: 80px; margin-bottom: 6px;">
@@ -1743,7 +1743,7 @@
         <!-- Report Footer -->
         <div style="margin-top: 60px; border-top: 1px solid #cbd5e1; padding-top: 20px; display: flex; justify-content: space-between; align-items: center;">
           <span style="font-size: 0.7rem; color: #94a3b8; font-weight: 600;">dotacian - Sistema Inteligente de Dotación</span>
-          <span style="font-size: 0.7rem; color: #94a3b8; font-weight: 600; text-transform: uppercase;">Soporte de Auditoría de Activos</span>
+          <span style="font-size: 0.7rem; color: #94a3b8; font-weight: 600; text-transform: uppercase;">Soporte de Auditoría de Dotación</span>
         </div>
       `;
 
@@ -2692,7 +2692,7 @@
       const meta = window._deliveryItemMeta[id];
       if (!meta) return;
 
-      const nameInput = row.querySelector('input[placeholder="Activo"]');
+      const nameInput = row.querySelector('input[placeholder="Prenda"]');
       const qtyInput = row.querySelector('input[type="number"]');
       const name = nameInput ? nameInput.value.trim() : meta.name;
       const qty = qtyInput ? (parseInt(qtyInput.value) || 1) : 1;
@@ -2955,7 +2955,7 @@
         doc.setTextColor(255, 255, 255);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(8);
-        doc.text('ACTIVO', cols.name, y + 5.5);
+        doc.text('PRENDA', cols.name, y + 5.5);
         doc.text('ESPECIFICACIONES', cols.specs, y + 5.5);
         doc.text('CANT.', cols.qty, y + 5.5);
         doc.text('PROVEEDOR(ES)', cols.prov, y + 5.5);
@@ -2971,7 +2971,7 @@
 
         const provText = item.providers.length > 0
           ? item.providers.map(p => `${p.nombre}${p.correo ? ' (' + p.correo + ')' : ''}`).join(', ')
-          : (item.hasAsset ? 'Sin proveedores registrados' : 'Sin vincular en Activos');
+          : (item.hasAsset ? 'Sin proveedores registrados' : 'Sin vincular en Uniformes');
 
         const nameLines = doc.splitTextToSize(item.name, 46);
         const specsLines = doc.splitTextToSize(specsText, 62);
@@ -3016,7 +3016,7 @@
     }
 
     function updateRowStockBadge(row) {
-      const nameInput = row.querySelector('input[placeholder="Activo"]');
+      const nameInput = row.querySelector('input[placeholder="Prenda"]');
       const sizeInput = row.querySelector('input[placeholder="Talla"]');
       const badgeContainer = row.querySelector('.stock-badge-container');
       if (!nameInput || !badgeContainer) return;
@@ -3082,7 +3082,7 @@
         const checked = checkbox ? checkbox.checked : false;
         if (!checked) return;
 
-        const nameInput = row.querySelector('input[placeholder="Activo"]');
+        const nameInput = row.querySelector('input[placeholder="Prenda"]');
         const sizeInput = row.querySelector('input[placeholder="Talla"]');
         const qtyInput = row.querySelector('input[type="number"]');
 
@@ -3132,7 +3132,7 @@
         // — los que no, requieren que el usuario los revise a propósito
         // ("Detalle"/"Cotizar con Dot") en vez de bloquear "Entrega" por
         // sorpresa con algo que nunca se pudo entregar.
-        const nameInput = row.querySelector('input[placeholder="Activo"]');
+        const nameInput = row.querySelector('input[placeholder="Prenda"]');
         const sizeInput = row.querySelector('input[placeholder="Talla"]');
         const checkbox = row.querySelector('input[type="checkbox"]');
         if (nameInput && checkbox) {
@@ -3182,7 +3182,7 @@
         <div style="width:100%; margin-top:0.5rem; padding-top:0.5rem; border-top:1px dashed #e2e8f0;">
           <button type="button" onclick="toggleSimilarPicker(this)"
             style="font-size:0.75rem; font-weight:700; color:#0891B2; background:#ecfeff; border:1px solid #a5f3fc; border-radius:8px; padding:0.3rem 0.65rem; cursor:pointer;">
-            Ver otros lotes disponibles de este activo
+            Ver otros lotes disponibles de esta prenda
           </button>
           <div class="similar-picker" style="display:none; margin-top:0.4rem; flex-wrap:wrap; gap:0.4rem;">
             ${alternativeLots.map(lot => `
@@ -3235,7 +3235,7 @@
       const meta = window._deliveryItemMeta[id];
       if (!meta) return;
 
-      const nameInput = row.querySelector('input[placeholder="Activo"]');
+      const nameInput = row.querySelector('input[placeholder="Prenda"]');
       const name = nameInput ? nameInput.value.trim() : meta.name;
       const existingSizeInput = row.querySelector('.delivery-item-detail input[placeholder="Talla"]');
       const size = existingSizeInput ? existingSizeInput.value.trim() : meta.size;
@@ -3300,14 +3300,14 @@
             ${editableName ? `
             <input type="text" value="${name}"
               style="width:100%; font-size:0.875rem; font-weight:600; color:#0f172a; border:none; background:transparent; outline:none; padding:0;"
-              placeholder="Activo"
+              placeholder="Prenda"
               oninput="updateRowStockBadge(this.closest('[data-delivery-item-id]'))"
               onfocus="this.style.background='#f0f9ff'; this.style.borderRadius='6px'; this.style.padding='2px 6px';"
               onblur="this.style.background='transparent'; this.style.padding='0';">
             ` : `
             <input type="text" value="${name}" readonly
               style="width:100%; font-size:0.875rem; font-weight:600; color:#0f172a; border:none; background:transparent; outline:none; padding:0; cursor:default;"
-              placeholder="Activo">
+              placeholder="Prenda">
             `}
           </div>
 
@@ -3345,7 +3345,7 @@
         </div>
         ${detailHtml}
         <div class="delivery-shortage-actions" style="display:${stock > 0 ? 'none' : 'flex'}; margin-top:0.65rem; padding-top:0.65rem; border-top:1px dashed #fecaca; padding-left:2.9rem; align-items:center; flex-wrap:wrap; gap:0.5rem;">
-          <span style="font-size:0.75rem; color:#ef4444; font-weight:600;">Sin stock de este activo. Revisa "Detalle" para ver opciones similares o cotizar.</span>
+          <span style="font-size:0.75rem; color:#ef4444; font-weight:600;">Sin stock de esta prenda. Revisa "Detalle" para ver opciones similares o cotizar.</span>
           <button type="button" onclick="cotizarActivoFaltante(this)"
             style="font-size:0.75rem; font-weight:700; color:white; background:#0f172a; border:none; border-radius:8px; padding:0.3rem 0.65rem; cursor:pointer;">
             Cotizar con Dot
@@ -3372,7 +3372,7 @@
       }
 
       section.style.display = '';
-      list.innerHTML = '<span style="color: var(--color-text-muted); font-size: 0.875rem;">Cargando activos digitales...</span>';
+      list.innerHTML = '<span style="color: var(--color-text-muted); font-size: 0.875rem;">Cargando accesos digitales...</span>';
 
       try {
         const { data: sessionData } = await _supabase.auth.getSession();
@@ -3417,7 +3417,7 @@
         });
       } catch (err) {
         console.error('Error cargando activos digitales:', err);
-        list.innerHTML = '<span style="color: var(--color-coral); font-size: 0.8125rem;">No se pudieron cargar los activos digitales.</span>';
+        list.innerHTML = '<span style="color: var(--color-coral); font-size: 0.8125rem;">No se pudieron cargar los accesos digitales.</span>';
       }
     }
 
@@ -3462,7 +3462,7 @@
         }
       } else if (!contactoEmail) {
         statusBadge = '<span style="font-size:0.7rem; font-weight:700; color:#b45309; background:#fef3c7; padding:3px 10px; border-radius:12px;">Sin contacto configurado</span>';
-        actionHtml = `<span style="font-size:0.75rem; color:var(--color-text-muted);">Configura el contacto en Activos</span>`;
+        actionHtml = `<span style="font-size:0.75rem; color:var(--color-text-muted);">Sin contacto de activación</span>`;
       } else if (status === 'activado') {
         statusBadge = `<span style="font-size:0.7rem; font-weight:700; color:#065f46; background:#d1fae5; padding:3px 10px; border-radius:12px;">Activado${statusRow.activado_at ? ' · ' + fmtDate(statusRow.activado_at) : ''}</span>`;
         actionHtml = `<button type="button" class="btn btn-outline" style="padding:0.4rem 0.9rem; font-size:0.75rem;" onclick="requestDigitalAssetActivation('${employeeId}', '${escapeAttr(employeeName)}', '${escapeAttr(tipo)}', '${escapeAttr(nombre)}', '${escapeAttr(contactoEmail)}')">Reenviar solicitud</button>`;
@@ -3491,7 +3491,7 @@
 
     async function requestDigitalAssetActivation(employeeId, employeeName, tipo, nombre, contactoEmail) {
       const subject = `Solicitud de activación: ${nombre} para ${employeeName}`;
-      const body = `Hola,\n\nSe asignó el activo digital "${nombre}" al empleado ${employeeName}. Por favor crea el acceso correspondiente cuando puedas.\n\nGracias.`;
+      const body = `Hola,\n\nSe asignó el acceso digital "${nombre}" al empleado ${employeeName}. Por favor crea el acceso correspondiente cuando puedas.\n\nGracias.`;
       const mailtoUrl = `mailto:${encodeURIComponent(contactoEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
       window.location.href = mailtoUrl;
 
@@ -3543,7 +3543,7 @@
 
         const employeeName = document.getElementById('detailName') ? document.getElementById('detailName').textContent : '';
         refreshDigitalAssetRow(employeeId, employeeName, tipo, nombre, data);
-        if (window.showToast) showToast('Activo actualizado', `${nombre} quedó marcado como activado.`);
+        if (window.showToast) showToast('Acceso actualizado', `${nombre} quedó marcado como activado.`);
       } catch (err) {
         console.error('Error marcando activo digital como activado:', err);
         if (window.showToast) showToast('Error', 'No se pudo actualizar el estado.', 'error');
@@ -3705,7 +3705,7 @@
       const list = document.getElementById('deliveryItemsList');
       const row = buildDeliveryRow('', 1, '', '', _customDeliveryItemId++, null, true, true);
       list.appendChild(row);
-      const input = row.querySelector('input[placeholder="Activo"]');
+      const input = row.querySelector('input[placeholder="Prenda"]');
       if (input) {
         input.focus();
         input.style.background = '#f0f9ff';
@@ -3734,7 +3734,7 @@
           return;
         }
 
-        const nameInput = row.querySelector('input[placeholder="Activo"]');
+        const nameInput = row.querySelector('input[placeholder="Prenda"]');
         const sizeInput = row.querySelector('input[placeholder="Talla"]');
         const qtyInput = row.querySelector('input[type="number"]');
 
@@ -3767,7 +3767,7 @@
       });
 
       if (itemsToDeliver.length === 0) {
-        showNotification("Debes seleccionar o ingresar al menos un activo válido para la entrega.", "error");
+        showNotification("Debes seleccionar o ingresar al menos una prenda válida para la entrega.", "error");
         return;
       }
 
@@ -3790,7 +3790,7 @@
         const errMsg = `
           <div style="display: flex; flex-direction: column; gap: 0.5rem; text-align: left; width: 320px; font-family: 'Inter', sans-serif;">
             <div style="font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 2px;">Sin Stock Disponible</div>
-            <div style="font-size: 0.75rem; color: #64748b; line-height: 1.4; margin-bottom: 4px;">No se permite registrar la entrega de activos sin existencias físicas en bodega. Ajusta las cantidades:</div>
+            <div style="font-size: 0.75rem; color: #64748b; line-height: 1.4; margin-bottom: 4px;">No se permite registrar la entrega de prendas sin existencias físicas en bodega. Ajusta las cantidades:</div>
             <div style="display: flex; flex-direction: column; gap: 0.4rem; width: 100%;">
               ${listHtml}
             </div>
