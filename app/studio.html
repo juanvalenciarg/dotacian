@@ -541,6 +541,228 @@
       color: #EF4444;
     }
 
+    .studio-input {
+      width: 100%;
+      padding: 0.65rem 0.8rem;
+      border: 1px solid var(--color-border);
+      border-radius: 0.7rem;
+      font-family: inherit;
+      font-size: 0.875rem;
+      color: var(--color-navy);
+      background: white;
+    }
+
+    .studio-input:focus {
+      outline: none;
+      border-color: var(--color-cyan);
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+    }
+
+    .studio-save-btn {
+      width: 100%;
+      margin-top: 0.75rem;
+    }
+
+    .studio-save-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .studio-save-secondary {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 0.4rem;
+    }
+
+    .studio-link-btn {
+      border: none;
+      background: none;
+      padding: 0.25rem;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #0891B2;
+      cursor: pointer;
+    }
+
+    .studio-link-btn:hover {
+      text-decoration: underline;
+    }
+
+    .studio-link-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .studio-save-msg {
+      margin: 0.6rem 0 0;
+      font-size: 0.78rem;
+      color: #64748B;
+      text-align: center;
+    }
+
+    .studio-save-msg.error {
+      color: #EF4444;
+    }
+
+    .studio-designs {
+      margin-top: 2.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .studio-designs [hidden] {
+      display: none !important;
+    }
+
+    .studio-designs-head {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 1rem;
+    }
+
+    .studio-designs-head h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: var(--color-navy);
+    }
+
+    .studio-designs-count {
+      background: var(--color-cyan-dim, #E0F7FA);
+      color: var(--color-cyan);
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+    }
+
+    .studio-designs-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    .studio-designs-empty {
+      grid-column: 1 / -1;
+      padding: 2rem;
+      text-align: center;
+      color: #64748B;
+      font-size: 0.9rem;
+      background: white;
+      border: 1px dashed #CBD5E1;
+      border-radius: 1.25rem;
+    }
+
+    .studio-designs-empty.error {
+      color: #EF4444;
+    }
+
+    .studio-design-card {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.85rem;
+      background: white;
+      border: 1.5px solid var(--color-border);
+      border-radius: 1.1rem;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .studio-design-card:hover {
+      border-color: #94A3B8;
+      box-shadow: 0 6px 18px -10px rgba(15, 23, 42, 0.25);
+    }
+
+    .studio-design-card.active {
+      border-color: var(--color-cyan);
+      background: #F0FDFF;
+    }
+
+    .studio-design-preview {
+      width: 56px;
+      height: 56px;
+      flex-shrink: 0;
+      border-radius: 0.9rem;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .studio-design-logo {
+      max-width: 70%;
+      max-height: 70%;
+      object-fit: contain;
+    }
+
+    .studio-design-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .studio-design-name {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--color-navy);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .studio-design-meta,
+    .studio-design-date {
+      font-size: 0.75rem;
+      color: #64748B;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .studio-design-date {
+      color: #94A3B8;
+    }
+
+    .studio-design-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.35rem;
+    }
+
+    .studio-design-open {
+      border: 1px solid var(--color-border);
+      background: white;
+      border-radius: 999px;
+      padding: 0.3rem 0.75rem;
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-navy);
+      cursor: pointer;
+    }
+
+    .studio-design-card.active .studio-design-open {
+      border-color: var(--color-cyan);
+      color: #0891B2;
+    }
+
+    .studio-design-delete {
+      border: none;
+      background: none;
+      color: #94A3B8;
+      cursor: pointer;
+      padding: 0.2rem;
+      border-radius: 0.4rem;
+    }
+
+    .studio-design-delete:hover {
+      color: #EF4444;
+      background: #FEF2F2;
+    }
+
     .studio-summary {
       display: flex;
       flex-direction: column;
@@ -801,8 +1023,31 @@
                 <div><span>Logo</span><span id="studioSummaryLogo">Sin logo</span></div>
               </div>
             </div>
+
+            <div class="studio-card">
+              <div class="studio-card-label">Guardar diseño</div>
+              <label class="studio-field-label" for="studioDesignName" style="margin-top: 0;"><span>Nombre del diseño</span></label>
+              <input type="text" id="studioDesignName" class="studio-input" maxlength="80" placeholder="Ej. Camisa recepción azul" autocomplete="off">
+              <button type="button" class="btn btn-primary studio-save-btn" id="studioSaveBtn">Guardar diseño</button>
+              <div class="studio-save-secondary">
+                <button type="button" class="studio-link-btn" id="studioSaveAsNewBtn" hidden>Guardar como nuevo</button>
+                <button type="button" class="studio-link-btn" id="studioNewDesignBtn" hidden>Empezar uno nuevo</button>
+              </div>
+              <p class="studio-save-msg" id="studioSaveMsg" hidden></p>
+            </div>
           </aside>
         </div>
+
+        <!-- Diseños guardados de la empresa -->
+        <section class="studio-designs" aria-labelledby="studioDesignsTitle">
+          <div class="studio-designs-head">
+            <h2 id="studioDesignsTitle">Diseños guardados</h2>
+            <span class="studio-designs-count" id="studioDesignsCount">0</span>
+          </div>
+          <div class="studio-designs-list" id="studioDesignsList">
+            <div class="studio-designs-empty">Cargando diseños…</div>
+          </div>
+        </section>
       </div>
     </main>
   </div>
@@ -1817,7 +2062,9 @@
       // --- Logo ---
       // La imagen se procesa solo en el navegador: se dibuja en un canvas y se
       // proyecta sobre el torso con un "decal" que sigue la curvatura de la tela.
-      const logoState = { texture: null, aspect: 1, placement: 'pechoIzq', sizeCm: GARMENTS.camiseta.logoPlacements.pechoIzq.defaultCm, name: '' };
+      // file: archivo original (para subirlo al guardar); storedPath: ruta en el
+      // bucket studio-logos si este logo ya está guardado.
+      const logoState = { texture: null, aspect: 1, placement: 'pechoIzq', sizeCm: GARMENTS.camiseta.logoPlacements.pechoIzq.defaultCm, name: '', file: null, storedPath: null };
       const logoMaterial = new THREE.MeshStandardMaterial({
         transparent: true,
         depthWrite: false,
@@ -1896,16 +2143,18 @@
         });
       }
 
-      function loadLogoFile(file) {
+      // opts (al abrir un diseño guardado): placement, sizeCm, storedPath, silent.
+      function loadLogoFile(file, opts = {}) {
+        return new Promise(resolve => {
         showLogoError('');
-        if (!file) return;
+        if (!file) return resolve(false);
         if (!/^image\/(png|jpeg|svg\+xml|webp)$/.test(file.type)) {
           showLogoError('Formato no compatible. Usa PNG, JPG, SVG o WEBP.');
-          return;
+          return resolve(false);
         }
         if (file.size > MAX_LOGO_BYTES) {
           showLogoError('El archivo pesa más de 5 MB.');
-          return;
+          return resolve(false);
         }
 
         const url = URL.createObjectURL(file);
@@ -1927,6 +2176,16 @@
           logoState.texture = tex;
           logoState.aspect = canvas.width / canvas.height;
           logoState.name = file.name;
+          logoState.file = file;
+          logoState.storedPath = opts.storedPath || null;
+          const spots = GARMENTS[garment.key].logoPlacements;
+          if (opts.placement && spots[opts.placement]) {
+            logoState.placement = opts.placement;
+            logoState.sizeCm = opts.sizeCm || spots[opts.placement].defaultCm;
+            logoSize.value = logoState.sizeCm;
+            logoSizeLabel.textContent = `${logoState.sizeCm} cm`;
+            syncPlacementButtons();
+          }
           logoMaterial.map = tex;
           logoMaterial.needsUpdate = true;
 
@@ -1938,13 +2197,16 @@
 
           placeLogo();
           updateLogoSummary();
-          goToView(LOGO_PLACEMENTS[logoState.placement].side === 'front' ? 'front' : 'back');
+          if (!opts.silent) goToView(LOGO_PLACEMENTS[logoState.placement].side === 'front' ? 'front' : 'back');
+          resolve(true);
         };
         img.onerror = () => {
           URL.revokeObjectURL(url);
           showLogoError('No pudimos leer la imagen. Prueba con otro archivo.');
+          resolve(false);
         };
         img.src = url;
+        });
       }
 
       function removeLogo() {
@@ -1953,6 +2215,8 @@
         thumb.removeAttribute('src');
         if (logoState.texture) logoState.texture.dispose();
         logoState.texture = null;
+        logoState.file = null;
+        logoState.storedPath = null;
         logoMaterial.map = null;
         placeLogo();
         logoInput.value = '';
@@ -2040,6 +2304,316 @@
         btn.addEventListener('click', () => setGarment(btn.dataset.garment));
       });
       syncPlacementButtons();
+
+      // --- Diseños guardados ---
+      // Cada diseño (prenda, color y logo) se guarda en la tabla studio_designs
+      // y el archivo del logo en el bucket privado studio-logos/<company_id>/.
+      const DESIGNS_TABLE = 'studio_designs';
+      const LOGOS_BUCKET = 'studio-logos';
+      const designNameInput = document.getElementById('studioDesignName');
+      const saveBtn = document.getElementById('studioSaveBtn');
+      const saveAsNewBtn = document.getElementById('studioSaveAsNewBtn');
+      const newDesignBtn = document.getElementById('studioNewDesignBtn');
+      const saveMsg = document.getElementById('studioSaveMsg');
+      const designsList = document.getElementById('studioDesignsList');
+      const designsCount = document.getElementById('studioDesignsCount');
+
+      let companyId = null;
+      let currentDesign = null; // fila de studio_designs abierta en el editor
+      let designs = [];
+      let saving = false;
+
+      function setSaveMsg(text, isError = false) {
+        saveMsg.textContent = text;
+        saveMsg.classList.toggle('error', isError);
+        saveMsg.hidden = !text;
+      }
+
+      function currentColorKey() {
+        const active = document.querySelector('#studioSwatches .studio-swatch.active');
+        return active ? active.dataset.color : 'blanco';
+      }
+
+      function escapeHtml(str) {
+        return String(str == null ? '' : str)
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      }
+
+      function friendlyError(err) {
+        const msg = (err && (err.message || err.error || '')) + '';
+        if (/relation .*studio_designs.* does not exist|Could not find the table/i.test(msg)) {
+          return 'Falta activar el guardado de diseños en la base de datos.';
+        }
+        if (/Bucket not found/i.test(msg)) {
+          return 'Falta crear el espacio para guardar logos (studio-logos).';
+        }
+        return 'No se pudo completar la acción. Intenta de nuevo.';
+      }
+
+      function refreshSaveButtons() {
+        saveBtn.textContent = currentDesign ? 'Guardar cambios' : 'Guardar diseño';
+        saveAsNewBtn.hidden = !currentDesign;
+        newDesignBtn.hidden = !currentDesign;
+        saveBtn.disabled = saving || !companyId;
+        saveAsNewBtn.disabled = saving || !companyId;
+      }
+
+      async function ensureCompany() {
+        if (companyId) return companyId;
+        if (!window._supabase) return null;
+        const { data } = await window._supabase.auth.getSession();
+        const userId = data && data.session && data.session.user && data.session.user.id;
+        if (!userId) return null;
+        companyId = await resolveCompanyId(window._supabase, userId);
+        return companyId;
+      }
+
+      function logoExtension(file) {
+        const byType = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/svg+xml': 'svg', 'image/webp': 'webp' };
+        return byType[file.type] || 'png';
+      }
+
+      async function uploadLogo(file) {
+        const path = `${companyId}/${crypto.randomUUID()}.${logoExtension(file)}`;
+        const { error } = await window._supabase.storage.from(LOGOS_BUCKET)
+          .upload(path, file, { contentType: file.type, upsert: false });
+        if (error) throw error;
+        return path;
+      }
+
+      async function removeStoredLogo(path) {
+        if (!path) return;
+        const { error } = await window._supabase.storage.from(LOGOS_BUCKET).remove([path]);
+        if (error) console.warn('No se pudo borrar el logo anterior:', error);
+      }
+
+      async function saveDesign(asNew) {
+        const nombre = designNameInput.value.trim();
+        if (!nombre) {
+          setSaveMsg('Ponle un nombre al diseño para guardarlo.', true);
+          designNameInput.focus();
+          return;
+        }
+        if (!(await ensureCompany())) {
+          setSaveMsg('Inicia sesión para guardar diseños.', true);
+          return;
+        }
+
+        saving = true;
+        refreshSaveButtons();
+        setSaveMsg('Guardando…');
+        const updating = !!currentDesign && !asNew;
+        const previousPath = updating ? currentDesign.logo_path : null;
+        let uploadedPath = null;
+        try {
+          // Se sube el logo si es nuevo o si se guarda como un diseño aparte
+          // (cada diseño tiene su propio archivo para poder borrarlo sin afectar a otros).
+          let logoPath = null;
+          if (logoState.file) {
+            const reuse = updating && logoState.storedPath && logoState.storedPath === previousPath;
+            if (reuse) {
+              logoPath = previousPath;
+            } else {
+              uploadedPath = await uploadLogo(logoState.file);
+              logoPath = uploadedPath;
+            }
+          }
+
+          const row = {
+            company_id: companyId,
+            nombre,
+            prenda: garment.key,
+            color: currentColorKey(),
+            logo_path: logoPath,
+            logo_nombre: logoState.file ? logoState.name : null,
+            logo_ubicacion: logoState.file ? logoState.placement : null,
+            logo_ancho_cm: logoState.file ? logoState.sizeCm : null,
+            updated_at: new Date().toISOString()
+          };
+
+          const query = updating
+            ? window._supabase.from(DESIGNS_TABLE).update(row).eq('id', currentDesign.id).select().single()
+            : window._supabase.from(DESIGNS_TABLE).insert(row).select().single();
+          const { data, error } = await query;
+          if (error) throw error;
+
+          // El archivo anterior ya no lo usa nadie.
+          if (updating && previousPath && previousPath !== logoPath) await removeStoredLogo(previousPath);
+
+          currentDesign = data;
+          logoState.storedPath = logoPath;
+          setSaveMsg('');
+          if (window.showToast) showToast('Diseño guardado', `"${nombre}" quedó guardado en tus diseños.`);
+          await loadDesigns();
+        } catch (err) {
+          console.error('Error guardando diseño:', err);
+          if (uploadedPath) await removeStoredLogo(uploadedPath);
+          setSaveMsg(friendlyError(err), true);
+        } finally {
+          saving = false;
+          refreshSaveButtons();
+        }
+      }
+
+      function designMeta(d) {
+        const g = GARMENTS[d.prenda];
+        const c = SHIRT_COLORS[d.color];
+        const parts = [g ? g.label : d.prenda, c ? c.label : d.color];
+        if (d.logo_path && LOGO_PLACEMENTS[d.logo_ubicacion]) parts.push(`Logo ${LOGO_PLACEMENTS[d.logo_ubicacion].label.toLowerCase()}`);
+        return parts.join(' · ');
+      }
+
+      function formatDate(iso) {
+        try {
+          return new Date(iso).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
+        } catch (e) {
+          return '';
+        }
+      }
+
+      async function renderDesigns() {
+        designsCount.textContent = designs.length;
+        if (!companyId) {
+          designsList.innerHTML = '<div class="studio-designs-empty">Inicia sesión para ver y guardar los diseños de tu empresa.</div>';
+          return;
+        }
+        if (designs.length === 0) {
+          designsList.innerHTML = '<div class="studio-designs-empty">Aún no has guardado diseños. Arma uno arriba, ponle nombre y guárdalo.</div>';
+          return;
+        }
+
+        // Miniaturas de los logos con enlaces temporales (el bucket es privado).
+        const paths = designs.map(d => d.logo_path).filter(Boolean);
+        const thumbs = {};
+        if (paths.length) {
+          const { data } = await window._supabase.storage.from(LOGOS_BUCKET).createSignedUrls(paths, 3600);
+          (data || []).forEach(item => { if (item.signedUrl) thumbs[item.path] = item.signedUrl; });
+        }
+
+        designsList.innerHTML = designs.map(d => {
+          const c = SHIRT_COLORS[d.color];
+          const active = currentDesign && currentDesign.id === d.id;
+          const thumb = d.logo_path && thumbs[d.logo_path]
+            ? `<img src="${escapeHtml(thumbs[d.logo_path])}" alt="" class="studio-design-logo">`
+            : '';
+          return `
+            <div class="studio-design-card${active ? ' active' : ''}" data-id="${d.id}">
+              <div class="studio-design-preview" style="background: ${c ? c.hex : '#E2E8F0'};">${thumb}</div>
+              <div class="studio-design-info">
+                <div class="studio-design-name">${escapeHtml(d.nombre)}</div>
+                <div class="studio-design-meta">${escapeHtml(designMeta(d))}</div>
+                <div class="studio-design-date">Actualizado ${escapeHtml(formatDate(d.updated_at))}</div>
+              </div>
+              <div class="studio-design-actions">
+                <button type="button" class="studio-design-open" data-action="open">${active ? 'Abierto' : 'Abrir'}</button>
+                <button type="button" class="studio-design-delete" data-action="delete" title="Eliminar diseño" aria-label="Eliminar ${escapeHtml(d.nombre)}">
+                  <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      async function loadDesigns() {
+        if (!(await ensureCompany())) {
+          designs = [];
+          refreshSaveButtons();
+          return renderDesigns();
+        }
+        refreshSaveButtons();
+        const { data, error } = await window._supabase
+          .from(DESIGNS_TABLE)
+          .select('*')
+          .eq('company_id', companyId)
+          .order('updated_at', { ascending: false });
+        if (error) {
+          console.error('Error cargando diseños:', error);
+          designs = [];
+          designsCount.textContent = '0';
+          designsList.innerHTML = `<div class="studio-designs-empty error">${escapeHtml(friendlyError(error))}</div>`;
+          return;
+        }
+        designs = data || [];
+        await renderDesigns();
+      }
+
+      async function openDesign(d) {
+        setSaveMsg('Abriendo diseño…');
+        setGarment(d.prenda);
+        const swatch = document.querySelector(`#studioSwatches .studio-swatch[data-color="${d.color}"]`);
+        if (swatch) swatch.click();
+        removeLogo();
+        if (d.logo_path) {
+          const { data, error } = await window._supabase.storage.from(LOGOS_BUCKET).download(d.logo_path);
+          if (error || !data) {
+            console.error('Error descargando logo:', error);
+            setSaveMsg('El diseño se abrió, pero no pudimos cargar su logo.', true);
+          } else {
+            const file = new File([data], d.logo_nombre || 'logo', { type: data.type });
+            await loadLogoFile(file, { placement: d.logo_ubicacion, sizeCm: d.logo_ancho_cm, storedPath: d.logo_path, silent: true });
+            setSaveMsg('');
+          }
+        } else {
+          setSaveMsg('');
+        }
+        currentDesign = d;
+        designNameInput.value = d.nombre;
+        refreshSaveButtons();
+        renderDesigns();
+        goToView('front');
+        viewer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      async function deleteDesign(d) {
+        if (!confirm(`¿Eliminar el diseño "${d.nombre}"? Esta acción no se puede deshacer.`)) return;
+        const { error } = await window._supabase.from(DESIGNS_TABLE).delete().eq('id', d.id);
+        if (error) {
+          console.error('Error eliminando diseño:', error);
+          if (window.showToast) showToast('Error', friendlyError(error), 'error');
+          return;
+        }
+        await removeStoredLogo(d.logo_path);
+        if (currentDesign && currentDesign.id === d.id) {
+          currentDesign = null;
+          // El logo sigue en el editor, pero su archivo guardado ya no existe.
+          logoState.storedPath = null;
+          refreshSaveButtons();
+        }
+        if (window.showToast) showToast('Diseño eliminado', `"${d.nombre}" se eliminó.`);
+        await loadDesigns();
+      }
+
+      function startNewDesign() {
+        currentDesign = null;
+        logoState.storedPath = null;
+        designNameInput.value = '';
+        setSaveMsg('');
+        refreshSaveButtons();
+        renderDesigns();
+        designNameInput.focus();
+      }
+
+      saveBtn.addEventListener('click', () => saveDesign(false));
+      saveAsNewBtn.addEventListener('click', () => saveDesign(true));
+      newDesignBtn.addEventListener('click', startNewDesign);
+      designNameInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') saveDesign(false);
+      });
+      designNameInput.addEventListener('input', () => setSaveMsg(''));
+      designsList.addEventListener('click', e => {
+        const btn = e.target.closest('button[data-action]');
+        const card = e.target.closest('.studio-design-card');
+        if (!card) return;
+        const d = designs.find(x => x.id === card.dataset.id);
+        if (!d) return;
+        if (btn && btn.dataset.action === 'delete') deleteDesign(d);
+        else openDesign(d);
+      });
+
+      refreshSaveButtons();
+      loadDesigns();
 
       window.dotacianStudio = { scene, camera, controls, shirt, fabric, logoState, setGarment, garment };
     }
