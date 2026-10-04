@@ -517,11 +517,6 @@
       transition: border-color 0.2s, background 0.2s, color 0.2s;
     }
 
-    .studio-placement:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
     .studio-placement.active {
       border-color: var(--color-cyan);
       background: #F0FDFF;
@@ -745,6 +740,15 @@
                     <span class="studio-garment-meta">Cuello camisero · Botones · Bolsillo</span>
                   </span>
                 </button>
+                <button type="button" class="studio-garment studio-garment-option" data-garment="hoodie" aria-pressed="false">
+                  <span class="studio-garment-icon">
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M8 5.5C8 3 10 2 12 2s4 1 4 3.5"></path><path d="M8 5.5 4 7.5 2.5 21h4L8 10v12h8V10l1.5 11h4L20 7.5l-4-2"></path><path d="M10.5 7v3"></path><path d="M13.5 7v3"></path><path d="M9 16h6l1 4H8z"></path></svg>
+                  </span>
+                  <span>
+                    <span class="studio-garment-name">Hoodie</span>
+                    <span class="studio-garment-meta">Capucha · Bolsillo canguro · Puños en rib</span>
+                  </span>
+                </button>
               </div>
               <div class="studio-soon">
                 <span>Polo · pronto</span>
@@ -779,11 +783,7 @@
 
               <div id="studioLogoControls" hidden>
                 <div class="studio-field-label"><span>Ubicación</span></div>
-                <div class="studio-placements" role="group" aria-label="Ubicación del logo">
-                  <button type="button" class="studio-placement active" data-placement="pechoIzq">Pecho izq.</button>
-                  <button type="button" class="studio-placement" data-placement="pechoCentro">Centro</button>
-                  <button type="button" class="studio-placement" data-placement="espalda">Espalda</button>
-                </div>
+                <div class="studio-placements" id="studioPlacements" role="group" aria-label="Ubicación del logo"></div>
                 <div class="studio-field-label"><span>Ancho del logo</span><span id="studioLogoSizeLabel">9 cm</span></div>
                 <input type="range" class="studio-range" id="studioLogoSize" min="5" max="30" step="1" value="9">
               </div>
@@ -843,9 +843,10 @@
     // cada una dependen de la prenda (ver logoPlacements en GARMENTS).
     // El pecho izquierdo es el de quien la usa (a la derecha vista de frente).
     const LOGO_PLACEMENTS = {
-      pechoIzq: { label: 'Pecho izquierdo', side: 'front' },
-      pechoCentro: { label: 'Centro del pecho', side: 'front' },
-      espalda: { label: 'Espalda', side: 'back' }
+      pechoIzq: { label: 'Pecho izquierdo', short: 'Pecho izq.', side: 'front' },
+      pechoDer: { label: 'Pecho derecho', short: 'Pecho der.', side: 'front' },
+      pechoCentro: { label: 'Centro del pecho', short: 'Centro', side: 'front' },
+      espalda: { label: 'Espalda', short: 'Espalda', side: 'back' }
     };
 
     // Ancho del torso modelado (≈0.68 unidades) equivale a ~52 cm de una talla M.
@@ -916,6 +917,7 @@
         placket: false,
         pocket: null,
         groundY: -0.80,
+        defaultPlacement: 'pechoIzq',
         logoPlacements: {
           pechoIzq: { x: 0.15, y: 0.17, defaultCm: 9 },
           pechoCentro: { x: 0, y: 0.1, defaultCm: 22 },
@@ -959,9 +961,58 @@
         placket: { halfWidth: 0.021, buttons: 7, spacing: 0.108 },
         pocket: { x0: 0.078, x1: 0.205, yTop: 0.165, yBottom: 0.02 },
         groundY: -0.86,
+        // En la camisa el logo va en el pecho derecho, al lado opuesto del bolsillo.
+        defaultPlacement: 'pechoDer',
         logoPlacements: {
-          pechoIzq: { x: 0.1415, y: 0.095, defaultCm: 7 },
+          pechoDer: { x: -0.1415, y: 0.095, defaultCm: 7 },
           espalda: { x: 0, y: 0.06, defaultCm: 26 }
+        }
+      },
+
+      hoodie: {
+        label: 'Hoodie',
+        meta: 'Capucha · Bolsillo canguro · Puños en rib',
+        summary: { cuello: 'Capucha con cordones', manga: 'Larga con puño en rib', bolsillo: 'Canguro' },
+        profile: [
+          { y: -0.70, a: 0.350, b: 0.182, n: 2.5 },
+          { y: -0.45, a: 0.353, b: 0.180, n: 2.5 },
+          { y: -0.15, a: 0.356, b: 0.184, n: 2.5 },
+          { y: 0.08, a: 0.363, b: 0.194, n: 2.4 },
+          { y: 0.22, a: 0.366, b: 0.192, n: 2.3 },
+          { y: 0.31, a: 0.332, b: 0.172, n: 2.2 },
+          { y: 0.37, a: 0.258, b: 0.147, n: 2.1 },
+          { y: 0.405, a: 0.188, b: 0.130, n: 2.0 },
+          { y: 0.420, a: 0.152, b: 0.122, n: 2.0 }
+        ],
+        neckStart: 5,
+        neckDip: 0.04,
+        hemCurve: 0,
+        waistFold: 0.0045,
+        sleeve: {
+          angleStart: deg(52),
+          angleEnd: deg(83),
+          length: 0.80,
+          hemTilt: 0,
+          forward: deg(9),
+          start: -0.2,
+          rBase: [0.170, 0.160],  // hombro caído y manga holgada
+          rEnd: [0.088, 0.082],
+          flare: false,
+          shoulder: new THREE.Vector3(0.348, 0.312, 0),
+          cuff: { length: 0.085, scale: 0.8, rib: true }
+        },
+        collar: 'hood',
+        placket: false,
+        pocket: null,
+        kangaroo: { yTop: -0.27, yBottom: -0.64, topHalf: 0.165, bottomHalf: 0.255 },
+        waistband: { height: 0.075, scale: 0.93 },
+        drawstrings: true,
+        groundY: -0.86,
+        defaultPlacement: 'pechoCentro',
+        logoPlacements: {
+          pechoCentro: { x: 0, y: -0.03, defaultCm: 18 },
+          pechoIzq: { x: 0.15, y: 0.14, defaultCm: 9 },
+          espalda: { x: 0, y: -0.06, defaultCm: 26 }
         }
       }
     };
@@ -1284,9 +1335,133 @@
       return { pocket: geo, details: [buildRim(border, 0.0026), buildRim(hemLine, 0.0015, false)] };
     }
 
+    // --- Hoodie: capucha caída, cordones, bolsillo canguro y pretina ---
+
+    // La capucha caída se modela como un "rollo" de tela alrededor del cuello:
+    // delgado al frente y amplio en la espalda, donde cae sobre los hombros.
+    function hoodPoint(cfg, u, phi) {
+      const base = torsoPoint(cfg, 1, u);
+      const angle = u * Math.PI * 2;
+      const backW = Math.pow(Math.max(0, -Math.sin(angle)), 1.4);
+      const sideW = Math.abs(Math.cos(angle));
+      const radial = new THREE.Vector3(base.x, 0, base.z).normalize();
+      const rh = 0.034 + 0.042 * backW + 0.012 * sideW;
+      const rv = 0.032 + 0.15 * backW + 0.02 * sideW;
+      const center = base.clone().addScaledVector(radial, rh * 0.8);
+      // El borde superior queda apenas sobre el cuello; en la espalda la
+      // capucha cuelga hacia abajo en lugar de levantarse.
+      const topAbove = 0.028 + 0.02 * (1 - backW);
+      center.y += topAbove - rv;
+      return center
+        .addScaledVector(radial, Math.cos(phi) * rh)
+        .add(new THREE.Vector3(0, Math.sin(phi) * rv, 0));
+    }
+
+    function buildHood(cfg) {
+      const hood = buildGrid(140, 40,
+        (v, u) => hoodPoint(cfg, v, u * Math.PI * 2),
+        (v, u) => ({ u: v * 2.4, v: u * 0.6 }));
+      // Costura central de la capucha (sobre la espalda).
+      const seam = [];
+      for (let i = 0; i <= 50; i++) seam.push(hoodPoint(cfg, 0.52 + (i / 50) * 0.46, Math.PI / 2));
+      return [hood, buildRim(seam, 0.0025, false)];
+    }
+
+    // Cordones que salen del frente de la capucha, con herretes en la punta.
+    function buildDrawstrings(cfg) {
+      const cords = [];
+      const tips = [];
+      [-1, 1].forEach(s => {
+        const start = hoodPoint(cfg, 0.25 + s * 0.04, -1.1);
+        const pts = [start];
+        const ys = [start.y - 0.05, 0.31, 0.24, 0.17, 0.12];
+        ys.forEach((y, k) => {
+          const x = start.x + -s * 0.004 * k;
+          const { point, normal } = frontPointAt(cfg, frontV(cfg, y), x);
+          pts.push(point.addScaledVector(normal, 0.012 + 0.002 * k));
+        });
+        const curve = new THREE.CatmullRomCurve3(pts);
+        cords.push(new THREE.TubeGeometry(curve, 60, 0.0055, 10, false));
+
+        const end = curve.getPoint(1);
+        const tangent = curve.getTangent(1).normalize();
+        const tip = new THREE.CylinderGeometry(0.0068, 0.0062, 0.032, 14);
+        tip.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), tangent));
+        tip.translate(end.x + tangent.x * 0.014, end.y + tangent.y * 0.014, end.z + tangent.z * 0.014);
+        tips.push(tip);
+
+        // Ojal por donde sale el cordón.
+        const eyelet = new THREE.TorusGeometry(0.009, 0.0025, 8, 20);
+        eyelet.lookAt(new THREE.Vector3(0, 0.3, 1));
+        eyelet.translate(start.x, start.y, start.z + 0.002);
+        tips.push(eyelet);
+      });
+      return { cords, tips };
+    }
+
+    // Bolsillo canguro: parche trapezoidal con las aberturas en los costados.
+    function buildKangarooPocket(cfg) {
+      const kp = cfg.kangaroo;
+      const offset = 0.006;
+      const rows = 36, cols = 40;
+      const vRows = [];
+      for (let i = 0; i <= rows; i++) vRows.push(frontV(cfg, THREE.MathUtils.lerp(kp.yBottom, kp.yTop, i / rows)));
+      const halfAt = (i) => {
+        const k = i / rows; // 0 abajo, 1 arriba
+        // Aberturas curvas: el borde lateral se mete hacia adentro al subir.
+        const curve = Math.sin(k * Math.PI / 2);
+        return THREE.MathUtils.lerp(kp.bottomHalf, kp.topHalf, curve);
+      };
+      const pointAt = (i, j) => {
+        const half = halfAt(i);
+        const x = THREE.MathUtils.lerp(-half, half, j / cols);
+        const { point, normal } = frontPointAt(cfg, vRows[i], x);
+        return point.addScaledVector(normal, offset);
+      };
+      const geo = buildGrid(rows, cols, (v, u) => pointAt(Math.round(v * rows), Math.round(u * cols)), (v, u) => ({ u: u * 0.6, v: v * 0.4 }));
+      const top = [], bottom = [], left = [], right = [];
+      for (let j = 0; j <= cols; j++) {
+        top.push(pointAt(rows, j));
+        bottom.push(pointAt(0, j));
+      }
+      for (let i = 0; i <= rows; i++) {
+        left.push(pointAt(i, 0));
+        right.push(pointAt(i, cols));
+      }
+      return {
+        pocket: geo,
+        details: [
+          buildRim(top, 0.0026, false),
+          buildRim(bottom, 0.0026, false),
+          buildRim(left, 0.0055, false),   // aberturas con dobladillo
+          buildRim(right, 0.0055, false)
+        ]
+      };
+    }
+
+    // Pretina en rib: banda que cierra el ruedo un poco más angosta que el torso.
+    function buildWaistband(cfg) {
+      const wb = cfg.waistband;
+      const bandPoint = (h, u) => {
+        const base = torsoPoint(cfg, 0, u);
+        const e = h * h * (3 - 2 * h);
+        const scale = THREE.MathUtils.lerp(0.995, wb.scale, e);
+        return new THREE.Vector3(base.x * scale, base.y - h * wb.height, base.z * scale);
+      };
+      const band = buildGrid(10, 160, (v, u) => bandPoint(v, u), (v, u) => ({ u: u * 2.2, v: v * 0.2 }));
+      const ring = (h, r) => {
+        const pts = [];
+        for (let j = 0; j < 96; j++) pts.push(bandPoint(h, j / 96));
+        return buildRim(pts, r);
+      };
+      return { band, rims: [ring(0, 0.003), ring(1, 0.006)] };
+    }
+
     // Arma todas las piezas de una prenda.
     function buildGarmentParts(cfg) {
       const fabricParts = [];
+      const ribParts = [];   // puños y pretina en tejido rib
+      const trimParts = [];  // herretes y ojales
       const buttonParts = [];
       const torso = buildTorso(cfg);
       fabricParts.push(torso);
@@ -1297,9 +1472,15 @@
         if (sl.cuff) {
           const cuffStart = 1 - sl.cuff.length / sl.length;
           fabricParts.push(buildSleeve(sl, axis, side, sl.start, cuffStart + 0.01, 1, 90));
-          fabricParts.push(buildSleeve(sl, axis, side, cuffStart, 1, sl.cuff.scale, 8));
+          const cuff = buildSleeve(sl, axis, side, cuffStart, 1, sl.cuff.scale, 8);
+          (sl.cuff.rib ? ribParts : fabricParts).push(cuff);
           fabricParts.push(buildRim(sleeveRing(sl, axis, side, cuffStart, sl.cuff.scale), 0.0035));
           fabricParts.push(buildRim(sleeveRing(sl, axis, side, 1, sl.cuff.scale), 0.0045));
+          if (sl.cuff.rib) {
+            // El puño en rib no lleva botón; la manga se recoge al entrar al puño.
+            fabricParts.push(buildRim(sleeveRing(sl, axis, side, cuffStart + 0.01, 1), 0.004));
+            return;
+          }
           // Botón del puño, del lado de afuera.
           const s = 1 - (sl.cuff.length * 0.5) / sl.length;
           const p = sleevePoint(sl, axis, side, s, 0, sl.cuff.scale + 0.06);
@@ -1315,10 +1496,25 @@
 
       if (cfg.collar === 'rib') {
         fabricParts.push(buildRim(torsoRing(cfg, 1, -0.004, 1.06), 0.016));
+      } else if (cfg.collar === 'hood') {
+        fabricParts.push(...buildHood(cfg));
       } else {
         fabricParts.push(...buildShirtCollar(cfg));
       }
-      fabricParts.push(buildRim(torsoRing(cfg, 0, 0.002, 1.004), cfg.hemCurve ? 0.004 : 0.0055));
+
+      if (cfg.waistband) {
+        const wb = buildWaistband(cfg);
+        ribParts.push(wb.band);
+        fabricParts.push(...wb.rims);
+      } else {
+        fabricParts.push(buildRim(torsoRing(cfg, 0, 0.002, 1.004), cfg.hemCurve ? 0.004 : 0.0055));
+      }
+
+      if (cfg.drawstrings) {
+        const ds = buildDrawstrings(cfg);
+        fabricParts.push(...ds.cords);
+        trimParts.push(...ds.tips);
+      }
 
       if (cfg.placket) {
         fabricParts.push(...buildPlacket(cfg));
@@ -1331,8 +1527,13 @@
         pocket = built.pocket;
         fabricParts.push(pocket, ...built.details);
       }
+      if (cfg.kangaroo) {
+        const built = buildKangarooPocket(cfg);
+        pocket = built.pocket;
+        fabricParts.push(pocket, ...built.details);
+      }
 
-      return { torso, pocket, fabricParts, buttonParts };
+      return { torso, pocket, fabricParts, ribParts, trimParts, buttonParts };
     }
 
     function buildButtonGeometry(radius) {
@@ -1340,6 +1541,30 @@
       const geo = new THREE.CylinderGeometry(radius, radius * 0.92, 0.0035, 24);
       geo.rotateX(Math.PI / 2);
       return geo;
+    }
+
+    // Textura de rib (acanalado vertical) para puños y pretina.
+    function buildRibTexture() {
+      const w = 256, h = 8;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      const img = ctx.createImageData(w, h);
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const val = 128 + Math.sin((x / w) * Math.PI * 2 * 32) * 110;
+          const idx = (y * w + x) * 4;
+          img.data[idx] = img.data[idx + 1] = img.data[idx + 2] = val;
+          img.data[idx + 3] = 255;
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(2, 1);
+      tex.anisotropy = 4;
+      return tex;
     }
 
     // Textura de tejido (punto jersey) generada en un canvas para el relieve.
@@ -1433,6 +1658,10 @@
         side: THREE.DoubleSide
       });
 
+      const ribMaterial = fabric.clone();
+      ribMaterial.bumpMap = buildRibTexture();
+      ribMaterial.bumpScale = 1.6;
+
       // Botones: mismo tono de la tela, un poco más oscuros y con brillo.
       const buttonMaterial = new THREE.MeshStandardMaterial({ roughness: 0.35, metalness: 0, envMapIntensity: 0.8 });
 
@@ -1460,6 +1689,17 @@
           if (geo === built.pocket) garment.pocketMesh = mesh;
         });
         if (!built.pocket) garment.pocketMesh = null;
+        built.ribParts.forEach(geo => {
+          const mesh = new THREE.Mesh(geo, ribMaterial);
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+          shirt.add(mesh);
+        });
+        built.trimParts.forEach(geo => {
+          const mesh = new THREE.Mesh(geo, buttonMaterial);
+          mesh.castShadow = true;
+          shirt.add(mesh);
+        });
         built.buttonParts.forEach(b => {
           const mesh = new THREE.Mesh(buildButtonGeometry(b.radius), buttonMaterial);
           mesh.position.copy(b.point);
@@ -1566,6 +1806,7 @@
         }
         fabric.color.lerp(targetColor, 0.12);
         buttonMaterial.color.copy(fabric.color).multiplyScalar(0.82);
+        ribMaterial.color.copy(fabric.color);
         controls.update();
         renderer.render(scene, camera);
         requestAnimationFrame(tick);
@@ -1736,21 +1977,20 @@
       }));
       logoDrop.addEventListener('drop', e => loadLogoFile(e.dataTransfer.files[0]));
 
-      document.querySelectorAll('.studio-placement').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const key = btn.dataset.placement;
-          if (!LOGO_PLACEMENTS[key]) return;
-          const spot = GARMENTS[garment.key].logoPlacements[key];
-          if (!spot) return;
-          logoState.placement = key;
-          logoState.sizeCm = spot.defaultCm;
-          logoSize.value = logoState.sizeCm;
-          logoSizeLabel.textContent = `${logoState.sizeCm} cm`;
-          document.querySelectorAll('.studio-placement').forEach(b => b.classList.toggle('active', b === btn));
-          placeLogo();
-          updateLogoSummary();
-          goToView(LOGO_PLACEMENTS[key].side === 'front' ? 'front' : 'back');
-        });
+      document.getElementById('studioPlacements').addEventListener('click', e => {
+        const btn = e.target.closest('.studio-placement');
+        if (!btn) return;
+        const key = btn.dataset.placement;
+        const spot = GARMENTS[garment.key].logoPlacements[key];
+        if (!spot) return;
+        logoState.placement = key;
+        logoState.sizeCm = spot.defaultCm;
+        logoSize.value = logoState.sizeCm;
+        logoSizeLabel.textContent = `${logoState.sizeCm} cm`;
+        syncPlacementButtons();
+        placeLogo();
+        updateLogoSummary();
+        goToView(LOGO_PLACEMENTS[key].side === 'front' ? 'front' : 'back');
       });
 
       logoSize.addEventListener('input', () => {
@@ -1761,22 +2001,20 @@
       });
 
       // --- Prenda ---
+      // Cada prenda tiene sus propias ubicaciones de logo.
       function syncPlacementButtons() {
-        const available = GARMENTS[garment.key].logoPlacements;
-        document.querySelectorAll('.studio-placement').forEach(btn => {
-          const ok = !!available[btn.dataset.placement];
-          btn.disabled = !ok;
-          btn.title = ok ? '' : 'No disponible en esta prenda';
-          btn.classList.toggle('active', btn.dataset.placement === logoState.placement);
-        });
+        const keys = Object.keys(GARMENTS[garment.key].logoPlacements);
+        const wrap = document.getElementById('studioPlacements');
+        wrap.style.gridTemplateColumns = `repeat(${keys.length}, 1fr)`;
+        wrap.innerHTML = keys.map(k => `<button type="button" class="studio-placement${k === logoState.placement ? ' active' : ''}" data-placement="${k}">${LOGO_PLACEMENTS[k].short}</button>`).join('');
       }
 
       function setGarment(key) {
         const cfg = GARMENTS[key];
         if (!cfg || key === garment.key) return;
         buildShirt(key);
-        // Si la ubicación del logo no existe en esta prenda, volvemos al pecho izquierdo.
-        if (!cfg.logoPlacements[logoState.placement]) logoState.placement = 'pechoIzq';
+        // Cada prenda arranca con su ubicación de logo habitual.
+        logoState.placement = cfg.defaultPlacement;
         logoState.sizeCm = cfg.logoPlacements[logoState.placement].defaultCm;
         logoSize.value = logoState.sizeCm;
         logoSizeLabel.textContent = `${logoState.sizeCm} cm`;
