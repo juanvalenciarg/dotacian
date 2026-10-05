@@ -334,6 +334,14 @@
       margin-left: 0.4rem;
     }
 
+    .studio-color-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      border: 1px solid rgba(15, 23, 42, 0.2);
+    }
+
     .asset-type-tag {
       font-size: 0.65rem;
       font-weight: 600;
@@ -1287,6 +1295,9 @@
     }
 
     function createAssetRowElement(item, checked) {
+      // Si viene de un diseño del Studio, se muestra con su nombre más reciente.
+      const design = item.design_id ? studioDesignsById[item.design_id] : null;
+      if (design) item = { ...item, name: design.nombre, color: STUDIO_COLOR_LABELS[design.color] || item.color };
       const itemCategory = item.category || 'fisico';
       const specFields = getAssetSpecFields(item.name, itemCategory);
       const hasSpecValues = !!(item.specs && Object.keys(item.specs).some(k => item.specs[k]));
@@ -1296,13 +1307,15 @@
       div.dataset.name = item.name;
       div.dataset.category = item.category || 'fisico';
       div.dataset.tipo = item.tipo || 'uniforme';
+      if (item.design_id) div.dataset.designId = item.design_id;
       div.style = "display: flex; flex-direction: column; gap: 0.65rem; padding: 0.85rem 1rem; background: var(--color-smoke); border-radius: 12px; border: 1px solid var(--color-smoke-mid); margin-bottom: 0.6rem;";
       div.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
           <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; flex: 1; min-width: 0;">
             <input type="checkbox" class="asset-check" ${checked ? 'checked' : ''} onchange="toggleAssetItem(this)" style="flex-shrink: 0; width: 18px; height: 18px; accent-color: var(--color-cyan); cursor: pointer;">
             <span style="font-weight: 600; font-size: 0.9rem; color: var(--color-navy); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.name}</span>
-            <span class="asset-type-tag" style="flex-shrink: 0;">${getTypeLabel(item.tipo)}</span>
+            ${design ? `<span class="studio-color-dot" style="background: ${STUDIO_COLOR_HEX[design.color] || '#E2E8F0'};"></span>` : ''}
+            <span class="asset-type-tag" style="flex-shrink: 0;">${item.design_id ? 'Studio' : getTypeLabel(item.tipo)}</span>
           </label>
           <div class="qty-stepper" style="flex-shrink: 0; display: flex; align-items: center; gap: 0.75rem; background: white; padding: 0.35rem 0.75rem; border-radius: 8px; border: 1px solid var(--color-smoke-mid);">
             <button type="button" onclick="changeQty(this, -1)" style="border: none; background: none; cursor: pointer; color: var(--color-text-secondary); font-size: 1.125rem; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">-</button>
@@ -1581,6 +1594,48 @@
       };
     }
 
+    // Diseños guardados en Dotacian Studio (/app/uniformes/studio). Un rol los
+    // referencia con item.design_id y siempre muestra su última versión.
+    const STUDIO_COLOR_LABELS = { blanco: 'Blanco', negro: 'Negro', azul: 'Azul', rojo: 'Rojo' };
+    const STUDIO_COLOR_HEX = { blanco: '#F4F4F1', negro: '#1B1B1E', azul: '#1E3F8A', rojo: '#B4232C' };
+    const STUDIO_GARMENT_LABELS = { camiseta: 'Camiseta básica', camisa: 'Camisa manga larga', hoodie: 'Hoodie' };
+    let studioDesigns = null;
+    let studioDesignsById = {};
+
+    async function ensureStudioDesigns() {
+      if (studioDesigns) return studioDesigns;
+      studioDesigns = [];
+      try {
+        const { data: { session } } = await window._supabase.auth.getSession();
+        if (!session) return studioDesigns;
+        const companyId = await resolveCompanyId(window._supabase, session.user.id);
+        const { data, error } = await window._supabase
+          .from('studio_designs')
+          .select('*')
+          .eq('company_id', companyId)
+          .order('nombre');
+        if (error) throw error;
+        // Los diseños archivados no se ofrecen, pero se conservan para el histórico.
+        (data || []).forEach(d => { studioDesignsById[d.id] = d; });
+        studioDesigns = (data || []).filter(d => !d.archived_at);
+      } catch (err) {
+        console.error('Error cargando diseños del Studio:', err);
+      }
+      return studioDesigns;
+    }
+
+    function studioDesignItem(design, qty) {
+      return {
+        name: design.nombre,
+        category: 'fisico',
+        tipo: 'uniforme',
+        qty,
+        color: STUDIO_COLOR_LABELS[design.color] || design.color,
+        available_sizes: 'S-XL',
+        design_id: design.id
+      };
+    }
+
     // Catálogo de prendas/EPP que la empresa activó en /app/uniformes (subconjunto
     // del catálogo completo). Se carga una vez y se reutiliza en los dos
     // flujos de Roles que permiten elegir activos.
@@ -1650,9 +1705,10 @@
       container.innerHTML = `<div style="padding: 1rem; text-align: center; color: var(--color-text-secondary); font-size: 0.85rem;">Cargando dotación...</div>`;
 
       const catalog = await ensureActiveAssetCatalog();
+      const designs = await ensureStudioDesigns();
       const categoriesWithAssets = Object.keys(catalog).filter(catKey => Object.keys(catalog[catKey] || {}).length > 0);
 
-      if (categoriesWithAssets.length === 0) {
+      if (categoriesWithAssets.length === 0 && designs.length === 0) {
         container.innerHTML = `
           <div style="padding: 1rem; text-align: center; background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 10px; color: #92400E; font-size: 0.85rem;">
             Aún no has activado ninguna prenda ni EPP.
@@ -1703,6 +1759,36 @@
           `;
         });
       }).join('');
+
+      if (designs.length > 0) {
+        const designRows = designs.map(d => `
+          <div class="new-role-asset-row" style="padding: 0.3rem 0;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer; flex: 1;">
+                <input type="checkbox" class="new-role-asset-check" data-category="fisico" data-tipo="uniforme" data-name="${escapeRoleAttr(d.nombre)}" data-design-id="${d.id}" onchange="toggleNewRoleAssetQty(this)" style="width: 16px; height: 16px; accent-color: var(--color-cyan); cursor: pointer;">
+                <span class="studio-color-dot" style="background: ${STUDIO_COLOR_HEX[d.color] || '#E2E8F0'};"></span>
+                ${escapeRoleAttr(d.nombre)}
+                <span style="font-size: 0.72rem; color: var(--color-text-secondary);">${STUDIO_GARMENT_LABELS[d.prenda] || ''}</span>
+              </label>
+              <div class="qty-stepper" style="display: none; align-items: center; gap: 0.5rem; background: white; padding: 0.25rem 0.5rem; border-radius: 6px; border: 1px solid var(--color-smoke-mid);">
+                <button type="button" onclick="changeQty(this, -1)" style="border: none; background: none; cursor: pointer; color: var(--color-text-secondary); font-size: 1rem; font-weight: bold; width: 20px; height: 20px;">-</button>
+                <span class="qty-val" style="min-width: 18px; text-align: center; font-weight: 700; color: var(--color-navy); font-size: 0.8rem;">1</span>
+                <button type="button" onclick="changeQty(this, 1)" style="border: none; background: none; cursor: pointer; color: var(--color-cyan); font-size: 1rem; font-weight: bold; width: 20px; height: 20px;">+</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+        container.insertAdjacentHTML('afterbegin', `
+          <div style="background: #F0FDFF; border: 1px solid #A5F3FC; border-radius: 10px; padding: 0.85rem 1rem;">
+            <div style="font-weight: 700; font-size: 0.8125rem; color: var(--color-navy); margin-bottom: 0.4rem;">Diseños del Studio</div>
+            <div style="display: flex; flex-direction: column;">${designRows}</div>
+          </div>
+        `);
+      }
+    }
+
+    function escapeRoleAttr(str) {
+      return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
     function collectNewRoleAssets() {
@@ -1711,8 +1797,10 @@
         const row = cb.closest('.new-role-asset-row');
         const qtyVal = row ? row.querySelector('.qty-val') : null;
         const qty = qtyVal ? parseInt(qtyVal.textContent) || 1 : 1;
-        const item = { name: cb.dataset.name, category: cb.dataset.category, tipo: cb.dataset.tipo, qty };
+        let item = { name: cb.dataset.name, category: cb.dataset.category, tipo: cb.dataset.tipo, qty };
         if (item.tipo === 'uniforme') { item.color = 'Predeterminado'; item.available_sizes = 'S-XL'; }
+        const design = cb.dataset.designId ? studioDesignsById[cb.dataset.designId] : null;
+        if (design) item = studioDesignItem(design, qty);
 
         const specInputs = row ? row.querySelectorAll('.asset-spec-input') : [];
         if (specInputs.length > 0) {
@@ -1745,8 +1833,12 @@
       const confirmBtn = document.getElementById('addAssetConfirmBtn');
       if (!select) return;
 
+      const designs = await ensureStudioDesigns();
       const alreadyAdded = new Set(
         Array.from(document.querySelectorAll('#roleAssetList .role-asset-item')).map(el => el.dataset.name)
+      );
+      const designsAdded = new Set(
+        Array.from(document.querySelectorAll('#roleAssetList .role-asset-item')).map(el => el.dataset.designId).filter(Boolean)
       );
 
       const options = [];
@@ -1758,6 +1850,10 @@
             options.push({ category: catKey, tipo: sub.tipo, name, groupLabel: sub.label });
           });
         });
+      });
+      designs.forEach(d => {
+        if (designsAdded.has(d.id)) return;
+        options.unshift({ category: 'fisico', tipo: 'uniforme', name: d.nombre, groupLabel: 'Diseños del Studio', designId: d.id });
       });
 
       if (options.length === 0) {
@@ -1780,7 +1876,7 @@
 
       select.innerHTML = Object.keys(groups).map(groupLabel => `
         <optgroup label="${groupLabel}">
-          ${groups[groupLabel].map(o => `<option value="${o.name}" data-category="${o.category}" data-tipo="${o.tipo}">${o.name}</option>`).join('')}
+          ${groups[groupLabel].map(o => `<option value="${o.name}" data-category="${o.category}" data-tipo="${o.tipo}"${o.designId ? ` data-design-id="${o.designId}"` : ''}>${o.name}</option>`).join('')}
         </optgroup>
       `).join('');
     }
@@ -1798,11 +1894,13 @@
       const list = document.getElementById('roleAssetList');
       if (list.querySelector('p')) list.innerHTML = '';
 
-      const item = { name, category, tipo, qty };
+      let item = { name, category, tipo, qty };
       if (tipo === 'uniforme') {
         item.color = 'Predeterminado';
         item.available_sizes = 'S-XL';
       }
+      const design = opt.dataset.designId ? studioDesignsById[opt.dataset.designId] : null;
+      if (design) item = studioDesignItem(design, qty);
       list.appendChild(createAssetRowElement(item, true));
       toggleAddAssetForm(false);
     }
@@ -1873,6 +1971,7 @@
         return;
       }
 
+      await ensureStudioDesigns();
       savedItems.forEach(item => list.appendChild(createAssetRowElement(item, true)));
     }
 
@@ -1903,7 +2002,10 @@
 
         const qtySpan = el.querySelector('.qty-val');
         const qty = qtySpan ? parseInt(qtySpan.innerText) || 1 : 1;
-        const existing = currentRoleAssets.find(u => u.name === el.dataset.name);
+        const designId = el.dataset.designId || null;
+        const existing = designId
+          ? currentRoleAssets.find(u => u.design_id === designId)
+          : currentRoleAssets.find(u => u.name === el.dataset.name);
         const category = el.dataset.category || 'fisico';
         const tipo = el.dataset.tipo || 'uniforme';
 
@@ -1912,6 +2014,11 @@
         if (tipo === 'uniforme') {
           item.color = existing ? existing.color : 'Predeterminado';
           item.available_sizes = existing ? existing.available_sizes : 'S-XL';
+        }
+        if (designId) {
+          const design = studioDesignsById[designId];
+          item.design_id = designId;
+          if (design) item.color = STUDIO_COLOR_LABELS[design.color] || item.color;
         }
 
         const specInputs = el.querySelectorAll('.asset-spec-input');

@@ -725,6 +725,100 @@
       color: #94A3B8;
     }
 
+    .studio-design-roles {
+      display: inline-block;
+      margin-top: 0.3rem;
+      padding: 0.15rem 0.55rem;
+      border: 1px dashed #CBD5E1;
+      border-radius: 999px;
+      background: white;
+      font-family: inherit;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #0891B2;
+      cursor: pointer;
+    }
+
+    .studio-design-roles.assigned {
+      border-style: solid;
+      border-color: #A5F3FC;
+      background: #ECFEFF;
+      color: #0E7490;
+    }
+
+    .studio-assign-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      max-height: 50vh;
+      overflow-y: auto;
+    }
+
+    .studio-assign-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: 0.75rem;
+    }
+
+    .studio-assign-row label {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      flex: 1;
+      min-width: 0;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-navy);
+      cursor: pointer;
+    }
+
+    .studio-assign-row input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--color-cyan);
+      flex-shrink: 0;
+    }
+
+    .studio-assign-inactive {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #94A3B8;
+      background: #F1F5F9;
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
+    }
+
+    .studio-assign-qty {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.72rem;
+      color: #64748B;
+      white-space: nowrap;
+    }
+
+    .studio-assign-qty input {
+      width: 52px;
+      padding: 0.3rem 0.4rem;
+      border: 1px solid var(--color-border);
+      border-radius: 0.5rem;
+      font-family: inherit;
+      text-align: center;
+    }
+
+    .studio-assign-empty {
+      padding: 1.25rem;
+      text-align: center;
+      font-size: 0.875rem;
+      color: #64748B;
+      background: #F8FAFC;
+      border-radius: 0.75rem;
+    }
+
     .studio-design-actions {
       display: flex;
       flex-direction: column;
@@ -1050,6 +1144,22 @@
         </section>
       </div>
     </main>
+
+    <!-- Asignar un diseño a roles -->
+    <div class="modal-overlay" id="studioAssignModal">
+      <div class="modal-content-lg" style="max-width: 480px;">
+        <div style="padding: 1.75rem;">
+          <h2 id="studioAssignTitle" style="font-size: 1.125rem; color: var(--color-navy); margin: 0 0 0.4rem;">Asignar a roles</h2>
+          <p style="font-size: 0.85rem; color: var(--color-text-secondary); line-height: 1.5; margin: 0 0 1.25rem;">Los roles marcados reciben este diseño en su dotación. Siempre usan su última versión: si lo editas en el Studio, el cambio se ve en los roles.</p>
+          <div class="studio-assign-list" id="studioAssignList"></div>
+          <p class="studio-save-msg error" id="studioAssignMsg" hidden></p>
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+            <button type="button" class="btn btn-outline" id="studioAssignCancel">Cancelar</button>
+            <button type="button" class="btn btn-primary" id="studioAssignSave">Guardar asignación</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -2320,6 +2430,11 @@
 
       let companyId = null;
       let currentDesign = null; // fila de studio_designs abierta en el editor
+      // Roles de la empresa y en cuáles está asignado cada diseño
+      // (role_definition.items[].design_id).
+      let companyRoles = [];       // [{ role_name, status }]
+      let roleDefinitions = {};    // role_name en minúsculas → fila de role_definition
+      let rolesByDesign = {};      // design_id → [role_name]
       let designs = [];
       let saving = false;
 
@@ -2344,6 +2459,9 @@
         const msg = (err && (err.message || err.error || '')) + '';
         if (/relation .*studio_designs.* does not exist|Could not find the table/i.test(msg)) {
           return 'Falta activar el guardado de diseños en la base de datos.';
+        }
+        if (/archived_at/i.test(msg)) {
+          return 'Falta activar el archivado de diseños en la base de datos.';
         }
         if (/Bucket not found/i.test(msg)) {
           return 'Falta crear el espacio para guardar logos (studio-logos).';
@@ -2444,7 +2562,11 @@
           currentDesign = data;
           logoState.storedPath = logoPath;
           setSaveMsg('');
-          if (window.showToast) showToast('Diseño guardado', `"${nombre}" quedó guardado en tus diseños.`);
+          const syncedRoles = updating ? await syncDesignInRoles(data) : [];
+          if (window.showToast) {
+            if (syncedRoles.length) showToast('Diseño actualizado', `Los cambios ya se ven en: ${syncedRoles.join(', ')}.`);
+            else showToast('Diseño guardado', `"${nombre}" quedó guardado en tus diseños.`);
+          }
           await loadDesigns();
         } catch (err) {
           console.error('Error guardando diseño:', err);
@@ -2504,6 +2626,11 @@
                 <div class="studio-design-name">${escapeHtml(d.nombre)}</div>
                 <div class="studio-design-meta">${escapeHtml(designMeta(d))}</div>
                 <div class="studio-design-date">Actualizado ${escapeHtml(formatDate(d.updated_at))}</div>
+                <button type="button" class="studio-design-roles${(rolesByDesign[d.id] || []).length ? ' assigned' : ''}" data-action="assign" title="${escapeHtml((rolesByDesign[d.id] || []).join(', '))}">
+                  ${(rolesByDesign[d.id] || []).length
+                    ? `En ${(rolesByDesign[d.id]).length} ${(rolesByDesign[d.id]).length === 1 ? 'rol' : 'roles'} · Editar`
+                    : '+ Asignar a roles'}
+                </button>
               </div>
               <div class="studio-design-actions">
                 <button type="button" class="studio-design-open" data-action="open">${active ? 'Abierto' : 'Abrir'}</button>
@@ -2514,6 +2641,63 @@
             </div>
           `;
         }).join('');
+      }
+
+      async function loadRoleUsage() {
+        companyRoles = [];
+        roleDefinitions = {};
+        rolesByDesign = {};
+        if (!companyId) return;
+        const [rolesRes, defsRes] = await Promise.all([
+          window._supabase.from('company_roles').select('role_name, status').eq('company_id', companyId),
+          window._supabase.from('role_definition').select('id, role_name, items').eq('company_id', companyId)
+        ]);
+        if (rolesRes.error) console.error('Error cargando roles:', rolesRes.error);
+        if (defsRes.error) console.error('Error cargando dotación de roles:', defsRes.error);
+        companyRoles = (rolesRes.data || []).sort((a, b) => a.role_name.localeCompare(b.role_name));
+        (defsRes.data || []).forEach(def => {
+          roleDefinitions[def.role_name.toLowerCase()] = def;
+          (def.items || []).forEach(item => {
+            if (!item.design_id) return;
+            if (!rolesByDesign[item.design_id]) rolesByDesign[item.design_id] = [];
+            rolesByDesign[item.design_id].push(def.role_name);
+          });
+        });
+      }
+
+      function designRoleItem(d, qty, previous) {
+        return {
+          name: d.nombre,
+          category: 'fisico',
+          tipo: 'uniforme',
+          qty,
+          color: SHIRT_COLORS[d.color] ? SHIRT_COLORS[d.color].label : d.color,
+          available_sizes: (previous && previous.available_sizes) || 'S-XL',
+          design_id: d.id
+        };
+      }
+
+      // Guarda la lista de prendas de un rol (crea su role_definition si no existe).
+      async function saveRoleItems(roleName, items) {
+        const def = roleDefinitions[roleName.toLowerCase()];
+        const query = def
+          ? window._supabase.from('role_definition').update({ items }).eq('id', def.id)
+          : window._supabase.from('role_definition').insert({ company_id: companyId, role_name: roleName, items });
+        const { error } = await query;
+        if (error) throw error;
+      }
+
+      // Los roles usan siempre la última versión: al guardar cambios se
+      // actualizan el nombre y el color de la prenda en cada rol.
+      async function syncDesignInRoles(d) {
+        const roles = rolesByDesign[d.id] || [];
+        for (const roleName of roles) {
+          const def = roleDefinitions[roleName.toLowerCase()];
+          if (!def) continue;
+          const items = (def.items || []).map(item => item.design_id === d.id ? designRoleItem(d, item.qty || 1, item) : item);
+          await saveRoleItems(roleName, items);
+        }
+        return roles;
       }
 
       async function loadDesigns() {
@@ -2535,7 +2719,9 @@
           designsList.innerHTML = `<div class="studio-designs-empty error">${escapeHtml(friendlyError(error))}</div>`;
           return;
         }
-        designs = data || [];
+        // Los diseños archivados se conservan para el histórico, pero no se listan.
+        designs = (data || []).filter(d => !d.archived_at);
+        await loadRoleUsage();
         await renderDesigns();
       }
 
@@ -2566,24 +2752,132 @@
         viewer.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
 
+      // "Eliminar" archiva el diseño: deja de listarse y se quita de los roles,
+      // pero el registro y su logo se conservan para el histórico de entregas.
       async function deleteDesign(d) {
-        if (!confirm(`¿Eliminar el diseño "${d.nombre}"? Esta acción no se puede deshacer.`)) return;
-        const { error } = await window._supabase.from(DESIGNS_TABLE).delete().eq('id', d.id);
-        if (error) {
+        const roles = rolesByDesign[d.id] || [];
+        const msg = roles.length
+          ? `"${d.nombre}" está asignado a: ${roles.join(', ')}.\n\nSi lo eliminas, se quitará de la dotación de esos roles. Las entregas que ya se hicieron conservan su registro.\n\n¿Eliminar el diseño?`
+          : `¿Eliminar el diseño "${d.nombre}"?`;
+        if (!confirm(msg)) return;
+        try {
+          // Primero se archiva: si falla, los roles quedan intactos.
+          const { error } = await window._supabase.from(DESIGNS_TABLE)
+            .update({ archived_at: new Date().toISOString() })
+            .eq('id', d.id);
+          if (error) throw error;
+          for (const roleName of roles) {
+            const def = roleDefinitions[roleName.toLowerCase()];
+            if (!def) continue;
+            await saveRoleItems(roleName, (def.items || []).filter(item => item.design_id !== d.id));
+          }
+        } catch (error) {
           console.error('Error eliminando diseño:', error);
           if (window.showToast) showToast('Error', friendlyError(error), 'error');
+          await loadDesigns();
           return;
         }
-        await removeStoredLogo(d.logo_path);
         if (currentDesign && currentDesign.id === d.id) {
           currentDesign = null;
-          // El logo sigue en el editor, pero su archivo guardado ya no existe.
-          logoState.storedPath = null;
           refreshSaveButtons();
         }
-        if (window.showToast) showToast('Diseño eliminado', `"${d.nombre}" se eliminó.`);
+        if (window.showToast) {
+          showToast('Diseño eliminado', roles.length
+            ? `"${d.nombre}" se quitó de: ${roles.join(', ')}.`
+            : `"${d.nombre}" se eliminó.`);
+        }
         await loadDesigns();
       }
+
+      // --- Asignar a roles ---
+      const assignModal = document.getElementById('studioAssignModal');
+      const assignList = document.getElementById('studioAssignList');
+      let assigningDesign = null;
+
+      function openAssignModal(d) {
+        assigningDesign = d;
+        document.getElementById('studioAssignTitle').textContent = `Asignar "${d.nombre}" a roles`;
+        if (companyRoles.length === 0) {
+          assignList.innerHTML = '<div class="studio-assign-empty">Aún no tienes roles creados. <a href="/app/roles">Crea uno en Roles</a>.</div>';
+        } else {
+          assignList.innerHTML = companyRoles.map((r, i) => {
+            const def = roleDefinitions[r.role_name.toLowerCase()];
+            const current = def && (def.items || []).find(item => item.design_id === d.id);
+            return `
+              <div class="studio-assign-row">
+                <label>
+                  <input type="checkbox" data-index="${i}" ${current ? 'checked' : ''}>
+                  <span>${escapeHtml(r.role_name)}</span>
+                  ${r.status !== 'active' ? '<span class="studio-assign-inactive">Inhabilitado</span>' : ''}
+                </label>
+                <span class="studio-assign-qty">
+                  <span>Cant. por persona</span>
+                  <input type="number" min="1" max="20" value="${current ? current.qty || 1 : 1}" data-qty="${i}" aria-label="Cantidad por persona para ${escapeHtml(r.role_name)}">
+                </span>
+              </div>
+            `;
+          }).join('');
+        }
+        document.getElementById('studioAssignMsg').hidden = true;
+        assignModal.classList.add('active');
+      }
+
+      function closeAssignModal() {
+        assignModal.classList.remove('active');
+        assigningDesign = null;
+      }
+
+      async function saveAssignment() {
+        const d = assigningDesign;
+        if (!d) return;
+        const confirmBtn = document.getElementById('studioAssignSave');
+        confirmBtn.disabled = true;
+        const added = [], removed = [], kept = [];
+        try {
+          for (let i = 0; i < companyRoles.length; i++) {
+            const roleName = companyRoles[i].role_name;
+            const checked = assignList.querySelector(`input[data-index="${i}"]`).checked;
+            const qty = Math.max(1, parseInt(assignList.querySelector(`input[data-qty="${i}"]`).value, 10) || 1);
+            const def = roleDefinitions[roleName.toLowerCase()];
+            const items = def ? [...(def.items || [])] : [];
+            const idx = items.findIndex(item => item.design_id === d.id);
+            if (checked) {
+              const next = designRoleItem(d, qty, idx >= 0 ? items[idx] : null);
+              if (idx >= 0) {
+                if (items[idx].qty === qty) { kept.push(roleName); continue; }
+                items[idx] = next;
+                kept.push(roleName);
+              } else {
+                items.push(next);
+                added.push(roleName);
+              }
+              await saveRoleItems(roleName, items);
+            } else if (idx >= 0) {
+              items.splice(idx, 1);
+              await saveRoleItems(roleName, items);
+              removed.push(roleName);
+            }
+          }
+          closeAssignModal();
+          const parts = [];
+          if (added.length) parts.push(`Asignado a: ${added.join(', ')}`);
+          if (removed.length) parts.push(`Quitado de: ${removed.join(', ')}`);
+          if (window.showToast) showToast('Roles actualizados', parts.length ? parts.join('. ') + '.' : 'La asignación quedó guardada.');
+          await loadDesigns();
+        } catch (err) {
+          console.error('Error asignando diseño:', err);
+          const msg = document.getElementById('studioAssignMsg');
+          msg.textContent = 'No se pudo guardar la asignación. Intenta de nuevo.';
+          msg.hidden = false;
+          await loadRoleUsage();
+        } finally {
+          confirmBtn.disabled = false;
+        }
+      }
+
+      document.getElementById('studioAssignCancel').addEventListener('click', closeAssignModal);
+      document.getElementById('studioAssignSave').addEventListener('click', saveAssignment);
+      assignModal.addEventListener('click', e => { if (e.target === assignModal) closeAssignModal(); });
 
       function startNewDesign() {
         currentDesign = null;
@@ -2609,6 +2903,7 @@
         const d = designs.find(x => x.id === card.dataset.id);
         if (!d) return;
         if (btn && btn.dataset.action === 'delete') deleteDesign(d);
+        else if (btn && btn.dataset.action === 'assign') openAssignModal(d);
         else openDesign(d);
       });
 
