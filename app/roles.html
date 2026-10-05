@@ -334,6 +334,24 @@
       margin-left: 0.4rem;
     }
 
+    .studio-design-thumb {
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      border-radius: 10px;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .studio-design-thumb img {
+      max-width: 70%;
+      max-height: 70%;
+      object-fit: contain;
+    }
+
     .studio-color-dot {
       width: 12px;
       height: 12px;
@@ -1618,6 +1636,15 @@
         // Los diseños archivados no se ofrecen, pero se conservan para el histórico.
         (data || []).forEach(d => { studioDesignsById[d.id] = d; });
         studioDesigns = (data || []).filter(d => !d.archived_at);
+
+        // Miniaturas del logo con enlaces temporales (el bucket studio-logos es privado).
+        const paths = studioDesigns.map(d => d.logo_path).filter(Boolean);
+        if (paths.length) {
+          const { data: signed } = await window._supabase.storage.from('studio-logos').createSignedUrls(paths, 3600);
+          const urls = {};
+          (signed || []).forEach(item => { if (item.signedUrl) urls[item.path] = item.signedUrl; });
+          studioDesigns.forEach(d => { d.thumbUrl = d.logo_path ? urls[d.logo_path] || null : null; });
+        }
       } catch (err) {
         console.error('Error cargando diseños del Studio:', err);
       }
@@ -1766,9 +1793,13 @@
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
               <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer; flex: 1;">
                 <input type="checkbox" class="new-role-asset-check" data-category="fisico" data-tipo="uniforme" data-name="${escapeRoleAttr(d.nombre)}" data-design-id="${d.id}" onchange="toggleNewRoleAssetQty(this)" style="width: 16px; height: 16px; accent-color: var(--color-cyan); cursor: pointer;">
-                <span class="studio-color-dot" style="background: ${STUDIO_COLOR_HEX[d.color] || '#E2E8F0'};"></span>
-                ${escapeRoleAttr(d.nombre)}
-                <span style="font-size: 0.72rem; color: var(--color-text-secondary);">${STUDIO_GARMENT_LABELS[d.prenda] || ''}</span>
+                <span class="studio-design-thumb" style="background: ${STUDIO_COLOR_HEX[d.color] || '#E2E8F0'};">
+                  ${d.thumbUrl ? `<img src="${escapeRoleAttr(d.thumbUrl)}" alt="">` : ''}
+                </span>
+                <span style="display: flex; flex-direction: column; min-width: 0;">
+                  <span style="font-weight: 600; color: var(--color-navy);">${escapeRoleAttr(d.nombre)}</span>
+                  <span style="font-size: 0.72rem; color: var(--color-text-secondary);">${STUDIO_GARMENT_LABELS[d.prenda] || ''} · ${STUDIO_COLOR_LABELS[d.color] || ''}</span>
+                </span>
               </label>
               <div class="qty-stepper" style="display: none; align-items: center; gap: 0.5rem; background: white; padding: 0.25rem 0.5rem; border-radius: 6px; border: 1px solid var(--color-smoke-mid);">
                 <button type="button" onclick="changeQty(this, -1)" style="border: none; background: none; cursor: pointer; color: var(--color-text-secondary); font-size: 1rem; font-weight: bold; width: 20px; height: 20px;">-</button>
