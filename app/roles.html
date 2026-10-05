@@ -791,8 +791,8 @@
                   </div>
                 </div>
                 <div id="noActiveAssetsHint" style="display: none; font-size: 0.8rem; color: #92400E; background: #FFFBEB; border: 1px solid #FDE68A; padding: 0.65rem 0.85rem; border-radius: 8px;">
-                  Ya agregaste todas las prendas disponibles, o aún no has activado ninguna.
-                  <a href="/app/uniformes" target="_blank" style="color: #92400E; font-weight: 700;">Ir a Uniformes</a>
+                  Ya agregaste todos tus diseños, o aún no tienes ninguno guardado.
+                  <a href="/app/uniformes/studio" target="_blank" style="color: #92400E; font-weight: 700;">Ir a Dotacian Studio</a>
                 </div>
                 <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
                   <button type="button" class="btn btn-outline" style="font-size: 0.8rem;" onclick="toggleAddAssetForm(false)" data-i18n="roleConfig.cancel">Cancelar</button>
@@ -1731,15 +1731,17 @@
       if (!container) return;
       container.innerHTML = `<div style="padding: 1rem; text-align: center; color: var(--color-text-secondary); font-size: 0.85rem;">Cargando dotación...</div>`;
 
-      const catalog = await ensureActiveAssetCatalog();
+      // Al crear un rol solo se ofrecen los diseños hechos en Dotacian Studio
+      // (no las prendas genéricas del catálogo de Uniformes).
+      const catalog = {};
       const designs = await ensureStudioDesigns();
-      const categoriesWithAssets = Object.keys(catalog).filter(catKey => Object.keys(catalog[catKey] || {}).length > 0);
+      const categoriesWithAssets = [];
 
-      if (categoriesWithAssets.length === 0 && designs.length === 0) {
+      if (designs.length === 0) {
         container.innerHTML = `
           <div style="padding: 1rem; text-align: center; background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 10px; color: #92400E; font-size: 0.85rem;">
-            Aún no has activado ninguna prenda ni EPP.
-            <a href="/app/uniformes" target="_blank" style="color: #92400E; font-weight: 700;">Actívalos en Uniformes</a>.
+            Aún no tienes diseños guardados.
+            <a href="/app/uniformes/studio" target="_blank" style="color: #92400E; font-weight: 700;">Crea uno en Dotacian Studio</a>.
           </div>
         `;
         return;
@@ -1858,33 +1860,21 @@
     }
 
     async function populateNewAssetSelect() {
-      const catalog = await ensureActiveAssetCatalog();
+      // Solo se ofrecen los diseños hechos en Dotacian Studio.
       const select = document.getElementById('newAssetSelect');
       const hint = document.getElementById('noActiveAssetsHint');
       const confirmBtn = document.getElementById('addAssetConfirmBtn');
       if (!select) return;
 
       const designs = await ensureStudioDesigns();
-      const alreadyAdded = new Set(
-        Array.from(document.querySelectorAll('#roleAssetList .role-asset-item')).map(el => el.dataset.name)
-      );
       const designsAdded = new Set(
         Array.from(document.querySelectorAll('#roleAssetList .role-asset-item')).map(el => el.dataset.designId).filter(Boolean)
       );
 
       const options = [];
-      Object.keys(catalog).forEach(catKey => {
-        Object.keys(catalog[catKey]).forEach(subKey => {
-          const sub = catalog[catKey][subKey];
-          sub.items.forEach(name => {
-            if (alreadyAdded.has(name)) return;
-            options.push({ category: catKey, tipo: sub.tipo, name, groupLabel: sub.label });
-          });
-        });
-      });
       designs.forEach(d => {
         if (designsAdded.has(d.id)) return;
-        options.unshift({ category: 'fisico', tipo: 'uniforme', name: d.nombre, groupLabel: 'Diseños del Studio', designId: d.id });
+        options.push({ category: 'fisico', tipo: 'uniforme', name: d.nombre, groupLabel: 'Diseños del Studio', designId: d.id });
       });
 
       if (options.length === 0) {
