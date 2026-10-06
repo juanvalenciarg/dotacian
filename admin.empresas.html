@@ -400,6 +400,7 @@
       <nav class="sidebar-nav">
         <a href="admin.html" id="nav-dashboard" class="nav-item">Dashboard</a>
         <a href="admin.empresas.html" id="nav-users" class="nav-item active">Gestión de Empresas</a>
+        <a href="admin.studio.html" id="nav-studio" class="nav-item">DS Hub</a>
         <a href="admin.sellers.html" id="nav-sellers" class="nav-item">Gestión de Fabricantes</a>
         <a href="admin.cotizaciones.html" id="nav-cotizaciones" class="nav-item">Gestión de Cotizaciones</a>
         <a href="admin.leads.html" id="nav-leads" class="nav-item">Gestión de Leads</a>
@@ -556,7 +557,7 @@
                   </div>
                   <div class="form-group">
                     <label>Sector / Industria</label>
-                    <input type="text" id="editIndustry" class="form-control" placeholder="Ej. Restaurantes">
+                    <select id="editIndustry" class="form-control"></select>
                   </div>
                   <div class="form-group">
                     <label>País</label>
@@ -718,7 +719,7 @@
         <div class="form-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 0.5rem;">
           <div class="form-group">
             <label>Industria</label>
-            <input type="text" id="newCompanyIndustry" class="form-control" placeholder="Ej. Restaurantes">
+            <select id="newCompanyIndustry" class="form-control"></select>
           </div>
           <div class="form-group">
             <label>País</label>
@@ -986,6 +987,7 @@
   <div class="toast-container" id="toast-container"></div>
 
   <script src="assets/js/utils.js?v=4"></script>
+  <script src="assets/js/industries.js?v=1"></script>
   <script>
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
@@ -1065,7 +1067,7 @@
               <span class="user-name">${company.company_name || 'Sin nombre'}</span>
             </div>
           </td>
-          <td><span style="font-size: 0.875rem; background: #F1F5F9; padding: 0.25rem 0.5rem; border-radius: 0.25rem;">${company.industry || 'N/A'}</span></td>
+          <td><span style="font-size: 0.875rem; background: #F1F5F9; padding: 0.25rem 0.5rem; border-radius: 0.25rem;">${industryLabel(company.industry) || (company.industry ? company.industry + ' (sin clasificar)' : 'Sin industria')}</span></td>
           <td><span style="font-weight: 600; color: #475569;">${company.country || 'N/A'}</span></td>
           <td><span style="font-weight: 700; color: #0F172A;">${company.admins.length}</span></td>
           <td>${formatDateShort(company.created_at)}</td>
@@ -1152,7 +1154,7 @@
 
       document.getElementById('cardEmail').textContent = `${company.admins.length} administrador${company.admins.length !== 1 ? 'es' : ''}`;
       document.getElementById('editCompany').value = company.company_name || '';
-      document.getElementById('editIndustry').value = company.industry || '';
+      fillIndustrySelect(document.getElementById('editIndustry'), company.industry);
       document.getElementById('editCountry').value = company.country || '';
       document.getElementById('editLegalName').value = company.legal_name || '';
       document.getElementById('editTaxId').value = company.tax_id || '';
@@ -1740,6 +1742,7 @@
     // -------- Crear Empresa (empresa + primer administrador) --------
 
     function openNewCompanyModal() {
+      fillIndustrySelect(document.getElementById('newCompanyIndustry'), '');
       document.getElementById('new-client-modal').classList.add('active');
     }
     function closeNewCompanyModal() {

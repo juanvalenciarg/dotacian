@@ -130,6 +130,37 @@
       color: white;
     }
 
+    /* Modo embebido (vista previa en DS Hub del admin): solo el visor. */
+    body.studio-embed .sidebar,
+    body.studio-embed .sidebar-overlay,
+    body.studio-embed .app-header,
+    body.studio-embed .studio-page-head,
+    body.studio-embed .uniform-tabs,
+    body.studio-embed .studio-panel,
+    body.studio-embed .studio-designs,
+    body.studio-embed #notificationToast {
+      display: none !important;
+    }
+
+    body.studio-embed .main-content {
+      margin-left: 0;
+    }
+
+    body.studio-embed .dashboard-content-wrapper {
+      padding: 0 !important;
+    }
+
+    body.studio-embed .studio-layout {
+      display: block;
+    }
+
+    body.studio-embed .studio-viewer {
+      height: 100vh;
+      min-height: 0;
+      border: none;
+      border-radius: 0;
+    }
+
     /* Layout del Studio */
     .studio-layout {
       display: grid;
@@ -1001,7 +1032,7 @@
       </header>
 
       <div class="dashboard-content-wrapper" style="padding-top: 5rem;">
-        <div style="margin-bottom: 1.5rem;">
+        <div class="studio-page-head" style="margin-bottom: 1.5rem;">
           <h1 class="dot-greeting" style="text-align: left; margin-bottom: 0.5rem; font-size: 3rem; background: linear-gradient(90deg, #94A3B8 0%, #1E293B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Dotacian Studio</h1>
           <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;">Diseña desde cero el uniforme de cada cliente y revísalo en 3D desde cualquier ángulo.</p>
         </div>
@@ -1210,6 +1241,11 @@
 
     // Ángulo de la cámara (azimut) para cada vista fija.
     const VIEW_ANGLES = { front: 0, right: Math.PI / 2, back: Math.PI, left: -Math.PI / 2 };
+
+    // ?embed=1&prenda=<clave>: vista previa de una prenda (DS Hub del admin).
+    const URL_PARAMS = new URLSearchParams(window.location.search);
+    const EMBED = URL_PARAMS.get('embed') === '1';
+    if (EMBED) document.body.classList.add('studio-embed');
 
     const viewer = document.getElementById('studioViewer');
     const hint = document.getElementById('studioHint');
@@ -2727,6 +2763,8 @@
 
       async function openDesign(d) {
         setSaveMsg('Abriendo diseño…');
+        // Los diseños ya creados se conservan aunque su prenda se deshabilite.
+        showGarmentOption(d.prenda, true);
         setGarment(d.prenda);
         const swatch = document.querySelector(`#studioSwatches .studio-swatch[data-color="${d.color}"]`);
         if (swatch) swatch.click();
@@ -2907,8 +2945,39 @@
         else openDesign(d);
       });
 
+      // --- Prendas disponibles para la industria de la empresa ---
+      // DS Hub (admin) define qué prendas ve cada industria; la
+      // función studio_garments_for_me() resuelve la empresa del usuario.
+      let availableGarments = null; // null = sin restricción (aún no cargado)
+
+      function showGarmentOption(key, visible) {
+        const btn = document.querySelector(`.studio-garment-option[data-garment="${key}"]`);
+        if (btn) btn.hidden = !visible;
+      }
+
+      async function loadAvailableGarments() {
+        if (EMBED || !(await ensureCompany())) return;
+        const { data, error } = await window._supabase.rpc('studio_garments_for_me');
+        if (error) {
+          // Si el catálogo aún no existe en la base de datos, se muestran todas.
+          console.warn('No se pudo cargar el catálogo de prendas:', error);
+          return;
+        }
+        let keys = (data || []).map(r => r.garment_key).filter(k => GARMENTS[k]);
+        if (!keys.length) keys = ['camiseta'];
+        availableGarments = new Set(keys);
+        Object.keys(GARMENTS).forEach(k => showGarmentOption(k, availableGarments.has(k)));
+        if (!availableGarments.has(garment.key)) setGarment(keys[0]);
+      }
+
       refreshSaveButtons();
       loadDesigns();
+      loadAvailableGarments();
+
+      if (EMBED) {
+        const prenda = URL_PARAMS.get('prenda');
+        if (GARMENTS[prenda]) setGarment(prenda);
+      }
 
       window.dotacianStudio = { scene, camera, controls, shirt, fabric, logoState, setGarment, garment };
     }

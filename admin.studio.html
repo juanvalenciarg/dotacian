@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dotacian | DS Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .catalog-intro {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      max-width: 900px;
+    }
+
+    .catalog-intro p {
+      margin: 0;
+      color: #475569;
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+
+    .catalog-note {
+      font-size: 0.85rem;
+      color: #475569;
+      background: #F1F5F9;
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+    }
+
+    .catalog-alert {
+      font-size: 0.875rem;
+      color: #92400E;
+      background: #FFFBEB;
+      border: 1px solid #FDE68A;
+      border-radius: 0.75rem;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1.25rem;
+      line-height: 1.5;
+    }
+
+    .catalog-alert a {
+      color: #92400E;
+      font-weight: 700;
+    }
+
+    .catalog-card {
+      background: white;
+      border: 1px solid #E2E8F0;
+      border-radius: 1rem;
+      overflow: hidden;
+    }
+
+    .catalog-table-wrap {
+      overflow-x: auto;
+    }
+
+    .catalog-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1100px;
+    }
+
+    .catalog-table th,
+    .catalog-table td {
+      border-bottom: 1px solid #F1F5F9;
+      padding: 0.85rem 0.6rem;
+      vertical-align: middle;
+    }
+
+    .catalog-table thead th {
+      background: #F8FAFC;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .catalog-garment-col {
+      text-align: left !important;
+      min-width: 280px;
+      position: sticky;
+      left: 0;
+      background: white;
+      z-index: 1;
+      padding-left: 1.25rem !important;
+    }
+
+    thead .catalog-garment-col {
+      background: #F8FAFC;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748B;
+    }
+
+    .catalog-industry-name {
+      display: block;
+      font-size: 0.78rem;
+      color: #0F172A;
+      white-space: nowrap;
+    }
+
+    .catalog-industry-count {
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 500;
+      color: #94A3B8;
+      white-space: nowrap;
+    }
+
+    .catalog-cell {
+      text-align: center;
+    }
+
+    .catalog-cell input {
+      width: 18px;
+      height: 18px;
+      accent-color: #06B6D4;
+      cursor: pointer;
+    }
+
+    .catalog-cell input:disabled {
+      cursor: not-allowed;
+      opacity: 0.35;
+    }
+
+    .catalog-row-off .catalog-garment-name,
+    .catalog-row-off .catalog-garment-desc {
+      opacity: 0.5;
+    }
+
+    .catalog-garment {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .catalog-garment-name {
+      font-weight: 700;
+      color: #0F172A;
+      font-size: 0.95rem;
+    }
+
+    .catalog-garment-desc {
+      font-size: 0.78rem;
+      color: #64748B;
+    }
+
+    .catalog-garment-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+    }
+
+    .catalog-link {
+      border: none;
+      background: none;
+      padding: 0;
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #0891B2;
+      cursor: pointer;
+    }
+
+    .catalog-link:hover {
+      text-decoration: underline;
+    }
+
+    .catalog-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    .catalog-switch input {
+      display: none;
+    }
+
+    .catalog-switch-slider {
+      width: 30px;
+      height: 17px;
+      border-radius: 999px;
+      background: #CBD5E1;
+      position: relative;
+      transition: background 0.2s;
+    }
+
+    .catalog-switch-slider::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: white;
+      transition: transform 0.2s;
+    }
+
+    .catalog-switch input:checked + .catalog-switch-slider {
+      background: #06B6D4;
+    }
+
+    .catalog-switch input:checked + .catalog-switch-slider::after {
+      transform: translateX(13px);
+    }
+
+    .catalog-loading {
+      text-align: center !important;
+      padding: 2.5rem !important;
+      color: #64748B;
+    }
+
+    .catalog-loading.error {
+      color: #EF4444;
+    }
+
+    .catalog-footnote {
+      margin: 0.85rem 0 0;
+      font-size: 0.8rem;
+      color: #94A3B8;
+    }
+
+    .catalog-preview {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .catalog-preview[hidden] {
+      display: none;
+    }
+
+    .catalog-preview-box {
+      background: white;
+      border-radius: 1.25rem;
+      width: min(760px, 100%);
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+    }
+
+    .catalog-preview-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1.1rem 1.25rem;
+      border-bottom: 1px solid #E2E8F0;
+    }
+
+    .catalog-preview-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #0F172A;
+    }
+
+    .catalog-preview-sub {
+      font-size: 0.8rem;
+      color: #64748B;
+    }
+
+    .catalog-preview-close {
+      border: none;
+      background: #F1F5F9;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      color: #475569;
+    }
+
+    .catalog-preview iframe {
+      display: block;
+      width: 100%;
+      height: min(70vh, 560px);
+      border: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-layout admin-dark">
+    <!-- Sidebar -->
+    <aside class="sidebar" style="background-color: #020617;">
+      <div class="sidebar-brand" style="padding: 1.5rem 2rem;">
+        <a href="admin.html">
+          <img src="assets/logos/logo_dotacian_admin.png" alt="dotacian admin"
+            style="width: 100%; max-width: 180px; height: auto; display: block;">
+        </a>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="admin.html" id="nav-dashboard" class="nav-item">Dashboard</a>
+        <a href="admin.empresas.html" id="nav-users" class="nav-item">Gestión de Empresas</a>
+        <a href="admin.studio.html" id="nav-studio" class="nav-item active">DS Hub</a>
+        <a href="admin.sellers.html" id="nav-sellers" class="nav-item">Gestión de Fabricantes</a>
+        <a href="admin.cotizaciones.html" id="nav-cotizaciones" class="nav-item">Gestión de Cotizaciones</a>
+        <a href="admin.leads.html" id="nav-leads" class="nav-item">Gestión de Leads</a>
+        <a href="admin.facturas.html" class="nav-item">Facturación</a>
+        <a href="admin.blog.html" id="nav-blog" class="nav-item">Gestión de Blog</a>
+        <a href="#" class="nav-item">Logs de Sistema</a>
+        <a href="#" class="nav-item">Seguridad</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="app-header">
+        <h1 id="pageTitle">DS Hub</h1>
+        <div class="header-right" style="position: relative; display: flex; align-items: center;">
+          <div id="header-company-badge" onclick="toggleUserPopover(event)"
+            style="background: white; padding: 0.5rem 1rem; border-radius: 1.25rem; border: 1px solid #E2E8F0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 0.75rem; cursor: pointer; transition: all 0.3s ease; position: relative;">
+            <div id="badge-industry-icon"
+              style="width: 32px; height: 32px; background: #F1F5F9; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--color-cyan); font-size: 1.2rem;">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            <div style="display: flex; flex-direction: column;">
+              <span id="admin-name-display"
+                style="font-weight: 700; color: #0F172A; font-size: 0.85rem; line-height: 1.2;">Administrador</span>
+              <span style="font-size: 0.65rem; color: #64748B; font-weight: 600; text-transform: uppercase;">Panel Admin</span>
+            </div>
+            <div style="margin-left: 0.25rem; color: #64748B;">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </div>
+
+            <!-- Popover -->
+            <div id="user-popover" class="user-popover" style="top: calc(100% + 0.5rem); right: 0;">
+              <div class="popover-label">Usuario</div>
+              <div id="pop-user-name" class="popover-value" style="font-size: 0.9rem;">Administrador</div>
+              <div class="popover-label">Correo Electrónico</div>
+              <div id="pop-user-email" class="popover-value" style="margin-bottom: 0; font-size: 0.8rem;">Cargando...</div>
+              <hr style="margin: 1rem 0; border: none; border-top: 1px solid #E2E8F0;">
+              <a href="#" onclick="logoutUser(); return false;"
+                style="color: #EF4444; font-size: 0.85rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; transition: color 0.2s;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Cerrar Sesión
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="app-container">
+        <div class="catalog-intro">
+          <p>Decide qué prendas puede diseñar cada industria en <strong>Dotacian Studio</strong>. Marca la casilla donde se cruzan una prenda y una industria para habilitarla. Los cambios se guardan al instante.</p>
+          <div class="catalog-note">
+            <strong>Empresas sin industria:</strong> ven solo la Camiseta básica. Los diseños que una empresa ya creó se conservan aunque deshabilites la prenda.
+          </div>
+        </div>
+
+        <div class="catalog-alert" id="catalogUnclassified" hidden></div>
+
+        <div class="catalog-card">
+          <div class="catalog-table-wrap">
+            <table class="catalog-table" id="catalogTable">
+              <thead id="catalogHead"></thead>
+              <tbody id="catalogBody">
+                <tr><td class="catalog-loading">Cargando catálogo...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="catalog-footnote">Para agregar una prenda nueva (por ejemplo, overol) primero hay que construir su modelo 3D; cuando esté lista aparecerá aquí para habilitarla.</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- Vista previa 3D de una prenda -->
+  <div class="catalog-preview" id="catalogPreview" hidden>
+    <div class="catalog-preview-box">
+      <div class="catalog-preview-head">
+        <div>
+          <div class="catalog-preview-title" id="catalogPreviewTitle">Vista previa</div>
+          <div class="catalog-preview-sub">Así la ven las empresas en Dotacian Studio. Arrastra para girarla.</div>
+        </div>
+        <button type="button" class="catalog-preview-close" onclick="closePreview()" aria-label="Cerrar vista previa">✕</button>
+      </div>
+      <iframe id="catalogPreviewFrame" title="Vista previa 3D" src="about:blank"></iframe>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="assets/js/utils.js?v=4"></script>
+  <script src="assets/js/industries.js?v=1"></script>
+  <script>
+    const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: 'dotacian-admin-token' } });
+
+    let garments = [];            // filas de studio_garments
+    let enabled = new Set();      // "garment_key|industria" habilitados
+    let companiesByIndustry = {}; // industria → cantidad de empresas
+
+    async function checkAdminAuth() {
+      const { data: { session } } = await _supabase.auth.getSession();
+      if (!session) {
+        window.location.href = 'login.admin.html';
+        return;
+      }
+      const { data: adminData, error } = await _supabase
+        .from('admin_profile')
+        .select('id')
+        .eq('id', session.user.id)
+        .maybeSingle();
+      if (error || !adminData) {
+        await _supabase.auth.signOut();
+        window.location.href = 'login.admin.html?error=unauthorized';
+        return;
+      }
+      const emailEl = document.getElementById('pop-user-email');
+      if (emailEl) emailEl.textContent = session.user.email || '';
+      loadCatalog();
+    }
+
+    function showToast(title, message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.style.cssText = "background: white; border-left: 4px solid " + (type === 'error' ? '#EF4444' : '#10B981') + "; padding: 1rem 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 1rem; min-width: 300px;";
+      toast.innerHTML = `
+        <div>
+          <div style="font-weight: 700; font-size: 0.9rem; color: #0F172A;">${title}</div>
+          <div style="font-size: 0.875rem; color: #64748B;">${message}</div>
+        </div>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => { toast.remove(); }, 4000);
+    }
+
+    function escapeHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    async function loadCatalog() {
+      const [gRes, iRes, cRes] = await Promise.all([
+        _supabase.from('studio_garments').select('*').order('orden'),
+        _supabase.from('studio_garment_industries').select('garment_key, industria'),
+        _supabase.from('company_profile').select('id, company_name, industry')
+      ]);
+
+      if (gRes.error || iRes.error) {
+        console.error('Error cargando catálogo:', gRes.error || iRes.error);
+        const missing = /does not exist|Could not find the table/i.test(((gRes.error || iRes.error).message) || '');
+        document.getElementById('catalogBody').innerHTML = `<tr><td class="catalog-loading error">${missing
+          ? 'Falta crear las tablas del DS Hub en la base de datos (supabase_migration_studio_catalog.sql).'
+          : 'No se pudo cargar el catálogo. Recarga la página.'}</td></tr>`;
+        return;
+      }
+
+      garments = gRes.data || [];
+      enabled = new Set((iRes.data || []).map(r => `${r.garment_key}|${r.industria}`));
+
+      companiesByIndustry = {};
+      const unclassified = [];
+      (cRes.data || []).forEach(c => {
+        const key = String(c.industry || '').trim().toLowerCase();
+        if (window.industryLabel(key)) companiesByIndustry[key] = (companiesByIndustry[key] || 0) + 1;
+        else unclassified.push(c);
+      });
+      renderUnclassified(unclassified);
+      renderTable();
+    }
+
+    function renderUnclassified(list) {
+      const box = document.getElementById('catalogUnclassified');
+      if (!list.length) {
+        box.hidden = true;
+        return;
+      }
+      const names = list.slice(0, 6).map(c => escapeHtml(c.company_name || 'Sin nombre')).join(', ');
+      const more = list.length > 6 ? ` y ${list.length - 6} más` : '';
+      box.innerHTML = `<strong>${list.length} ${list.length === 1 ? 'empresa no tiene' : 'empresas no tienen'} una industria de la lista</strong> (${names}${more}), así que solo ven la Camiseta básica. Asígnales una industria en <a href="admin.empresas.html">Gestión de Empresas</a>.`;
+      box.hidden = false;
+    }
+
+    function renderTable() {
+      const industries = window.DOTACIAN_INDUSTRIES;
+      document.getElementById('catalogHead').innerHTML = `
+        <tr>
+          <th class="catalog-garment-col">Prenda</th>
+          ${industries.map(i => `
+            <th class="catalog-industry-col">
+              <span class="catalog-industry-name">${i.label}</span>
+              <span class="catalog-industry-count">${companiesByIndustry[i.key] || 0} ${(companiesByIndustry[i.key] || 0) === 1 ? 'empresa' : 'empresas'}</span>
+            </th>`).join('')}
+        </tr>
+      `;
+
+      if (!garments.length) {
+        document.getElementById('catalogBody').innerHTML = `<tr><td class="catalog-loading" colspan="${industries.length + 1}">No hay prendas en el catálogo.</td></tr>`;
+        return;
+      }
+
+      document.getElementById('catalogBody').innerHTML = garments.map(g => `
+        <tr class="${g.activo ? '' : 'catalog-row-off'}">
+          <td class="catalog-garment-col">
+            <div class="catalog-garment">
+              <div>
+                <div class="catalog-garment-name">${escapeHtml(g.nombre)}</div>
+                <div class="catalog-garment-desc">${escapeHtml(g.descripcion || '')}</div>
+              </div>
+              <div class="catalog-garment-actions">
+                <label class="catalog-switch" title="${g.activo ? 'Activa: se ofrece en las industrias marcadas' : 'Apagada: no la ve ninguna empresa'}">
+                  <input type="checkbox" ${g.activo ? 'checked' : ''} onchange="toggleGarmentActive('${g.key}', this)">
+                  <span class="catalog-switch-slider"></span>
+                  <span class="catalog-switch-label">${g.activo ? 'Activa' : 'Apagada'}</span>
+                </label>
+                <button type="button" class="catalog-link" onclick="openPreview('${g.key}')">Ver en 3D</button>
+                <button type="button" class="catalog-link" onclick="toggleRow('${g.key}')">Todas / ninguna</button>
+              </div>
+            </div>
+          </td>
+          ${industries.map(i => `
+            <td class="catalog-cell">
+              <input type="checkbox" aria-label="${escapeHtml(g.nombre)} en ${i.label}"
+                ${enabled.has(`${g.key}|${i.key}`) ? 'checked' : ''}
+                ${g.activo ? '' : 'disabled'}
+                onchange="toggleCell('${g.key}', '${i.key}', this)">
+            </td>`).join('')}
+        </tr>
+      `).join('');
+    }
+
+    async function setCell(garmentKey, industria, on) {
+      const query = on
+        ? _supabase.from('studio_garment_industries').insert({ garment_key: garmentKey, industria })
+        : _supabase.from('studio_garment_industries').delete().eq('garment_key', garmentKey).eq('industria', industria);
+      const { error } = await query;
+      if (error && !(on && error.code === '23505')) throw error; // 23505: ya existía
+      const k = `${garmentKey}|${industria}`;
+      if (on) enabled.add(k); else enabled.delete(k);
+    }
+
+    async function toggleCell(garmentKey, industria, checkbox) {
+      checkbox.disabled = true;
+      try {
+        await setCell(garmentKey, industria, checkbox.checked);
+        const g = garments.find(x => x.key === garmentKey);
+        showToast(checkbox.checked ? 'Prenda habilitada' : 'Prenda deshabilitada',
+          `${g ? g.nombre : garmentKey} ${checkbox.checked ? 'ahora aparece' : 'ya no aparece'} para ${window.industryLabel(industria)}.`);
+      } catch (err) {
+        console.error('Error actualizando visibilidad:', err);
+        checkbox.checked = !checkbox.checked;
+        showToast('Error', 'No se pudo guardar el cambio.', 'error');
+      } finally {
+        checkbox.disabled = false;
+      }
+    }
+
+    // Marca o desmarca todas las industrias de una prenda.
+    async function toggleRow(garmentKey) {
+      const g = garments.find(x => x.key === garmentKey);
+      if (!g || !g.activo) return;
+      const industries = window.DOTACIAN_INDUSTRIES.map(i => i.key);
+      const allOn = industries.every(i => enabled.has(`${garmentKey}|${i}`));
+      try {
+        for (const i of industries) {
+          const has = enabled.has(`${garmentKey}|${i}`);
+          if (allOn && has) await setCell(garmentKey, i, false);
+          if (!allOn && !has) await setCell(garmentKey, i, true);
+        }
+        showToast('Catálogo actualizado', `${g.nombre} ${allOn ? 'quedó deshabilitada en todas las industrias' : 'quedó habilitada en todas las industrias'}.`);
+      } catch (err) {
+        console.error('Error actualizando prenda:', err);
+        showToast('Error', 'No se pudieron guardar todos los cambios.', 'error');
+      }
+      renderTable();
+    }
+
+    async function toggleGarmentActive(garmentKey, checkbox) {
+      checkbox.disabled = true;
+      const activo = checkbox.checked;
+      const { error } = await _supabase.from('studio_garments')
+        .update({ activo, updated_at: new Date().toISOString() })
+        .eq('key', garmentKey);
+      checkbox.disabled = false;
+      if (error) {
+        console.error('Error actualizando prenda:', error);
+        checkbox.checked = !activo;
+        showToast('Error', 'No se pudo guardar el cambio.', 'error');
+        return;
+      }
+      const g = garments.find(x => x.key === garmentKey);
+      if (g) g.activo = activo;
+      showToast(activo ? 'Prenda activada' : 'Prenda apagada',
+        `${g ? g.nombre : garmentKey} ${activo ? 'vuelve a ofrecerse en las industrias marcadas' : 'ya no la ve ninguna empresa'}.`);
+      renderTable();
+    }
+
+    function openPreview(garmentKey) {
+      const g = garments.find(x => x.key === garmentKey);
+      document.getElementById('catalogPreviewTitle').textContent = g ? g.nombre : 'Vista previa';
+      document.getElementById('catalogPreviewFrame').src = `/app/studio.html?embed=1&prenda=${encodeURIComponent(garmentKey)}`;
+      document.getElementById('catalogPreview').hidden = false;
+    }
+
+    function closePreview() {
+      document.getElementById('catalogPreview').hidden = true;
+      document.getElementById('catalogPreviewFrame').src = 'about:blank';
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closePreview(); });
+    document.getElementById('catalogPreview').addEventListener('click', e => {
+      if (e.target.id === 'catalogPreview') closePreview();
+    });
+
+    checkAdminAuth();
+  </script>
+</body>
+
+</html>

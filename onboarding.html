@@ -15,6 +15,7 @@
   <!-- SDKs & Utils -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/utils.js?v=4"></script>
+  <script src="assets/js/industries.js?v=1"></script>
 
   <style>
     /* =============================================
@@ -289,6 +290,21 @@
       transition: all 0.3s;
     }
 
+    .modern-select {
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2394A3B8' stroke-width='2.5' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1.2rem center;
+      padding-right: 3rem;
+    }
+
+    .modern-select option {
+      color: #0F172A;
+      background: white;
+    }
+
     .modern-input:focus {
       background: rgba(255, 255, 255, 0.05);
       border-color: #06B6D4;
@@ -544,7 +560,7 @@
             </div>
             <div class="input-wrapper">
               <label for="industry">Sector / Industria</label>
-              <input type="text" id="industry" class="modern-input" placeholder="Ej. Restaurantes" autocomplete="off" oninput="validateStep1()">
+              <select id="industry" class="modern-input modern-select" onchange="validateStep1()"></select>
             </div>
           </div>
           <button id="btn-next-1" class="btn-glow" onclick="nextStep(2)" disabled>
@@ -663,6 +679,12 @@
     }
 
     // Input Validations
+    // La industria se elige de la lista oficial (assets/js/industries.js):
+    // DS Hub decide qué prendas ve cada industria.
+    document.addEventListener('DOMContentLoaded', () => {
+      fillIndustrySelect(document.getElementById('industry'), '', 'Selecciona tu industria...');
+    });
+
     function validateStep1() {
       const cName = document.getElementById('companyName').value.trim();
       const industry = document.getElementById('industry').value.trim();
