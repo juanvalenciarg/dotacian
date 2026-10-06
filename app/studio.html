@@ -1096,6 +1096,15 @@
                     <span class="studio-garment-meta">Capucha · Bolsillo canguro · Puños en rib</span>
                   </span>
                 </button>
+                <button type="button" class="studio-garment studio-garment-option" data-garment="filipina" aria-pressed="false">
+                  <span class="studio-garment-icon">
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 3h6v2H9z"></path><path d="M9 5 4 7 2.5 21h4L8 10v12h8V10l1.5 11h4L20 7l-5-2"></path><path d="M9 5l4 17"></path><circle cx="10.5" cy="10" r="0.6"></circle><circle cx="14.5" cy="10" r="0.6"></circle><circle cx="10.8" cy="14" r="0.6"></circle><circle cx="14.8" cy="14" r="0.6"></circle></svg>
+                  </span>
+                  <span>
+                    <span class="studio-garment-name">Filipina de chef</span>
+                    <span class="studio-garment-meta">Cuello mao · Doble botonadura · Manga larga</span>
+                  </span>
+                </button>
               </div>
               <div class="studio-soon">
                 <span>Polo · pronto</span>
@@ -1405,6 +1414,54 @@
           pechoIzq: { x: 0.15, y: 0.14, defaultCm: 9 },
           espalda: { x: 0, y: -0.06, defaultCm: 26 }
         }
+      },
+
+      filipina: {
+        label: 'Filipina de chef',
+        meta: 'Cuello mao · Doble botonadura · Manga larga',
+        summary: { cuello: 'Mao', manga: 'Larga con puño', bolsillo: null },
+        profile: [
+          { y: -0.78, a: 0.345, b: 0.172, n: 2.6 },
+          { y: -0.50, a: 0.338, b: 0.165, n: 2.6 },
+          { y: -0.18, a: 0.340, b: 0.170, n: 2.6 },
+          { y: 0.08, a: 0.352, b: 0.184, n: 2.5 },
+          { y: 0.24, a: 0.355, b: 0.182, n: 2.4 },
+          { y: 0.33, a: 0.318, b: 0.160, n: 2.3 },
+          { y: 0.39, a: 0.238, b: 0.132, n: 2.1 },
+          { y: 0.425, a: 0.160, b: 0.114, n: 2.0 },
+          { y: 0.440, a: 0.118, b: 0.106, n: 2.0 }
+        ],
+        neckStart: 5,
+        neckDip: 0.02,
+        hemCurve: 0,
+        waistFold: 0.003,
+        sleeve: {
+          angleStart: deg(50),
+          angleEnd: deg(84),
+          length: 0.86,
+          hemTilt: 0,
+          forward: deg(9),
+          start: -0.18,
+          rBase: [0.155, 0.146],
+          rEnd: [0.072, 0.068],
+          flare: false,
+          shoulder: new THREE.Vector3(0.335, 0.336, 0),
+          cuff: { length: 0.1, scale: 1.1, button: false } // puño ancho doblado, sin botón
+        },
+        collar: 'mandarin',
+        placket: false,
+        pocket: null,
+        // Doble botonadura: el panel del frente se cruza y su borde queda a la
+        // derecha vista de frente; dos filas de botones a cada lado del centro.
+        doubleBreasted: { panelFrom: -0.06, edgeX: 0.115, rows: [-0.07, 0.072], buttons: 5, spacing: 0.105 },
+        buttonContrast: true, // botones oscuros en filipina clara y claros en oscura
+        groundY: -0.86,
+        defaultPlacement: 'pechoIzq',
+        logoPlacements: {
+          pechoIzq: { x: 0.215, y: 0.19, defaultCm: 7 },
+          pechoDer: { x: -0.205, y: 0.19, defaultCm: 7 },
+          espalda: { x: 0, y: 0.06, defaultCm: 24 }
+        }
       }
     };
 
@@ -1658,6 +1715,64 @@
       return [stand, leaf, buildRim(edge, 0.0028, false), buildRim(standTop, 0.0035)];
     }
 
+    // --- Cuello mao (filipina): banda alta que rodea el cuello ---
+    const MANDARIN_H = 0.05;
+    const MANDARIN_GAP = 0.01; // separación (en vueltas) entre los extremos al frente
+
+    function mandarinPoint(cfg, h, w) {
+      // w: 0 → 1 recorre el cuello desde un extremo del frente, por la espalda, hasta el otro.
+      const u = 0.25 + MANDARIN_GAP + w * (1 - 2 * MANDARIN_GAP);
+      const p = torsoPoint(cfg, 1, u);
+      const scale = 1.025 - 0.07 * h; // la banda se inclina hacia el cuello
+      return new THREE.Vector3(p.x * scale, p.y - 0.004 + h * MANDARIN_H, p.z * scale);
+    }
+
+    function buildMandarinCollar(cfg) {
+      const band = buildGrid(8, 140, (v, u) => mandarinPoint(cfg, v, u), (v, u) => ({ u: u * 2, v }));
+      const top = [], bottom = [];
+      for (let j = 0; j <= 140; j++) {
+        top.push(mandarinPoint(cfg, 1, j / 140));
+        bottom.push(mandarinPoint(cfg, 0.04, j / 140));
+      }
+      const ends = [0, 1].map(w => {
+        const pts = [];
+        for (let i = 0; i <= 8; i++) pts.push(mandarinPoint(cfg, i / 8, w));
+        return buildRim(pts, 0.0035, false);
+      });
+      return [band, buildRim(top, 0.004, false), buildRim(bottom, 0.0025, false), ...ends];
+    }
+
+    // --- Doble botonadura (filipina) ---
+    function buildDoubleBreastedPanel(cfg) {
+      const db = cfg.doubleBreasted;
+      const offset = 0.004;
+      const panel = buildGrid(120, 14, (v, u) => {
+        const x = THREE.MathUtils.lerp(db.panelFrom, db.edgeX, u);
+        const { point, normal } = frontPointAt(cfg, v, x);
+        return point.addScaledVector(normal, offset * u); // se levanta hacia el borde que se cruza
+      }, (v, u) => ({ u: u * 0.3, v: v * 1.2 }));
+      const edge = [];
+      for (let i = 0; i <= 60; i++) {
+        const { point, normal } = frontPointAt(cfg, i / 60, db.edgeX);
+        edge.push(point.addScaledVector(normal, offset));
+      }
+      return [panel, buildRim(edge, 0.003, false)];
+    }
+
+    function doubleBreastedButtons(cfg) {
+      const db = cfg.doubleBreasted;
+      const neckY = torsoPoint(cfg, 1, 0.25).y;
+      const out = [];
+      for (let i = 0; i < db.buttons; i++) {
+        const y = neckY - 0.1 - i * db.spacing;
+        db.rows.forEach(x => {
+          const { point, normal } = frontPointAt(cfg, frontV(cfg, y), x);
+          out.push({ point: point.addScaledVector(normal, 0.009), normal, radius: 0.012 });
+        });
+      }
+      return out;
+    }
+
     // --- Tapeta con botones ---
     function buildPlacket(cfg) {
       const pl = cfg.placket;
@@ -1872,6 +1987,7 @@
             fabricParts.push(buildRim(sleeveRing(sl, axis, side, cuffStart + 0.01, 1), 0.004));
             return;
           }
+          if (sl.cuff.button === false) return;
           // Botón del puño, del lado de afuera.
           const s = 1 - (sl.cuff.length * 0.5) / sl.length;
           const p = sleevePoint(sl, axis, side, s, 0, sl.cuff.scale + 0.06);
@@ -1889,6 +2005,8 @@
         fabricParts.push(buildRim(torsoRing(cfg, 1, -0.004, 1.06), 0.016));
       } else if (cfg.collar === 'hood') {
         fabricParts.push(...buildHood(cfg));
+      } else if (cfg.collar === 'mandarin') {
+        fabricParts.push(...buildMandarinCollar(cfg));
       } else {
         fabricParts.push(...buildShirtCollar(cfg));
       }
@@ -1905,6 +2023,11 @@
         const ds = buildDrawstrings(cfg);
         fabricParts.push(...ds.cords);
         trimParts.push(...ds.tips);
+      }
+
+      if (cfg.doubleBreasted) {
+        fabricParts.push(...buildDoubleBreastedPanel(cfg));
+        buttonParts.push(...doubleBreastedButtons(cfg));
       }
 
       if (cfg.placket) {
@@ -2053,6 +2176,20 @@
       ribMaterial.bumpMap = buildRibTexture();
       ribMaterial.bumpScale = 1.6;
 
+      // Botones: mismo tono de la tela (un poco más oscuros) o, en prendas con
+      // buttonContrast (filipina), oscuros sobre tela clara y claros sobre oscura.
+      const BUTTON_DARK = new THREE.Color('#1F2328');
+      const BUTTON_LIGHT = new THREE.Color('#E8E8E4');
+      function setButtonColor() {
+        const cfg = GARMENTS[garment.key];
+        if (cfg && cfg.buttonContrast) {
+          const lum = 0.2126 * fabric.color.r + 0.7152 * fabric.color.g + 0.0722 * fabric.color.b;
+          buttonMaterial.color.copy(lum > 0.25 ? BUTTON_DARK : BUTTON_LIGHT);
+        } else {
+          buttonMaterial.color.copy(fabric.color).multiplyScalar(0.82);
+        }
+      }
+
       // Botones: mismo tono de la tela, un poco más oscuros y con brillo.
       const buttonMaterial = new THREE.MeshStandardMaterial({ roughness: 0.35, metalness: 0, envMapIntensity: 0.8 });
 
@@ -2196,7 +2333,7 @@
           if (k >= 1) viewAnim = null;
         }
         fabric.color.lerp(targetColor, 0.12);
-        buttonMaterial.color.copy(fabric.color).multiplyScalar(0.82);
+        setButtonColor();
         ribMaterial.color.copy(fabric.color);
         controls.update();
         renderer.render(scene, camera);
@@ -2987,7 +3124,7 @@
         const c = SHIRT_COLORS[colorKey] || SHIRT_COLORS.blanco;
         fabric.color.set(c.hex);
         targetColor.set(c.hex);
-        buttonMaterial.color.copy(fabric.color).multiplyScalar(0.82);
+        setButtonColor();
         ribMaterial.color.copy(fabric.color);
         viewAnim = null;
         controls.autoRotate = false;
