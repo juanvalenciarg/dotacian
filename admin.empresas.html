@@ -385,6 +385,139 @@
       background: #F8FAFC;
     }
   </style>
+  <style>
+    .ncg-help {
+      margin: 0 0 0.6rem;
+      font-size: 0.78rem;
+      color: #64748B;
+    }
+
+    .ncg-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+      gap: 0.6rem;
+    }
+
+    .ncg-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.5rem 0.5rem 0.6rem;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 0.85rem;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .ncg-card:has(input:checked) {
+      border-color: #06B6D4;
+      background: #F0FDFF;
+    }
+
+    .ncg-card input {
+      position: absolute;
+      top: 0.45rem;
+      left: 0.45rem;
+      width: 16px;
+      height: 16px;
+      accent-color: #06B6D4;
+    }
+
+    .ncg-thumb {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 0.6rem;
+      background: radial-gradient(ellipse at 50% 38%, #FFFFFF 0%, #EEF2F6 70%, #E2E8F0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .ncg-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .ncg-name {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #0F172A;
+      line-height: 1.2;
+    }
+
+    .ncg-tag {
+      font-size: 0.62rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #0E7490;
+      background: #CFFAFE;
+      border-radius: 999px;
+      padding: 0.05rem 0.4rem;
+    }
+
+    .ncg-more {
+      margin-top: 0.6rem;
+      border: none;
+      background: none;
+      padding: 0;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #0891B2;
+      cursor: pointer;
+    }
+
+    .ncg-more[hidden] {
+      display: none;
+    }
+
+    .ncg-empty {
+      grid-column: 1 / -1;
+      font-size: 0.8rem;
+      color: #64748B;
+      background: #F8FAFC;
+      border-radius: 0.7rem;
+      padding: 0.85rem;
+      text-align: center;
+    }
+
+    .ncg-hub-link {
+      display: inline-block;
+      margin-top: 0.4rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #0891B2;
+      text-decoration: none;
+    }
+
+    .ncg-hub-link:hover {
+      text-decoration: underline;
+    }
+
+    .ds-render-loading {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 3px solid #CBD5E1;
+      border-top-color: #06B6D4;
+      animation: ncg-spin 0.9s linear infinite;
+    }
+
+    .ds-render-missing {
+      font-size: 0.68rem;
+      color: #94A3B8;
+    }
+
+    @keyframes ncg-spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 
 <body>
@@ -558,6 +691,7 @@
                   <div class="form-group">
                     <label>Sector / Industria</label>
                     <select id="editIndustry" class="form-control"></select>
+                    <a id="editCompanyGarmentsLink" href="admin.studio.html" class="ncg-hub-link">Prendas de Dotacian Studio → gestionar en DS Hub</a>
                   </div>
                   <div class="form-group">
                     <label>País</label>
@@ -700,7 +834,7 @@
   <!-- Modal Crear Empresa -->
   <div id="new-client-modal" class="modal-overlay" style="z-index: 10000;">
     <div class="modal-content"
-      style="max-width: 520px; width: 95%; background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
+      style="max-width: 620px; width: 95%; max-height: 92vh; overflow-y: auto; background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
       <div
         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #E2E8F0; padding-bottom: 1rem;">
         <h2 style="font-size: 1.25rem; color: #0f172a; font-weight: 700; margin: 0; font-family: var(--font-family-heading, 'Outfit');">
@@ -719,7 +853,7 @@
         <div class="form-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 0.5rem;">
           <div class="form-group">
             <label>Industria</label>
-            <select id="newCompanyIndustry" class="form-control"></select>
+            <select id="newCompanyIndustry" class="form-control" onchange="renderNewCompanyGarments(true)"></select>
           </div>
           <div class="form-group">
             <label>País</label>
@@ -730,6 +864,13 @@
             </select>
           </div>
         </div>
+
+        <div class="form-section-title" style="margin: 1.5rem 0 0.35rem;">
+          <div class="title-left">Prendas que usa (Dotacian Studio)</div>
+        </div>
+        <p class="ncg-help">Marcadas: las sugeridas para su industria. Después se cambian desde DS Hub.</p>
+        <div id="newCompanyGarments" class="ncg-grid"></div>
+        <button type="button" class="ncg-more" id="newCompanyGarmentsMore" onclick="toggleAllNewCompanyGarments()" hidden>Ver todas las prendas</button>
 
         <div class="form-section-title" style="margin: 1.5rem 0 0.75rem;">
           <div class="title-left">Primer Administrador</div>
@@ -988,6 +1129,7 @@
 
   <script src="assets/js/utils.js?v=4"></script>
   <script src="assets/js/industries.js?v=1"></script>
+  <script src="assets/js/studio-renders.js?v=1"></script>
   <script>
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
@@ -1155,6 +1297,7 @@
       document.getElementById('cardEmail').textContent = `${company.admins.length} administrador${company.admins.length !== 1 ? 'es' : ''}`;
       document.getElementById('editCompany').value = company.company_name || '';
       fillIndustrySelect(document.getElementById('editIndustry'), company.industry);
+      document.getElementById('editCompanyGarmentsLink').href = `admin.studio.html?empresa=${encodeURIComponent(company.id)}`;
       document.getElementById('editCountry').value = company.country || '';
       document.getElementById('editLegalName').value = company.legal_name || '';
       document.getElementById('editTaxId').value = company.tax_id || '';
@@ -1741,8 +1884,71 @@
 
     // -------- Crear Empresa (empresa + primer administrador) --------
 
+    // --- Prendas de Dotacian Studio al crear una empresa ---
+    // Se muestran marcadas las sugeridas para la industria elegida (DS Hub →
+    // Sugeridas por industria) y, con "Ver todas las prendas", el resto.
+    let studioCatalog = null;          // { garments: [...], suggested: Set("key|industria") }
+    let newCompanyGarmentsShowAll = false;
+
+    async function loadStudioCatalog() {
+      if (studioCatalog) return studioCatalog;
+      const [gRes, sRes] = await Promise.all([
+        _supabase.from('studio_garments').select('key, nombre, descripcion, activo, orden').eq('activo', true).order('orden'),
+        _supabase.from('studio_garment_industries').select('garment_key, industria')
+      ]);
+      if (gRes.error || sRes.error) {
+        console.error('Error cargando prendas de Dotacian Studio:', gRes.error || sRes.error);
+        return null;
+      }
+      studioCatalog = {
+        garments: gRes.data || [],
+        suggested: new Set((sRes.data || []).map(r => `${r.garment_key}|${r.industria}`))
+      };
+      return studioCatalog;
+    }
+
+    async function renderNewCompanyGarments(resetSelection) {
+      const wrap = document.getElementById('newCompanyGarments');
+      const moreBtn = document.getElementById('newCompanyGarmentsMore');
+      const catalog = await loadStudioCatalog();
+      if (!catalog) {
+        wrap.innerHTML = '<div class="ncg-empty">No se pudieron cargar las prendas. Podrás habilitarlas después desde DS Hub.</div>';
+        moreBtn.hidden = true;
+        return;
+      }
+      const industry = document.getElementById('newCompanyIndustry').value;
+      const checked = new Set(resetSelection
+        ? catalog.garments.filter(g => catalog.suggested.has(`${g.key}|${industry}`)).map(g => g.key)
+        : Array.from(wrap.querySelectorAll('input:checked')).map(i => i.value));
+      const suggestedKeys = catalog.garments.filter(g => catalog.suggested.has(`${g.key}|${industry}`)).map(g => g.key);
+      const visible = catalog.garments.filter(g => newCompanyGarmentsShowAll || suggestedKeys.includes(g.key) || checked.has(g.key));
+
+      wrap.innerHTML = visible.length
+        ? visible.map(g => `
+            <label class="ncg-card">
+              <input type="checkbox" value="${g.key}" ${checked.has(g.key) ? 'checked' : ''}>
+              <span class="ncg-thumb" data-render="${g.key}"></span>
+              <span class="ncg-name">${g.nombre}</span>
+              ${suggestedKeys.includes(g.key) ? '<span class="ncg-tag">Sugerida</span>' : ''}
+            </label>`).join('')
+        : `<div class="ncg-empty">${industry ? 'No hay prendas sugeridas para esta industria.' : 'Elige la industria para ver las prendas sugeridas.'}</div>`;
+
+      const hiddenCount = catalog.garments.length - visible.length;
+      moreBtn.hidden = !newCompanyGarmentsShowAll && hiddenCount === 0;
+      moreBtn.textContent = newCompanyGarmentsShowAll ? 'Mostrar solo las sugeridas' : `Ver todas las prendas (${hiddenCount} más)`;
+
+      if (window.DSRenders) wrap.querySelectorAll('[data-render]').forEach(el => window.DSRenders.fillRender(el, el.dataset.render));
+    }
+
+    function toggleAllNewCompanyGarments() {
+      newCompanyGarmentsShowAll = !newCompanyGarmentsShowAll;
+      renderNewCompanyGarments(false);
+    }
+
     function openNewCompanyModal() {
       fillIndustrySelect(document.getElementById('newCompanyIndustry'), '');
+      newCompanyGarmentsShowAll = false;
+      renderNewCompanyGarments(true);
       document.getElementById('new-client-modal').classList.add('active');
     }
     function closeNewCompanyModal() {
@@ -1755,6 +1961,7 @@
       const companyName = document.getElementById('newCompanyName').value.trim();
       const industry = document.getElementById('newCompanyIndustry').value.trim();
       const country = document.getElementById('newCompanyCountry').value.trim();
+      const garmentKeys = Array.from(document.querySelectorAll('#newCompanyGarments input:checked')).map(i => i.value);
 
       const fName = document.getElementById('newClientFirstName').value.trim();
       const lName = document.getElementById('newClientLastName').value.trim();
@@ -1807,6 +2014,17 @@
           });
 
           if (rpcError) throw rpcError;
+
+          // Prendas que podrá diseñar en Dotacian Studio (sin ninguna: solo la camiseta básica).
+          if (garmentKeys.length) {
+            const { error: garmentsError } = await _supabase
+              .from('studio_company_garments')
+              .insert(garmentKeys.map(key => ({ company_id: newUserId, garment_key: key })));
+            if (garmentsError) {
+              console.error('Error guardando prendas de la empresa:', garmentsError);
+              showToast('Atención', 'La empresa se creó, pero no se guardaron sus prendas. Habilítalas desde DS Hub.', 'error');
+            }
+          }
 
           showToast('Éxito', 'Empresa creada correctamente.', 'success');
           closeNewCompanyModal();

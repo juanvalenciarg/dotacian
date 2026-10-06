@@ -2979,7 +2979,29 @@
         if (GARMENTS[prenda]) setGarment(prenda);
       }
 
-      window.dotacianStudio = { scene, camera, controls, shirt, fabric, logoState, setGarment, garment };
+      // Foto (PNG) de una prenda para las tarjetas del DS Hub del admin, que
+      // carga esta página oculta con ?embed=1 y llama a esta función.
+      function snapshot(key, colorKey = 'blanco') {
+        if (!GARMENTS[key]) return null;
+        buildShirt(key);
+        const c = SHIRT_COLORS[colorKey] || SHIRT_COLORS.blanco;
+        fabric.color.set(c.hex);
+        targetColor.set(c.hex);
+        buttonMaterial.color.copy(fabric.color).multiplyScalar(0.82);
+        ribMaterial.color.copy(fabric.color);
+        viewAnim = null;
+        controls.autoRotate = false;
+        // Vista 3/4 para que se lean mangas, cuello y volumen.
+        const azimuth = -0.5;
+        controls.target.set(0, -0.16, 0);
+        camera.position.set(Math.sin(azimuth) * 3.3, 0.12, Math.cos(azimuth) * 3.3);
+        camera.lookAt(controls.target);
+        controls.update();
+        renderer.render(scene, camera);
+        return renderer.domElement.toDataURL('image/png');
+      }
+
+      window.dotacianStudio = { scene, camera, controls, shirt, fabric, logoState, setGarment, garment, snapshot };
     }
 
     if (!webglAvailable()) {
