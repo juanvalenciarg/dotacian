@@ -2998,7 +2998,18 @@
         camera.lookAt(controls.target);
         controls.update();
         renderer.render(scene, camera);
-        return renderer.domElement.toDataURL('image/png');
+        // Se reduce a 400 px (suficiente para las tarjetas) para que cada
+        // imagen pese poco y quepan muchas en la caché del navegador.
+        const src = renderer.domElement;
+        const side = 400;
+        const scale = Math.min(side / src.width, side / src.height);
+        const out = document.createElement('canvas');
+        out.width = side;
+        out.height = side;
+        const w = src.width * scale;
+        const h = src.height * scale;
+        out.getContext('2d').drawImage(src, (side - w) / 2, (side - h) / 2, w, h);
+        return out.toDataURL('image/png');
       }
 
       window.dotacianStudio = { scene, camera, controls, shirt, fabric, logoState, setGarment, garment, snapshot };
