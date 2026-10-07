@@ -3794,8 +3794,13 @@
       }
 
       refreshSaveButtons();
-      loadDesigns();
-      loadAvailableGarments();
+      // ?diseno=<id> (desde el Catálogo): abre ese diseño cuando ya se sabe qué
+      // diseños y prendas tiene la empresa.
+      Promise.all([loadDesigns(), loadAvailableGarments()]).then(() => {
+        const wanted = URL_PARAMS.get('diseno');
+        const d = wanted && designs.find(x => x.id === wanted);
+        if (d) openDesign(d);
+      });
 
       if (EMBED) {
         const prenda = URL_PARAMS.get('prenda');

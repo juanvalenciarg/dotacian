@@ -131,392 +131,205 @@
     }
 
 
-    .asset-category-section {
-      margin-bottom: 2rem;
-    }
-
-    .asset-category-title {
-      font-size: 1.1rem;
-      font-weight: 800;
-      color: var(--color-navy);
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-
-    .asset-category-title .badge-count {
-      background: var(--color-cyan-dim);
-      color: var(--color-cyan);
-      font-size: 0.7rem;
-      font-weight: 800;
-      padding: 0.2rem 0.6rem;
-      border-radius: 999px;
-    }
-
-    .asset-subcat-icon-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .asset-subcat-tile {
-      background: white;
-      border: 1px solid var(--color-border);
-      border-radius: 1.25rem;
-      padding: 1.25rem 0.75rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.6rem;
-      cursor: pointer;
-      font-family: inherit;
-      text-align: center;
-      transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-    }
-
-    .asset-subcat-tile:hover {
-      border-color: var(--color-cyan);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
-    }
-
-    .asset-subcat-tile.active {
-      border-color: var(--color-cyan);
-      background: var(--color-cyan-dim);
-    }
-
-    .asset-subcat-tile-icon {
-      width: 46px;
-      height: 46px;
-      border-radius: 50%;
-      background: #F1F5F9;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--color-navy);
-      transition: background 0.2s ease, color 0.2s ease;
-    }
-
-    .asset-subcat-tile.active .asset-subcat-tile-icon {
-      background: var(--color-cyan);
-      color: white;
-    }
-
-    .asset-subcat-tile-label {
-      font-weight: 700;
-      font-size: 0.85rem;
-      color: var(--color-navy);
-      line-height: 1.2;
-    }
-
-    .asset-subcat-tile-count {
-      font-size: 0.7rem;
-      color: var(--color-text-muted);
-      font-weight: 600;
-    }
-
-    .asset-subcat-panel {
-      display: none;
-    }
-
-    .asset-subcat-panel.open {
-      display: block;
-    }
-
-    .asset-subcat-card {
-      background: white;
-      border-radius: 1.25rem;
-      border: 1px solid var(--color-border);
-      margin-bottom: 1rem;
-      overflow: hidden;
-    }
-
-    .asset-subcat-header {
-      padding: 1rem 1.25rem;
-      font-weight: 700;
-      color: var(--color-navy);
-      font-size: 0.9rem;
-      background: #F8FAFC;
-      border-bottom: 1px solid var(--color-border);
-    }
-
-    .asset-row {
-      padding: 1rem 1.25rem;
-      border-bottom: 1px solid #F1F5F9;
-    }
-
-    .asset-row:last-child {
-      border-bottom: none;
-    }
-
-    .asset-row-main {
+    /* Catálogo: uniformes guardados en Dotacian Studio */
+    .catalog-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
-    }
-
-    .asset-row-info {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      flex: 1;
-      min-width: 0;
-      cursor: pointer;
-    }
-
-    .asset-row-chevron {
-      flex-shrink: 0;
-      color: var(--color-text-muted);
-      transition: transform 0.2s ease;
-    }
-
-    .asset-row:has(.asset-detail-panel.open) .asset-row-chevron {
-      transform: rotate(90deg);
-    }
-
-    .asset-row-name {
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: var(--color-navy);
-    }
-
-    .asset-row-summary {
-      font-size: 0.75rem;
-      color: var(--color-text-muted);
-      margin-top: 0.2rem;
-    }
-
-    .toggle-switch {
-      position: relative;
-      display: inline-block;
-      width: 42px;
-      height: 23px;
-      flex-shrink: 0;
-    }
-
-    .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .toggle-switch .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #CBD5E1;
-      transition: .35s cubic-bezier(0.4, 0, 0.2, 1);
-      border-radius: 24px;
-    }
-
-    .toggle-switch .slider:before {
-      position: absolute;
-      content: "";
-      height: 17px;
-      width: 17px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: .35s cubic-bezier(0.4, 0, 0.2, 1);
-      border-radius: 50%;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    }
-
-    .toggle-switch input:checked+.slider {
-      background-color: var(--color-cyan);
-    }
-
-    .toggle-switch input:checked+.slider:before {
-      transform: translateX(19px);
-    }
-
-    .asset-detail-panel {
-      display: none;
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px dashed var(--color-border);
-    }
-
-    .asset-detail-panel.open {
-      display: block;
-    }
-
-    .asset-detail-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
       margin-bottom: 1rem;
     }
 
-    @media (max-width: 600px) {
-      .asset-detail-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .asset-field label {
-      display: block;
+    .catalog-head .badge-count {
+      background: var(--color-cyan-dim);
+      color: var(--color-cyan);
       font-size: 0.75rem;
-      font-weight: 700;
-      color: var(--color-text-secondary);
-      margin-bottom: 0.4rem;
+      font-weight: 800;
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
     }
 
-    .asset-field input[type="text"],
-    .asset-field input[type="number"] {
-      width: 100%;
-      padding: 0.6rem 0.75rem;
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      font-family: inherit;
-      font-size: 0.85rem;
-      box-sizing: border-box;
-    }
-
-    .asset-field-checkbox {
-      display: flex;
+    .catalog-new-btn {
+      display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
+      padding: 0.6rem 1.1rem;
+      border-radius: 999px;
+      background: var(--color-navy);
+      color: white;
       font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--color-navy);
-      cursor: pointer;
-    }
-
-    .asset-field-checkbox input {
-      width: 16px;
-      height: 16px;
-      accent-color: var(--color-cyan);
-      cursor: pointer;
-    }
-
-    .asset-providers-block {
-      margin-bottom: 1.25rem;
-    }
-
-    .asset-providers-head {
-      margin-bottom: 0.6rem;
-    }
-
-    .asset-providers-head label {
-      display: block;
-      font-size: 0.75rem;
       font-weight: 700;
-      color: var(--color-text-secondary);
-      margin-bottom: 0.2rem;
+      text-decoration: none;
+      transition: background 0.2s;
     }
 
-    .asset-providers-hint {
-      font-size: 0.75rem;
-      color: var(--color-text-muted);
+    .catalog-new-btn:hover {
+      background: #1E293B;
     }
 
-    .provider-list {
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .catalog-card {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 1.25rem;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
-      margin-bottom: 0.6rem;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    .provider-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr auto;
-      gap: 0.5rem;
+    .catalog-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 30px -18px rgba(15, 23, 42, 0.35);
+    }
+
+    .catalog-render {
+      position: relative;
+      display: flex;
       align-items: center;
+      justify-content: center;
+      aspect-ratio: 1 / 1;
+      background: radial-gradient(ellipse at 50% 38%, #FFFFFF 0%, #EEF2F6 70%, #E2E8F0 100%);
     }
 
-    @media (max-width: 700px) {
-      .provider-row {
-        grid-template-columns: 1fr auto;
-        grid-template-areas: "nombre remove" "correo correo" "telefono telefono";
-      }
-
-      .provider-row .prov-nombre { grid-area: nombre; }
-      .provider-row .prov-correo { grid-area: correo; }
-      .provider-row .prov-telefono { grid-area: telefono; }
-      .provider-row .provider-remove-btn { grid-area: remove; }
-    }
-
-    .provider-row input[type="text"],
-    .provider-row input[type="email"],
-    .provider-row input[type="tel"] {
+    .catalog-render-img {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       width: 100%;
-      padding: 0.6rem 0.75rem;
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      font-family: inherit;
-      font-size: 0.85rem;
-      box-sizing: border-box;
+      height: 100%;
     }
 
-    .provider-remove-btn {
-      background: none;
+    .catalog-render-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .catalog-logo {
+      position: absolute;
+      right: 0.65rem;
+      bottom: 0.65rem;
+      width: 44px;
+      height: 44px;
+      border-radius: 0.65rem;
+      background: white;
       border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.3rem;
+      box-shadow: 0 4px 10px -6px rgba(15, 23, 42, 0.35);
+    }
+
+    .catalog-logo img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .ds-render-loading {
       width: 34px;
       height: 34px;
-      flex-shrink: 0;
-      cursor: pointer;
-      font-size: 0.9rem;
-      line-height: 1;
+      border-radius: 50%;
+      border: 3px solid #CBD5E1;
+      border-top-color: var(--color-cyan);
+      animation: catalog-spin 0.9s linear infinite;
     }
 
-    .provider-remove-btn:hover {
-      border-color: #EF4444;
-      color: #EF4444;
+    .ds-render-missing {
+      font-size: 0.78rem;
+      color: #94A3B8;
     }
 
-    .btn-add-provider {
-      background: none;
-      border: 1px dashed var(--color-border);
-      border-radius: var(--radius-md);
-      color: var(--color-cyan);
+    @keyframes catalog-spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .catalog-body {
+      padding: 0.95rem 1rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      flex: 1;
+    }
+
+    .catalog-name {
       font-weight: 700;
+      color: var(--color-navy);
+      font-size: 1rem;
+    }
+
+    .catalog-meta {
       font-size: 0.8rem;
-      padding: 0.5rem 0.9rem;
-      cursor: pointer;
+      color: #64748B;
     }
 
-    .btn-add-provider:hover {
-      background: var(--color-cyan-dim);
-    }
-
-    .asset-lifecycle-grid {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 1rem 1.5rem;
-      margin-bottom: 1.25rem;
-      padding-top: 1rem;
-      border-top: 1px dashed var(--color-border);
-    }
-
-    .renov-months-wrap {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .renov-months-wrap label {
-      margin-bottom: 0;
+    .catalog-roles {
+      margin-top: 0.35rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #94A3B8;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .renov-months-wrap input {
-      width: 80px;
-      padding: 0.4rem 0.6rem;
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      font-family: inherit;
+    .catalog-roles.assigned {
+      color: #0E7490;
+    }
+
+    .catalog-open {
+      margin-top: auto;
+      padding-top: 0.75rem;
       font-size: 0.85rem;
-      box-sizing: border-box;
+      font-weight: 700;
+      color: #0891B2;
+      text-decoration: none;
+    }
+
+    .catalog-open:hover {
+      text-decoration: underline;
+    }
+
+    .catalog-empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3rem 1.5rem;
+      color: var(--color-text-secondary);
+      background: white;
+      border: 1px dashed #CBD5E1;
+      border-radius: 1.25rem;
+    }
+
+    .catalog-empty-cta h3 {
+      margin: 0.75rem 0 0.4rem;
+      color: var(--color-navy);
+      font-size: 1.15rem;
+    }
+
+    .catalog-empty-cta p {
+      max-width: 460px;
+      margin: 0 auto 1.25rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .catalog-empty-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: #F0FDFF;
+      color: var(--color-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   </style>
 </head>
@@ -642,7 +455,7 @@
       <div class="dashboard-content-wrapper" style="padding-top: 5rem;">
         <div style="margin-bottom: 1.5rem;">
           <h1 class="dot-greeting" style="text-align: left; margin-bottom: 0.5rem; font-size: 3rem; background: linear-gradient(90deg, #94A3B8 0%, #1E293B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Catálogo de Uniformes</h1>
-          <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;">Elige las prendas y el EPP que tu empresa entrega a cada rol y registra los proveedores con los que diseñas, compras y renuevas tu dotación.</p>
+          <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;">Estos son los uniformes que tu empresa diseñó en Dotacian Studio. Ábrelos para ajustarlos o asígnalos a tus roles.</p>
         </div>
 
         <nav class="uniform-tabs" aria-label="Secciones de Uniformes">
@@ -654,7 +467,7 @@
           <!-- Search -->
           <div class="app-card" style="margin-bottom: 1.5rem; padding: 1rem;">
             <div style="flex: 1; position: relative;">
-              <input type="text" id="assetSearchInput" placeholder="Buscar prenda o EPP..." onkeyup="filterAssets(this.value)"
+              <input type="text" id="designSearchInput" placeholder="Buscar uniforme..." autocomplete="off" aria-label="Buscar uniforme"
                 style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-md);">
               <span
                 style="position: absolute; left: 0.875rem; top: 50%; transform: translateY(-50%); color: var(--color-text-muted);">
@@ -666,629 +479,144 @@
             </div>
           </div>
 
-          <div id="assetCatalogRoot">
-            <div style="text-align: center; padding: 3rem; color: var(--color-text-secondary);">Cargando catálogo...</div>
+          <div class="catalog-head">
+            <span class="badge-count" id="designCount">0 uniformes</span>
+            <a href="/app/uniformes/studio" class="catalog-new-btn">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
+              Nuevo uniforme
+            </a>
+          </div>
+
+          <div id="designCatalogRoot" class="catalog-grid">
+            <div class="catalog-empty">Cargando uniformes...</div>
           </div>
         </div>
       </div>
     </main>
-
-    <!-- Alerta: el activo a desactivar está asignado en roles -->
-    <div class="modal-overlay" id="assetRolesModal">
-      <div class="modal-content-lg" style="max-width: 460px;">
-        <div style="padding: 1.75rem;">
-          <h2 style="font-size: 1.125rem; color: var(--color-navy); margin: 0 0 0.75rem;">Este activo está asignado a roles</h2>
-          <p id="assetRolesModalMessage" style="font-size: 0.9rem; color: var(--color-text-secondary); line-height: 1.5; margin: 0 0 1rem;"></p>
-          <div id="assetRolesModalList" style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.75rem;"></div>
-          <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
-            <button class="btn btn-outline" onclick="closeAssetRolesModal()">Cancelar</button>
-            <button class="btn" onclick="confirmDeactivateWithRoles()" style="background: #EF4444; color: white; border: none;">Quitar y desactivar</button>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 
+  <script src="/assets/js/studio-renders.js?v=3"></script>
   <script>
-    // Catálogo de dotación (categoría → subcategoría → ítems). Dotacian se
-    // enfoca en uniformes y EPP; las demás subcategorías (cómputo, vehículos,
-    // licencias...) ya no se muestran, pero sus filas en company_assets no se
-    // borran. catKey 'fisico' se sigue guardando en company_assets.category.
-    const ASSET_CATALOG = {
-      fisico: {
-        label: 'Físico',
-        subcats: {
-          uniforme: { label: 'Uniformes', items: ['Camiseta/Camisa', 'Pantalón', 'Zapatos/Calzado', 'Chaqueta', 'Delantal', 'Overol', 'Filipina', 'Gorro'] },
-          epp: { label: 'EPP', items: ['Casco', 'Zapatos de seguridad', 'Equipo para trabajo en alturas', 'Gafas de protección', 'Guantes de seguridad', 'Chaleco reflectivo', 'Protección auditiva', 'Respirador/Mascarilla', 'Lámpara de casco'] }
-        }
-      }
+    // Catálogo de Uniformes: los diseños que la empresa guardó en Dotacian
+    // Studio (tabla studio_designs). Los archivados no se muestran.
+    const GARMENT_LABELS = {
+      camiseta: 'Camiseta básica', camisa: 'Camisa manga larga', hoodie: 'Hoodie', filipina: 'Filipina de chef',
+      polo: 'Camiseta tipo polo', pantalon: 'Pantalón chino', limpieza: 'Uniforme de limpieza'
+    };
+    const COLOR_LABELS = {
+      blanco: 'Blanco', negro: 'Negro', azul: 'Azul', rojo: 'Rojo', beige: 'Beige', azulMarino: 'Azul marino', gris: 'Gris'
+    };
+    const PLACEMENT_LABELS = {
+      pechoIzq: 'Pecho izquierdo', pechoDer: 'Pecho derecho', pechoCentro: 'Centro del pecho',
+      espalda: 'Espalda', bolsilloTrasero: 'Bolsillo trasero', musloIzq: 'Muslo izquierdo'
     };
 
-    const SUBCAT_ICONS = {
-      computo: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="10" rx="1"></rect><line x1="2" y1="18" x2="22" y2="18"></line></svg>',
-      uniforme: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path></svg>',
-      acceso: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="7" cy="15" r="4"></circle><path d="M10.5 11.5 19 3"></path><path d="M15.5 7 18 9.5"></path><path d="M18 4.5 20.5 7"></path></svg>',
-      vehiculo: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"></path><circle cx="6.5" cy="16.5" r="2.5"></circle><circle cx="16.5" cy="16.5" r="2.5"></circle></svg>',
-      herramienta: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"></path></svg>',
-      epp: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5z"></path><path d="m9 12 2 2 4-4"></path></svg>',
-      licencia: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z"></path></svg>',
-      default: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>'
-    };
+    let catalogDesigns = [];
+    let rolesByDesign = {};
+    let logoUrls = {};
 
-    let currentCompanyId = null;
-    let assetRowsByKey = {}; // "tipo|nombre" -> row de company_assets
-    let assetProvidersByAssetId = {}; // company_asset_id -> [{id, nombre, correo, telefono}]
-
-    function assetKey(tipo, nombre) {
-      return `${tipo}|${nombre}`;
+    function escapeHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
     window.onload = () => {
-      setTimeout(loadAssets, 1000); // Esperar a que Supabase esté listo
+      setTimeout(loadSavedDesigns, 600); // Esperar a que Supabase esté listo
     };
 
-    async function loadAssets() {
+    async function loadSavedDesigns() {
+      const root = document.getElementById('designCatalogRoot');
       try {
-        const { data: sessionData, error: sessionError } = await _supabase.auth.getSession();
-        if (sessionError) throw sessionError;
-        if (!sessionData.session) return;
+        const { data: sessionData } = await _supabase.auth.getSession();
+        if (!sessionData.session) {
+          root.innerHTML = '<div class="catalog-empty">Inicia sesión para ver los uniformes de tu empresa.</div>';
+          return;
+        }
+        const companyId = await resolveCompanyId(_supabase, sessionData.session.user.id);
 
-        currentCompanyId = await resolveCompanyId(_supabase, sessionData.session.user.id);
+        const [designsRes, defsRes] = await Promise.all([
+          _supabase.from('studio_designs').select('*').eq('company_id', companyId).order('updated_at', { ascending: false }),
+          _supabase.from('role_definition').select('role_name, items').eq('company_id', companyId)
+        ]);
+        if (designsRes.error) throw designsRes.error;
 
-        const { data, error } = await _supabase
-          .from('company_assets')
-          .select('*')
-          .eq('company_id', currentCompanyId);
+        catalogDesigns = (designsRes.data || []).filter(d => !d.archived_at);
+        rolesByDesign = {};
+        (defsRes.data || []).forEach(def => (def.items || []).forEach(item => {
+          if (!item.design_id) return;
+          (rolesByDesign[item.design_id] = rolesByDesign[item.design_id] || []).push(def.role_name);
+        }));
 
-        if (error) throw error;
-
-        assetRowsByKey = {};
-        (data || []).forEach(row => {
-          assetRowsByKey[assetKey(row.tipo, row.nombre)] = row;
-        });
-
-        assetProvidersByAssetId = {};
-        const assetIds = (data || []).map(row => row.id);
-        if (assetIds.length > 0) {
-          const { data: provData, error: provError } = await _supabase
-            .from('company_asset_providers')
-            .select('*')
-            .in('company_asset_id', assetIds);
-          if (provError) throw provError;
-          (provData || []).forEach(p => {
-            if (!assetProvidersByAssetId[p.company_asset_id]) assetProvidersByAssetId[p.company_asset_id] = [];
-            assetProvidersByAssetId[p.company_asset_id].push(p);
-          });
+        // Miniaturas de los logos con enlaces temporales (el bucket es privado).
+        logoUrls = {};
+        const paths = catalogDesigns.map(d => d.logo_path).filter(Boolean);
+        if (paths.length) {
+          const { data } = await _supabase.storage.from('studio-logos').createSignedUrls(paths, 3600);
+          (data || []).forEach(item => { if (item.signedUrl) logoUrls[item.path] = item.signedUrl; });
         }
 
-        renderCatalog();
+        renderSavedDesigns();
       } catch (err) {
-        console.error('Error cargando catálogo de activos:', err);
-        const root = document.getElementById('assetCatalogRoot');
-        if (root) {
-          root.innerHTML = '<div style="text-align: center; padding: 3rem; color: #EF4444;">No se pudo cargar el catálogo de uniformes.</div>';
-        }
+        console.error('Error cargando uniformes:', err);
+        root.innerHTML = '<div class="catalog-empty" style="color: #EF4444;">No se pudieron cargar los uniformes. Recarga la página.</div>';
       }
     }
 
-    // Una sola sección sin encabezado: catKey ('fisico'/'digital') se sigue
-    // guardando en company_assets.category para no romper la lógica que
-    // depende de eso (ej. bodega.html excluye los activos "digital"), pero
-    // ya no se agrupa visualmente por esa categoría.
-    function renderCatalog() {
-      const root = document.getElementById('assetCatalogRoot');
-      root.innerHTML = '';
+    function renderSavedDesigns() {
+      const root = document.getElementById('designCatalogRoot');
+      const q = document.getElementById('designSearchInput').value.trim().toLowerCase();
+      const count = catalogDesigns.length;
+      document.getElementById('designCount').textContent = `${count} ${count === 1 ? 'uniforme' : 'uniformes'}`;
 
-      const section = document.createElement('div');
-      section.className = 'asset-category-section';
-
-      section.innerHTML = `<div class="asset-category-title"><span class="badge-count">0 activas</span></div>`;
-
-      const grid = document.createElement('div');
-      grid.className = 'asset-subcat-icon-grid';
-
-      const panelsWrap = document.createElement('div');
-      panelsWrap.className = 'asset-subcat-panels';
-
-      Object.keys(ASSET_CATALOG).forEach(catKey => {
-        const cat = ASSET_CATALOG[catKey];
-
-        Object.keys(cat.subcats).forEach(subKey => {
-          const sub = cat.subcats[subKey];
-
-          const tile = document.createElement('button');
-          tile.type = 'button';
-          tile.className = 'asset-subcat-tile';
-          tile.dataset.cat = catKey;
-          tile.dataset.subcat = subKey;
-          tile.onclick = () => toggleSubcatPanel(catKey, subKey);
-          tile.innerHTML = `
-            <div class="asset-subcat-tile-icon">${SUBCAT_ICONS[subKey] || SUBCAT_ICONS.default}</div>
-            <div class="asset-subcat-tile-label">${sub.label}</div>
-            <div class="asset-subcat-tile-count" id="subcat-count-${catKey}-${subKey}">0/${sub.items.length}</div>
-          `;
-          grid.appendChild(tile);
-
-          const card = document.createElement('div');
-          card.className = 'asset-subcat-card asset-subcat-panel';
-          card.id = `subcat-panel-${catKey}-${subKey}`;
-          card.dataset.cat = catKey;
-          card.dataset.subcat = subKey;
-          card.innerHTML = `<div class="asset-subcat-header">${sub.label}</div>`;
-
-          sub.items.forEach(name => {
-            card.appendChild(renderAssetRow(catKey, subKey, name));
-          });
-
-          panelsWrap.appendChild(card);
-        });
-      });
-
-      section.appendChild(grid);
-      section.appendChild(panelsWrap);
-      root.appendChild(section);
-
-      updateCategoryCounts();
-    }
-
-    function toggleSubcatPanel(catKey, subKey) {
-      const panel = document.getElementById(`subcat-panel-${catKey}-${subKey}`);
-      const tile = document.querySelector(`.asset-subcat-tile[data-cat="${catKey}"][data-subcat="${subKey}"]`);
-      if (!panel) return;
-      const isOpen = panel.classList.toggle('open');
-      if (tile) tile.classList.toggle('active', isOpen);
-    }
-
-    function renderAssetRow(category, tipo, nombre) {
-      const key = assetKey(tipo, nombre);
-      const row = assetRowsByKey[key] || null;
-      const isActive = !!(row && row.activo);
-      const s = slug(key);
-      const providers = row ? (assetProvidersByAssetId[row.id] || []) : [];
-      const esRenovable = !!(row && row.es_renovable);
-      const devolvible = !row || row.devolvible_offboarding !== false;
-      const isDigital = category === 'digital';
-      const offboardingModo = (row && row.offboarding_modo) || 'inmediato';
-      const offboardingGraciaDias = row && row.offboarding_gracia_dias != null ? row.offboarding_gracia_dias : '';
-
-      const wrap = document.createElement('div');
-      wrap.className = 'asset-row';
-      wrap.dataset.name = nombre.toLowerCase();
-
-      const providersOrContactBlock = isDigital ? `
-          <div class="asset-providers-block">
-            <div class="asset-providers-head">
-              <label>Contacto de activación</label>
-              <span class="asset-providers-hint">La persona que crea el acceso en esta plataforma. Al asignar este activo a un empleado, se le podrá solicitar la activación por correo.</span>
+      if (!count) {
+        root.innerHTML = `
+          <div class="catalog-empty catalog-empty-cta">
+            <div class="catalog-empty-icon">
+              <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path></svg>
             </div>
-            <div class="provider-list">
-              <div class="provider-row" style="grid-template-columns: 1fr 1fr;">
-                <input type="text" id="contactoNombre-${s}" placeholder="Nombre (ej. Soporte TI)" value="${escapeAttr(row && row.contacto_encargado_nombre || '')}">
-                <input type="email" id="contactoEmail-${s}" placeholder="Correo (obligatorio para poder solicitar)" value="${escapeAttr(row && row.contacto_encargado_email || '')}">
+            <h3>Aún no tienes uniformes</h3>
+            <p>Crea tu primer uniforme en Dotacian Studio: elige la prenda, el color y sube el logo de tu empresa. Cuando lo guardes aparecerá aquí para asignarlo a tus roles.</p>
+            <a href="/app/uniformes/studio" class="catalog-new-btn">Crear mi primer uniforme</a>
+          </div>`;
+        return;
+      }
+
+      const list = catalogDesigns.filter(d => !q || `${d.nombre} ${GARMENT_LABELS[d.prenda] || ''} ${COLOR_LABELS[d.color] || ''}`.toLowerCase().includes(q));
+      if (!list.length) {
+        root.innerHTML = '<div class="catalog-empty">Ningún uniforme coincide con la búsqueda.</div>';
+        return;
+      }
+
+      root.innerHTML = list.map(d => {
+        const roles = rolesByDesign[d.id] || [];
+        const logo = d.logo_path
+          ? `Logo: ${escapeHtml(PLACEMENT_LABELS[d.logo_ubicacion] || 'sí')}${d.logo_ancho_cm ? ` · ${d.logo_ancho_cm} cm` : ''}`
+          : 'Sin logo';
+        return `
+          <article class="catalog-card">
+            <a class="catalog-render" href="/app/uniformes/studio?diseno=${encodeURIComponent(d.id)}" aria-label="Abrir ${escapeHtml(d.nombre)} en Dotacian Studio">
+              <span class="catalog-render-img" data-render="${escapeHtml(d.prenda)}" data-color="${escapeHtml(d.color)}"></span>
+              ${d.logo_path && logoUrls[d.logo_path] ? `<span class="catalog-logo"><img src="${escapeHtml(logoUrls[d.logo_path])}" alt="Logo"></span>` : ''}
+            </a>
+            <div class="catalog-body">
+              <div class="catalog-name">${escapeHtml(d.nombre)}</div>
+              <div class="catalog-meta">${escapeHtml(GARMENT_LABELS[d.prenda] || d.prenda)} · ${escapeHtml(COLOR_LABELS[d.color] || d.color)}</div>
+              <div class="catalog-meta">${logo}</div>
+              <div class="catalog-roles ${roles.length ? 'assigned' : ''}" title="${escapeHtml(roles.join(', '))}">
+                ${roles.length ? `En ${roles.length} ${roles.length === 1 ? 'rol' : 'roles'}: ${escapeHtml(roles.join(', '))}` : 'Sin asignar a roles'}
               </div>
+              <a class="catalog-open" href="/app/uniformes/studio?diseno=${encodeURIComponent(d.id)}">Abrir en Studio</a>
             </div>
-          </div>
-      ` : `
-          <div class="asset-providers-block">
-            <div class="asset-providers-head">
-              <label>Proveedores</label>
-              <span class="asset-providers-hint">Agrega los proveedores con los que trabajas para este activo; un agente podrá cotizar directamente con ellos.</span>
-            </div>
-            <div class="provider-list" id="providers-${s}">
-              ${(providers.length > 0 ? providers : [null]).map(providerRowHtml).join('')}
-            </div>
-            <button type="button" class="btn-add-provider" onclick="addProviderRow('${s}')">+ Agregar proveedor</button>
-          </div>
-      `;
+          </article>`;
+      }).join('');
 
-      wrap.innerHTML = `
-        <div class="asset-row-main">
-          <div class="asset-row-info" onclick="toggleDetailPanel('${s}')">
-            <svg class="asset-row-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            <div>
-              <div class="asset-row-name">${nombre}</div>
-              <div class="asset-row-summary">${summaryForRow(row, isDigital)}</div>
-            </div>
-          </div>
-          <label class="toggle-switch">
-            <input type="checkbox" ${isActive ? 'checked' : ''} onchange="toggleAsset(this, '${category}', '${tipo}', '${escapeAttr(nombre)}')">
-            <span class="slider"></span>
-          </label>
-        </div>
-        <div class="asset-detail-panel" id="panel-${s}">
-          ${providersOrContactBlock}
-
-          <div class="asset-lifecycle-grid">
-            <label class="asset-field-checkbox">
-              <input type="checkbox" id="renovable-${s}" onchange="toggleRenovMeses(this, '${s}')" ${esRenovable ? 'checked' : ''}>
-              Es renovable
-            </label>
-            <div class="renov-months-wrap" id="renovwrap-${s}" style="${esRenovable ? '' : 'display:none;'}">
-              <label>Cada</label>
-              <input type="number" id="renovmeses-${s}" min="1" step="1" placeholder="meses" value="${row && row.renovacion_meses != null ? row.renovacion_meses : ''}">
-              <label>meses</label>
-            </div>
-
-            ${isDigital ? `
-            <label class="asset-field-checkbox">
-              <input type="radio" name="offboardingModo-${s}" value="inmediato" ${offboardingModo !== 'gracia' ? 'checked' : ''} onchange="toggleOffboardingGracia(this, '${s}')">
-              Al dar de baja: desactivar de inmediato
-            </label>
-            <div class="renov-months-wrap">
-              <label>
-                <input type="radio" name="offboardingModo-${s}" value="gracia" ${offboardingModo === 'gracia' ? 'checked' : ''} onchange="toggleOffboardingGracia(this, '${s}')" style="margin-right: 0.4rem; accent-color: var(--color-cyan);">
-                Desactivar después de
-              </label>
-              <input type="number" id="offboardingDias-${s}" min="1" step="1" placeholder="días" value="${offboardingGraciaDias}" ${offboardingModo === 'gracia' ? '' : 'disabled'}>
-              <label>días</label>
-            </div>
-            ` : `
-            <label class="asset-field-checkbox">
-              <input type="checkbox" id="devolvible-${s}" ${devolvible ? 'checked' : ''}>
-              Se devuelve en el offboarding
-            </label>
-
-            <label class="asset-field-checkbox">
-              <input type="checkbox" id="reutiliza-${s}" ${!row || row.reutilizable ? 'checked' : ''}>
-              Se reutiliza con el siguiente empleado cuando el actual sale
-            </label>
-            `}
-          </div>
-
-          <button type="button" class="btn btn-outline" style="padding: 0.5rem 1.25rem; font-size: 0.8125rem;" onclick="saveAssetDetails('${category}', '${tipo}', '${escapeAttr(nombre)}')">Guardar detalles</button>
-        </div>
-      `;
-
-      return wrap;
-    }
-
-    function summaryForRow(row, isDigital) {
-      if (!row || !row.activo) return 'Desactivado';
-      if (isDigital) {
-        return row.contacto_encargado_email ? `Contacto: ${row.contacto_encargado_email}` : 'Sin contacto de activación';
-      }
-      const providers = assetProvidersByAssetId[row.id] || [];
-      return providers.length > 0
-        ? `${providers.length} proveedor${providers.length > 1 ? 'es' : ''}`
-        : 'Sin proveedores registrados';
-    }
-
-    function providerRowHtml(p) {
-      const pid = p && p.id ? p.id : '';
-      return `
-        <div class="provider-row" data-provider-id="${pid}">
-          <input type="text" class="prov-nombre" placeholder="ej. Textiles del Norte S.A." value="${escapeAttr(p && p.nombre || '')}">
-          <input type="email" class="prov-correo" placeholder="Correo (obligatorio)" value="${escapeAttr(p && p.correo || '')}">
-          <input type="tel" class="prov-telefono" placeholder="Teléfono (opcional)" value="${escapeAttr(p && p.telefono || '')}">
-          <button type="button" class="provider-remove-btn" onclick="removeProviderRow(this)" title="Quitar proveedor">✕</button>
-        </div>
-      `;
-    }
-
-    function addProviderRow(s) {
-      const container = document.getElementById(`providers-${s}`);
-      if (container) container.insertAdjacentHTML('beforeend', providerRowHtml(null));
-    }
-
-    function removeProviderRow(btn) {
-      const container = btn.closest('.provider-list');
-      btn.closest('.provider-row').remove();
-      if (container && container.children.length === 0) {
-        container.insertAdjacentHTML('beforeend', providerRowHtml(null));
+      if (window.DSRenders) {
+        root.querySelectorAll('[data-render]').forEach(el => window.DSRenders.fillRender(el, el.dataset.render, el.dataset.color));
       }
     }
 
-    function toggleRenovMeses(checkbox, s) {
-      const wrap = document.getElementById(`renovwrap-${s}`);
-      if (wrap) wrap.style.display = checkbox.checked ? '' : 'none';
-    }
-
-    function toggleOffboardingGracia(radio, s) {
-      const diasInput = document.getElementById(`offboardingDias-${s}`);
-      if (diasInput) diasInput.disabled = radio.value !== 'gracia';
-    }
-
-    function toggleDetailPanel(s) {
-      const panel = document.getElementById(`panel-${s}`);
-      if (panel) panel.classList.toggle('open');
-    }
-
-    function slug(str) {
-      return str.replace(/[^a-zA-Z0-9]/g, '_');
-    }
-
-    function escapeAttr(str) {
-      return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-    }
-
-    function filterAssets(query) {
-      const q = query.trim().toLowerCase();
-      document.querySelectorAll('.asset-subcat-panel').forEach(panel => {
-        const rows = Array.from(panel.querySelectorAll('.asset-row'));
-        let anyVisible = false;
-        rows.forEach(row => {
-          const match = !q || row.dataset.name.includes(q);
-          row.style.display = match ? '' : 'none';
-          if (match) anyVisible = true;
-        });
-
-        const catKey = panel.dataset.cat;
-        const subKey = panel.dataset.subcat;
-        const tile = document.querySelector(`.asset-subcat-tile[data-cat="${catKey}"][data-subcat="${subKey}"]`);
-
-        if (q) {
-          panel.classList.toggle('open', anyVisible);
-          if (tile) {
-            tile.style.display = anyVisible ? '' : 'none';
-            tile.classList.toggle('active', anyVisible);
-          }
-        } else {
-          panel.classList.remove('open');
-          if (tile) {
-            tile.style.display = '';
-            tile.classList.remove('active');
-          }
-        }
-      });
-    }
-
-    async function toggleAsset(checkbox, category, tipo, nombre) {
-      const activo = checkbox.checked;
-
-      if (!activo) {
-        checkbox.disabled = true;
-        const rolesUsingIt = await getRolesUsingAsset(tipo, nombre);
-        checkbox.disabled = false;
-        if (rolesUsingIt.length > 0) {
-          checkbox.checked = true; // se mantiene activo hasta que decidan en el modal
-          openAssetRolesModal(checkbox, category, tipo, nombre, rolesUsingIt);
-          return;
-        }
-      }
-
-      await applyAssetActive(checkbox, category, tipo, nombre, activo);
-    }
-
-    async function getRolesUsingAsset(tipo, nombre) {
-      try {
-        const { data, error } = await _supabase
-          .from('role_definition')
-          .select('id, role_name, items')
-          .eq('company_id', currentCompanyId);
-        if (error) throw error;
-        return (data || []).filter(r => Array.isArray(r.items) && r.items.some(it => it.tipo === tipo && it.name === nombre));
-      } catch (err) {
-        console.error('Error verificando roles que usan el activo:', err);
-        return [];
-      }
-    }
-
-    async function applyAssetActive(checkbox, category, tipo, nombre, activo) {
-      const key = assetKey(tipo, nombre);
-      const panel = document.getElementById(`panel-${slug(key)}`);
-      const summaryEl = checkbox.closest('.asset-row').querySelector('.asset-row-summary');
-
-      checkbox.disabled = true;
-      try {
-        const existing = assetRowsByKey[key];
-        const payload = {
-          company_id: currentCompanyId,
-          category,
-          tipo,
-          nombre,
-          activo,
-          updated_at: new Date().toISOString()
-        };
-
-        let saved;
-        if (existing) {
-          const { data, error } = await _supabase.from('company_assets').update(payload).eq('id', existing.id).select().single();
-          if (error) throw error;
-          saved = data;
-        } else {
-          const { data, error } = await _supabase.from('company_assets').insert([payload]).select().single();
-          if (error) throw error;
-          saved = data;
-        }
-
-        assetRowsByKey[key] = saved;
-        checkbox.checked = activo;
-        if (panel) panel.classList.toggle('open', activo);
-        if (summaryEl) summaryEl.textContent = summaryForRow(saved);
-        updateCategoryCounts();
-      } catch (err) {
-        console.error('Error activando/desactivando activo:', err);
-        checkbox.checked = !activo;
-        if (window.showToast) showToast('Error', 'No se pudo actualizar el activo.', 'error');
-      } finally {
-        checkbox.disabled = false;
-      }
-    }
-
-    // --- Alerta al desactivar un activo que ya está asignado a roles ---
-    let pendingDeactivate = null; // { checkbox, category, tipo, nombre, roles }
-
-    function openAssetRolesModal(checkbox, category, tipo, nombre, roles) {
-      pendingDeactivate = { checkbox, category, tipo, nombre, roles };
-      const count = roles.length;
-      document.getElementById('assetRolesModalMessage').textContent =
-        `"${nombre}" está asignado en ${count} rol${count > 1 ? 'es' : ''}. Selecciona de cuáles quitarlo antes de desactivarlo; los empleados con ese rol dejarán de tenerlo asignado.`;
-      document.getElementById('assetRolesModalList').innerHTML = roles.map(r => `
-        <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--color-navy); cursor: pointer;">
-          <input type="checkbox" class="remove-role-check" value="${r.id}" checked style="width: 16px; height: 16px; accent-color: var(--color-cyan); cursor: pointer;">
-          ${escapeAttr(r.role_name)}
-        </label>
-      `).join('');
-      document.getElementById('assetRolesModal').classList.add('active');
-    }
-
-    function closeAssetRolesModal() {
-      document.getElementById('assetRolesModal').classList.remove('active');
-      pendingDeactivate = null;
-    }
-
-    async function confirmDeactivateWithRoles() {
-      if (!pendingDeactivate) return;
-      const { checkbox, category, tipo, nombre, roles } = pendingDeactivate;
-      const checkedIds = Array.from(document.querySelectorAll('#assetRolesModalList .remove-role-check:checked')).map(c => c.value);
-      const rolesToUpdate = roles.filter(r => checkedIds.includes(String(r.id)));
-
-      document.getElementById('assetRolesModal').classList.remove('active');
-      pendingDeactivate = null;
-
-      try {
-        for (const role of rolesToUpdate) {
-          const newItems = (role.items || []).filter(it => !(it.tipo === tipo && it.name === nombre));
-          const { error } = await _supabase.from('role_definition').update({ items: newItems }).eq('id', role.id);
-          if (error) throw error;
-        }
-        await applyAssetActive(checkbox, category, tipo, nombre, false);
-        if (window.showToast) {
-          showToast('Éxito', rolesToUpdate.length > 0 ? `Se quitó de ${rolesToUpdate.length} rol(es) y se desactivó.` : 'Activo desactivado.');
-        }
-      } catch (err) {
-        console.error('Error quitando el activo de los roles:', err);
-        if (window.showToast) showToast('Error', 'No se pudo actualizar los roles.', 'error');
-      }
-    }
-
-    function updateCategoryCounts() {
-      let total = 0;
-      Object.keys(ASSET_CATALOG).forEach(catKey => {
-        const cat = ASSET_CATALOG[catKey];
-        Object.keys(cat.subcats).forEach(subKey => {
-          let subCount = 0;
-          cat.subcats[subKey].items.forEach(name => {
-            const row = assetRowsByKey[assetKey(subKey, name)];
-            if (row && row.activo) { subCount++; total++; }
-          });
-          const countEl = document.getElementById(`subcat-count-${catKey}-${subKey}`);
-          if (countEl) countEl.textContent = `${subCount}/${cat.subcats[subKey].items.length}`;
-        });
-      });
-      const badge = document.querySelector('.asset-category-section .badge-count');
-      if (badge) badge.textContent = `${total} ${total === 1 ? 'activa' : 'activas'}`;
-    }
-
-    async function saveAssetDetails(category, tipo, nombre) {
-      const key = assetKey(tipo, nombre);
-      const s = slug(key);
-      const isDigital = category === 'digital';
-
-      const esRenovable = document.getElementById(`renovable-${s}`).checked;
-      const renovMesesRaw = document.getElementById(`renovmeses-${s}`).value;
-
-      let providers = [];
-      let contactoNombre = null;
-      let contactoEmail = null;
-      let devolvible = true;
-      let reutilizable = true;
-      let offboardingModo = null;
-      let offboardingGraciaDias = null;
-
-      if (isDigital) {
-        contactoNombre = document.getElementById(`contactoNombre-${s}`).value.trim() || null;
-        contactoEmail = document.getElementById(`contactoEmail-${s}`).value.trim() || null;
-
-        const modoRadio = document.querySelector(`input[name="offboardingModo-${s}"]:checked`);
-        offboardingModo = modoRadio ? modoRadio.value : 'inmediato';
-        if (offboardingModo === 'gracia') {
-          const diasRaw = document.getElementById(`offboardingDias-${s}`).value;
-          offboardingGraciaDias = diasRaw ? parseInt(diasRaw) : null;
-          if (!offboardingGraciaDias) {
-            if (window.showToast) showToast('Falta la cantidad de días', 'Indica después de cuántos días se debe desactivar.', 'error');
-            return;
-          }
-        }
-      } else {
-        devolvible = document.getElementById(`devolvible-${s}`).checked;
-        reutilizable = document.getElementById(`reutiliza-${s}`).checked;
-
-        const providerRows = Array.from(document.querySelectorAll(`#providers-${s} .provider-row`))
-          .map(rowEl => ({
-            nombre: rowEl.querySelector('.prov-nombre').value.trim(),
-            correo: rowEl.querySelector('.prov-correo').value.trim(),
-            telefono: rowEl.querySelector('.prov-telefono').value.trim()
-          }))
-          .filter(p => p.nombre || p.correo || p.telefono);
-
-        const providersMissingCorreo = providerRows.filter(p => !p.correo);
-        if (providersMissingCorreo.length > 0) {
-          if (window.showToast) showToast('Falta el correo', 'Cada proveedor necesita un correo para poder cotizar con él.', 'error');
-          return;
-        }
-        providers = providerRows;
-      }
-
-      const existing = assetRowsByKey[key];
-      const payload = {
-        company_id: currentCompanyId,
-        category,
-        tipo,
-        nombre,
-        activo: true,
-        es_renovable: esRenovable,
-        renovacion_meses: esRenovable && renovMesesRaw ? parseInt(renovMesesRaw) : null,
-        devolvible_offboarding: devolvible,
-        reutilizable,
-        contacto_encargado_nombre: contactoNombre,
-        contacto_encargado_email: contactoEmail,
-        updated_at: new Date().toISOString()
-      };
-      if (isDigital) {
-        payload.offboarding_modo = offboardingModo;
-        payload.offboarding_gracia_dias = offboardingGraciaDias;
-      }
-
-      try {
-        let saved;
-        if (existing) {
-          const { data, error } = await _supabase.from('company_assets').update(payload).eq('id', existing.id).select().single();
-          if (error) throw error;
-          saved = data;
-        } else {
-          const { data, error } = await _supabase.from('company_assets').insert([payload]).select().single();
-          if (error) throw error;
-          saved = data;
-        }
-        assetRowsByKey[key] = saved;
-
-        let savedProviders = assetProvidersByAssetId[saved.id] || [];
-        if (!isDigital) {
-          // Reemplaza la lista completa de proveedores por la que quedó en el formulario.
-          const { error: delError } = await _supabase.from('company_asset_providers').delete().eq('company_asset_id', saved.id);
-          if (delError) throw delError;
-
-          savedProviders = [];
-          if (providers.length > 0) {
-            const { data: provData, error: provError } = await _supabase
-              .from('company_asset_providers')
-              .insert(providers.map(p => ({ company_id: currentCompanyId, company_asset_id: saved.id, nombre: p.nombre || null, correo: p.correo, telefono: p.telefono || null })))
-              .select();
-            if (provError) throw provError;
-            savedProviders = provData || [];
-          }
-          assetProvidersByAssetId[saved.id] = savedProviders;
-        }
-
-        const panel = document.getElementById(`panel-${s}`);
-        const row = panel.closest('.asset-row');
-        const toggle = row.querySelector('.toggle-switch input');
-        toggle.checked = true;
-        panel.classList.remove('open');
-        row.querySelector('.asset-row-summary').textContent = summaryForRow(saved, isDigital);
-
-        const providerList = document.getElementById(`providers-${s}`);
-        if (providerList) providerList.innerHTML = (savedProviders.length > 0 ? savedProviders : [null]).map(providerRowHtml).join('');
-
-        updateCategoryCounts();
-
-        if (window.showToast) showToast('Éxito', 'Detalles guardados correctamente.');
-      } catch (err) {
-        console.error('Error guardando detalles del activo:', err);
-        if (window.showToast) showToast('Error', 'No se pudieron guardar los detalles.', 'error');
-      }
-    }
+    document.getElementById('designSearchInput').addEventListener('input', renderSavedDesigns);
 
     function toggleSidebar() {
       const layout = document.getElementById('app-layout-wrapper');
