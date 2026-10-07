@@ -1096,6 +1096,15 @@
                     <span class="studio-garment-meta">Capucha · Bolsillo canguro · Puños en rib</span>
                   </span>
                 </button>
+                <button type="button" class="studio-garment studio-garment-option" data-garment="polo" aria-pressed="false">
+                  <span class="studio-garment-icon">
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20.38 3.46 16 2l-4 4-4-4-4.38 1.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path><path d="M12 6v4"></path><circle cx="12" cy="7.5" r="0.5"></circle></svg>
+                  </span>
+                  <span>
+                    <span class="studio-garment-name">Camiseta tipo polo</span>
+                    <span class="studio-garment-meta">Cuello polo en rib · Tapeta con 2 botones</span>
+                  </span>
+                </button>
                 <button type="button" class="studio-garment studio-garment-option" data-garment="filipina" aria-pressed="false">
                   <span class="studio-garment-icon">
                     <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 3h6v2H9z"></path><path d="M9 5 4 7 2.5 21h4L8 10v12h8V10l1.5 11h4L20 7l-5-2"></path><path d="M9 5l4 17"></path><circle cx="10.5" cy="10" r="0.6"></circle><circle cx="14.5" cy="10" r="0.6"></circle><circle cx="10.8" cy="14" r="0.6"></circle><circle cx="14.8" cy="14" r="0.6"></circle></svg>
@@ -1107,7 +1116,6 @@
                 </button>
               </div>
               <div class="studio-soon">
-                <span>Polo · pronto</span>
                 <span>Chaqueta · pronto</span>
               </div>
             </div>
@@ -1416,6 +1424,52 @@
         }
       },
 
+      polo: {
+        label: 'Camiseta tipo polo',
+        meta: 'Cuello polo en rib · Tapeta con 2 botones',
+        summary: { cuello: 'Polo en rib', manga: 'Corta con puño en rib', bolsillo: null },
+        profile: [
+          { y: -0.74, a: 0.340, b: 0.166, n: 2.7 },
+          { y: -0.45, a: 0.334, b: 0.158, n: 2.7 },
+          { y: -0.15, a: 0.337, b: 0.165, n: 2.7 },
+          { y: 0.08, a: 0.347, b: 0.178, n: 2.6 },
+          { y: 0.24, a: 0.352, b: 0.178, n: 2.5 },
+          { y: 0.325, a: 0.316, b: 0.157, n: 2.4 },
+          { y: 0.385, a: 0.238, b: 0.129, n: 2.2 },
+          { y: 0.422, a: 0.160, b: 0.111, n: 2.0 },
+          { y: 0.437, a: 0.114, b: 0.103, n: 2.0 }
+        ],
+        neckStart: 5,
+        neckDip: 0.025,
+        hemCurve: 0,
+        waistFold: 0.0035,
+        sleeve: {
+          angleStart: deg(50),
+          angleEnd: deg(50),
+          length: 0.25,
+          hemTilt: 0.07,
+          forward: deg(12),
+          start: -0.18,
+          rBase: [0.158, 0.150],
+          rEnd: [0.124, 0.112],
+          flare: false,
+          shoulder: new THREE.Vector3(0.335, 0.334, 0),
+          cuff: { length: 0.035, scale: 0.97, rib: true } // puño en rib
+        },
+        collar: 'polo',
+        collarTip: 0.55, // puntas más cortas y suaves que la camisa
+        // Tapeta corta: va del cuello hacia abajo, con 2 botones y sin botón en el cuello.
+        placket: { halfWidth: 0.019, length: 0.17, buttons: 2, spacing: 0.07, firstOffset: 0.05, standButton: false },
+        pocket: null,
+        groundY: -0.80,
+        defaultPlacement: 'pechoIzq',
+        logoPlacements: {
+          pechoIzq: { x: 0.15, y: 0.17, defaultCm: 8 },
+          pechoDer: { x: -0.15, y: 0.17, defaultCm: 8 },
+          espalda: { x: 0, y: 0.08, defaultCm: 26 }
+        }
+      },
+
       filipina: {
         label: 'Filipina de chef',
         meta: 'Cuello mao · Doble botonadura · Manga larga',
@@ -1695,10 +1749,11 @@
       const radial = new THREE.Vector3(fold.x, 0, fold.z).normalize();
       const endDist = Math.min(w, 1 - w);
       const tip = Math.max(0, 1 - endDist / 0.13);
-      const out = (0.018 + 0.045 * tip) * Math.sin(r * Math.PI / 2) + 0.012 * r;
-      const drop = (0.050 + 0.062 * tip * tip) * r;
+      const k = cfg.collarTip != null ? cfg.collarTip : 1; // tamaño de las puntas
+      const out = (0.018 + 0.045 * tip * k) * Math.sin(r * Math.PI / 2) + 0.012 * r;
+      const drop = (0.050 + 0.062 * tip * tip * k) * r;
       // En las puntas el borde exterior se abre hacia los lados del frente.
-      const spread = 0.03 * tip * tip * r;
+      const spread = 0.03 * tip * tip * k * r;
       const sideDir = new THREE.Vector3(Math.sign(fold.x) || (w < 0.5 ? 1 : -1), 0, 0);
       return fold.addScaledVector(radial, out).addScaledVector(sideDir, spread).add(new THREE.Vector3(0, -drop, 0));
     }
@@ -1776,21 +1831,33 @@
     // --- Tapeta con botones ---
     function buildPlacket(cfg) {
       const pl = cfg.placket;
-      const vTop = 1;
+      // Tapeta completa (camisa) o corta desde el cuello (polo, pl.length).
+      const neckY = torsoPoint(cfg, 1, 0.25).y;
+      const vFrom = pl.length ? frontV(cfg, neckY - pl.length) : 0;
+      const vAt = v => vFrom + v * (1 - vFrom);
       const offset = 0.0035;
-      const geo = buildGrid(120, 6, (v, u) => {
+      const geo = buildGrid(pl.length ? 40 : 120, 6, (v, u) => {
         const x = -pl.halfWidth + u * pl.halfWidth * 2;
-        const { point, normal } = frontPointAt(cfg, v * vTop, x);
+        const { point, normal } = frontPointAt(cfg, vAt(v), x);
         return point.addScaledVector(normal, offset);
       }, (v, u) => ({ u, v: v * 1.2 }));
       const edges = [-1, 1].map(sideSign => {
         const pts = [];
         for (let i = 0; i <= 60; i++) {
-          const { point, normal } = frontPointAt(cfg, i / 60, sideSign * pl.halfWidth);
+          const { point, normal } = frontPointAt(cfg, vAt(i / 60), sideSign * pl.halfWidth);
           pts.push(point.addScaledVector(normal, offset));
         }
         return buildRim(pts, 0.0018, false);
       });
+      if (pl.length) {
+        // Costura de cierre en la base de la tapeta corta.
+        const base = [];
+        for (let i = 0; i <= 8; i++) {
+          const { point, normal } = frontPointAt(cfg, vFrom, -pl.halfWidth + (i / 8) * pl.halfWidth * 2);
+          base.push(point.addScaledVector(normal, offset));
+        }
+        edges.push(buildRim(base, 0.0018, false));
+      }
       return [geo, ...edges];
     }
 
@@ -1798,11 +1865,14 @@
       const pl = cfg.placket;
       const neckY = torsoPoint(cfg, 1, 0.25).y;
       const out = [];
-      // Botón del pie de cuello.
-      const top = collarStandPoint(cfg, 0.5, 0.25);
-      out.push({ point: top.clone().add(new THREE.Vector3(0, 0, 0.004)), normal: new THREE.Vector3(0, 0, 1) });
+      // Botón del pie de cuello (camisa; el polo no lo lleva).
+      if (pl.standButton !== false) {
+        const top = collarStandPoint(cfg, 0.5, 0.25);
+        out.push({ point: top.clone().add(new THREE.Vector3(0, 0, 0.004)), normal: new THREE.Vector3(0, 0, 1) });
+      }
+      const first = pl.firstOffset != null ? pl.firstOffset : 0.075;
       for (let i = 0; i < pl.buttons; i++) {
-        const y = neckY - 0.075 - i * pl.spacing;
+        const y = neckY - first - i * pl.spacing;
         const { point, normal } = frontPointAt(cfg, frontV(cfg, y), 0);
         out.push({ point: point.addScaledVector(normal, 0.0075), normal });
       }
@@ -2007,6 +2077,11 @@
         fabricParts.push(...buildHood(cfg));
       } else if (cfg.collar === 'mandarin') {
         fabricParts.push(...buildMandarinCollar(cfg));
+      } else if (cfg.collar === 'polo') {
+        // Mismo corte del cuello camisero, pero en tejido rib.
+        const [stand, leaf, ...rims] = buildShirtCollar(cfg);
+        ribParts.push(stand, leaf);
+        fabricParts.push(...rims);
       } else {
         fabricParts.push(...buildShirtCollar(cfg));
       }
