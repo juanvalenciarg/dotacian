@@ -1130,6 +1130,15 @@
                     <span class="studio-garment-meta">Cuello polo en rib · Tapeta con 2 botones</span>
                   </span>
                 </button>
+                <button type="button" class="studio-garment studio-garment-option" data-garment="pantalon" aria-pressed="false">
+                  <span class="studio-garment-icon">
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M6 2h12l1.5 20h-5L12 9l-2.5 13h-5z"></path><path d="M6 5h12"></path><path d="M12 5v4"></path></svg>
+                  </span>
+                  <span>
+                    <span class="studio-garment-name">Pantalón chino</span>
+                    <span class="studio-garment-meta">Pretina con pasadores · Bolsillos sesgados</span>
+                  </span>
+                </button>
                 <button type="button" class="studio-garment studio-garment-option" data-garment="filipina" aria-pressed="false">
                   <span class="studio-garment-icon">
                     <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 3h6v2H9z"></path><path d="M9 5 4 7 2.5 21h4L8 10v12h8V10l1.5 11h4L20 7l-5-2"></path><path d="M9 5l4 17"></path><circle cx="10.5" cy="10" r="0.6"></circle><circle cx="14.5" cy="10" r="0.6"></circle><circle cx="10.8" cy="14" r="0.6"></circle><circle cx="14.8" cy="14" r="0.6"></circle></svg>
@@ -1147,12 +1156,7 @@
 
             <div class="studio-card">
               <div class="studio-card-label">Color</div>
-              <div class="studio-swatches" id="studioSwatches">
-                <button type="button" class="studio-swatch active" data-color="blanco"><span class="studio-swatch-dot" style="background: #F4F4F1;"></span>Blanco</button>
-                <button type="button" class="studio-swatch" data-color="negro"><span class="studio-swatch-dot" style="background: #1B1B1E;"></span>Negro</button>
-                <button type="button" class="studio-swatch" data-color="azul"><span class="studio-swatch-dot" style="background: #1E3F8A;"></span>Azul</button>
-                <button type="button" class="studio-swatch" data-color="rojo"><span class="studio-swatch-dot" style="background: #B4232C;"></span>Rojo</button>
-              </div>
+              <div class="studio-swatches" id="studioSwatches"></div>
             </div>
 
             <div class="studio-card">
@@ -1183,8 +1187,8 @@
               <div class="studio-card-label">Resumen del diseño</div>
               <div class="studio-summary">
                 <div><span>Prenda</span><span id="studioSummaryGarment">Camiseta básica</span></div>
-                <div><span>Cuello</span><span id="studioSummaryCollar">Redondo</span></div>
-                <div><span>Manga</span><span id="studioSummarySleeve">Corta</span></div>
+                <div id="studioSummaryCollarRow"><span>Cuello</span><span id="studioSummaryCollar">Redondo</span></div>
+                <div id="studioSummarySleeveRow"><span>Manga</span><span id="studioSummarySleeve">Corta</span></div>
                 <div id="studioSummaryPocketRow" hidden><span>Bolsillo</span><span id="studioSummaryPocket"></span></div>
                 <div><span>Color</span><span id="studioSummaryColor">Blanco</span></div>
                 <div><span>Logo</span><span id="studioSummaryLogo">Sin logo</span></div>
@@ -1264,8 +1268,12 @@
       blanco: { label: 'Blanco', hex: '#F4F4F1' },
       negro: { label: 'Negro', hex: '#1B1B1E' },
       azul: { label: 'Azul', hex: '#1E3F8A' },
-      rojo: { label: 'Rojo', hex: '#B4232C' }
+      rojo: { label: 'Rojo', hex: '#B4232C' },
+      beige: { label: 'Beige', hex: '#C8B48E' }
     };
+
+    // Colores de cada prenda (si la prenda no define `colors`, usa estos).
+    const DEFAULT_COLORS = ['blanco', 'negro', 'azul', 'rojo'];
 
     // Ubicaciones del logo. Las coordenadas (x, y) y el tamaño sugerido de
     // cada una dependen de la prenda (ver logoPlacements en GARMENTS).
@@ -1274,7 +1282,9 @@
       pechoIzq: { label: 'Pecho izquierdo', short: 'Pecho izq.', side: 'front' },
       pechoDer: { label: 'Pecho derecho', short: 'Pecho der.', side: 'front' },
       pechoCentro: { label: 'Centro del pecho', short: 'Centro', side: 'front' },
-      espalda: { label: 'Espalda', short: 'Espalda', side: 'back' }
+      espalda: { label: 'Espalda', short: 'Espalda', side: 'back' },
+      bolsilloTrasero: { label: 'Bolsillo trasero', short: 'Bolsillo tras.', side: 'back' },
+      musloIzq: { label: 'Muslo izquierdo', short: 'Muslo izq.', side: 'front' }
     };
 
     // Ancho del torso modelado (≈0.68 unidades) equivale a ~52 cm de una talla M.
@@ -1540,6 +1550,43 @@
           pechoIzq: { x: 0.215, y: 0.19, defaultCm: 7 },
           pechoDer: { x: -0.205, y: 0.19, defaultCm: 7 },
           espalda: { x: 0, y: 0.06, defaultCm: 24 }
+        }
+      },
+
+      pantalon: {
+        label: 'Pantalón chino',
+        meta: 'Pretina con pasadores · Bolsillos sesgados',
+        summary: { cuello: null, manga: null, bolsillo: 'Sesgados al frente, de ribete atrás' },
+        colors: ['negro', 'beige', 'azul'],
+        thumbColor: 'beige', // color de la imagen en DS Hub (se lee mejor que el negro)
+        pants: {
+          waistY: 0.55,
+          waistbandH: 0.045,
+          overlap: 0.06, // cuánto se superponen las dos mitades en la cadera
+          // Cadera de arriba (cintura) hacia abajo (entrepierna): medio ancho y media profundidad.
+          hip: [
+            { y: 0.55, a: 0.272, b: 0.150 },
+            { y: 0.46, a: 0.281, b: 0.156 },
+            { y: 0.34, a: 0.298, b: 0.168 },
+            { y: 0.22, a: 0.302, b: 0.166 },
+            { y: 0.10, a: 0.300, b: 0.162 }
+          ],
+          beltLoops: [0.165, 0.335, 0.03, 0.47, 0.66, 0.75, 0.84],
+          flyX: 0.035,       // bragueta al lado izquierdo de quien lo usa
+          flyBottomY: 0.30,
+          frontPocket: { x0: 0.165, x1: 0.285, yEnd: 0.37 },
+          backPocket: { center: 0.13, halfWidth: 0.065, y: 0.43 },
+          leg: {
+            crotchY: 0.10, thighY: -0.04, kneeY: -0.40, hemY: -0.83,
+            rThigh: [0.150, 0.150], rKnee: [0.118, 0.112], rHem: [0.106, 0.100],
+            centerTop: 0.148, centerHem: 0.14
+          }
+        },
+        groundY: -0.86,
+        defaultPlacement: 'bolsilloTrasero',
+        logoPlacements: {
+          bolsilloTrasero: { x: -0.13, y: 0.35, defaultCm: 5 }, // bolsillo trasero derecho
+          musloIzq: { x: 0.16, y: -0.02, defaultCm: 6 }
         }
       }
     };
@@ -2058,12 +2105,220 @@
       return { band, rims: [ring(0, 0.003), ring(1, 0.006)] };
     }
 
+    // --- Pantalón (chino / dril) ---
+    // Cada pierna es una sola pieza desde la cintura hasta el ruedo. En la
+    // cadera las dos mitades se superponen hacia el centro (juntas forman la
+    // cadera) y al bajar se separan: la entrepierna se forma sola, sin costura
+    // horizontal entre cadera y piernas.
+
+    function smooth01(t) {
+      const k = Math.max(0, Math.min(1, t));
+      return k * k * (3 - 2 * k);
+    }
+
+    // Sección de una mitad a la altura y: centro (cx), radios (rx, rz) y forma (n).
+    function pantsSection(pt, side, y) {
+      const k = pt.leg;
+      // Cadera: interpolación de la tabla pt.hip (de arriba hacia abajo).
+      const hipAt = yy => {
+        const h = pt.hip;
+        if (yy >= h[0].y) return h[0];
+        for (let i = 0; i < h.length - 1; i++) {
+          if (yy <= h[i].y && yy >= h[i + 1].y) {
+            const t = smooth01((h[i].y - yy) / (h[i].y - h[i + 1].y));
+            return { a: THREE.MathUtils.lerp(h[i].a, h[i + 1].a, t), b: THREE.MathUtils.lerp(h[i].b, h[i + 1].b, t) };
+          }
+        }
+        return h[h.length - 1];
+      };
+      const hipSection = yy => {
+        const { a, b } = hipAt(yy);
+        return { cx: side * (a / 2 - pt.overlap), rx: a / 2 + pt.overlap, rz: b, n: 3.2 };
+      };
+      const legSection = yy => {
+        const v = (k.thighY - yy) / (k.thighY - k.hemY);
+        let rx, rz;
+        if (yy >= k.kneeY) {
+          const t = smooth01((k.thighY - yy) / (k.thighY - k.kneeY));
+          rx = THREE.MathUtils.lerp(k.rThigh[0], k.rKnee[0], t);
+          rz = THREE.MathUtils.lerp(k.rThigh[1], k.rKnee[1], t);
+        } else {
+          const t = (k.kneeY - yy) / (k.kneeY - k.hemY);
+          rx = THREE.MathUtils.lerp(k.rKnee[0], k.rHem[0], t);
+          rz = THREE.MathUtils.lerp(k.rKnee[1], k.rHem[1], t);
+        }
+        return { cx: side * THREE.MathUtils.lerp(k.centerTop, k.centerHem, Math.max(0, v)), rx, rz, n: 2.1 };
+      };
+      if (y >= k.crotchY) return hipSection(y);
+      if (y <= k.thighY) return legSection(y);
+      // Transición: de media cadera a pierna redonda.
+      const t = smooth01((k.crotchY - y) / (k.crotchY - k.thighY));
+      const h = hipSection(k.crotchY);
+      const l = legSection(k.thighY);
+      return {
+        cx: THREE.MathUtils.lerp(h.cx, l.cx, t),
+        rx: THREE.MathUtils.lerp(h.rx, l.rx, t),
+        rz: THREE.MathUtils.lerp(h.rz, l.rz, t),
+        n: THREE.MathUtils.lerp(h.n, l.n, t)
+      };
+    }
+
+    function pantsHalfPoint(pt, side, y, angle) {
+      const sec = pantsSection(pt, side, y);
+      const q = superellipse(angle, sec.rx, sec.rz, sec.n);
+      const brk = Math.max(0, (pt.leg.hemY + 0.12 - y) / 0.12); // pliegues sobre el zapato
+      const fold = 0.004 * brk * Math.sin(angle * 5 + y * 60);
+      const len = Math.hypot(q.x, q.z) || 1;
+      return new THREE.Vector3(sec.cx + q.x + fold * q.x / len, y, q.z + fold * q.z / len);
+    }
+
+    function buildPantsHalf(pt, side) {
+      const top = pt.waistY;
+      return buildGrid(170, 80,
+        (v, u) => pantsHalfPoint(pt, side, THREE.MathUtils.lerp(top, pt.leg.hemY, v), u * Math.PI * 2),
+        (v, u) => ({ u: u * 1.6, v: v * 1.4 }));
+    }
+
+    // Superficie exterior del pantalón en (x, y) del frente o la espalda: la
+    // mitad que queda más afuera en ese punto. Devuelve punto y normal.
+    function pantsSurfaceAt(pt, side, y, x) {
+      let best = null;
+      [1, -1].forEach(s => {
+        const sec = pantsSection(pt, s, y);
+        const r = Math.abs(x - sec.cx) / sec.rx;
+        if (r >= 1) return;
+        const z = sec.rz * Math.pow(1 - Math.pow(r, sec.n), 1 / sec.n);
+        if (!best || z > best.z) best = { z, sec, s };
+      });
+      if (!best) return { point: new THREE.Vector3(x, y, 0), normal: new THREE.Vector3(Math.sign(x) || 1, 0, 0) };
+      const { sec, z } = best;
+      const dx = x - sec.cx;
+      const nx = Math.sign(dx) * Math.pow(Math.abs(dx) / sec.rx, sec.n - 1) / sec.rx;
+      const nz = Math.pow(z / sec.rz, sec.n - 1) / sec.rz;
+      const sign = side === 'back' ? -1 : 1;
+      return {
+        point: new THREE.Vector3(x, y, sign * z),
+        normal: new THREE.Vector3(nx, 0, sign * nz).normalize()
+      };
+    }
+
+    // Contorno de la cadera a la altura y (u: 0.25 = centro del frente).
+    function pantsRingPoint(pt, y, u, grow = 1) {
+      const outer = pantsSection(pt, 1, y);
+      const a = outer.cx + outer.rx;
+      const ang = u * Math.PI * 2;
+      const x = a * Math.cos(ang) * 0.999;
+      const { point, normal } = pantsSurfaceAt(pt, Math.sin(ang) >= 0 ? 'front' : 'back', y, x);
+      return point.addScaledVector(normal, grow);
+    }
+
+    // Pretina con pasadores y botón al frente.
+    function buildPantsWaistband(pt) {
+      const bandPoint = (h, u) => pantsRingPoint(pt, pt.waistY - pt.waistbandH + h * pt.waistbandH, u, 0.004);
+      const band = buildGrid(6, 160, (v, u) => bandPoint(v, u), (v, u) => ({ u: u * 2.2, v: v * 0.2 }));
+      const ring = (h, r) => {
+        const pts = [];
+        for (let j = 0; j < 120; j++) pts.push(bandPoint(h, j / 120));
+        return buildRim(pts, r);
+      };
+      const loops = pt.beltLoops.map(u => {
+        const top = bandPoint(1, u);
+        const radial = new THREE.Vector3(top.x, 0, top.z).normalize();
+        const geo = new THREE.BoxGeometry(0.014, pt.waistbandH * 1.35, 0.006);
+        geo.applyMatrix4(new THREE.Matrix4().lookAt(new THREE.Vector3(), radial, new THREE.Vector3(0, 1, 0)));
+        const pos = top.clone().addScaledVector(radial, 0.004);
+        pos.y -= pt.waistbandH * 0.55;
+        geo.translate(pos.x, pos.y, pos.z);
+        return geo;
+      });
+      return { parts: [band, ring(0, 0.003), ring(1, 0.004), ...loops], frontButton: bandPoint(0.5, 0.25) };
+    }
+
+    // Costuras: bragueta en J, bolsillos delanteros sesgados, ribetes traseros
+    // con botón y costuras laterales.
+    function buildPantsDetails(pt) {
+      const waistY = pt.waistY - pt.waistbandH;
+      const parts = [];
+      const line = (side, pts, r = 0.0022, offset = 0.0025) => buildRim(pts.map(([x, y]) => {
+        const { point, normal } = pantsSurfaceAt(pt, side, y, x);
+        return point.addScaledVector(normal, offset);
+      }), r, false);
+
+      const fly = [];
+      for (let i = 0; i <= 16; i++) {
+        const t = i / 16;
+        const y = THREE.MathUtils.lerp(waistY - 0.004, pt.flyBottomY, t);
+        const x = t < 0.75 ? pt.flyX : THREE.MathUtils.lerp(pt.flyX, 0.003, (t - 0.75) / 0.25);
+        fly.push([x, y]);
+      }
+      parts.push(line('front', fly));
+      parts.push(line('front', [[0, waistY - 0.004], [0, pt.flyBottomY], [0, pt.leg.crotchY + 0.02]], 0.0018));
+      parts.push(line('back', [[0, waistY - 0.004], [0, 0.3], [0, pt.leg.crotchY + 0.02]], 0.0018));
+
+      [1, -1].forEach(s => {
+        const pts = [];
+        for (let i = 0; i <= 12; i++) {
+          const t = i / 12;
+          pts.push([s * THREE.MathUtils.lerp(pt.frontPocket.x0, pt.frontPocket.x1, t),
+                    THREE.MathUtils.lerp(waistY - 0.004, pt.frontPocket.yEnd, t * t * 0.4 + t * 0.6)]);
+        }
+        parts.push(line('front', pts, 0.003, 0.003));
+      });
+
+      const backButtons = [];
+      [1, -1].forEach(s => {
+        const x0 = s * (pt.backPocket.center - pt.backPocket.halfWidth);
+        const x1 = s * (pt.backPocket.center + pt.backPocket.halfWidth);
+        [0, -0.012].forEach(dy => {
+          const pts = [];
+          for (let i = 0; i <= 8; i++) pts.push([THREE.MathUtils.lerp(x0, x1, i / 8), pt.backPocket.y + dy]);
+          parts.push(line('back', pts, 0.0028, 0.003));
+        });
+        const { point, normal } = pantsSurfaceAt(pt, 'back', pt.backPocket.y - 0.03, s * pt.backPocket.center);
+        backButtons.push({ point: point.addScaledVector(normal, 0.006), normal, radius: 0.008 });
+      });
+
+      // Costura lateral: borde exterior de cada mitad, de la cintura al ruedo.
+      [1, -1].forEach(s => {
+        const pts = [];
+        for (let i = 0; i <= 40; i++) {
+          const y = THREE.MathUtils.lerp(waistY, pt.leg.hemY + 0.01, i / 40);
+          const sec = pantsSection(pt, s, y);
+          pts.push(new THREE.Vector3(sec.cx + s * sec.rx * 1.003, y, 0));
+        }
+        parts.push(buildRim(pts, 0.0016, false));
+      });
+
+      return { parts, backButtons };
+    }
+
+    function buildPantsParts(cfg) {
+      const pt = cfg.pants;
+      const fabricParts = [];
+      const buttonParts = [];
+      const halves = [1, -1].map(side => buildPantsHalf(pt, side));
+      fabricParts.push(...halves);
+      [1, -1].forEach(side => {
+        const ring = [];
+        for (let j = 0; j < 80; j++) ring.push(pantsHalfPoint(pt, side, pt.leg.hemY, (j / 80) * Math.PI * 2));
+        fabricParts.push(buildRim(ring, 0.005)); // ruedo
+      });
+      const wb = buildPantsWaistband(pt);
+      fabricParts.push(...wb.parts);
+      buttonParts.push({ point: wb.frontButton.clone().add(new THREE.Vector3(0, 0, 0.007)), normal: new THREE.Vector3(0, 0, 1), radius: 0.0115 });
+      const details = buildPantsDetails(pt);
+      fabricParts.push(...details.parts);
+      buttonParts.push(...details.backButtons);
+      return { torso: halves[0], pocket: null, decalExtra: [halves[1]], fabricParts, ribParts: [], trimParts: [], buttonParts };
+    }
+
     // Arma todas las piezas de una prenda.
     function buildGarmentParts(cfg) {
       const fabricParts = [];
       const ribParts = [];   // puños y pretina en tejido rib
       const trimParts = [];  // herretes y ojales
       const buttonParts = [];
+      if (cfg.pants) return buildPantsParts(cfg);
       const torso = buildTorso(cfg);
       fabricParts.push(torso);
 
@@ -2295,7 +2550,7 @@
 
       const shirt = new THREE.Group();
       scene.add(shirt);
-      const garment = { key: null, torsoMesh: null, pocketMesh: null };
+      const garment = { key: null, torsoMesh: null, pocketMesh: null, extraMeshes: [] };
 
       function disposeShirt() {
         [...shirt.children].forEach(child => {
@@ -2308,6 +2563,7 @@
         const cfg = GARMENTS[key];
         disposeShirt();
         const built = buildGarmentParts(cfg);
+        garment.extraMeshes = [];
         built.fabricParts.forEach(geo => {
           const mesh = new THREE.Mesh(geo, fabric);
           mesh.castShadow = true;
@@ -2315,6 +2571,7 @@
           shirt.add(mesh);
           if (geo === built.torso) garment.torsoMesh = mesh;
           if (geo === built.pocket) garment.pocketMesh = mesh;
+          if (built.decalExtra && built.decalExtra.includes(geo)) garment.extraMeshes.push(mesh);
         });
         if (!built.pocket) garment.pocketMesh = null;
         built.ribParts.forEach(geo => {
@@ -2364,16 +2621,33 @@
       resize();
 
       // --- Color ---
+      // Cada prenda tiene sus colores (cfg.colors); el selector se arma según la prenda.
       const targetColor = new THREE.Color(SHIRT_COLORS.blanco.hex);
-      document.querySelectorAll('#studioSwatches .studio-swatch').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const c = SHIRT_COLORS[btn.dataset.color];
-          if (!c) return;
-          targetColor.set(c.hex);
-          document.querySelectorAll('#studioSwatches .studio-swatch').forEach(b => b.classList.toggle('active', b === btn));
-          document.getElementById('studioSummaryColor').textContent = c.label;
-        });
+      let colorKey = 'blanco';
+
+      function setColor(key) {
+        const c = SHIRT_COLORS[key];
+        if (!c) return;
+        colorKey = key;
+        targetColor.set(c.hex);
+        document.querySelectorAll('#studioSwatches .studio-swatch').forEach(b => b.classList.toggle('active', b.dataset.color === key));
+        document.getElementById('studioSummaryColor').textContent = c.label;
+      }
+
+      function syncColorSwatches() {
+        const cfg = GARMENTS[garment.key];
+        const keys = (cfg && cfg.colors) || DEFAULT_COLORS;
+        const wrap = document.getElementById('studioSwatches');
+        wrap.style.gridTemplateColumns = `repeat(${Math.max(keys.length, 3)}, 1fr)`;
+        wrap.innerHTML = keys.map(k => `<button type="button" class="studio-swatch" data-color="${k}"><span class="studio-swatch-dot" style="background: ${SHIRT_COLORS[k].hex};"></span>${SHIRT_COLORS[k].label}</button>`).join('');
+        setColor(keys.includes(colorKey) ? colorKey : keys[0]);
+      }
+
+      document.getElementById('studioSwatches').addEventListener('click', e => {
+        const btn = e.target.closest('.studio-swatch');
+        if (btn) setColor(btn.dataset.color);
       });
+      syncColorSwatches();
 
       // --- Vistas y giro ---
       let viewAnim = null;
@@ -2495,7 +2769,7 @@
         const origin = new THREE.Vector3(spot.x, spot.y, front ? 2 : -2);
         const dir = new THREE.Vector3(0, 0, front ? -1 : 1);
         // El logo se proyecta sobre el torso y, si existe, sobre el bolsillo.
-        const targets = [garment.torsoMesh, garment.pocketMesh].filter(Boolean);
+        const targets = [garment.torsoMesh, garment.pocketMesh, ...garment.extraMeshes].filter(Boolean);
         targets.forEach(m => m.updateMatrixWorld());
         raycaster.set(origin, dir);
         const hit = raycaster.intersectObjects(targets, false)[0];
@@ -2683,8 +2957,11 @@
           b.setAttribute('aria-pressed', on ? 'true' : 'false');
         });
         document.getElementById('studioSummaryGarment').textContent = cfg.label;
-        document.getElementById('studioSummaryCollar').textContent = cfg.summary.cuello;
-        document.getElementById('studioSummarySleeve').textContent = cfg.summary.manga;
+        syncColorSwatches();
+        document.getElementById('studioSummaryCollar').textContent = cfg.summary.cuello || '';
+        document.getElementById('studioSummaryCollarRow').hidden = !cfg.summary.cuello;
+        document.getElementById('studioSummarySleeve').textContent = cfg.summary.manga || '';
+        document.getElementById('studioSummarySleeveRow').hidden = !cfg.summary.manga;
         const pocketRow = document.getElementById('studioSummaryPocketRow');
         pocketRow.hidden = !cfg.summary.bolsillo;
         document.getElementById('studioSummaryPocket').textContent = cfg.summary.bolsillo || '';
@@ -2726,8 +3003,7 @@
       }
 
       function currentColorKey() {
-        const active = document.querySelector('#studioSwatches .studio-swatch.active');
-        return active ? active.dataset.color : 'blanco';
+        return colorKey;
       }
 
       function escapeHtml(str) {
@@ -3011,8 +3287,7 @@
         // Los diseños ya creados se conservan aunque su prenda se deshabilite.
         showGarmentOption(d.prenda, true);
         setGarment(d.prenda);
-        const swatch = document.querySelector(`#studioSwatches .studio-swatch[data-color="${d.color}"]`);
-        if (swatch) swatch.click();
+        if (SHIRT_COLORS[d.color]) setColor(d.color);
         removeLogo();
         if (d.logo_path) {
           const { data, error } = await window._supabase.storage.from(LOGOS_BUCKET).download(d.logo_path);
@@ -3226,10 +3501,11 @@
 
       // Foto (PNG) de una prenda para las tarjetas del DS Hub del admin, que
       // carga esta página oculta con ?embed=1 y llama a esta función.
-      function snapshot(key, colorKey = 'blanco') {
+      function snapshot(key, snapColor = 'blanco') {
         if (!GARMENTS[key]) return null;
         buildShirt(key);
-        const c = SHIRT_COLORS[colorKey] || SHIRT_COLORS.blanco;
+        const allowed = GARMENTS[key].colors || DEFAULT_COLORS;
+        const c = SHIRT_COLORS[allowed.includes(snapColor) ? snapColor : (GARMENTS[key].thumbColor || allowed[0])];
         fabric.color.set(c.hex);
         targetColor.set(c.hex);
         setButtonColor();
