@@ -175,6 +175,31 @@
       }
     }
 
+    /* El visor queda fijo mientras se baja por el panel, para ver el
+       resultado al ajustar color, logo o tamaño. overflow-x: hidden (de
+       styles.css) anula position: sticky; clip recorta igual sin anularlo. */
+    html,
+    body,
+    .main-content {
+      overflow-x: clip;
+    }
+
+    .studio-layout > .studio-viewer {
+      position: sticky;
+      top: 1.25rem;
+      z-index: 5;
+    }
+
+    @media (max-width: 1100px) {
+      .studio-layout > .studio-viewer {
+        top: 0;
+        height: 46vh;
+        min-height: 300px;
+        border-radius: 0 0 1.25rem 1.25rem;
+        box-shadow: 0 10px 24px -16px rgba(15, 23, 42, 0.35);
+      }
+    }
+
     .studio-viewer {
       position: relative;
       height: min(60vh, 600px);
@@ -2614,6 +2639,14 @@
         updateLogoSummary();
         goToView(LOGO_PLACEMENTS[key].side === 'front' ? 'front' : 'back');
       });
+
+      // Al empezar a ajustar el tamaño, la cámara gira hacia el lado del logo.
+      ['pointerdown', 'focus'].forEach(evt => logoSize.addEventListener(evt, () => {
+        const side = LOGO_PLACEMENTS[logoState.placement].side === 'front' ? 'front' : 'back';
+        const target = VIEW_ANGLES[side];
+        const diff = Math.atan2(Math.sin(target - currentAzimuth()), Math.cos(target - currentAzimuth()));
+        if (Math.abs(diff) > 0.2) goToView(side);
+      }));
 
       logoSize.addEventListener('input', () => {
         logoState.sizeCm = parseInt(logoSize.value, 10);
