@@ -1139,6 +1139,15 @@
                     <span class="studio-garment-meta">Pretina con pasadores · Bolsillos sesgados</span>
                   </span>
                 </button>
+                <button type="button" class="studio-garment studio-garment-option" data-garment="limpieza" aria-pressed="false">
+                  <span class="studio-garment-icon">
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 4 8 3l1.5 3L11 3l3 1 .5 4-2 .5V17H4V8.5l-2-.5z"></path><path d="M15 6h7l.6 15h-2.8L18 11l-1.2 10H14z"></path><path d="M15 8h7"></path></svg>
+                  </span>
+                  <span>
+                    <span class="studio-garment-name">Uniforme de limpieza</span>
+                    <span class="studio-garment-meta">Túnica con vivos + pantalón de resorte</span>
+                  </span>
+                </button>
                 <button type="button" class="studio-garment studio-garment-option" data-garment="filipina" aria-pressed="false">
                   <span class="studio-garment-icon">
                     <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 3h6v2H9z"></path><path d="M9 5 4 7 2.5 21h4L8 10v12h8V10l1.5 11h4L20 7l-5-2"></path><path d="M9 5l4 17"></path><circle cx="10.5" cy="10" r="0.6"></circle><circle cx="14.5" cy="10" r="0.6"></circle><circle cx="10.8" cy="14" r="0.6"></circle><circle cx="14.8" cy="14" r="0.6"></circle></svg>
@@ -1269,7 +1278,9 @@
       negro: { label: 'Negro', hex: '#1B1B1E' },
       azul: { label: 'Azul', hex: '#1E3F8A' },
       rojo: { label: 'Rojo', hex: '#B4232C' },
-      beige: { label: 'Beige', hex: '#C8B48E' }
+      beige: { label: 'Beige', hex: '#C8B48E' },
+      azulMarino: { label: 'Azul marino', hex: '#1F2A44' },
+      gris: { label: 'Gris', hex: '#5E646E' }
     };
 
     // Colores de cada prenda (si la prenda no define `colors`, usa estos).
@@ -1562,31 +1573,119 @@
         pants: {
           waistY: 0.55,
           waistbandH: 0.045,
-          overlap: 0.06, // cuánto se superponen las dos mitades en la cadera
+          overlap: 0.035, // cuánto se superponen las dos mitades en la cadera
           // Cadera de arriba (cintura) hacia abajo (entrepierna): medio ancho y media profundidad.
+          // Corte slim: tiro corto (~¼ del largo) y piernas largas que se angostan al tobillo.
           hip: [
-            { y: 0.55, a: 0.272, b: 0.150 },
-            { y: 0.46, a: 0.281, b: 0.156 },
-            { y: 0.34, a: 0.298, b: 0.168 },
-            { y: 0.22, a: 0.302, b: 0.166 },
-            { y: 0.10, a: 0.300, b: 0.162 }
+            { y: 0.55, a: 0.250, b: 0.140 },
+            { y: 0.47, a: 0.262, b: 0.148 },
+            { y: 0.38, a: 0.272, b: 0.156 },
+            { y: 0.30, a: 0.272, b: 0.152 },
+            { y: 0.22, a: 0.268, b: 0.146 }
           ],
           beltLoops: [0.165, 0.335, 0.03, 0.47, 0.66, 0.75, 0.84],
-          flyX: 0.035,       // bragueta al lado izquierdo de quien lo usa
-          flyBottomY: 0.30,
-          frontPocket: { x0: 0.165, x1: 0.285, yEnd: 0.37 },
-          backPocket: { center: 0.13, halfWidth: 0.065, y: 0.43 },
+          flyX: 0.032,       // bragueta al lado izquierdo de quien lo usa
+          flyBottomY: 0.36,
+          frontPocket: { x0: 0.15, x1: 0.258, yEnd: 0.42 },
+          backPocket: { center: 0.115, halfWidth: 0.058, y: 0.47 },
+          breakFolds: 0.007, // arrugas sobre el zapato
           leg: {
-            crotchY: 0.10, thighY: -0.04, kneeY: -0.40, hemY: -0.83,
-            rThigh: [0.150, 0.150], rKnee: [0.118, 0.112], rHem: [0.106, 0.100],
-            centerTop: 0.148, centerHem: 0.14
+            crotchY: 0.22, thighY: 0.10, kneeY: -0.33, hemY: -0.83,
+            rThigh: [0.128, 0.130], rKnee: [0.098, 0.095], rHem: [0.086, 0.082],
+            centerTop: 0.128, centerHem: 0.112
           }
         },
         groundY: -0.86,
         defaultPlacement: 'bolsilloTrasero',
         logoPlacements: {
-          bolsilloTrasero: { x: -0.13, y: 0.35, defaultCm: 5 }, // bolsillo trasero derecho
-          musloIzq: { x: 0.16, y: -0.02, defaultCm: 6 }
+          bolsilloTrasero: { x: -0.115, y: 0.39, defaultCm: 5 }, // bolsillo trasero derecho
+          musloIzq: { x: 0.135, y: 0.08, defaultCm: 6 }
+        }
+      },
+
+      // Conjunto: túnica (a la izquierda) + pantalón de resorte (a la derecha).
+      limpieza: {
+        label: 'Uniforme de limpieza',
+        meta: 'Túnica con vivos + pantalón de resorte',
+        summary: { cuello: 'Solapa en V con vivo', manga: 'Corta con puño y vivo', bolsillo: 'Inferiores con vivo' },
+        colors: ['azulMarino', 'negro', 'gris'],
+        thumbColor: 'azulMarino',
+        cameraDistance: 4.7,
+        groundY: -0.86,
+        set: {
+          topOffset: [-0.43, 0],
+          bottomOffset: [0.45, 0],
+          top: {
+            profile: [
+              { y: -0.72, a: 0.352, b: 0.172, n: 2.6 },
+              { y: -0.48, a: 0.336, b: 0.165, n: 2.6 },
+              { y: -0.18, a: 0.316, b: 0.158, n: 2.6 }, // talle entallado
+              { y: 0.08, a: 0.340, b: 0.178, n: 2.5 },
+              { y: 0.24, a: 0.348, b: 0.178, n: 2.4 },
+              { y: 0.325, a: 0.315, b: 0.157, n: 2.3 },
+              { y: 0.385, a: 0.238, b: 0.129, n: 2.1 },
+              { y: 0.422, a: 0.162, b: 0.112, n: 2.0 },
+              { y: 0.437, a: 0.118, b: 0.104, n: 2.0 }
+            ],
+            neckStart: 5,
+            neckDip: 0.025,
+            hemCurve: 0,
+            waistFold: 0.002,
+            sleeve: {
+              angleStart: deg(50),
+              angleEnd: deg(50),
+              length: 0.25,
+              hemTilt: 0.06,
+              forward: deg(12),
+              start: -0.18,
+              rBase: [0.156, 0.148],
+              rEnd: [0.126, 0.114],
+              flare: false,
+              shoulder: new THREE.Vector3(0.333, 0.334, 0),
+              cuff: { length: 0.055, scale: 1.06, button: false, piping: true }
+            },
+            collar: 'revere',
+            collarStandH: 0.012,
+            collarTip: 0.3,
+            placket: false,
+            pocket: null,
+            // Solapas que forman la V sobre el pecho (con vivo en el borde).
+            lapels: { yTop: 0.405, yBottom: 0.235, inTop: 0.034, outTop: 0.145 },
+            concealedPlacket: { x: 0.022, fromY: 0.235 },
+            princessSeams: { x: 0.15, topY: 0.27, bend: 0.025 },
+            lowerPockets: { yTop: -0.40, yBottom: -0.58, x0: 0.075, x1: 0.235 }
+          },
+          bottom: {
+            pants: {
+              waistY: 0.55,
+              waistbandH: 0.075,
+              elastic: true,
+              overlap: 0.06,
+              hip: [
+                { y: 0.55, a: 0.268, b: 0.150 },
+                { y: 0.46, a: 0.278, b: 0.156 },
+                { y: 0.36, a: 0.288, b: 0.162 },
+                { y: 0.27, a: 0.288, b: 0.160 },
+                { y: 0.19, a: 0.284, b: 0.156 }
+              ],
+              beltLoops: [],
+              flyX: null,
+              frontPocket: null,
+              backPocket: null,
+              leg: {
+                crotchY: 0.19, thighY: 0.06, kneeY: -0.36, hemY: -0.83,
+                rThigh: [0.138, 0.138], rKnee: [0.118, 0.112], rHem: [0.106, 0.100],
+                centerTop: 0.138, centerHem: 0.132
+              }
+            }
+          }
+        },
+        // Logo en la túnica (las coordenadas incluyen su desplazamiento a la izquierda).
+        defaultPlacement: 'pechoIzq',
+        logoPlacements: {
+          pechoIzq: { x: -0.43 + 0.15, y: 0.17, defaultCm: 7 },
+          pechoDer: { x: -0.43 - 0.15, y: 0.17, defaultCm: 7 },
+          espalda: { x: -0.43, y: 0.06, defaultCm: 22 }
         }
       }
     };
@@ -1661,7 +1760,7 @@
       const neckW = Math.max(0, (t - cfg.neckStart) / (last - cfg.neckStart));
       const front = Math.max(0, Math.sin(angle));
       const back = Math.max(0, -Math.sin(angle));
-      y -= cfg.neckDip * neckW * neckW * front * front;
+      y -= cfg.neckDip * neckW * neckW * Math.pow(front, cfg.neckDipPower || 2); // potencia alta = escote en V
       y += 0.008 * neckW * back;
       // Faldón: los costados del ruedo suben y el frente/espalda bajan en curva.
       if (cfg.hemCurve) {
@@ -1808,7 +1907,8 @@
     function collarStandPoint(cfg, h, u) {
       const p = torsoPoint(cfg, 1, u);
       const scale = 1.02 - 0.05 * h; // el pie de cuello se inclina un poco hacia el cuello
-      return new THREE.Vector3(p.x * scale, p.y - 0.004 + h * COLLAR_STAND_H, p.z * scale);
+      const standH = cfg.collarStandH != null ? cfg.collarStandH : COLLAR_STAND_H;
+      return new THREE.Vector3(p.x * scale, p.y - 0.004 + h * standH, p.z * scale);
     }
 
     const COLLAR_GAP = 0.018; // separación (en vueltas) entre las dos puntas al frente
@@ -2120,16 +2220,22 @@
     function pantsSection(pt, side, y) {
       const k = pt.leg;
       // Cadera: interpolación de la tabla pt.hip (de arriba hacia abajo).
+      // Curva suave (Catmull-Rom) por la tabla: sin abultamientos en cada medida.
       const hipAt = yy => {
         const h = pt.hip;
         if (yy >= h[0].y) return h[0];
-        for (let i = 0; i < h.length - 1; i++) {
+        const last = h.length - 1;
+        const get = j => h[Math.max(0, Math.min(last, j))];
+        for (let i = 0; i < last; i++) {
           if (yy <= h[i].y && yy >= h[i + 1].y) {
-            const t = smooth01((h[i].y - yy) / (h[i].y - h[i + 1].y));
-            return { a: THREE.MathUtils.lerp(h[i].a, h[i + 1].a, t), b: THREE.MathUtils.lerp(h[i].b, h[i + 1].b, t) };
+            const t = (h[i].y - yy) / (h[i].y - h[i + 1].y);
+            return {
+              a: catmull(get(i - 1).a, h[i].a, h[i + 1].a, get(i + 2).a, t),
+              b: catmull(get(i - 1).b, h[i].b, h[i + 1].b, get(i + 2).b, t)
+            };
           }
         }
-        return h[h.length - 1];
+        return h[last];
       };
       const hipSection = yy => {
         const { a, b } = hipAt(yy);
@@ -2166,8 +2272,8 @@
     function pantsHalfPoint(pt, side, y, angle) {
       const sec = pantsSection(pt, side, y);
       const q = superellipse(angle, sec.rx, sec.rz, sec.n);
-      const brk = Math.max(0, (pt.leg.hemY + 0.12 - y) / 0.12); // pliegues sobre el zapato
-      const fold = 0.004 * brk * Math.sin(angle * 5 + y * 60);
+      const brk = Math.max(0, (pt.leg.hemY + 0.16 - y) / 0.16); // pliegues sobre el zapato
+      const fold = (pt.breakFolds || 0.004) * brk * brk * Math.sin(angle * 5 + y * 70);
       const len = Math.hypot(q.x, q.z) || 1;
       return new THREE.Vector3(sec.cx + q.x + fold * q.x / len, y, q.z + fold * q.z / len);
     }
@@ -2244,18 +2350,22 @@
         return point.addScaledVector(normal, offset);
       }), r, false);
 
-      const fly = [];
-      for (let i = 0; i <= 16; i++) {
-        const t = i / 16;
-        const y = THREE.MathUtils.lerp(waistY - 0.004, pt.flyBottomY, t);
-        const x = t < 0.75 ? pt.flyX : THREE.MathUtils.lerp(pt.flyX, 0.003, (t - 0.75) / 0.25);
-        fly.push([x, y]);
+      // Bragueta en J (solo pantalón con cierre).
+      if (pt.flyX != null) {
+        const fly = [];
+        for (let i = 0; i <= 16; i++) {
+          const t = i / 16;
+          const y = THREE.MathUtils.lerp(waistY - 0.004, pt.flyBottomY, t);
+          const x = t < 0.75 ? pt.flyX : THREE.MathUtils.lerp(pt.flyX, 0.003, (t - 0.75) / 0.25);
+          fly.push([x, y]);
+        }
+        parts.push(line('front', fly));
       }
-      parts.push(line('front', fly));
-      parts.push(line('front', [[0, waistY - 0.004], [0, pt.flyBottomY], [0, pt.leg.crotchY + 0.02]], 0.0018));
+      // Costuras centrales de frente y espalda.
+      parts.push(line('front', [[0, waistY - 0.004], [0, 0.3], [0, pt.leg.crotchY + 0.02]], 0.0018));
       parts.push(line('back', [[0, waistY - 0.004], [0, 0.3], [0, pt.leg.crotchY + 0.02]], 0.0018));
 
-      [1, -1].forEach(s => {
+      if (pt.frontPocket) [1, -1].forEach(s => {
         const pts = [];
         for (let i = 0; i <= 12; i++) {
           const t = i / 12;
@@ -2266,7 +2376,7 @@
       });
 
       const backButtons = [];
-      [1, -1].forEach(s => {
+      if (pt.backPocket) [1, -1].forEach(s => {
         const x0 = s * (pt.backPocket.center - pt.backPocket.halfWidth);
         const x1 = s * (pt.backPocket.center + pt.backPocket.halfWidth);
         [0, -0.012].forEach(dy => {
@@ -2303,21 +2413,172 @@
         for (let j = 0; j < 80; j++) ring.push(pantsHalfPoint(pt, side, pt.leg.hemY, (j / 80) * Math.PI * 2));
         fabricParts.push(buildRim(ring, 0.005)); // ruedo
       });
+      const ribParts = [];
       const wb = buildPantsWaistband(pt);
-      fabricParts.push(...wb.parts);
-      buttonParts.push({ point: wb.frontButton.clone().add(new THREE.Vector3(0, 0, 0.007)), normal: new THREE.Vector3(0, 0, 1), radius: 0.0115 });
+      if (pt.elastic) {
+        // Cintura con resorte: la pretina es tejido fruncido (textura rib), sin pasadores ni botón.
+        const [band, ...rest] = wb.parts;
+        ribParts.push(band);
+        fabricParts.push(...rest);
+      } else {
+        fabricParts.push(...wb.parts);
+        buttonParts.push({ point: wb.frontButton.clone().add(new THREE.Vector3(0, 0, 0.007)), normal: new THREE.Vector3(0, 0, 1), radius: 0.0115 });
+      }
       const details = buildPantsDetails(pt);
       fabricParts.push(...details.parts);
       buttonParts.push(...details.backButtons);
-      return { torso: halves[0], pocket: null, decalExtra: [halves[1]], fabricParts, ribParts: [], trimParts: [], buttonParts };
+      return { torso: halves[0], pocket: null, decalExtra: [halves[1]], fabricParts, ribParts, trimParts: [], buttonParts };
+    }
+
+    // --- Túnica (uniforme de limpieza / salud) ---
+    function torsoBackPointAt(cfg, y, x) {
+      let lo = 0, hi = 1;
+      for (let k = 0; k < 30; k++) {
+        const mid = (lo + hi) / 2;
+        if (torsoPoint(cfg, mid, 0.75).y < y) lo = mid; else hi = mid;
+      }
+      const v = (lo + hi) / 2;
+      const p = torsoProfile(cfg, v * (cfg.profile.length - 1));
+      const c = Math.sign(x) * Math.pow(Math.min(1, Math.abs(x) / p.a), p.n / 2);
+      const angle = -Math.acos(Math.max(-1, Math.min(1, c)));
+      const pt = torsoPoint(cfg, v, angle / (Math.PI * 2) + 1);
+      const nx = Math.sign(pt.x) * Math.pow(Math.abs(pt.x) / p.a, p.n - 1) / p.a;
+      const nz = -Math.pow(Math.abs(pt.z) / p.b, p.n - 1) / p.b;
+      return { point: pt, normal: new THREE.Vector3(nx, 0, nz).normalize() };
+    }
+
+    function tunicSurface(cfg, side, y, x) {
+      return side === 'back' ? torsoBackPointAt(cfg, y, x) : frontPointAt(cfg, frontV(cfg, y), x);
+    }
+
+    function tunicLine(cfg, side, pts, r, offset = 0.0025) {
+      return buildRim(pts.map(([x, y]) => {
+        const { point, normal } = tunicSurface(cfg, side, y, x);
+        return point.addScaledVector(normal, offset);
+      }), r, false);
+    }
+
+    function buildLapels(cfg) {
+      const lp = cfg.lapels;
+      const fabric = [], piping = [], shade = [];
+      const rows = 24, cols = 10;
+      const edgeX = (t, which) => which === 'in'
+        ? THREE.MathUtils.lerp(lp.inTop, 0.004, t)
+        : THREE.MathUtils.lerp(lp.outTop, 0.004, Math.pow(t, 0.85));
+      const yAt = t => THREE.MathUtils.lerp(lp.yTop, lp.yBottom, t);
+      const onChest = (x, y, offset) => {
+        const { point, normal } = frontPointAt(cfg, frontV(cfg, y), x);
+        return point.addScaledVector(normal, offset);
+      };
+      [1, -1].forEach(sg => {
+        // La solapa se levanta un poco hacia su borde exterior (doblez de la tela).
+        const at = (t, r) => onChest(sg * THREE.MathUtils.lerp(edgeX(t, 'in'), edgeX(t, 'out'), r), yAt(t), 0.004 + 0.004 * r * (1 - t));
+        fabric.push(buildGrid(rows, cols, (v, u) => at(v, u), (v, u) => ({ u: u * 0.3, v })));
+        const outer = [];
+        for (let i = 0; i <= rows; i++) outer.push(at(i / rows, 1));
+        piping.push(buildRim(outer, 0.0042, false));
+        const inner = [];
+        for (let i = 0; i <= rows; i++) inner.push(at(i / rows, 0));
+        fabric.push(buildRim(inner, 0.0022, false));
+      });
+      // Abertura en V entre las solapas: se ve el interior de la prenda (más oscuro).
+      shade.push(buildGrid(rows, 8, (v, u) => {
+        const t = v;
+        const x = THREE.MathUtils.lerp(-edgeX(t, 'in'), edgeX(t, 'in'), u);
+        return onChest(x, yAt(t), 0.0025);
+      }, (v, u) => ({ u, v })));
+      return { fabric, piping, shade };
+    }
+
+    function buildTunicDetails(cfg) {
+      const fabric = [], piping = [], pockets = [], shade = [];
+      if (cfg.lapels) {
+        const lp = buildLapels(cfg);
+        fabric.push(...lp.fabric);
+        piping.push(...lp.piping);
+        shade.push(...lp.shade);
+      }
+      const hemY = torsoPoint(cfg, 0, 0.25).y + 0.012;
+      // Cierre oculto: borde de la tapeta desde el fondo del escote hasta el ruedo.
+      if (cfg.concealedPlacket) {
+        const topY = cfg.concealedPlacket.fromY != null ? cfg.concealedPlacket.fromY : torsoPoint(cfg, 1, 0.25).y - 0.006;
+        const pts = [];
+        for (let i = 0; i <= 30; i++) pts.push([cfg.concealedPlacket.x, THREE.MathUtils.lerp(topY, hemY, i / 30)]);
+        fabric.push(tunicLine(cfg, 'front', pts, 0.0022));
+      }
+      // Costuras de pinza (princesa) al frente y atrás.
+      if (cfg.princessSeams) {
+        const ps = cfg.princessSeams;
+        ['front', 'back'].forEach(side => [1, -1].forEach(sg => {
+          const pts = [];
+          for (let i = 0; i <= 30; i++) {
+            const y = THREE.MathUtils.lerp(ps.topY, hemY, i / 30);
+            const bend = Math.sin((i / 30) * Math.PI) * ps.bend; // se entallan en la cintura
+            pts.push([sg * (ps.x - bend), y]);
+          }
+          fabric.push(tunicLine(cfg, side, pts, 0.0016, 0.0015));
+        }));
+      }
+      // Bolsillos inferiores de parche con vivo en el borde superior.
+      if (cfg.lowerPockets) {
+        const lp = cfg.lowerPockets;
+        const offset = 0.0045;
+        [1, -1].forEach(sg => {
+          const rows = 16, cols = 16;
+          const at = (i, j) => {
+            const y = THREE.MathUtils.lerp(lp.yBottom, lp.yTop, i / rows);
+            const x = sg * THREE.MathUtils.lerp(lp.x0, lp.x1, j / cols);
+            const { point, normal } = frontPointAt(cfg, frontV(cfg, y), x);
+            return point.addScaledVector(normal, offset);
+          };
+          pockets.push(buildGrid(rows, cols, (v, u) => at(Math.round(v * rows), Math.round(u * cols)), (v, u) => ({ u, v })));
+          const border = [];
+          for (let i = rows; i >= 0; i--) border.push(at(i, 0));
+          for (let j = 1; j <= cols; j++) border.push(at(0, j));
+          for (let i = 1; i <= rows; i++) border.push(at(i, cols));
+          fabric.push(buildRim(border, 0.0022, false));
+          const top = [];
+          for (let j = 0; j <= cols; j++) top.push(at(rows, j));
+          piping.push(buildRim(top, 0.0045, false));
+        });
+      }
+      return { fabric, piping, pockets, shade };
+    }
+
+    // Conjunto (túnica + pantalón) lado a lado, como en la foto de catálogo.
+    function buildSetParts(cfg) {
+      const top = buildGarmentParts(cfg.set.top);
+      const bottom = buildPantsParts(cfg.set.bottom);
+      const moved = new Set();
+      const move = (list, [dx, dy]) => list.forEach(g => {
+        if (moved.has(g)) return;
+        moved.add(g);
+        g.translate(dx, dy, 0);
+      });
+      const offsetButtons = (list, [dx, dy]) => list.map(b => ({ ...b, point: b.point.clone().add(new THREE.Vector3(dx, dy, 0)) }));
+      [top.fabricParts, top.ribParts, top.trimParts, top.pipingParts || [], top.shadeParts || []].forEach(l => move(l, cfg.set.topOffset));
+      [bottom.fabricParts, bottom.ribParts, bottom.trimParts, bottom.pipingParts || []].forEach(l => move(l, cfg.set.bottomOffset));
+      return {
+        torso: top.torso,
+        pocket: top.pocket,
+        decalExtra: [],
+        fabricParts: [...top.fabricParts, ...bottom.fabricParts],
+        ribParts: [...top.ribParts, ...bottom.ribParts],
+        trimParts: [...top.trimParts, ...bottom.trimParts],
+        pipingParts: [...(top.pipingParts || []), ...(bottom.pipingParts || [])],
+        shadeParts: [...(top.shadeParts || [])],
+        buttonParts: [...offsetButtons(top.buttonParts, cfg.set.topOffset), ...offsetButtons(bottom.buttonParts, cfg.set.bottomOffset)]
+      };
     }
 
     // Arma todas las piezas de una prenda.
     function buildGarmentParts(cfg) {
+      if (cfg.set) return buildSetParts(cfg);
       const fabricParts = [];
       const ribParts = [];   // puños y pretina en tejido rib
       const trimParts = [];  // herretes y ojales
       const buttonParts = [];
+      const pipingParts = []; // vivos en color contraste (túnica)
       if (cfg.pants) return buildPantsParts(cfg);
       const torso = buildTorso(cfg);
       fabricParts.push(torso);
@@ -2330,7 +2591,8 @@
           fabricParts.push(buildSleeve(sl, axis, side, sl.start, cuffStart + 0.01, 1, 90));
           const cuff = buildSleeve(sl, axis, side, cuffStart, 1, sl.cuff.scale, 8);
           (sl.cuff.rib ? ribParts : fabricParts).push(cuff);
-          fabricParts.push(buildRim(sleeveRing(sl, axis, side, cuffStart, sl.cuff.scale), 0.0035));
+          if (sl.cuff.piping) pipingParts.push(buildRim(sleeveRing(sl, axis, side, cuffStart, sl.cuff.scale), 0.0045));
+          else fabricParts.push(buildRim(sleeveRing(sl, axis, side, cuffStart, sl.cuff.scale), 0.0035));
           fabricParts.push(buildRim(sleeveRing(sl, axis, side, 1, sl.cuff.scale), 0.0045));
           if (sl.cuff.rib) {
             // El puño en rib no lleva botón; la manga se recoge al entrar al puño.
@@ -2357,6 +2619,14 @@
         fabricParts.push(...buildHood(cfg));
       } else if (cfg.collar === 'mandarin') {
         fabricParts.push(...buildMandarinCollar(cfg));
+      } else if (cfg.collar === 'revere') {
+        // Cuello de solapa abierto en V, con vivo en el borde.
+        const [stand, leaf, , standTop] = buildShirtCollar(cfg);
+        fabricParts.push(stand, leaf, standTop);
+        // Vivo solo en el borde exterior del cuello (no en las puntas, que van bajo las solapas).
+        const outer = [];
+        for (let j = 0; j <= 140; j++) outer.push(collarLeafPoint(cfg, 1, j / 140));
+        pipingParts.push(buildRim(outer, 0.0042, false));
       } else if (cfg.collar === 'polo') {
         // Mismo corte del cuello camisero, pero en tejido rib.
         const [stand, leaf, ...rims] = buildShirtCollar(cfg);
@@ -2402,7 +2672,16 @@
         fabricParts.push(pocket, ...built.details);
       }
 
-      return { torso, pocket, fabricParts, ribParts, trimParts, buttonParts };
+      const shadeParts = []; // interior visible de la prenda (abertura en V)
+      if (cfg.lapels || cfg.concealedPlacket || cfg.princessSeams || cfg.lowerPockets) {
+        const td = buildTunicDetails(cfg);
+        fabricParts.push(...td.fabric, ...td.pockets);
+        pipingParts.push(...td.piping);
+        shadeParts.push(...td.shade);
+        if (td.pockets.length && !pocket) pocket = td.pockets[0];
+      }
+
+      return { torso, pocket, fabricParts, ribParts, trimParts, buttonParts, pipingParts, shadeParts };
     }
 
     function buildButtonGeometry(radius) {
@@ -2531,6 +2810,12 @@
       ribMaterial.bumpMap = buildRibTexture();
       ribMaterial.bumpScale = 1.6;
 
+      // Interior visible de la prenda (abertura en V): la tela, más oscura.
+      const shadeMaterial = new THREE.MeshStandardMaterial({ roughness: 0.95, metalness: 0, side: THREE.DoubleSide });
+
+      // Vivos (ribetes en contraste) de la túnica: siempre blancos.
+      const pipingMaterial = new THREE.MeshStandardMaterial({ color: new THREE.Color('#F2F2EE'), roughness: 0.6, metalness: 0 });
+
       // Botones: mismo tono de la tela (un poco más oscuros) o, en prendas con
       // buttonContrast (filipina), oscuros sobre tela clara y claros sobre oscura.
       const BUTTON_DARK = new THREE.Color('#1F2328');
@@ -2578,6 +2863,14 @@
           const mesh = new THREE.Mesh(geo, ribMaterial);
           mesh.castShadow = true;
           mesh.receiveShadow = true;
+          shirt.add(mesh);
+        });
+        (built.shadeParts || []).forEach(geo => {
+          shirt.add(new THREE.Mesh(geo, shadeMaterial));
+        });
+        (built.pipingParts || []).forEach(geo => {
+          const mesh = new THREE.Mesh(geo, pipingMaterial);
+          mesh.castShadow = true;
           shirt.add(mesh);
         });
         built.trimParts.forEach(geo => {
@@ -2709,6 +3002,7 @@
         fabric.color.lerp(targetColor, 0.12);
         setButtonColor();
         ribMaterial.color.copy(fabric.color);
+        shadeMaterial.color.copy(fabric.color).multiplyScalar(0.35);
         controls.update();
         renderer.render(scene, camera);
         requestAnimationFrame(tick);
@@ -2965,7 +3259,16 @@
         const pocketRow = document.getElementById('studioSummaryPocketRow');
         pocketRow.hidden = !cfg.summary.bolsillo;
         document.getElementById('studioSummaryPocket').textContent = cfg.summary.bolsillo || '';
+        setCameraDistance(cfg.cameraDistance || CAMERA_DISTANCE);
         goToView('front');
+      }
+
+      function setCameraDistance(d) {
+        const off = camera.position.clone().sub(controls.target);
+        off.setLength(d);
+        camera.position.copy(controls.target).add(off);
+        controls.maxDistance = Math.max(4.5, d + 1);
+        controls.update();
       }
 
       document.querySelectorAll('.studio-garment-option').forEach(btn => {
@@ -3510,12 +3813,14 @@
         targetColor.set(c.hex);
         setButtonColor();
         ribMaterial.color.copy(fabric.color);
+        shadeMaterial.color.copy(fabric.color).multiplyScalar(0.35);
         viewAnim = null;
         controls.autoRotate = false;
         // Vista 3/4 para que se lean mangas, cuello y volumen.
         const azimuth = -0.5;
         controls.target.set(0, -0.16, 0);
-        camera.position.set(Math.sin(azimuth) * 3.3, 0.12, Math.cos(azimuth) * 3.3);
+        const dist = (GARMENTS[key].cameraDistance || 3.5) * 0.94;
+        camera.position.set(Math.sin(azimuth) * dist, 0.12, Math.cos(azimuth) * dist);
         camera.lookAt(controls.target);
         controls.update();
         renderer.render(scene, camera);
