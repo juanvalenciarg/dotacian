@@ -800,13 +800,16 @@
           <div style="display: flex; gap: 1rem; margin-bottom: 1.25rem;">
             <div style="flex: 1;">
               <label>Correo Corporativo</label>
-              <input type="email" id="empEmail" placeholder="correo@empresa.com" required>
+              <input type="email" id="empEmail" placeholder="correo@empresa.com">
             </div>
             <div style="flex: 1;">
               <label>Celular</label>
-              <input type="text" id="empPhone" placeholder="55 0000 0000" required>
+              <input type="text" id="empPhone" placeholder="55 0000 0000">
             </div>
           </div>
+          <p style="font-size: 0.8125rem; color: var(--color-text-muted); margin: -0.75rem 0 1.25rem 0;">
+            Ingresa al menos el correo o el celular.
+          </p>
 
           <div style="display: flex; gap: 1rem; margin-bottom: 1.25rem;">
             <div style="flex: 1;">
@@ -1915,8 +1918,8 @@
     const BULK_TEMPLATE_COLUMNS = [
       { header: 'Nombre', required: true },
       { header: 'Apellido', required: true },
-      { header: 'Correo Corporativo', required: true },
-      { header: 'Celular', required: true },
+      { header: 'Correo Corporativo', required: false, note: 'Obligatorio si no hay celular' },
+      { header: 'Celular', required: false, note: 'Obligatorio si no hay correo' },
       { header: 'Número de Identificación', required: true },
       { header: 'Fecha de Nacimiento (dd/mm/aaaa)', required: true },
       { header: 'Rol / Puesto', required: true },
@@ -2106,7 +2109,7 @@
 
           if (!name && !lastName && !email && !phone) return; // fila vacía, no cuenta como error
 
-          if (!name || !lastName || !email || !phone || !docId || !birthDate || !role) {
+          if (!name || !lastName || (!email && !phone) || !docId || !birthDate || !role) {
             skipped++;
             return;
           }
@@ -2119,9 +2122,9 @@
             company_id: companyId,
             first_name: name,
             last_name: lastName,
-            email: email,
+            email: email || null,
             id_document: docId,
-            phone: phone,
+            phone: phone || null,
             role: role,
             birth_date: birthDate,
             address_country: addressCountry || null,
@@ -4350,7 +4353,7 @@
       const lastName = document.getElementById('empLastName').value;
       const email = document.getElementById('empEmail').value.trim();
       const empDoc = document.getElementById('empDoc').value;
-      const phone = document.getElementById('empPhone').value;
+      const phone = document.getElementById('empPhone').value.trim();
       const role = document.getElementById('empRole').value;
       const birthDate = document.getElementById('empBirthDate').value;
       const hireDate = document.getElementById('empHireDate').value;
@@ -4365,6 +4368,12 @@
       const pantsSize = document.getElementById('empPantsSize').value;
       const shoeSize = document.getElementById('empShoeSize').value;
       const requestSizes = document.getElementById('empRequestSizes')?.checked;
+
+      if (!email && !phone) {
+        showToast('Falta un medio de contacto', 'Ingresa el correo o el celular del empleado (al menos uno de los dos).', 'error');
+        document.getElementById('empEmail').focus();
+        return;
+      }
 
       if (wantsHomeDelivery && (!addressCountry || !addressCity || !addressLine)) {
         showToast('Falta la dirección', 'Ya que se le entrega algo en su domicilio, completa país, ciudad y dirección.', 'error');
@@ -4382,7 +4391,7 @@
           last_name: lastName,
           email: email || null,
           id_document: empDoc,
-          phone: phone,
+          phone: phone || null,
           role: role,
           area: area || null,
           birth_date: birthDate || null,
