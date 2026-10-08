@@ -806,6 +806,7 @@
         const { data: posts, error } = await _supabase
           .from('blog_posts')
           .select('id, title, slug, author, created_at, content, image_url')
+          .eq('lang', document.documentElement.lang === 'en' ? 'en' : 'es')
           .order('created_at', { ascending: false })
           .limit(3);
 
