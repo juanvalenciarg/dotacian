@@ -441,6 +441,40 @@
       background: #CBD5E1;
       cursor: not-allowed;
     }
+
+    /* Miniatura de los diseños de Dotacian Studio en "Entregar dotación" */
+    .delivery-design-thumb {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    .delivery-design-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .delivery-design-thumb .ds-render-loading {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid #CBD5E1;
+      border-top-color: var(--color-cyan);
+      animation: delivery-thumb-spin 0.9s linear infinite;
+    }
+
+    .delivery-design-thumb .ds-render-missing {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+
+    @keyframes delivery-thumb-spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
   <!-- PDF Generation Support Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -2312,7 +2346,7 @@
         const img = item.image || item.img || '';
         const sized = isSizedItem(item);
         const size = sized ? guessSize(item.name, empObj) : '';
-        deliveryItemsList.appendChild(buildDeliveryRow(item.name, qty, size, img, index, item.specs, sized));
+        deliveryItemsList.appendChild(buildDeliveryRow(item.name, qty, size, img, index, item.specs, sized, false, item.design_id));
       });
       if (physicalItems.length === 0) {
         deliveryItemsList.innerHTML = `
@@ -3266,7 +3300,7 @@
       if (svg) svg.style.transform = isOpen ? '' : 'rotate(90deg)';
     }
 
-    function buildDeliveryRow(name, qty, size, img, id, specs, sized, editableName) {
+    function buildDeliveryRow(name, qty, size, img, id, specs, sized, editableName, designId) {
       const wrapper = document.createElement('div');
       wrapper.dataset.deliveryItemId = id;
       wrapper.style.cssText = 'display:flex; flex-direction:column; background:white; padding:0.75rem 1rem; border-radius:12px; border:1px solid #e2e8f0; transition:all 0.2s;';
@@ -3283,6 +3317,8 @@
         stockBadgeHtml = `<span style="font-size:0.75rem; font-weight:600; color:#ef4444; background:#fef2f2; padding:2px 8px; border-radius:12px; border:1px solid #fecaca;">Stock: 0</span>`;
       }
 
+      const studioDesign = designId && window.studioDesignsById ? window.studioDesignsById[designId] : null;
+
       const { hasContent: hasDetailContent } = buildDeliveryDetailInner(name, size, sized, specs, null);
       const detailHtml = renderDeliveryDetailHtml();
 
@@ -3295,10 +3331,15 @@
               style="width:18px; height:18px; accent-color:#06B6D4; cursor:pointer; border-radius:5px;">
           </label>
 
-          <!-- Thumbnail -->
+          <!-- Thumbnail: render del diseño de Dotacian Studio si el ítem viene
+               de uno; si no, la imagen del activo -->
           <div style="width:44px; height:44px; background:#f1f5f9; border-radius:10px; overflow:hidden; flex-shrink:0; display:flex; align-items:center; justify-content:center;">
+            ${studioDesign ? `
+            <span class="delivery-design-thumb" data-render="${escapeAttr(studioDesign.prenda)}" data-color="${escapeAttr(studioDesign.color)}"></span>
+            ` : `
             <img src="${img}" style="width:100%; height:100%; object-fit:contain;"
               onerror="this.parentElement.style.background='#e2e8f0'; this.parentElement.innerHTML='<span style=\\'font-size:0.65rem; font-weight:700; color:#94a3b8;\\'>Kit</span>';">
+            `}
           </div>
 
           <!-- Name: editable solo para activos agregados a mano; los que
@@ -3360,6 +3401,9 @@
         </div>
       `;
       refreshDeliveryRowDetail(wrapper);
+      const thumb = wrapper.querySelector('.delivery-design-thumb');
+      if (thumb && window.DSRenders) window.DSRenders.fillRender(thumb, thumb.dataset.render, thumb.dataset.color);
+
       return wrapper;
     }
 
@@ -4740,11 +4784,22 @@
         const companyId = await resolveCompanyId(_supabase, sessionData?.session?.user?.id);
         if (!companyId) return;
 
-        const { data, error } = await _supabase.from('role_definition')
-          .select('role_name, items, renewal_frequency, area')
-          .eq('company_id', companyId);
+        const [rolesRes, designsRes] = await Promise.all([
+          _supabase.from('role_definition')
+            .select('role_name, items, renewal_frequency, area')
+            .eq('company_id', companyId),
+          // Diseños de Dotacian Studio, para mostrar su miniatura en
+          // "Entregar dotación" (los ítems del rol guardan design_id).
+          _supabase.from('studio_designs')
+            .select('id, prenda, color')
+            .eq('company_id', companyId)
+        ]);
 
+        const { data, error } = rolesRes;
         if (error) throw error;
+
+        window.studioDesignsById = {};
+        (designsRes.data || []).forEach(d => { window.studioDesignsById[d.id] = d; });
 
         window.roleAreaMap = window.roleAreaMap || {};
         data.forEach(row => {
@@ -4808,6 +4863,7 @@
     }
   </script>
   <script src="/assets/js/utils.js?v=4"></script>
+  <script src="/assets/js/studio-renders.js?v=3"></script>
 </body>
 
 </html>
