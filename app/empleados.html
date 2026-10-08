@@ -4514,10 +4514,14 @@
         const statusTextColor = isActive ? '#059669' : '#EF4444';
         const statusText = isActive ? 'ACTIVO' : 'INACTIVO';
 
+        // Confirmada = el empleado las confirmó desde su enlace; Registrada =
+        // las cargó la empresa (al registrar o con "Actualizar Tallas").
         const sizesConfirmed = !!emp.sizes_confirmed_at;
-        const sizesBadgeColor = sizesConfirmed ? '#ECFDF5' : '#FFFBEB';
-        const sizesTextColor = sizesConfirmed ? '#059669' : '#D97706';
-        const sizesBadgeText = sizesConfirmed ? 'Confirmada' : 'Pendiente';
+        const sizesRegistered = !!(emp.shirt_size || emp.pants_size || emp.shoe_size);
+        const sizesOk = sizesConfirmed || sizesRegistered;
+        const sizesBadgeColor = sizesOk ? '#ECFDF5' : '#FFFBEB';
+        const sizesTextColor = sizesOk ? '#059669' : '#D97706';
+        const sizesBadgeText = sizesConfirmed ? 'Confirmada' : (sizesRegistered ? 'Registrada' : 'Pendiente');
 
         const row = document.createElement('tr');
         row.innerHTML = `
