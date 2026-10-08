@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
-  <script src="/assets/js/i18n.js?v=2"></script>
+  <script src="/assets/js/i18n.js?v=3"></script>
   <style>
     /* Main Content Refinement */
     .main-content {
@@ -769,6 +769,14 @@
                 </div>
               </div>
 
+              <div style="margin-bottom: 1.5rem;">
+                <label
+                  style="display: block; font-size: 0.8125rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.5rem;" data-i18n="renewal.label">Renovar dotación cada</label>
+                <select id="roleRenewalSelect"
+                  style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); font-family: var(--font-family-primary); background: white; color: var(--color-navy);"></select>
+                <p style="font-size: 0.75rem; color: var(--color-text-secondary); margin: 0.4rem 0 0 0;" data-i18n="renewal.hint">Se cuenta desde la fecha en que se le entrega al empleado.</p>
+              </div>
+
               <div id="roleAssetList" style="display: flex; flex-direction: column; gap: 0.75rem;">
                 <!-- Asset items rendered here -->
               </div>
@@ -863,6 +871,12 @@
                 <div class="form-row">
                   <label data-i18n="roleConfig.subarea">Subárea (opcional)</label>
                   <input type="text" id="newRoleSubarea" placeholder="Ej. Cocina" data-i18n-placeholder="roleConfig.subareaPlaceholder">
+                </div>
+                <div class="form-row">
+                  <label data-i18n="renewal.label">Renovar dotación cada</label>
+                  <select id="newRoleRenewal"
+                    style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); font-family: var(--font-family-primary); background: white; color: var(--color-navy);"></select>
+                  <p style="font-size: 0.75rem; color: var(--color-text-secondary); margin: 0.4rem 0 0 0;" data-i18n="renewal.hint">Se cuenta desde la fecha en que se le entrega al empleado.</p>
                 </div>
 
                 <div class="role-form-fullwidth" style="border-top: 1px solid var(--color-smoke); padding-top: 1.25rem;">
@@ -1032,7 +1046,7 @@
           if (activeRolesData) companyRoles = activeRolesData;
 
           const { data } = await window._supabase.from('role_definition')
-            .select('role_name, items, area, description')
+            .select('role_name, items, area, description, renewal_frequency')
             .eq('company_id', companyId);
           if (data) {
             data.forEach(r => { dbRolesMap[r.role_name.toLowerCase()] = r; });
@@ -1075,6 +1089,9 @@
         const areaText = area || t('card.unassigned');
         const areaMuted = !area;
 
+        const renewalMonths = dbRole && dbRole.renewal_frequency ? dbRole.renewal_frequency : null;
+        const renewalText = renewalMonths ? t('card.renewalEvery', { n: formatRenewalMonths(renewalMonths) }) : '—';
+
         const desc = (dbRole && dbRole.description) ? dbRole.description : findLegacyRoleDesc(role.role_name);
         const safeName = role.role_name.replace(/'/g, "\\'");
 
@@ -1111,6 +1128,10 @@
             <div class="role-stat-pill">
               <span class="role-stat-label">${t('card.area')}</span>
               <span class="role-stat-value ${areaMuted ? 'muted' : ''}" title="${areaText}">${areaText}</span>
+            </div>
+            <div class="role-stat-pill" style="grid-column: 1 / -1;">
+              <span class="role-stat-label">${t('card.renewal')}</span>
+              <span class="role-stat-value ${renewalMonths ? '' : 'muted'}">${renewalText}</span>
             </div>
           </div>
 
@@ -1287,10 +1308,33 @@
     // Listener independiente: si initPortal() falla, no debe impedir que los
     // dropdowns se inicialicen.
     document.addEventListener('DOMContentLoaded', () => {
-      ['newRoleArea', 'roleAreaSelect'].forEach(id => {
+      ['newRoleArea', 'roleAreaSelect', 'newRoleRenewal', 'roleRenewalSelect'].forEach(id => {
         initCustomSelect(document.getElementById(id));
       });
     });
+
+    // Cada cuántos meses se renueva la dotación del rol (role_definition.
+    // renewal_frequency). Empleados la usa para calcular la próxima entrega
+    // a partir de la última entrega firmada.
+    const RENEWAL_OPTIONS_MONTHS = [1, 2, 3, 4, 6, 9, 12, 18, 24];
+    const DEFAULT_RENEWAL_MONTHS = 6;
+
+    function formatRenewalMonths(months) {
+      return `${months} ${months === 1 ? t('renewal.month') : t('renewal.months')}`;
+    }
+
+    function fillRenewalSelect(select, months) {
+      if (!select) return;
+      const value = parseInt(months, 10) || DEFAULT_RENEWAL_MONTHS;
+      const options = RENEWAL_OPTIONS_MONTHS.includes(value)
+        ? RENEWAL_OPTIONS_MONTHS
+        : [...RENEWAL_OPTIONS_MONTHS, value].sort((a, b) => a - b);
+      select.innerHTML = options
+        .map(m => `<option value="${m}">${formatRenewalMonths(m)}</option>`)
+        .join('');
+      select.value = String(value);
+      refreshCustomSelectLabel(select);
+    }
 
     function toggleSidebar() {
       const layout = document.getElementById('app-layout-wrapper');
@@ -1940,13 +1984,15 @@
       let savedItems = [];
       let savedArea = '';
       let savedSubarea = '';
+      let savedRenewal = DEFAULT_RENEWAL_MONTHS;
+      fillRenewalSelect(document.getElementById('roleRenewalSelect'), savedRenewal);
       try {
         const { data: { session } } = await window._supabase.auth.getSession();
         if (session) {
           const companyId = await resolveCompanyId(window._supabase, session.user.id);
           const { data } = await window._supabase
             .from('role_definition')
-            .select('items, area, subarea')
+            .select('items, area, subarea, renewal_frequency')
             .eq('company_id', companyId)
             .ilike('role_name', roleName.trim())
             .maybeSingle();
@@ -1955,6 +2001,7 @@
             if (data.items) savedItems = data.items;
             if (data.area) savedArea = data.area;
             if (data.subarea) savedSubarea = data.subarea;
+            if (data.renewal_frequency) savedRenewal = data.renewal_frequency;
           }
         }
       } catch (err) {
@@ -1979,6 +2026,7 @@
       }
       const subareaInput = document.getElementById('roleSubareaInput');
       if (subareaInput) subareaInput.value = savedSubarea;
+      fillRenewalSelect(document.getElementById('roleRenewalSelect'), savedRenewal);
 
       list.innerHTML = '';
       if (footerBlock) footerBlock.style.display = 'flex';
@@ -2059,6 +2107,7 @@
       let areaValue = areaSelect ? areaSelect.value : '';
       if (areaValue === 'otra') areaValue = areaCustom ? areaCustom.value.trim() : '';
       const subareaValue = document.getElementById('roleSubareaInput')?.value.trim() || '';
+      const renewalValue = parseInt(document.getElementById('roleRenewalSelect')?.value, 10) || DEFAULT_RENEWAL_MONTHS;
 
       try {
         const { data: { session } } = await window._supabase.auth.getSession();
@@ -2076,7 +2125,7 @@
         if (existing) {
           const { error } = await window._supabase
             .from('role_definition')
-            .update({ items: updatedItems, area: areaValue, subarea: subareaValue })
+            .update({ items: updatedItems, area: areaValue, subarea: subareaValue, renewal_frequency: renewalValue })
             .eq('id', existing.id);
           if (error) throw error;
         } else {
@@ -2087,7 +2136,8 @@
               role_name: currentConfigRoleName,
               items: updatedItems,
               area: areaValue,
-              subarea: subareaValue
+              subarea: subareaValue,
+              renewal_frequency: renewalValue
             });
           if (error) throw error;
         }
@@ -2108,6 +2158,7 @@
       document.getElementById('newRoleArea').value = '';
       refreshCustomSelectLabel(document.getElementById('newRoleArea'));
       document.getElementById('newRoleSubarea').value = '';
+      fillRenewalSelect(document.getElementById('newRoleRenewal'), DEFAULT_RENEWAL_MONTHS);
 
       document.getElementById('newRoleModal').classList.add('active');
       renderNewRoleAssetPicker();
@@ -2128,6 +2179,7 @@
       const area = document.getElementById('newRoleArea').value;
       const subarea = document.getElementById('newRoleSubarea').value.trim();
       const items = collectNewRoleAssets();
+      const renewalFrequency = parseInt(document.getElementById('newRoleRenewal').value, 10) || DEFAULT_RENEWAL_MONTHS;
 
       try {
         const { data: { session } } = await window._supabase.auth.getSession();
@@ -2141,7 +2193,7 @@
 
         const { error: defErr } = await window._supabase
           .from('role_definition')
-          .insert({ company_id: companyId, role_name: name, items, area, subarea, description });
+          .insert({ company_id: companyId, role_name: name, items, area, subarea, description, renewal_frequency: renewalFrequency });
         if (defErr) throw defErr;
 
         showToast(t('toast.roleCreatedTitle'), t('toast.roleCreatedMsg', { name }));
@@ -2188,6 +2240,10 @@
       if (document.getElementById('newRoleModal')?.classList.contains('active')) {
         renderNewRoleAssetPicker();
       }
+      ['newRoleRenewal', 'roleRenewalSelect'].forEach(id => {
+        const sel = document.getElementById(id);
+        if (sel && sel.value) fillRenewalSelect(sel, sel.value);
+      });
       renderRoles();
       if (document.getElementById('roleConfigModal').classList.contains('active') && currentConfigRoleName) {
         openRoleConfig(currentConfigRoleName);

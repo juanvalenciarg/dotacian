@@ -38,6 +38,12 @@ const I18N = {
     'card.configureAssets': 'Configurar dotación',
     'card.asset': 'Ítem',
     'card.assets': 'Ítems',
+    'card.renewal': 'Renovación',
+    'card.renewalEvery': 'Cada {n}',
+    'renewal.label': 'Renovar dotación cada',
+    'renewal.hint': 'Se cuenta desde la fecha en que se le entrega al empleado.',
+    'renewal.month': 'mes',
+    'renewal.months': 'meses',
     'card.deleteRole': 'Eliminar rol',
 
     // Confirm modal
@@ -224,6 +230,12 @@ const I18N = {
     'card.configureAssets': 'Configure uniform kit',
     'card.asset': 'Item',
     'card.assets': 'Items',
+    'card.renewal': 'Renewal',
+    'card.renewalEvery': 'Every {n}',
+    'renewal.label': 'Renew uniform kit every',
+    'renewal.hint': 'Counted from the date it is delivered to the employee.',
+    'renewal.month': 'month',
+    'renewal.months': 'months',
     'card.deleteRole': 'Delete role',
 
     'confirm.defaultTitle': 'Confirm action',

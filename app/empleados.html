@@ -837,11 +837,20 @@
             </select>
           </div>
 
-          <div style="margin-bottom: 1.5rem;">
-            <label>Área</label>
-            <div id="empAreaDisplay"
-              style="padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); background: #f8fafc; color: var(--color-text-secondary); font-size: 0.9375rem;">
-              Se asigna según el rol seleccionado
+          <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="flex: 1;">
+              <label>Área</label>
+              <div id="empAreaDisplay"
+                style="padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); background: #f8fafc; color: var(--color-text-secondary); font-size: 0.9375rem;">
+                Se asigna según el rol seleccionado
+              </div>
+            </div>
+            <div style="flex: 1;">
+              <label>Renovación de dotación</label>
+              <div id="empRenewalDisplay"
+                style="padding: 0.75rem; border: 1px solid var(--color-smoke-mid); border-radius: var(--radius-md); background: #f8fafc; color: var(--color-text-secondary); font-size: 0.9375rem;">
+                Se asigna según el rol seleccionado
+              </div>
             </div>
           </div>
 
@@ -1821,6 +1830,19 @@
       if (display) {
         const area = getEmpAreaValue();
         display.textContent = area || 'Se asigna según el rol seleccionado';
+      }
+      // Frecuencia de renovación configurada en el rol (Roles → Renovar
+      // dotación cada). La próxima renovación se calcula desde la entrega.
+      const renewalDisplay = document.getElementById('empRenewalDisplay');
+      if (renewalDisplay) {
+        const roleKey = (document.getElementById('empRole')?.value || '').toLowerCase().trim();
+        const def = roleKey && window.roleDefinitions ? window.roleDefinitions[roleKey] : null;
+        if (def) {
+          const months = def.renewal_frequency || 6;
+          renewalDisplay.textContent = `Cada ${months} ${months === 1 ? 'mes' : 'meses'} desde la entrega`;
+        } else {
+          renewalDisplay.textContent = 'Se asigna según el rol seleccionado';
+        }
       }
       updateEmployeePreview();
     }
