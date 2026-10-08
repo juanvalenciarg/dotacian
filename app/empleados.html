@@ -2265,22 +2265,6 @@
       const usageVal = parseInt(usage);
       const kitList = document.getElementById('detailKitList');
 
-      // Default fallback
-      const defaultKitData = {
-        'mesero': [
-          { name: 'Camisa Oxford', image: '/assets/oxford_shirt.png', quantity: 2 },
-          { name: 'Pantalón Gabardina', image: '/assets/pants_black.png', quantity: 1 }
-        ],
-        'chef': [
-          { name: 'Filipina Chef Classic', image: '/assets/chef_coat.png', quantity: 2 },
-          { name: 'Pantalón de Cocina Pro', image: '/assets/chef_pants_black.png', quantity: 1 }
-        ],
-        'barista': [
-          { name: 'Mandil Barista', image: '/assets/barista_apron.png', quantity: 1 },
-          { name: 'Polo Premium', image: '/assets/polo_shirt.png', quantity: 1 }
-        ]
-      };
-
       let items = [];
       const roleLower = (role || '').toLowerCase().trim();
 
@@ -2301,17 +2285,8 @@
         }
       }
 
-      // 3. Last resort: hardcoded fallback kit
-      if (items.length === 0) {
-        let fallbackMatchedRole = 'mesero';
-        for (const key of Object.keys(defaultKitData)) {
-          if (roleLower.includes(key)) {
-            fallbackMatchedRole = key;
-            break;
-          }
-        }
-        items = defaultKitData[fallbackMatchedRole];
-      }
+      // Sin dotación configurada para el rol: no se inventa un kit (antes
+      // caía a un kit fijo de "mesero"); se avisa y se puede agregar a mano.
 
       // Reset delivery link container and button
       document.getElementById('deliveryLinkContainer').style.display = 'none';
@@ -2331,15 +2306,22 @@
 
       // Solo activos físicos se entregan/firman aquí y contra stock de
       // bodega. Los digitales (licencias, accesos) tendrán su propio flujo.
-      items
-        .filter(item => item.category !== 'digital')
-        .forEach((item, index) => {
-          const qty = item.quantity || item.qty || 1;
-          const img = item.image || item.img || '';
-          const sized = isSizedItem(item);
-          const size = sized ? guessSize(item.name, empObj) : '';
-          deliveryItemsList.appendChild(buildDeliveryRow(item.name, qty, size, img, index, item.specs, sized));
-        });
+      const physicalItems = items.filter(item => item.category !== 'digital');
+      physicalItems.forEach((item, index) => {
+        const qty = item.quantity || item.qty || 1;
+        const img = item.image || item.img || '';
+        const sized = isSizedItem(item);
+        const size = sized ? guessSize(item.name, empObj) : '';
+        deliveryItemsList.appendChild(buildDeliveryRow(item.name, qty, size, img, index, item.specs, sized));
+      });
+      if (physicalItems.length === 0) {
+        deliveryItemsList.innerHTML = `
+          <div id="deliveryNoKitNotice" style="padding: 1rem; border: 1px dashed var(--color-smoke-mid); border-radius: 12px; background: #f8fafc; color: var(--color-text-secondary); font-size: 0.875rem; line-height: 1.5;">
+            El rol <strong>${escapeDeliveryLabel(role || 'sin rol')}</strong> no tiene dotación configurada.
+            Configúrala en <a href="/app/roles" style="color: var(--color-cyan); font-weight: 700;">Roles → Configurar dotación</a>
+            o agrega una prenda manualmente abajo.
+          </div>`;
+      }
 
       const digitalItems = items.filter(item => item.category === 'digital');
       window.currentEmployeeDigitalItems = digitalItems;
@@ -3728,6 +3710,7 @@
     let _customDeliveryItemId = 2000;
     function addCustomDeliveryItem() {
       const list = document.getElementById('deliveryItemsList');
+      document.getElementById('deliveryNoKitNotice')?.remove();
       const row = buildDeliveryRow('', 1, '', '', _customDeliveryItemId++, null, true, true);
       list.appendChild(row);
       const input = row.querySelector('input[placeholder="Prenda"]');
@@ -4746,6 +4729,11 @@
 
     window.roleGarments = {};
     window.roleDefinitions = {};
+    // Si la dotación del rol se cambia en Roles (otra pestaña), se recarga al
+    // volver para que "Entregar dotación" use la configuración vigente.
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') loadRoleGarments();
+    });
     async function loadRoleGarments() {
       try {
         const { data: sessionData } = await _supabase.auth.getSession();
