@@ -1157,8 +1157,10 @@
             <div id="adjustSizeWrap" style="display: none;">
               <label
                 style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Talla</label>
-              <input type="text" id="adjustSize" placeholder="Ej. M, L, Unitalla"
-                style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem;">
+              <select id="adjustSize"
+                style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem; background: white;">
+                <option value="">Selecciona una talla...</option>
+              </select>
             </div>
 
             <!-- Detalles del lote: mismas specs que se definen al asignar el activo a un rol -->
@@ -3040,6 +3042,53 @@
     // Talla solo tiene sentido para uniformes/calzado. Para el resto de
     // activos (laptops, cascos, monitores...) el campo queda oculto y se
     // guarda con talla 'N/A', igual que ya se lee en loadInventory().
+    // Mismas tallas que el registro de empleados (app/empleados.html), para
+    // que el stock coincida con las tallas de cada persona.
+    const ADJUST_SIZE_LISTS = {
+      superior: [{ options: ['XS', 'S', 'M', 'L', 'XL', '2XL'] }],
+      pantalon: [
+        { label: 'Hombre', options: ['28', '30', '32', '34', '36', '38', '40', '42', '44'] },
+        { label: 'Mujer', options: ['2', '3', '4', '5', '6', '7', '8', '9', '10'] }
+      ],
+      calzado: [{ options: ['26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46'] }]
+    };
+
+    function getAdjustSizeKind(name) {
+      const prenda = (window._adjustGarmentPrendas || {})[name];
+      if (prenda === 'pantalon') return 'pantalon';
+      if (prenda) return 'superior';
+      const n = (name || '').toLowerCase();
+      if (/pantal[oó]n|pant|jeans|bermuda/.test(n)) return 'pantalon';
+      if (/zapato|bota|tenis|calzado/.test(n)) return 'calzado';
+      return 'superior';
+    }
+
+    function populateAdjustSizeOptions(name, fixedSize) {
+      const select = document.getElementById('adjustSize');
+      if (!select) return;
+      // Al quitar, la talla viene del lote elegido: se muestra solo esa.
+      if (fixedSize !== undefined) {
+        select.innerHTML = '';
+        const opt = document.createElement('option');
+        opt.value = fixedSize;
+        opt.textContent = fixedSize;
+        select.appendChild(opt);
+        select.value = fixedSize;
+        select.disabled = true;
+        return;
+      }
+      select.disabled = false;
+      const previous = select.value;
+      const groups = ADJUST_SIZE_LISTS[getAdjustSizeKind(name)];
+      const optionHtml = v => `<option value="${v}">${v}</option>`;
+      select.innerHTML = '<option value="">Selecciona una talla...</option>' +
+        groups.map(g => g.label
+          ? `<optgroup label="${g.label}">${g.options.map(optionHtml).join('')}</optgroup>`
+          : g.options.map(optionHtml).join('')).join('') +
+        optionHtml('Unitalla');
+      if (previous && Array.from(select.options).some(o => o.value === previous)) select.value = previous;
+    }
+
     function updateAdjustSizeVisibility() {
       const wrap = document.getElementById('adjustSizeWrap');
       const productSelect = document.getElementById('adjustProduct');
@@ -3051,7 +3100,15 @@
       const tipo = (window._adjustGarmentTipos || {})[name];
       const sized = name ? isSizedItemDot({ tipo, name }) : false;
       wrap.style.display = sized ? 'block' : 'none';
-      if (!sized && adjustMode === 'add') document.getElementById('adjustSize').value = '';
+      if (sized) {
+        if (adjustMode === 'remove') {
+          populateAdjustSizeOptions(name, (productSelect.value || '').split(':::')[1] || '');
+        } else {
+          populateAdjustSizeOptions(name);
+        }
+      } else if (adjustMode === 'add') {
+        document.getElementById('adjustSize').value = '';
+      }
 
       renderAdjustSpecsFields(name);
     }
@@ -3079,10 +3136,6 @@
       // On selection: auto-fill size field and show stock indicator
       select.onchange = () => {
         const selectedKey = select.value;
-        if (selectedKey) {
-          const [, talla] = selectedKey.split(':::');
-          document.getElementById('adjustSize').value = talla;
-        }
         updateStockIndicator(selectedKey);
         updateAdjustSizeVisibility();
       };
@@ -3114,6 +3167,7 @@
       productSelect.onchange = null;
       window._adjustSelectedRoleId = '';
       document.getElementById('adjustSize').value = '';
+      document.getElementById('adjustSize').disabled = false;
       document.getElementById('adjustSizeWrap').style.display = 'none';
       document.getElementById('adjustSpecsWrap').style.display = 'none';
       document.getElementById('adjustSpecsGrid').innerHTML = '';
@@ -3155,6 +3209,16 @@
         window._rolesById = {};
         const garmentsByRole = {};
         const garmentTiposByRole = {};
+        // Prenda del diseño de Dotacian Studio (camisa, pantalon, ...) para
+        // saber qué lista de tallas ofrecer en el ajuste.
+        let studioPrendaById = {};
+        try {
+          const { data: designs } = await _supabase.from('studio_designs')
+            .select('id, prenda')
+            .eq('company_id', currentCompanyId);
+          (designs || []).forEach(d => { studioPrendaById[d.id] = d.prenda; });
+        } catch (e) { /* sin diseños: se usa el nombre de la prenda */ }
+        window._adjustGarmentPrendas = {};
         roleDefs.forEach(rd => {
           window._rolesById[rd.id] = rd.role_name;
           const garmentsSet = new Set();
@@ -3166,6 +3230,9 @@
               const trimmed = it.name.trim();
               garmentsSet.add(trimmed);
               if (it.tipo) garmentTipos[trimmed] = it.tipo;
+              if (it.design_id && studioPrendaById[it.design_id]) {
+                window._adjustGarmentPrendas[trimmed] = studioPrendaById[it.design_id];
+              }
             }
           });
           garmentsByRole[rd.id] = Array.from(garmentsSet).sort();
@@ -3237,7 +3304,12 @@
         const tipo = (window._adjustGarmentTipos || {})[product];
         const sized = product ? isSizedItemDot({ tipo, name: product }) : false;
         const rawSize = document.getElementById('adjustSize').value.trim();
-        size = sized ? (rawSize || 'Unitalla') : 'N/A';
+        if (sized && !rawSize) {
+          if (window.showToast) showToast('Error', 'Selecciona la talla de la prenda.', 'error');
+          else alert('Selecciona la talla de la prenda.');
+          return;
+        }
+        size = sized ? rawSize : 'N/A';
       }
 
       const state = document.getElementById('adjustState').value;
