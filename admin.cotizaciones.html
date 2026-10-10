@@ -464,11 +464,77 @@
                     <div id="viewQuoteDate" style="font-weight: 600; color: #334155;">--</div>
                   </div>
                 </div>
+                <div id="viewQuoteUrgent" style="display: none; margin-bottom: 1rem; display: flex; gap: 0.5rem; align-items: flex-start; padding: 0.75rem 0.875rem; border-radius: 10px; background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; font-size: 0.8125rem; line-height: 1.45;">
+                  <span style="flex-shrink: 0;">⚠</span>
+                  <span id="viewQuoteUrgentText"></span>
+                </div>
                 <div class="form-group">
                   <label id="viewQuotePromptLabel">Prompt del cliente</label>
                   <div id="viewQuotePrompt"
                     style="background: white; border: 1px solid #E2E8F0; border-radius: 8px; padding: 0.85rem 1rem; font-size: 0.875rem; color: #334155; white-space: pre-wrap; line-height: 1.5;">
                     --</div>
+                </div>
+              </div>
+
+              <!-- Precios (cotizaciones manuales) -->
+              <div class="form-section" id="quotePricingSection" style="display: none;">
+                <div class="form-section-title">
+                  <div class="form-section-title-label">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <line x1="12" y1="1" x2="12" y2="23"></line>
+                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                    Precios
+                  </div>
+                  <select id="pricingCurrency" class="form-control" onchange="recalcQuotePricing()"
+                    style="width: auto; padding: 0.35rem 0.6rem; font-size: 0.8rem;">
+                    <option value="COP">COP</option>
+                    <option value="MXN">MXN</option>
+                    <option value="USD">USD</option>
+                  </select>
+                </div>
+
+                <div style="overflow-x: auto;">
+                  <table style="width: 100%; border-collapse: collapse; font-size: 0.8125rem;">
+                    <thead>
+                      <tr style="text-align: left; color: #64748B; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em;">
+                        <th style="padding: 0.4rem 0.3rem;">Prenda</th>
+                        <th style="padding: 0.4rem 0.3rem; text-align: center;">Talla</th>
+                        <th style="padding: 0.4rem 0.3rem; text-align: center;">Cant.</th>
+                        <th style="padding: 0.4rem 0.3rem; text-align: right;">Precio unit.</th>
+                        <th style="padding: 0.4rem 0.3rem; text-align: right;">Subtotal</th>
+                      </tr>
+                    </thead>
+                    <tbody id="pricingItemsRows"></tbody>
+                  </table>
+                </div>
+
+                <div class="form-grid" style="margin-top: 1rem;">
+                  <div class="form-group" id="pricingSamplesGroup">
+                    <label>Muestras</label>
+                    <input type="number" min="0" step="any" id="pricingSamples" class="form-control" placeholder="0" oninput="recalcQuotePricing()">
+                  </div>
+                  <div class="form-group">
+                    <label>Envío</label>
+                    <input type="number" min="0" step="any" id="pricingShipping" class="form-control" placeholder="0" oninput="recalcQuotePricing()">
+                  </div>
+                  <div class="form-group">
+                    <label>IVA (%)</label>
+                    <input type="number" min="0" max="100" step="any" id="pricingTaxRate" class="form-control" oninput="recalcQuotePricing()">
+                  </div>
+                  <div class="form-group">
+                    <label>Vigencia (días)</label>
+                    <input type="number" min="1" step="1" id="pricingValidity" class="form-control" value="15">
+                  </div>
+                </div>
+
+                <div id="pricingTotals"
+                  style="margin-top: 0.75rem; background: white; border: 1px solid #E2E8F0; border-radius: 10px; padding: 0.85rem 1rem; font-size: 0.875rem; color: #334155;"></div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 0.75rem;">
+                  <span id="pricingSavedAt" style="font-size: 0.75rem; color: #64748B;"></span>
+                  <button type="button" class="btn btn-outline" id="btnSaveQuotePricing" onclick="saveQuotePricing()"
+                    style="padding: 0.45rem 1rem; font-size: 0.8rem; border-radius: 8px;">Guardar precios</button>
                 </div>
               </div>
 
@@ -798,6 +864,184 @@
       return { items, extras };
     }
 
+    // Fecha de entrega que guarda la cotización manual en el texto
+    // ("Fecha de entrega requerida: 20 de octubre de 2026") y aviso cuando
+    // hay menos de 10 días entre la solicitud y esa fecha.
+    const URGENT_DELIVERY_DAYS = 10;
+    const SPANISH_MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+    function parseRequestedDeliveryDate(promptText) {
+      const m = (promptText || '').match(/Fecha de entrega requerida: (\d{1,2}) de ([a-záéíóú]+) de (\d{4})/i);
+      if (!m) return null;
+      const month = SPANISH_MONTHS.indexOf(m[2].toLowerCase());
+      if (month < 0) return null;
+      return new Date(parseInt(m[3], 10), month, parseInt(m[1], 10));
+    }
+
+    function daysBetween(from, to) {
+      const a = new Date(from); a.setHours(0, 0, 0, 0);
+      const b = new Date(to); b.setHours(0, 0, 0, 0);
+      return Math.round((b - a) / 86400000);
+    }
+
+    // Días entre la solicitud y la entrega pedida, si es menos de 10.
+    function getUrgentDeliveryDays(q) {
+      const requested = parseRequestedDeliveryDate(q && q.prompt_text);
+      if (!requested) return null;
+      const days = daysBetween(q.created_at, requested);
+      return days < URGENT_DELIVERY_DAYS ? days : null;
+    }
+
+    // ── Precios de la cotización (supabase_migration_quote_pricing.sql) ──
+    // En las cotizaciones manuales las prendas salen del detalle; aquí se
+    // les pone precio unitario, más muestras, envío e IVA.
+    let pricingItems = [];
+
+    function defaultCurrencyForCountry(country) {
+      const c = (country || '').toLowerCase();
+      if (c.includes('méxico') || c.includes('mexico')) return 'MXN';
+      if (c.includes('colombia')) return 'COP';
+      return 'USD';
+    }
+
+    function defaultTaxRateForCurrency(currency) {
+      return { COP: 19, MXN: 16 }[currency] ?? 0;
+    }
+
+    function formatMoney(value, currency) {
+      const n = Number(value) || 0;
+      try {
+        return new Intl.NumberFormat({ COP: 'es-CO', MXN: 'es-MX', USD: 'en-US' }[currency] || 'es-CO', {
+          style: 'currency', currency,
+          maximumFractionDigits: currency === 'COP' ? 0 : 2
+        }).format(n).replace(/ /g, ' ');
+      } catch (e) {
+        return `${currency} ${n.toFixed(2)}`;
+      }
+    }
+
+    function quoteRequestsSamples(q) {
+      const line = (q.prompt_text || '').split('\n').find(l => l.startsWith('Muestras:'));
+      return !!line && !/no requiere/i.test(line);
+    }
+
+    function renderQuotePricing(q, parsedItems) {
+      const saved = q.pricing || null;
+      const currency = (saved && saved.currency) || defaultCurrencyForCountry(q.country);
+      document.getElementById('pricingCurrency').value = currency;
+
+      pricingItems = parsedItems.map((it, idx) => {
+        const savedItem = saved && Array.isArray(saved.items) ? saved.items[idx] : null;
+        const sameItem = savedItem && savedItem.name === it.name && (savedItem.size || '') === (it.size || '');
+        return { name: it.name, size: it.size || '', qty: it.qty || 1, unit_price: sameItem ? savedItem.unit_price : '' };
+      });
+
+      document.getElementById('pricingItemsRows').innerHTML = pricingItems.map((it, idx) => `
+        <tr style="border-top: 1px solid #F1F5F9;">
+          <td style="padding: 0.45rem 0.3rem; font-weight: 600; color: #0F172A;">${escapeQuoteHtml(it.name)}</td>
+          <td style="padding: 0.45rem 0.3rem; text-align: center;">${escapeQuoteHtml(it.size || '—')}</td>
+          <td style="padding: 0.45rem 0.3rem; text-align: center;">${it.qty}</td>
+          <td style="padding: 0.45rem 0.3rem; text-align: right;">
+            <input type="number" min="0" step="any" class="form-control" data-pricing-idx="${idx}"
+              value="${it.unit_price === '' || it.unit_price == null ? '' : it.unit_price}" placeholder="0"
+              oninput="pricingItems[${idx}].unit_price = this.value; recalcQuotePricing()"
+              style="width: 110px; padding: 0.35rem 0.5rem; text-align: right; display: inline-block;">
+          </td>
+          <td style="padding: 0.45rem 0.3rem; text-align: right; font-weight: 600;" id="pricingRowTotal${idx}"></td>
+        </tr>`).join('');
+
+      const asksSamples = quoteRequestsSamples(q);
+      document.getElementById('pricingSamplesGroup').style.display = asksSamples ? '' : 'none';
+      document.getElementById('pricingSamples').value = saved && saved.samples_cost ? saved.samples_cost : '';
+      document.getElementById('pricingShipping').value = saved && saved.shipping_cost ? saved.shipping_cost : '';
+      document.getElementById('pricingTaxRate').value = saved && saved.tax_rate != null ? saved.tax_rate : defaultTaxRateForCurrency(currency);
+      document.getElementById('pricingValidity').value = saved && saved.validity_days ? saved.validity_days : 15;
+      document.getElementById('pricingSavedAt').textContent = q.priced_at
+        ? `Precios guardados el ${formatDate(q.priced_at)}`
+        : 'Sin precios guardados';
+      recalcQuotePricing();
+    }
+
+    // Arma el objeto de precios con los valores actuales del formulario.
+    function collectQuotePricing() {
+      const currency = document.getElementById('pricingCurrency').value;
+      const items = pricingItems.map(it => ({
+        name: it.name, size: it.size, qty: it.qty,
+        unit_price: it.unit_price === '' || it.unit_price == null ? null : Number(it.unit_price)
+      }));
+      const itemsTotal = items.reduce((sum, it) => sum + (it.unit_price || 0) * it.qty, 0);
+      const samplesVisible = document.getElementById('pricingSamplesGroup').style.display !== 'none';
+      const samples = samplesVisible ? Number(document.getElementById('pricingSamples').value) || 0 : 0;
+      const shipping = Number(document.getElementById('pricingShipping').value) || 0;
+      const taxRate = Number(document.getElementById('pricingTaxRate').value) || 0;
+      const subtotal = itemsTotal + samples + shipping;
+      const tax = Math.round(subtotal * taxRate) / 100;
+      return {
+        currency, tax_rate: taxRate,
+        validity_days: parseInt(document.getElementById('pricingValidity').value, 10) || 15,
+        samples_cost: samples, shipping_cost: shipping,
+        items, items_total: itemsTotal, subtotal, tax, total: subtotal + tax
+      };
+    }
+
+    function recalcQuotePricing() {
+      const pr = collectQuotePricing();
+      pr.items.forEach((it, idx) => {
+        const cell = document.getElementById(`pricingRowTotal${idx}`);
+        if (cell) cell.textContent = it.unit_price == null ? '—' : formatMoney(it.unit_price * it.qty, pr.currency);
+      });
+      const line = (label, value, strong) => `
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; ${strong ? 'font-weight: 800; color: #0F172A; font-size: 1rem; border-top: 1px solid #E2E8F0; margin-top: 0.35rem; padding-top: 0.5rem;' : ''}">
+          <span>${label}</span><span>${formatMoney(value, pr.currency)}</span>
+        </div>`;
+      document.getElementById('pricingTotals').innerHTML =
+        line('Prendas', pr.items_total) +
+        (document.getElementById('pricingSamplesGroup').style.display !== 'none' ? line('Muestras', pr.samples_cost) : '') +
+        line('Envío', pr.shipping_cost) +
+        line('Subtotal', pr.subtotal) +
+        line(`IVA (${pr.tax_rate}%)`, pr.tax) +
+        line('Total', pr.total, true);
+    }
+
+    function pricingIsComplete(pr) {
+      return pr.items.length > 0 && pr.items.every(it => it.unit_price != null && it.unit_price >= 0);
+    }
+
+    async function saveQuotePricing({ silent } = {}) {
+      if (!currentQuote) return false;
+      const pr = collectQuotePricing();
+      if (!pricingIsComplete(pr)) {
+        if (!silent) showToast('Faltan precios', 'Pon el precio unitario de todas las prendas.', 'error');
+        return false;
+      }
+      const btn = document.getElementById('btnSaveQuotePricing');
+      btn.disabled = true;
+      btn.textContent = 'Guardando...';
+      try {
+        const { error } = await _supabase.rpc('admin_save_dot_quote_pricing', { p_id: currentQuote.id, p_pricing: pr });
+        if (error) throw error;
+        const now = new Date().toISOString();
+        currentQuote.pricing = pr;
+        currentQuote.priced_at = now;
+        if (currentQuote.status === 'nueva') currentQuote.status = 'en_proceso';
+        const idx = allQuotes.findIndex(q => q.id === currentQuote.id);
+        if (idx >= 0) allQuotes[idx] = { ...allQuotes[idx], pricing: pr, priced_at: now, status: currentQuote.status };
+        paintCardStatus(currentQuote.status);
+        updateQuoteStatusFilterCounts();
+        renderQuotesTable();
+        document.getElementById('pricingSavedAt').textContent = `Precios guardados el ${formatDate(now)}`;
+        if (!silent) showToast('Precios guardados', `Total: ${formatMoney(pr.total, pr.currency)}`, 'success');
+        return true;
+      } catch (err) {
+        console.error('Error guardando precios:', err);
+        showToast('Error', 'No se pudieron guardar los precios. ¿Ya ejecutaste la migración de precios en Supabase?', 'error');
+        return false;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Guardar precios';
+      }
+    }
+
     function normalizeQuoteStatus(status) {
       if (status === 'pendiente') return 'nueva';
       if (status === 'generado') return 'en_proceso';
@@ -882,7 +1126,8 @@
           <td><span class="user-name">${escapeQuoteHtml(q.company_name || 'Empresa')}</span></td>
           <td>${target}</td>
           <td>${detail}</td>
-          <td>${formatDateShort(q.created_at)}</td>
+          <td>${formatDateShort(q.created_at)}${getUrgentDeliveryDays(q) !== null && q.status !== 'entregada'
+            ? '<br><span class="role-badge" style="background:#FEE2E2; color:#B91C1C; margin-top: 4px; display: inline-block;">Urgente</span>' : ''}</td>
           <td>${statusBadge}</td>
         `;
         tbody.appendChild(tr);
@@ -929,9 +1174,24 @@
 
       paintCardStatus(q.status);
 
+      const urgentDays = getUrgentDeliveryDays(q);
+      const urgentBox = document.getElementById('viewQuoteUrgent');
+      if (urgentDays !== null) {
+        const plazo = urgentDays < 0
+          ? 'una fecha de entrega anterior a la solicitud'
+          : `entrega en ${urgentDays} día${urgentDays === 1 ? '' : 's'} desde la solicitud`;
+        document.getElementById('viewQuoteUrgentText').textContent =
+          `Entrega urgente: el cliente pidió ${plazo} (menos de ${URGENT_DELIVERY_DAYS}). Se le informó que haremos lo posible por cumplir, pero los tiempos de entrega pueden variar.`;
+        urgentBox.style.display = 'flex';
+      } else {
+        urgentBox.style.display = 'none';
+      }
+
       document.getElementById('quoteItemsRows').innerHTML = '';
       quoteItemRowSeq = 0;
       document.getElementById('quoteItemsSection').style.display = manual ? 'none' : '';
+      document.getElementById('quotePricingSection').style.display = manual ? '' : 'none';
+      if (manual) renderQuotePricing(q, parseManualQuote(q.prompt_text).items);
       if (manual) {
         // Las prendas salen del detalle de la solicitud (parseManualQuote).
       } else if (q.item_name) {
@@ -1051,6 +1311,16 @@
       const manual = isManualQuote(currentQuote);
       const parsedManual = manual ? parseManualQuote(currentQuote.prompt_text) : null;
       const items = manual ? parsedManual.items : collectQuoteItems();
+      // Si todas las prendas tienen precio, se guardan y salen en el PDF.
+      let pricing = null;
+      if (manual) {
+        const pr = collectQuotePricing();
+        if (pricingIsComplete(pr)) {
+          const saved = await saveQuotePricing({ silent: true });
+          if (!saved) return;
+          pricing = pr;
+        }
+      }
       if (items.length === 0) {
         showToast('Faltan ítems', 'Agrega al menos un activo con nombre para generar el PDF.', 'error');
         return;
@@ -1070,6 +1340,7 @@
           roleName,
           employeeName,
           promptText: manual ? parsedManual.extras.join('\n') : currentQuote.prompt_text,
+          pricing,
           items
         });
 
@@ -1097,7 +1368,7 @@
       }
     }
 
-    function buildAdminCotizacionPDF({ company, roleName, employeeName, promptText, items }) {
+    function buildAdminCotizacionPDF({ company, roleName, employeeName, promptText, items, pricing }) {
       let jsPDFClass = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
       if (!jsPDFClass) {
         showToast('Error', 'Librería PDF no disponible. Recarga la página.', 'error');
@@ -1196,7 +1467,12 @@
       }
 
       // ── Table header ──────────────────────────────────────────
-      const cols = { name: margin + 2, specs: margin + 70, qty: margin + 158 };
+      // Con precios: columnas de precio unitario y subtotal a la derecha.
+      const priced = !!(pricing && pricing.items && pricing.items.length);
+      const rightEdge = pageW - margin - 2;
+      const cols = priced
+        ? { name: margin + 2, specs: margin + 48, qty: margin + 112, unit: margin + 146, total: rightEdge }
+        : { name: margin + 2, specs: margin + 70, qty: margin + 158 };
       const drawTableHeader = () => {
         doc.setFillColor(6, 182, 212);
         doc.rect(margin, y, pageW - margin * 2, 8, 'F');
@@ -1206,6 +1482,10 @@
         doc.text('ACTIVO', cols.name, y + 5.5);
         doc.text('ESPECIFICACIONES', cols.specs, y + 5.5);
         doc.text('CANT.', cols.qty, y + 5.5);
+        if (priced) {
+          doc.text('P. UNIT.', cols.unit, y + 5.5, { align: 'right' });
+          doc.text('SUBTOTAL', cols.total, y + 5.5, { align: 'right' });
+        }
         y += 8;
       };
       drawTableHeader();
@@ -1219,6 +1499,7 @@
 
         const nameLines = doc.splitTextToSize(item.name, cols.specs - cols.name - 4);
         const specsLines = doc.splitTextToSize(specsText, cols.qty - cols.specs - 4);
+        const priceItem = priced ? pricing.items[idx] : null;
         const rowLines = Math.max(nameLines.length, specsLines.length, 1);
         const rowH = rowLines * 4.6 + 4;
 
@@ -1248,8 +1529,47 @@
         doc.setTextColor(15, 23, 42);
         doc.text(String(item.qty || 1), cols.qty, y + 5.5);
 
+        if (priceItem && priceItem.unit_price != null) {
+          doc.setFont('helvetica', 'normal');
+          doc.text(formatMoney(priceItem.unit_price, pricing.currency), cols.unit, y + 5.5, { align: 'right' });
+          doc.setFont('helvetica', 'bold');
+          doc.text(formatMoney(priceItem.unit_price * (item.qty || 1), pricing.currency), cols.total, y + 5.5, { align: 'right' });
+        }
+
         y += rowH;
       });
+
+      // ── Totales ──────────────────────────────────────────────
+      if (priced) {
+        const lines = [['Prendas', pricing.items_total]];
+        if (pricing.samples_cost) lines.push(['Muestras', pricing.samples_cost]);
+        if (pricing.shipping_cost) lines.push(['Envío', pricing.shipping_cost]);
+        lines.push(['Subtotal', pricing.subtotal], [`IVA (${pricing.tax_rate}%)`, pricing.tax]);
+        if (y + lines.length * 5.5 + 22 > pageH - 20) { doc.addPage(); y = 20; }
+        y += 4;
+        doc.setFontSize(8.5);
+        lines.forEach(([label, value]) => {
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(71, 85, 105);
+          doc.text(label, cols.unit, y + 4, { align: 'right' });
+          doc.setTextColor(15, 23, 42);
+          doc.text(formatMoney(value, pricing.currency), cols.total, y + 4, { align: 'right' });
+          y += 5.5;
+        });
+        doc.setFillColor(14, 23, 44);
+        doc.rect(margin + 100, y + 1, pageW - margin * 2 - 100, 9, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.setTextColor(255, 255, 255);
+        doc.text('TOTAL', cols.unit, y + 7, { align: 'right' });
+        doc.text(formatMoney(pricing.total, pricing.currency), cols.total, y + 7, { align: 'right' });
+        y += 14;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(100, 116, 139);
+        doc.text(`Precios en ${pricing.currency}. Cotización válida por ${pricing.validity_days} días.`, margin, y);
+        y += 4;
+      }
 
       // ── Footer note ──────────────────────────────────────────
       y += 8;
