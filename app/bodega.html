@@ -1245,6 +1245,25 @@
         </div>
       </div>
 
+      <!-- Confirmar respuesta a una cotización (aprobar / rechazar) -->
+      <div class="modal-overlay" id="quoteConfirmModal" style="z-index: 1100;">
+        <div class="modal-content" style="max-width: 440px; text-align: center;">
+          <div id="quoteConfirmIcon"
+            style="width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;"></div>
+          <h2 id="quoteConfirmTitle"
+            style="font-family: var(--font-family-heading); color: var(--color-navy); font-size: 1.35rem; margin-bottom: 0.5rem;"></h2>
+          <p id="quoteConfirmText" style="color: var(--color-text-secondary); font-size: 0.875rem; line-height: 1.5; margin: 0 0 1.25rem;"></p>
+          <div id="quoteConfirmSummary"
+            style="background: #F8FAFC; border: 1px solid var(--color-border); border-radius: 12px; padding: 0.85rem 1rem; text-align: left; margin-bottom: 1.5rem;"></div>
+          <div style="display: flex; gap: 0.75rem;">
+            <button type="button" class="btn btn-outline" style="flex: 1; font-size: 0.875rem; padding: 0.7rem;"
+              onclick="closeQuoteConfirm(false)">Cancelar</button>
+            <button type="button" id="quoteConfirmBtn" class="btn btn-primary" style="flex: 1; font-size: 0.875rem; padding: 0.7rem; border: none; color: white;"
+              onclick="closeQuoteConfirm(true)"></button>
+          </div>
+        </div>
+      </div>
+
       <!-- Mis cotizaciones Modal -->
       <div class="modal-overlay" id="misCotizacionesModal">
         <div class="modal-content" style="max-width: 720px;">
@@ -2284,6 +2303,45 @@
 
     let _misCotizaciones = {};
 
+    // Ventana de confirmación para aprobar o rechazar (en vez de confirm()).
+    let _quoteConfirmResolve = null;
+
+    function askQuoteConfirm(q, action) {
+      const approve = action === 'aprobar';
+      const number = q.quote_number ? formatQuoteNumberBodega(q.quote_number) : '';
+      const icon = document.getElementById('quoteConfirmIcon');
+      icon.style.background = approve ? '#ECFDF5' : '#FEF2F2';
+      icon.innerHTML = approve
+        ? '<svg width="28" height="28" fill="none" stroke="#059669" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'
+        : '<svg width="28" height="28" fill="none" stroke="#DC2626" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+      document.getElementById('quoteConfirmTitle').textContent = approve ? 'Aprobar cotización' : 'Rechazar cotización';
+      document.getElementById('quoteConfirmText').textContent = approve
+        ? 'Al aprobarla, el equipo de Dotacian se pondrá en contacto contigo para continuar con el pedido.'
+        : 'Si la rechazas, la cotización queda cerrada. Si solo necesitas ajustes, usa "Solicitar cambios".';
+
+      const target = q.target_mode === 'empleado'
+        ? `${q.target_employee_name || 'Una persona'}${q.target_role ? ' · ' + q.target_role : ''}`
+        : `Rol ${q.target_role || '—'}`;
+      const total = q.pricing ? formatMoneyBodega(q.pricing.total, q.pricing.currency) : '';
+      document.getElementById('quoteConfirmSummary').innerHTML = `
+        ${number ? `<div style="font-size: 0.75rem; font-weight: 800; color: var(--color-cyan); letter-spacing: 0.03em;">No. ${escapeManualHtml(number)}</div>` : ''}
+        <div style="font-weight: 700; color: var(--color-navy); font-size: 0.9rem; margin-top: 2px;">${escapeManualHtml(target)}</div>
+        ${total ? `<div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.875rem;"><span style="color: var(--color-text-secondary);">Total</span><strong style="color: var(--color-navy);">${escapeManualHtml(total)}</strong></div>` : ''}`;
+
+      const btn = document.getElementById('quoteConfirmBtn');
+      btn.textContent = approve ? 'Sí, aprobar' : 'Sí, rechazar';
+      btn.style.background = approve ? '#059669' : '#DC2626';
+
+      document.getElementById('quoteConfirmModal').classList.add('active');
+      return new Promise(resolve => { _quoteConfirmResolve = resolve; });
+    }
+
+    function closeQuoteConfirm(confirmed) {
+      document.getElementById('quoteConfirmModal').classList.remove('active');
+      if (_quoteConfirmResolve) _quoteConfirmResolve(confirmed);
+      _quoteConfirmResolve = null;
+    }
+
     function toggleQuoteChangesForm(id) {
       const box = document.getElementById(`quoteChanges-${id}`);
       box.style.display = box.style.display === 'none' ? 'block' : 'none';
@@ -2300,8 +2358,7 @@
         return;
       }
       const number = q.quote_number ? ` ${formatQuoteNumberBodega(q.quote_number)}` : '';
-      if (action === 'aprobar' && !confirm(`¿Aprobar la cotización${number}?`)) return;
-      if (action === 'rechazar' && !confirm(`¿Rechazar la cotización${number}?`)) return;
+      if ((action === 'aprobar' || action === 'rechazar') && !(await askQuoteConfirm(q, action))) return;
 
       try {
         const { error } = await _supabase.rpc('client_respond_dot_quote', { p_id: id, p_action: action, p_comment: comment });
