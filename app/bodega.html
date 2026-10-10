@@ -2080,12 +2080,13 @@
       try {
         const [roleDefs, employeesRes, designsRes] = await Promise.all([
           fetchActiveRolesWithId(currentCompanyId),
-          _supabase.from('company_employees').select('id, first_name, last_name, role').eq('company_id', currentCompanyId),
+          _supabase.from('company_employees').select('id, first_name, last_name, role, role_status, id_document, email, phone').eq('company_id', currentCompanyId),
           _supabase.from('studio_designs').select('id, prenda').eq('company_id', currentCompanyId)
         ]);
         _manualQuoteRoleDefs = (roleDefs || []).slice().sort((a, b) => a.role_name.localeCompare(b.role_name));
+        // Solo empleados activos (los desactivados no reciben dotación).
         _manualQuoteEmployees = (employeesRes.data || [])
-          .slice()
+          .filter(e => !e.role_status || e.role_status === 'active')
           .sort((a, b) => `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`));
 
         // Tipo de prenda de los diseños de Studio, para la lista de tallas.
@@ -2125,7 +2126,12 @@
           _manualQuoteEmployees.map(e => {
             const name = `${e.first_name || ''} ${e.last_name || ''}`.trim();
             const role = e.role ? ` — ${e.role}` : '';
-            return `<option value="${escapeManualHtml(e.id)}">${escapeManualHtml(name + role)}</option>`;
+            // Si hay dos personas con el mismo nombre, se agrega un dato
+            // que las distinga (documento, correo o celular).
+            const sameName = _manualQuoteEmployees.filter(o => `${o.first_name || ''} ${o.last_name || ''}`.trim() === name).length > 1;
+            const extra = sameName ? (e.id_document || e.email || e.phone || '') : '';
+            const label = name + role + (extra ? ` (${extra})` : '');
+            return `<option value="${escapeManualHtml(e.id)}">${escapeManualHtml(label)}</option>`;
           }).join('');
       }
       onManualTargetChange();
