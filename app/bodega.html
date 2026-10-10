@@ -2140,6 +2140,8 @@
           return;
         }
 
+        _misCotizaciones = {};
+        data.forEach(q => { _misCotizaciones[q.id] = q; });
         list.innerHTML = data.map(q => {
           // Mismos estados que Gestión de Cotizaciones (admin); los valores
           // viejos pendiente/generado se leen como nueva/en_proceso.
@@ -2147,18 +2149,23 @@
           const st = {
             nueva: { label: 'Nueva', color: '#D97706', bg: '#FFFBEB' },
             en_proceso: { label: 'En proceso', color: '#1D4ED8', bg: '#EFF6FF' },
-            entregada: { label: 'Entregada', color: '#059669', bg: '#ECFDF5' }
+            entregada: { label: 'Por aprobar', color: '#0369A1', bg: '#E0F2FE' },
+            aprobada: { label: 'Aprobada', color: '#059669', bg: '#ECFDF5' },
+            rechazada: { label: 'Rechazada', color: '#B91C1C', bg: '#FEF2F2' }
           }[status] || { label: 'Nueva', color: '#D97706', bg: '#FFFBEB' };
           const badge = `<span style="font-size: 0.7rem; font-weight: 800; color: ${st.color}; background: ${st.bg}; padding: 3px 10px; border-radius: 99px; text-transform: uppercase; letter-spacing: 0.03em; flex-shrink: 0;">${st.label}</span>`;
           const target = q.target_mode === 'empleado'
             ? `Para ${escapeManualHtml(q.target_employee_name || 'una persona')}${q.target_role ? ` · ${escapeManualHtml(q.target_role)}` : ''}`
             : `Rol ${escapeManualHtml(q.target_role || '—')}`;
           const created = new Date(q.created_at).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
-          const readyNote = status === 'entregada'
-            ? '<div style="font-size: 0.8rem; color: #059669; margin-top: 0.6rem;">El equipo de Dotacian ya te entregó esta cotización.</div>'
-            : (status === 'en_proceso'
-              ? '<div style="font-size: 0.8rem; color: #1D4ED8; margin-top: 0.6rem;">El equipo de Dotacian está preparando tu cotización.</div>'
-              : '');
+          const readyNote = {
+            entregada: '<div style="font-size: 0.8rem; color: #0369A1; margin-top: 0.6rem;">Revisa la cotización y apruébala, recházala o pide cambios.</div>',
+            en_proceso: q.client_response === 'cambios'
+              ? '<div style="font-size: 0.8rem; color: #1D4ED8; margin-top: 0.6rem;">Recibimos tus cambios. El equipo de Dotacian está actualizando la cotización.</div>'
+              : '<div style="font-size: 0.8rem; color: #1D4ED8; margin-top: 0.6rem;">El equipo de Dotacian está preparando tu cotización.</div>',
+            aprobada: '<div style="font-size: 0.8rem; color: #059669; margin-top: 0.6rem;">Aprobaste esta cotización. El equipo de Dotacian se pondrá en contacto para continuar con el pedido.</div>',
+            rechazada: '<div style="font-size: 0.8rem; color: #B91C1C; margin-top: 0.6rem;">Rechazaste esta cotización.</div>'
+          }[status] || '';
           const requestedDate = parseRequestedDeliveryDate(q.prompt_text);
           const urgent = requestedDate && status !== 'entregada' && daysBetween(q.created_at, requestedDate) < URGENT_DELIVERY_DAYS;
           const urgentNote = urgent
@@ -2166,7 +2173,7 @@
             : '';
           // Precios: el cliente los ve cuando el equipo marca la cotización
           // como entregada (ver supabase_migration_quote_pricing.sql).
-          const pricing = status === 'entregada' && q.pricing && Array.isArray(q.pricing.items) ? q.pricing : null;
+          const pricing = ['entregada', 'aprobada', 'rechazada'].includes(status) && q.pricing && Array.isArray(q.pricing.items) ? q.pricing : null;
           const money = v => formatMoneyBodega(v, pricing ? pricing.currency : 'COP');
           const pricingHtml = pricing ? `
             <div style="margin-top: 0.75rem; border: 1px solid var(--color-border); border-radius: 10px; overflow: hidden;">
@@ -2207,6 +2214,26 @@
               ${urgentNote}
               ${pricingHtml}
               ${readyNote}
+              ${pricing ? `
+              <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem;">
+                <button type="button" class="btn btn-outline" onclick="downloadClientQuotePDF('${q.id}')"
+                  style="font-size: 0.8rem; padding: 0.45rem 0.9rem;">Descargar PDF</button>
+                ${status === 'entregada' ? `
+                <button type="button" class="btn btn-primary" onclick="respondToQuote('${q.id}', 'aprobar')"
+                  style="font-size: 0.8rem; padding: 0.45rem 0.9rem;">Aprobar</button>
+                <button type="button" class="btn btn-outline" onclick="toggleQuoteChangesForm('${q.id}')"
+                  style="font-size: 0.8rem; padding: 0.45rem 0.9rem;">Solicitar cambios</button>
+                <button type="button" class="btn btn-outline" onclick="respondToQuote('${q.id}', 'rechazar')"
+                  style="font-size: 0.8rem; padding: 0.45rem 0.9rem; color: #B91C1C; border-color: #FECACA;">Rechazar</button>` : ''}
+              </div>
+              <div id="quoteChanges-${q.id}" style="display: none; margin-top: 0.6rem;">
+                <textarea id="quoteChangesText-${q.id}" placeholder="Cuéntanos qué quieres cambiar: cantidades, tallas, fecha de entrega, precio..."
+                  style="width: 100%; height: 70px; padding: 0.6rem 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.8125rem; resize: none; font-family: inherit;"></textarea>
+                <div style="display: flex; justify-content: flex-end; margin-top: 0.4rem;">
+                  <button type="button" class="btn btn-primary" onclick="respondToQuote('${q.id}', 'cambios')"
+                    style="font-size: 0.8rem; padding: 0.45rem 0.9rem;">Enviar cambios</button>
+                </div>
+              </div>` : ''}
             </details>`;
         }).join('');
       } catch (err) {
@@ -2253,6 +2280,185 @@
 
     function formatQuoteNumberBodega(n) {
       return `COT-${String(n).padStart(4, '0')}`;
+    }
+
+    let _misCotizaciones = {};
+
+    function toggleQuoteChangesForm(id) {
+      const box = document.getElementById(`quoteChanges-${id}`);
+      box.style.display = box.style.display === 'none' ? 'block' : 'none';
+      if (box.style.display === 'block') document.getElementById(`quoteChangesText-${id}`).focus();
+    }
+
+    // Aprobar, rechazar o pedir cambios (RPC client_respond_dot_quote).
+    async function respondToQuote(id, action) {
+      const q = _misCotizaciones[id];
+      if (!q) return;
+      const comment = action === 'cambios' ? document.getElementById(`quoteChangesText-${id}`).value.trim() : '';
+      if (action === 'cambios' && !comment) {
+        showToast('Faltan los cambios', 'Describe qué quieres cambiar de la cotización.', 'error');
+        return;
+      }
+      const number = q.quote_number ? ` ${formatQuoteNumberBodega(q.quote_number)}` : '';
+      if (action === 'aprobar' && !confirm(`¿Aprobar la cotización${number}?`)) return;
+      if (action === 'rechazar' && !confirm(`¿Rechazar la cotización${number}?`)) return;
+
+      try {
+        const { error } = await _supabase.rpc('client_respond_dot_quote', { p_id: id, p_action: action, p_comment: comment });
+        if (error) throw error;
+        showToast(
+          { aprobar: 'Cotización aprobada', rechazar: 'Cotización rechazada', cambios: 'Cambios enviados' }[action],
+          { aprobar: 'El equipo de Dotacian se pondrá en contacto para continuar con el pedido.',
+            rechazar: 'Gracias por avisarnos.',
+            cambios: 'El equipo de Dotacian actualizará la cotización.' }[action]);
+        openMisCotizacionesModal();
+      } catch (err) {
+        console.error('Error respondiendo la cotización:', err);
+        showToast('Error', 'No se pudo enviar tu respuesta. Intenta de nuevo.', 'error');
+      }
+    }
+
+    // Lee el detalle de la cotización manual: datos del diseño por prenda y
+    // condiciones (muestras, fecha de entrega, notas). Mismo formato que
+    // parseManualQuote en admin.cotizaciones.html.
+    function parseManualQuoteBodega(promptText) {
+      const designs = [];
+      const extras = [];
+      (promptText || '').split('\n').forEach(line => {
+        if (/^- \d+ × /.test(line)) { designs.push(''); return; }
+        const detail = line.trim();
+        if (!detail || detail === 'Cotización manual:') return;
+        if (/^\s/.test(line) && designs.length) { designs[designs.length - 1] = detail; return; }
+        extras.push(detail);
+      });
+      return { designs, extras };
+    }
+
+    // PDF de la cotización con precios, generado en el navegador.
+    async function downloadClientQuotePDF(id) {
+      const q = _misCotizaciones[id];
+      const pricing = q && q.pricing;
+      const jsPDFClass = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+      if (!pricing || !jsPDFClass) {
+        showToast('Error', 'No se pudo generar el PDF. Recarga la página.', 'error');
+        return;
+      }
+
+      let companyName = '';
+      try {
+        const { data } = await _supabase.from('company_profile').select('company_name').eq('id', currentCompanyId).maybeSingle();
+        companyName = (data && data.company_name) || '';
+      } catch (e) { /* el PDF sale sin nombre de empresa */ }
+
+      const { designs, extras } = parseManualQuoteBodega(q.prompt_text);
+      const money = v => formatMoneyBodega(v, pricing.currency).replace(/ /g, ' ');
+      const number = q.quote_number ? formatQuoteNumberBodega(q.quote_number) : '';
+      const doc = new jsPDFClass({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const pageW = doc.internal.pageSize.getWidth();
+      const pageH = doc.internal.pageSize.getHeight();
+      const margin = 18;
+      const right = pageW - margin - 2;
+
+      doc.setFillColor(14, 23, 44);
+      doc.rect(0, 0, pageW, 32, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(20);
+      doc.text('dotacian', margin, 20);
+      doc.setFontSize(11);
+      doc.text(`Cotización${number ? ' No. ' + number : ''}`, pageW - margin, 18, { align: 'right' });
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text(new Date(q.priced_at || q.created_at).toLocaleDateString('es-MX'), pageW - margin, 25, { align: 'right' });
+
+      let y = 44;
+      doc.setTextColor(15, 23, 42);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      if (companyName) { doc.text(companyName, margin, y); y += 6; }
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      const target = q.target_mode === 'empleado'
+        ? `Dotación para: ${q.target_employee_name || ''}${q.target_role ? ' (' + q.target_role + ')' : ''}`
+        : `Dotación para el rol: ${q.target_role || '—'}`;
+      doc.text(target, margin, y);
+      y += 8;
+
+      const cols = { name: margin + 2, specs: margin + 48, qty: margin + 112, unit: margin + 146, total: right };
+      const header = () => {
+        doc.setFillColor(6, 182, 212);
+        doc.rect(margin, y, pageW - margin * 2, 8, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.text('PRENDA', cols.name, y + 5.5);
+        doc.text('ESPECIFICACIONES', cols.specs, y + 5.5);
+        doc.text('CANT.', cols.qty, y + 5.5);
+        doc.text('P. UNIT.', cols.unit, y + 5.5, { align: 'right' });
+        doc.text('SUBTOTAL', cols.total, y + 5.5, { align: 'right' });
+        y += 8;
+      };
+      header();
+
+      pricing.items.forEach((it, idx) => {
+        const specs = [it.size ? `Talla: ${it.size}` : '', designs[idx] || ''].filter(Boolean).join(' · ') || '—';
+        const nameLines = doc.splitTextToSize(it.name, cols.specs - cols.name - 4);
+        const specLines = doc.splitTextToSize(specs, cols.qty - cols.specs - 4);
+        const rowH = Math.max(nameLines.length, specLines.length, 1) * 4.6 + 4;
+        if (y + rowH > pageH - 20) { doc.addPage(); y = 20; header(); }
+        if (idx % 2 === 0) { doc.setFillColor(248, 250, 252); doc.rect(margin, y, pageW - margin * 2, rowH, 'F'); }
+        doc.setTextColor(15, 23, 42);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.5);
+        doc.text(nameLines, cols.name, y + 5.5);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.5);
+        doc.setTextColor(71, 85, 105);
+        doc.text(specLines, cols.specs, y + 5.5);
+        doc.setFontSize(8.5);
+        doc.setTextColor(15, 23, 42);
+        doc.text(String(it.qty), cols.qty, y + 5.5);
+        doc.text(money(it.unit_price), cols.unit, y + 5.5, { align: 'right' });
+        doc.setFont('helvetica', 'bold');
+        doc.text(money((it.unit_price || 0) * it.qty), cols.total, y + 5.5, { align: 'right' });
+        y += rowH;
+      });
+
+      const lines = [['Prendas', pricing.items_total]];
+      if (pricing.samples_cost) lines.push(['Muestras', pricing.samples_cost]);
+      if (pricing.shipping_cost) lines.push(['Envío', pricing.shipping_cost]);
+      lines.push(['Subtotal', pricing.subtotal], [`IVA (${pricing.tax_rate}%)`, pricing.tax]);
+      if (y + lines.length * 5.5 + 40 > pageH - 15) { doc.addPage(); y = 20; }
+      y += 4;
+      doc.setFontSize(8.5);
+      lines.forEach(([label, value]) => {
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(71, 85, 105);
+        doc.text(label, cols.unit, y + 4, { align: 'right' });
+        doc.setTextColor(15, 23, 42);
+        doc.text(money(value), cols.total, y + 4, { align: 'right' });
+        y += 5.5;
+      });
+      doc.setFillColor(14, 23, 44);
+      doc.rect(margin + 100, y + 1, pageW - margin * 2 - 100, 9, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(255, 255, 255);
+      doc.text('TOTAL', cols.unit, y + 7, { align: 'right' });
+      doc.text(money(pricing.total), cols.total, y + 7, { align: 'right' });
+      y += 16;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(71, 85, 105);
+      [...extras, `Precios en ${pricing.currency}. Cotización válida por ${pricing.validity_days} días.`].forEach(text => {
+        const wrapped = doc.splitTextToSize(text, pageW - margin * 2);
+        if (y + wrapped.length * 4 > pageH - 12) { doc.addPage(); y = 20; }
+        doc.text(wrapped, margin, y);
+        y += wrapped.length * 4 + 1.5;
+      });
+
+      doc.save(`cotizacion-${number || 'dotacian'}.pdf`);
     }
 
     function closeMisCotizacionesModal() {

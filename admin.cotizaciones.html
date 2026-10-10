@@ -389,6 +389,8 @@
                 <option value="nueva">Nuevas</option>
                 <option value="en_proceso">En proceso</option>
                 <option value="entregada">Entregadas</option>
+                <option value="aprobada">Aprobadas</option>
+                <option value="rechazada">Rechazadas</option>
               </select>
             </div>
           </div>
@@ -434,6 +436,8 @@
                   <option value="nueva">Nueva</option>
                   <option value="en_proceso">En proceso</option>
                   <option value="entregada">Entregada</option>
+                  <option value="aprobada">Aprobada</option>
+                  <option value="rechazada">Rechazada</option>
                 </select>
                 <button onclick="closeDrawer()"
                   style="background: none; border: none; font-size: 1.5rem; color: #94A3B8; cursor: pointer; line-height: 1;">&times;</button>
@@ -464,6 +468,7 @@
                     <div id="viewQuoteDate" style="font-weight: 600; color: #334155;">--</div>
                   </div>
                 </div>
+                <div id="viewQuoteClientResponse" style="display: none; margin-bottom: 1rem; padding: 0.75rem 0.875rem; border-radius: 10px; font-size: 0.8125rem; line-height: 1.45;"></div>
                 <div id="viewQuoteUrgent" style="display: none; margin-bottom: 1rem; display: flex; gap: 0.5rem; align-items: flex-start; padding: 0.75rem 0.875rem; border-radius: 10px; background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; font-size: 0.8125rem; line-height: 1.45;">
                   <span style="flex-shrink: 0;">⚠</span>
                   <span id="viewQuoteUrgentText"></span>
@@ -566,7 +571,15 @@
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                   <polyline points="14 2 14 8 20 8"></polyline>
                 </svg>
-                Generar PDF de cotización
+                Descargar PDF
+              </button>
+              <button class="btn btn-primary" id="btnSendQuoteToClient" onclick="sendQuoteToClient()"
+                style="display: none; align-items: center; gap: 0.5rem; background: #0F172A; color: white;">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+                Enviar al cliente
               </button>
             </div>
           </div>
@@ -824,7 +837,9 @@
     const QUOTE_STATUS = {
       nueva: { label: 'Nueva', filterLabel: 'Nuevas', bg: '#FEF3C7', color: '#92400E' },
       en_proceso: { label: 'En proceso', filterLabel: 'En proceso', bg: '#DBEAFE', color: '#1E40AF' },
-      entregada: { label: 'Entregada', filterLabel: 'Entregadas', bg: '#D1FAE5', color: '#065F46' }
+      entregada: { label: 'Entregada', filterLabel: 'Entregadas', bg: '#E0F2FE', color: '#075985' },
+      aprobada: { label: 'Aprobada', filterLabel: 'Aprobadas', bg: '#D1FAE5', color: '#065F46' },
+      rechazada: { label: 'Rechazada', filterLabel: 'Rechazadas', bg: '#FEE2E2', color: '#991B1B' }
     };
 
     // Número consecutivo (supabase_migration_quote_number.sql): COT-0005.
@@ -1042,6 +1057,59 @@
       }
     }
 
+    // Respuesta del cliente desde Bodega → Mis cotizaciones
+    // (supabase_migration_quote_client_response.sql).
+    function renderClientResponse(q) {
+      const box = document.getElementById('viewQuoteClientResponse');
+      if (!q.client_responded_at || !q.client_response) {
+        box.style.display = 'none';
+        return;
+      }
+      const styles = {
+        aprobada: ['#ECFDF5', '#A7F3D0', '#065F46', 'El cliente aprobó la cotización'],
+        rechazada: ['#FEF2F2', '#FECACA', '#991B1B', 'El cliente rechazó la cotización'],
+        cambios: ['#FFFBEB', '#FDE68A', '#92400E', 'El cliente pidió cambios']
+      }[q.client_response] || ['#F8FAFC', '#E2E8F0', '#334155', 'Respuesta del cliente'];
+      box.style.background = styles[0];
+      box.style.border = `1px solid ${styles[1]}`;
+      box.style.color = styles[2];
+      box.innerHTML = `<strong>${styles[3]}</strong> · ${escapeQuoteHtml(formatDate(q.client_responded_at))}` +
+        (q.client_comment ? `<div style="margin-top: 0.35rem; white-space: pre-wrap;">"${escapeQuoteHtml(q.client_comment)}"</div>` : '');
+      box.style.display = 'block';
+    }
+
+    // Guarda los precios y deja la cotización como "entregada": el cliente
+    // la ve en Mis cotizaciones y puede descargarla, aprobarla, rechazarla
+    // o pedir cambios.
+    async function sendQuoteToClient() {
+      if (!currentQuote) return;
+      const pr = collectQuotePricing();
+      if (!pricingIsComplete(pr)) {
+        showToast('Faltan precios', 'Pon el precio unitario de todas las prendas antes de enviarla.', 'error');
+        return;
+      }
+      const btn = document.getElementById('btnSendQuoteToClient');
+      btn.disabled = true;
+      try {
+        const saved = await saveQuotePricing({ silent: true });
+        if (!saved) return;
+        const { error } = await _supabase.rpc('admin_set_dot_quote_status', { p_id: currentQuote.id, p_status: 'entregada' });
+        if (error) throw error;
+        currentQuote.status = 'entregada';
+        const idx = allQuotes.findIndex(q => q.id === currentQuote.id);
+        if (idx >= 0) allQuotes[idx] = { ...allQuotes[idx], status: 'entregada' };
+        paintCardStatus('entregada');
+        updateQuoteStatusFilterCounts();
+        renderQuotesTable();
+        showToast('Cotización enviada', 'El cliente ya la puede ver, descargar y responder en Mis cotizaciones.', 'success');
+      } catch (err) {
+        console.error('Error enviando la cotización al cliente:', err);
+        showToast('Error', 'No se pudo enviar la cotización.', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
     function normalizeQuoteStatus(status) {
       if (status === 'pendiente') return 'nueva';
       if (status === 'generado') return 'en_proceso';
@@ -1128,7 +1196,8 @@
           <td>${detail}</td>
           <td>${formatDateShort(q.created_at)}${getUrgentDeliveryDays(q) !== null && q.status !== 'entregada'
             ? '<br><span class="role-badge" style="background:#FEE2E2; color:#B91C1C; margin-top: 4px; display: inline-block;">Urgente</span>' : ''}</td>
-          <td>${statusBadge}</td>
+          <td>${statusBadge}${q.client_response === 'cambios' && q.status === 'en_proceso'
+            ? '<br><span class="role-badge" style="background:#FFFBEB; color:#92400E; margin-top: 4px; display: inline-block;">Cambios pedidos</span>' : ''}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -1173,6 +1242,9 @@
       document.getElementById('viewQuotePrompt').textContent = q.prompt_text || '—';
 
       paintCardStatus(q.status);
+
+      document.getElementById('btnSendQuoteToClient').style.display = manual ? 'flex' : 'none';
+      renderClientResponse(q);
 
       const urgentDays = getUrgentDeliveryDays(q);
       const urgentBox = document.getElementById('viewQuoteUrgent');
