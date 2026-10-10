@@ -1281,8 +1281,30 @@
             </div>
 
             <div>
-              <label style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Notas (opcional)</label>
-              <textarea id="manualQuoteNotes" placeholder="Ej. color, logo, fecha en que lo necesitas, presupuesto..."
+              <label style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Muestras</label>
+              <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <label style="display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.75rem 0.875rem; border: 1px solid var(--color-border); border-radius: 10px; cursor: pointer; font-size: 0.875rem; color: var(--color-navy);">
+                  <input type="checkbox" id="manualSampleFabric" style="width: 18px; height: 18px; margin-top: 1px; accent-color: #06B6D4; flex-shrink: 0;">
+                  <span><strong>Muestras de tela primero</strong><br>
+                    <span style="font-size: 0.8rem; color: var(--color-text-secondary);">Recibir la tela para aprobarla antes de producir.</span></span>
+                </label>
+                <label style="display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.75rem 0.875rem; border: 1px solid var(--color-border); border-radius: 10px; cursor: pointer; font-size: 0.875rem; color: var(--color-navy);">
+                  <input type="checkbox" id="manualSamplePerSize" style="width: 18px; height: 18px; margin-top: 1px; accent-color: #06B6D4; flex-shrink: 0;">
+                  <span><strong>Una prenda de muestra por talla</strong><br>
+                    <span style="font-size: 0.8rem; color: var(--color-text-secondary);">Para probar las tallas antes del pedido completo.</span></span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Fecha de entrega requerida</label>
+              <input type="date" id="manualDeliveryDate"
+                style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem; background: white; color: var(--color-navy);">
+            </div>
+
+            <div>
+              <label style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Notas del pedido y la entrega (opcional)</label>
+              <textarea id="manualQuoteNotes" placeholder="Ej. dirección o sede de entrega, horario de recepción, persona que recibe, entregas parciales, empaque por empleado..."
                 style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem; background: white; color: var(--color-navy); height: 80px; resize: none; font-family: inherit;"></textarea>
             </div>
           </div>
@@ -2061,6 +2083,29 @@
     let _manualQuoteRoleDefs = [];
     let _manualQuoteEmployees = [];
     let _manualQuoteItemSeq = 0;
+    let _manualQuoteDesignsByName = {};
+
+    const MANUAL_GARMENT_LABELS = {
+      camiseta: 'Camiseta básica', camisa: 'Camisa manga larga', hoodie: 'Hoodie', filipina: 'Filipina de chef',
+      polo: 'Camiseta tipo polo', pantalon: 'Pantalón chino', limpieza: 'Uniforme de limpieza'
+    };
+    const MANUAL_COLOR_LABELS = {
+      blanco: 'Blanco', negro: 'Negro', azul: 'Azul', rojo: 'Rojo', beige: 'Beige', azulMarino: 'Azul marino', gris: 'Gris'
+    };
+    const MANUAL_PLACEMENT_LABELS = {
+      pechoIzq: 'Pecho izquierdo', pechoDer: 'Pecho derecho', pechoCentro: 'Centro del pecho',
+      espalda: 'Espalda', bolsilloTrasero: 'Bolsillo trasero', musloIzq: 'Muslo izquierdo'
+    };
+
+    function describeManualDesign(name) {
+      const d = _manualQuoteDesignsByName[(name || '').trim().toLowerCase()];
+      if (!d) return '';
+      const parts = [MANUAL_GARMENT_LABELS[d.prenda] || d.prenda, MANUAL_COLOR_LABELS[d.color] || d.color];
+      parts.push(d.logo_path
+        ? `logo en ${MANUAL_PLACEMENT_LABELS[d.logo_ubicacion] || d.logo_ubicacion || 'ubicación por definir'}${d.logo_ancho_cm ? ` de ${d.logo_ancho_cm} cm` : ''}`
+        : 'sin logo');
+      return `Diseño Studio "${d.nombre}": ${parts.join(' · ')}`;
+    }
 
     function escapeManualHtml(str) {
       return String(str == null ? '' : str)
@@ -2071,6 +2116,12 @@
     async function openCotizacionManualModal() {
       document.getElementById('cotizacionManualModal').classList.add('active');
       document.getElementById('manualQuoteNotes').value = '';
+      document.getElementById('manualSampleFabric').checked = false;
+      document.getElementById('manualSamplePerSize').checked = false;
+      const dateInput = document.getElementById('manualDeliveryDate');
+      dateInput.value = '';
+      const today = new Date();
+      dateInput.min = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
       document.getElementById('manualItemsList').innerHTML = '';
       document.getElementById('manualProductOptions').innerHTML = '';
       document.getElementById('manualTarget').innerHTML = '<option value="">Cargando...</option>';
@@ -2081,7 +2132,7 @@
         const [roleDefs, employeesRes, designsRes] = await Promise.all([
           fetchActiveRolesWithId(currentCompanyId),
           _supabase.from('company_employees').select('id, first_name, last_name, role, role_status, id_document, email, phone').eq('company_id', currentCompanyId),
-          _supabase.from('studio_designs').select('id, prenda').eq('company_id', currentCompanyId)
+          _supabase.from('studio_designs').select('id, nombre, prenda, color, logo_path, logo_ubicacion, logo_ancho_cm').eq('company_id', currentCompanyId)
         ]);
         _manualQuoteRoleDefs = (roleDefs || []).slice().sort((a, b) => a.role_name.localeCompare(b.role_name));
         // Solo empleados activos (los desactivados no reciben dotación).
@@ -2090,12 +2141,17 @@
           .sort((a, b) => `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`));
 
         // Tipo de prenda de los diseños de Studio, para la lista de tallas.
-        const prendaById = {};
-        (designsRes.data || []).forEach(d => { prendaById[d.id] = d.prenda; });
+        // También se guarda el diseño completo por nombre de prenda, para
+        // incluir color y logo en la solicitud (ya se definieron en Studio).
+        const designById = {};
+        (designsRes.data || []).forEach(d => { designById[d.id] = d; });
         window._adjustGarmentPrendas = window._adjustGarmentPrendas || {};
+        _manualQuoteDesignsByName = {};
         _manualQuoteRoleDefs.forEach(rd => (rd.items || []).forEach(it => {
-          if (it.name && it.design_id && prendaById[it.design_id]) {
-            window._adjustGarmentPrendas[it.name.trim()] = prendaById[it.design_id];
+          const design = it.name && it.design_id ? designById[it.design_id] : null;
+          if (design) {
+            window._adjustGarmentPrendas[it.name.trim()] = design.prenda;
+            _manualQuoteDesignsByName[it.name.trim().toLowerCase()] = design;
           }
         }));
       } catch (err) {
@@ -2223,12 +2279,38 @@
         return;
       }
 
+      const deliveryDate = document.getElementById('manualDeliveryDate').value;
+      if (!deliveryDate) {
+        showToast('Falta la fecha', 'Indica la fecha de entrega que necesitas.', 'error');
+        return;
+      }
+
       const notes = document.getElementById('manualQuoteNotes').value.trim();
+      const sampleFabric = document.getElementById('manualSampleFabric').checked;
+      const samplePerSize = document.getElementById('manualSamplePerSize').checked;
       const emp = manualQuoteMode === 'empleado' ? _manualQuoteEmployees.find(e => e.id === targetValue) : null;
       const empName = emp ? `${emp.first_name || ''} ${emp.last_name || ''}`.trim() : null;
 
-      const lines = items.map(it => `- ${it.qty} × ${it.name}${it.size ? ` (talla ${it.size})` : ''}`);
-      const promptText = ['Cotización manual:', ...lines, notes ? `\nNotas: ${notes}` : ''].join('\n').trim();
+      const lines = [];
+      items.forEach(it => {
+        lines.push(`- ${it.qty} × ${it.name}${it.size ? ` (talla ${it.size})` : ''}`);
+        const design = describeManualDesign(it.name);
+        if (design) lines.push(`    ${design}`);
+      });
+      const samples = [];
+      if (sampleFabric) samples.push('muestras de tela primero');
+      if (samplePerSize) samples.push('una prenda de muestra por talla');
+      const deliveryLabel = new Date(deliveryDate + 'T00:00:00')
+        .toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
+
+      const promptText = [
+        'Cotización manual:',
+        ...lines,
+        '',
+        `Muestras: ${samples.length ? samples.join(' y ') : 'no requiere'}`,
+        `Fecha de entrega requerida: ${deliveryLabel}`,
+        notes ? `Notas del pedido y la entrega: ${notes}` : ''
+      ].join('\n').trim();
 
       const btn = document.getElementById('btnEnviarCotizacionManual');
       btn.disabled = true;
