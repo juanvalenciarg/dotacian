@@ -378,8 +378,8 @@
           <!-- Buscador -->
           <div class="search-container">
             <div class="search-input-group">
-              <label for="searchQuoteCompany">Buscar por empresa</label>
-              <input type="text" id="searchQuoteCompany" class="search-input" placeholder="Nombre de la empresa..."
+              <label for="searchQuoteCompany">Buscar por empresa o número</label>
+              <input type="text" id="searchQuoteCompany" class="search-input" placeholder="Nombre de la empresa o COT-0001..."
                 oninput="renderQuotesTable()">
             </div>
             <div class="search-input-group" style="flex: 0 0 220px;">
@@ -398,6 +398,7 @@
             <table class="users-table">
               <thead>
                 <tr>
+                  <th>No.</th>
                   <th>Empresa</th>
                   <th>Solicitado para</th>
                   <th>Activo / Detalle</th>
@@ -407,7 +408,7 @@
               </thead>
               <tbody id="quotesTableBody">
                 <tr>
-                  <td colspan="5" style="text-align: center; color: #64748B; padding: 2rem;">Cargando solicitudes...
+                  <td colspan="6" style="text-align: center; color: #64748B; padding: 2rem;">Cargando solicitudes...
                   </td>
                 </tr>
               </tbody>
@@ -422,6 +423,8 @@
                 <h2 id="cardTitle"
                   style="margin: 0; font-family: var(--font-family-heading); color: var(--color-navy); font-size: 1.25rem;">
                   Solicitud de Cotización</h2>
+                <p id="cardQuoteNumber"
+                  style="margin: 0.25rem 0 0 0; color: var(--color-navy); font-size: 0.875rem; font-weight: 700;"></p>
                 <p id="cardCompany"
                   style="margin: 0.25rem 0 0 0; color: var(--color-text-secondary); font-size: 0.875rem;">-</p>
               </div>
@@ -448,7 +451,7 @@
                       <path d="M8 14v1a4 4 0 0 0 8 0v-1"></path>
                       <line x1="12" y1="19" x2="12" y2="22"></line>
                     </svg>
-                    Solicitud del cliente (vía Dot)
+                    <span id="viewQuoteSourceLabel">Solicitud del cliente (vía Dot)</span>
                   </div>
                 </div>
                 <div class="form-grid">
@@ -462,7 +465,7 @@
                   </div>
                 </div>
                 <div class="form-group">
-                  <label>Prompt del cliente</label>
+                  <label id="viewQuotePromptLabel">Prompt del cliente</label>
                   <div id="viewQuotePrompt"
                     style="background: white; border: 1px solid #E2E8F0; border-radius: 8px; padding: 0.85rem 1rem; font-size: 0.875rem; color: #334155; white-space: pre-wrap; line-height: 1.5;">
                     --</div>
@@ -745,7 +748,7 @@
         renderQuotesTable();
       } catch (err) {
         console.error('Error cargando solicitudes de cotización:', err);
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #EF4444; padding: 2rem;">Error al cargar solicitudes. Asegúrate de haber ejecutado la migración de Supabase.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #EF4444; padding: 2rem;">Error al cargar solicitudes. Asegúrate de haber ejecutado la migración de Supabase.</td></tr>`;
       }
     }
 
@@ -756,6 +759,17 @@
       en_proceso: { label: 'En proceso', filterLabel: 'En proceso', bg: '#DBEAFE', color: '#1E40AF' },
       entregada: { label: 'Entregada', filterLabel: 'Entregadas', bg: '#D1FAE5', color: '#065F46' }
     };
+
+    // Número consecutivo (supabase_migration_quote_number.sql): COT-0005.
+    function formatQuoteNumber(n) {
+      return n ? `COT-${String(n).padStart(4, '0')}` : '—';
+    }
+
+    // Las solicitudes del formulario "Cotización manual" de Bodega empiezan
+    // con ese encabezado; las demás vienen del chat de Dot.
+    function isManualQuote(q) {
+      return /^Cotización manual:/.test(q && q.prompt_text || '');
+    }
 
     function normalizeQuoteStatus(status) {
       if (status === 'pendiente') return 'nueva';
@@ -814,11 +828,13 @@
       const statusFilter = document.getElementById('filterQuoteStatus').value;
 
       let rows = allQuotes;
-      if (search) rows = rows.filter(q => (q.company_name || '').toLowerCase().includes(search));
+      if (search) rows = rows.filter(q =>
+        (q.company_name || '').toLowerCase().includes(search) ||
+        formatQuoteNumber(q.quote_number).toLowerCase().includes(search));
       if (statusFilter) rows = rows.filter(q => q.status === statusFilter);
 
       if (rows.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #64748B; padding: 2rem;">No hay solicitudes${search || statusFilter ? ' que coincidan con el filtro' : ' de cotización todavía'}.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #64748B; padding: 2rem;">No hay solicitudes${search || statusFilter ? ' que coincidan con el filtro' : ' de cotización todavía'}.</td></tr>`;
         return;
       }
 
@@ -835,6 +851,7 @@
         const tr = document.createElement('tr');
         tr.onclick = () => openQuoteDrawer(q.id);
         tr.innerHTML = `
+          <td style="font-weight: 700; white-space: nowrap;">${formatQuoteNumber(q.quote_number)}</td>
           <td><span class="user-name">${escapeQuoteHtml(q.company_name || 'Empresa')}</span></td>
           <td>${target}</td>
           <td>${detail}</td>
@@ -871,6 +888,10 @@
       currentQuote = q;
 
       document.getElementById('cardCompany').textContent = q.company_name || 'Empresa';
+      document.getElementById('cardQuoteNumber').textContent = q.quote_number ? `No. ${formatQuoteNumber(q.quote_number)}` : '';
+      const manual = isManualQuote(q);
+      document.getElementById('viewQuoteSourceLabel').textContent = manual ? 'Solicitud del cliente (cotización manual)' : 'Solicitud del cliente (vía Dot)';
+      document.getElementById('viewQuotePromptLabel').textContent = manual ? 'Detalle de la solicitud' : 'Prompt del cliente';
 
       const target = q.target_mode === 'empleado'
         ? (q.target_employee_name || 'Persona específica')
@@ -1066,14 +1087,18 @@
       doc.text('dotacian', margin, 20);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
-      doc.text('Cotización generada por Dot', margin, 27);
+      doc.text(isManualQuote(company) ? 'Cotización manual' : 'Cotización generada por Dot', margin, 27);
 
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
       doc.text('Solicitud de Cotización', pageW - margin, 18, { align: 'right' });
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
-      doc.text(new Date().toLocaleDateString('es-MX'), pageW - margin, 25, { align: 'right' });
+      doc.text(
+        company.quote_number
+          ? `No. ${formatQuoteNumber(company.quote_number)} · ${new Date().toLocaleDateString('es-MX')}`
+          : new Date().toLocaleDateString('es-MX'),
+        pageW - margin, 25, { align: 'right' });
 
       y = 44;
 
@@ -1200,7 +1225,9 @@
       doc.text('Generado desde el panel de administración de dotacian — Gestión de Cotizaciones.', margin, Math.min(y, pageH - 10));
 
       const fileSlug = (company.company_name || 'empresa').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-      doc.save(`cotizacion-dot-${fileSlug}-${Date.now()}.pdf`);
+      doc.save(company.quote_number
+        ? `cotizacion-${formatQuoteNumber(company.quote_number)}-${fileSlug}.pdf`
+        : `cotizacion-dot-${fileSlug}-${Date.now()}.pdf`);
     }
 
     function showToast(title, message, type = 'success') {
