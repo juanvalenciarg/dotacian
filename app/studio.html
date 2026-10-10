@@ -1308,6 +1308,10 @@
     // ?embed=1&prenda=<clave>: vista previa de una prenda (DS Hub del admin).
     const URL_PARAMS = new URLSearchParams(window.location.search);
     const EMBED = URL_PARAMS.get('embed') === '1';
+    // ?embed=1&admin=1&empresa=<company_id>&diseno=<id>: el panel admin
+    // (Gestión de Cotizaciones) ve el diseño de un cliente en 3D, con su
+    // logo, usando la sesión del admin (RPC admin_list_studio_designs).
+    const ADMIN_VIEW = EMBED && URL_PARAMS.get('admin') === '1';
     if (EMBED) document.body.classList.add('studio-embed');
 
     const viewer = document.getElementById('studioViewer');
@@ -3794,13 +3798,33 @@
       }
 
       refreshSaveButtons();
-      // ?diseno=<id> (desde el Catálogo): abre ese diseño cuando ya se sabe qué
-      // diseños y prendas tiene la empresa.
-      Promise.all([loadDesigns(), loadAvailableGarments()]).then(() => {
-        const wanted = URL_PARAMS.get('diseno');
-        const d = wanted && designs.find(x => x.id === wanted);
-        if (d) openDesign(d);
-      });
+
+      async function openAdminDesign() {
+        // El cliente de Supabase se crea en un <script> posterior.
+        for (let i = 0; i < 100 && !window._supabase; i++) await new Promise(r => setTimeout(r, 100));
+        try {
+          const { data, error } = await window._supabase.rpc('admin_list_studio_designs', { p_company_id: URL_PARAMS.get('empresa') });
+          if (error) throw error;
+          const d = (data || []).find(x => x.id === URL_PARAMS.get('diseno'));
+          if (d) await openDesign(d);
+          else hint.textContent = 'No se encontró el diseño.';
+        } catch (err) {
+          console.error('Error abriendo el diseño para el admin:', err);
+          hint.textContent = 'No se pudo cargar el diseño.';
+        }
+      }
+
+      if (ADMIN_VIEW) {
+        openAdminDesign();
+      } else {
+        // ?diseno=<id> (desde el Catálogo): abre ese diseño cuando ya se sabe qué
+        // diseños y prendas tiene la empresa.
+        Promise.all([loadDesigns(), loadAvailableGarments()]).then(() => {
+          const wanted = URL_PARAMS.get('diseno');
+          const d = wanted && designs.find(x => x.id === wanted);
+          if (d) openDesign(d);
+        });
+      }
 
       if (EMBED) {
         const prenda = URL_PARAMS.get('prenda');
@@ -3858,7 +3882,9 @@
     if (typeof window._supabase === 'undefined') {
       window.SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
       window.SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
-      window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token', multiTab: false } });
+      // En la vista del admin (?embed=1&admin=1) se usa la sesión del panel admin.
+      const adminView = new URLSearchParams(window.location.search).get('admin') === '1';
+      window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, { auth: { storageKey: adminView ? 'dotacian-admin-token' : (window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token'), multiTab: false, autoRefreshToken: !adminView } });
     }
   </script>
   <script src="/assets/js/utils.js?v=4"></script>
