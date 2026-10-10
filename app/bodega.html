@@ -805,14 +805,25 @@
             <h1 class="dot-greeting" style="text-align: left; margin-bottom: 0.5rem; font-size: 3rem; background: linear-gradient(90deg, #94A3B8 0%, #1E293B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Bodega</h1>
             <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;">Prendas y EPP en stock — producidos pero pendientes de entrega al empleado</p>
           </div>
-          <button type="button" onclick="openCotizarDotModal()"
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+          <button type="button" onclick="openCotizacionManualModal()"
             style="flex-shrink: 0; display: flex; align-items: center; gap: 0.6rem; padding: 0.85rem 1.5rem; background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); color: white; border: none; border-radius: 14px; font-size: 0.9375rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(15,23,42,0.25); transition: transform 0.15s;"
+            onmouseover="this.style.transform='translateY(-1px)';" onmouseout="this.style.transform='translateY(0)';">
+            <svg width="18" height="18" fill="none" stroke="#22D3EE" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/>
+            </svg>
+            Cotización manual
+          </button>
+          <!-- "Cotizar con Dot" apagado por ahora: se vuelve a mostrar quitando display: none -->
+          <button type="button" onclick="openCotizarDotModal()"
+            style="display: none; flex-shrink: 0; align-items: center; gap: 0.6rem; padding: 0.85rem 1.5rem; background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); color: white; border: none; border-radius: 14px; font-size: 0.9375rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(15,23,42,0.25); transition: transform 0.15s;"
             onmouseover="this.style.transform='translateY(-1px)';" onmouseout="this.style.transform='translateY(0)';">
             <svg width="18" height="18" fill="none" stroke="#22D3EE" stroke-width="2" viewBox="0 0 24 24">
               <path d="M12 2a5 5 0 0 0-5 5v2a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5z"/><path d="M8 14v1a4 4 0 0 0 8 0v-1"/><line x1="12" y1="19" x2="12" y2="22"/>
             </svg>
             Cotizar con Dot
           </button>
+          </div>
         </div>
         <div class="app-container">
           <!-- Main KPI Area -->
@@ -1222,6 +1233,66 @@
               onclick="closeAdjustModal()">Cancelar</button>
             <button id="btnGuardarAjuste" class="btn btn-primary" style="font-size: 0.875rem; padding: 0.6rem 1.25rem;"
               onclick="saveInventoryAdjustment()">Guardar Ajuste</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cotización manual Modal -->
+      <div class="modal-overlay" id="cotizacionManualModal">
+        <div class="modal-content">
+          <button class="modal-close" onclick="closeCotizacionManualModal()">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+
+          <h2
+            style="font-family: var(--font-family-heading); color: var(--color-navy); font-size: 1.5rem; margin-bottom: 0.5rem;">
+            Cotización manual</h2>
+          <p style="color: var(--color-text-secondary); font-size: 0.875rem; margin-bottom: 1.5rem;">Indica qué
+            prendas necesitas cotizar. La solicitud llega al equipo de Dotacian para armar la cotización.</p>
+
+          <div style="display: flex; background: #F1F5F9; border-radius: 12px; padding: 4px; margin-bottom: 1.25rem; gap: 4px;">
+            <button type="button" id="btnManualModeRol" onclick="setManualQuoteMode('rol')"
+              style="flex: 1; padding: 0.6rem; border-radius: 8px; border: none; font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+              Para un rol
+            </button>
+            <button type="button" id="btnManualModeEmpleado" onclick="setManualQuoteMode('empleado')"
+              style="flex: 1; padding: 0.6rem; border-radius: 8px; border: none; font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+              Para una persona
+            </button>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+            <div>
+              <label id="manualTargetLabel" style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Rol</label>
+              <select id="manualTarget" onchange="onManualTargetChange()"
+                style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem; background: white; color: var(--color-navy); font-weight: 600;">
+                <option value="">Cargando...</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Prendas a cotizar</label>
+              <div id="manualItemsList" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
+              <datalist id="manualProductOptions"></datalist>
+              <button type="button" class="btn btn-outline" onclick="addManualQuoteItem()"
+                style="width: 100%; margin-top: 0.5rem; font-size: 0.8rem; padding: 0.6rem;">+ Agregar prenda</button>
+            </div>
+
+            <div>
+              <label style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Notas (opcional)</label>
+              <textarea id="manualQuoteNotes" placeholder="Ej. color, logo, fecha en que lo necesitas, presupuesto..."
+                style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem; background: white; color: var(--color-navy); height: 80px; resize: none; font-family: inherit;"></textarea>
+            </div>
+          </div>
+
+          <div
+            style="display: flex; justify-content: flex-end; gap: 1rem; border-top: 1px solid var(--color-border); padding-top: 1.5rem;">
+            <button class="btn btn-outline" style="font-size: 0.875rem; padding: 0.6rem 1.25rem;"
+              onclick="closeCotizacionManualModal()">Cancelar</button>
+            <button id="btnEnviarCotizacionManual" class="btn btn-primary" style="font-size: 0.875rem; padding: 0.6rem 1.25rem;"
+              onclick="submitCotizacionManual()">Enviar solicitud</button>
           </div>
         </div>
       </div>
@@ -1979,6 +2050,209 @@
 
     function escapeBodegaAttr(str) {
       return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+
+    // ── Cotización manual ────────────────────────────────────────
+    // Formulario (rol o persona + prendas, talla y cantidad) que guarda la
+    // solicitud en company_dot_quote_requests, la misma tabla que "Cotizar
+    // con Dot", para que el panel admin (admin.cotizaciones.html) la vea.
+    let manualQuoteMode = 'rol';
+    let _manualQuoteRoleDefs = [];
+    let _manualQuoteEmployees = [];
+    let _manualQuoteItemSeq = 0;
+
+    function escapeManualHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    async function openCotizacionManualModal() {
+      document.getElementById('cotizacionManualModal').classList.add('active');
+      document.getElementById('manualQuoteNotes').value = '';
+      document.getElementById('manualItemsList').innerHTML = '';
+      document.getElementById('manualProductOptions').innerHTML = '';
+      document.getElementById('manualTarget').innerHTML = '<option value="">Cargando...</option>';
+      addManualQuoteItem();
+      if (!currentCompanyId) return;
+
+      try {
+        const [roleDefs, employeesRes, designsRes] = await Promise.all([
+          fetchActiveRolesWithId(currentCompanyId),
+          _supabase.from('company_employees').select('id, first_name, last_name, role').eq('company_id', currentCompanyId),
+          _supabase.from('studio_designs').select('id, prenda').eq('company_id', currentCompanyId)
+        ]);
+        _manualQuoteRoleDefs = (roleDefs || []).slice().sort((a, b) => a.role_name.localeCompare(b.role_name));
+        _manualQuoteEmployees = (employeesRes.data || [])
+          .slice()
+          .sort((a, b) => `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`));
+
+        // Tipo de prenda de los diseños de Studio, para la lista de tallas.
+        const prendaById = {};
+        (designsRes.data || []).forEach(d => { prendaById[d.id] = d.prenda; });
+        window._adjustGarmentPrendas = window._adjustGarmentPrendas || {};
+        _manualQuoteRoleDefs.forEach(rd => (rd.items || []).forEach(it => {
+          if (it.name && it.design_id && prendaById[it.design_id]) {
+            window._adjustGarmentPrendas[it.name.trim()] = prendaById[it.design_id];
+          }
+        }));
+      } catch (err) {
+        console.error('Error cargando roles/empleados para la cotización manual:', err);
+      }
+      setManualQuoteMode('rol');
+    }
+
+    function closeCotizacionManualModal() {
+      document.getElementById('cotizacionManualModal').classList.remove('active');
+    }
+
+    function setManualQuoteMode(mode) {
+      manualQuoteMode = mode;
+      [['rol', 'btnManualModeRol'], ['empleado', 'btnManualModeEmpleado']].forEach(([m, id]) => {
+        const btn = document.getElementById(id);
+        btn.style.background = m === mode ? 'var(--color-cyan)' : 'transparent';
+        btn.style.color = m === mode ? 'var(--color-navy)' : 'var(--color-text-secondary)';
+      });
+      document.getElementById('manualTargetLabel').textContent = mode === 'rol' ? 'Rol' : 'Persona';
+
+      const select = document.getElementById('manualTarget');
+      if (mode === 'rol') {
+        select.innerHTML = '<option value="">Selecciona un rol...</option>' +
+          _manualQuoteRoleDefs.map(rd => `<option value="${escapeManualHtml(rd.role_name)}">${escapeManualHtml(rd.role_name)}</option>`).join('');
+      } else {
+        select.innerHTML = '<option value="">Selecciona una persona...</option>' +
+          _manualQuoteEmployees.map(e => {
+            const name = `${e.first_name || ''} ${e.last_name || ''}`.trim();
+            const role = e.role ? ` — ${e.role}` : '';
+            return `<option value="${escapeManualHtml(e.id)}">${escapeManualHtml(name + role)}</option>`;
+          }).join('');
+      }
+      onManualTargetChange();
+    }
+
+    function getManualQuoteRoleName() {
+      const value = document.getElementById('manualTarget').value;
+      if (!value) return '';
+      if (manualQuoteMode === 'rol') return value;
+      const emp = _manualQuoteEmployees.find(e => e.id === value);
+      return emp ? (emp.role || '') : '';
+    }
+
+    // Sugerencias de producto: la dotación física configurada para el rol.
+    function onManualTargetChange() {
+      const roleName = getManualQuoteRoleName().toLowerCase().trim();
+      const rd = _manualQuoteRoleDefs.find(r => r.role_name.toLowerCase().trim() === roleName);
+      const names = rd ? (rd.items || []).filter(it => it.name && it.category !== 'digital').map(it => it.name.trim()) : [];
+      document.getElementById('manualProductOptions').innerHTML =
+        Array.from(new Set(names)).map(n => `<option value="${escapeManualHtml(n)}"></option>`).join('');
+    }
+
+    function addManualQuoteItem() {
+      const id = _manualQuoteItemSeq++;
+      const row = document.createElement('div');
+      row.className = 'manual-quote-item';
+      row.style.cssText = 'display: flex; gap: 0.5rem; align-items: center;';
+      row.innerHTML = `
+        <input type="text" class="manual-item-name" list="manualProductOptions" placeholder="Prenda o EPP"
+          oninput="refreshManualItemSizes(this.closest('.manual-quote-item'))"
+          style="flex: 2; min-width: 0; padding: 0.65rem 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem;">
+        <select class="manual-item-size"
+          style="flex: 1; min-width: 0; padding: 0.65rem 0.5rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem; background: white;"></select>
+        <input type="number" class="manual-item-qty" min="1" value="1"
+          style="width: 72px; padding: 0.65rem 0.5rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem;">
+        <button type="button" title="Quitar" onclick="removeManualQuoteItem(this)"
+          style="flex-shrink: 0; width: 34px; height: 34px; border: none; border-radius: 8px; background: #FEF2F2; color: #EF4444; cursor: pointer; font-size: 1rem;">✕</button>
+      `;
+      row.dataset.manualItemId = id;
+      document.getElementById('manualItemsList').appendChild(row);
+      refreshManualItemSizes(row);
+    }
+
+    function removeManualQuoteItem(btn) {
+      const list = document.getElementById('manualItemsList');
+      if (list.children.length <= 1) {
+        const row = btn.closest('.manual-quote-item');
+        row.querySelector('.manual-item-name').value = '';
+        row.querySelector('.manual-item-qty').value = 1;
+        refreshManualItemSizes(row);
+        return;
+      }
+      btn.closest('.manual-quote-item').remove();
+    }
+
+    // Misma lista de tallas que el ajuste de inventario, según el tipo de prenda.
+    function refreshManualItemSizes(row) {
+      if (!row) return;
+      const name = row.querySelector('.manual-item-name').value.trim();
+      const select = row.querySelector('.manual-item-size');
+      const previous = select.value;
+      const groups = ADJUST_SIZE_LISTS[getAdjustSizeKind(name)];
+      const optionHtml = v => `<option value="${v}">${v}</option>`;
+      select.innerHTML = '<option value="">Sin talla</option>' +
+        groups.map(g => g.label
+          ? `<optgroup label="${g.label}">${g.options.map(optionHtml).join('')}</optgroup>`
+          : g.options.map(optionHtml).join('')).join('') +
+        optionHtml('Unitalla');
+      if (previous && Array.from(select.options).some(o => o.value === previous)) select.value = previous;
+    }
+
+    async function submitCotizacionManual() {
+      if (!currentCompanyId) return;
+      const targetValue = document.getElementById('manualTarget').value;
+      if (!targetValue) {
+        showToast('Falta seleccionar', manualQuoteMode === 'rol' ? 'Elige el rol.' : 'Elige la persona.', 'error');
+        return;
+      }
+
+      const items = [];
+      document.querySelectorAll('#manualItemsList .manual-quote-item').forEach(row => {
+        const name = row.querySelector('.manual-item-name').value.trim();
+        const size = row.querySelector('.manual-item-size').value;
+        const qty = parseInt(row.querySelector('.manual-item-qty').value, 10) || 0;
+        if (name && qty > 0) items.push({ name, size, qty });
+      });
+      if (items.length === 0) {
+        showToast('Faltan prendas', 'Agrega al menos una prenda con cantidad mayor a 0.', 'error');
+        return;
+      }
+
+      const notes = document.getElementById('manualQuoteNotes').value.trim();
+      const emp = manualQuoteMode === 'empleado' ? _manualQuoteEmployees.find(e => e.id === targetValue) : null;
+      const empName = emp ? `${emp.first_name || ''} ${emp.last_name || ''}`.trim() : null;
+
+      const lines = items.map(it => `- ${it.qty} × ${it.name}${it.size ? ` (talla ${it.size})` : ''}`);
+      const promptText = ['Cotización manual:', ...lines, notes ? `\nNotas: ${notes}` : ''].join('\n').trim();
+
+      const btn = document.getElementById('btnEnviarCotizacionManual');
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+      try {
+        const row = {
+          company_id: currentCompanyId,
+          prompt_text: promptText,
+          target_mode: manualQuoteMode,
+          target_role: manualQuoteMode === 'rol' ? targetValue : (emp ? emp.role : null),
+          target_employee_id: emp ? emp.id : null,
+          target_employee_name: empName
+        };
+        // Con una sola prenda se llenan también los campos estructurados.
+        if (items.length === 1) {
+          row.item_name = items[0].name;
+          row.item_qty = items[0].qty;
+          row.item_size = items[0].size || null;
+        }
+        const { error } = await _supabase.from('company_dot_quote_requests').insert(row);
+        if (error) throw error;
+        showToast('Solicitud enviada', 'Recibimos tu solicitud de cotización. Te avisaremos cuando esté lista.');
+        closeCotizacionManualModal();
+      } catch (err) {
+        console.error('Error guardando la cotización manual:', err);
+        showToast('Error', 'No se pudo enviar la solicitud. Intenta de nuevo.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Enviar solicitud';
+      }
     }
 
     // ── Cotizar con Dot ──────────────────────────────────────────
