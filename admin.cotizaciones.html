@@ -472,8 +472,9 @@
                 </div>
               </div>
 
-              <!-- Items para cotizar -->
-              <div class="form-section">
+              <!-- Items para cotizar (solo solicitudes de Dot: en las manuales
+                   las prendas ya vienen en el detalle de la solicitud) -->
+              <div class="form-section" id="quoteItemsSection">
                 <div class="form-section-title">
                   <div class="form-section-title-label">
                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
@@ -771,6 +772,32 @@
       return /^Cotización manual:/.test(q && q.prompt_text || '');
     }
 
+    // Lee el texto que arma Bodega → Cotización manual:
+    //   - 3 × Uniforme Limpieza (talla M)
+    //       Diseño Studio "...": prenda · color · logo
+    //   Muestras: ... / Fecha de entrega requerida: ... / Notas ...: ...
+    // y devuelve las prendas para el PDF y el resto como condiciones.
+    function parseManualQuote(promptText) {
+      const items = [];
+      const extras = [];
+      (promptText || '').split('\n').forEach(line => {
+        const itemMatch = line.match(/^- (\d+) × (.+?)(?: \(talla (.+)\))?$/);
+        if (itemMatch) {
+          items.push({ name: itemMatch[2].trim(), qty: parseInt(itemMatch[1], 10) || 1, size: itemMatch[3] || '', specs: [], notes: '' });
+          return;
+        }
+        const detail = line.trim();
+        if (!detail || detail === 'Cotización manual:') return;
+        if (/^\s/.test(line) && items.length) {
+          const last = items[items.length - 1];
+          last.notes = last.notes ? `${last.notes} · ${detail}` : detail;
+          return;
+        }
+        extras.push(detail);
+      });
+      return { items, extras };
+    }
+
     function normalizeQuoteStatus(status) {
       if (status === 'pendiente') return 'nueva';
       if (status === 'generado') return 'en_proceso';
@@ -904,7 +931,10 @@
 
       document.getElementById('quoteItemsRows').innerHTML = '';
       quoteItemRowSeq = 0;
-      if (q.item_name) {
+      document.getElementById('quoteItemsSection').style.display = manual ? 'none' : '';
+      if (manual) {
+        // Las prendas salen del detalle de la solicitud (parseManualQuote).
+      } else if (q.item_name) {
         addQuoteItemRow({ name: q.item_name, qty: q.item_qty || 1, size: q.item_size || '' });
       } else {
         addQuoteItemRow();
@@ -1018,7 +1048,9 @@
 
     async function generateQuotePDF() {
       if (!currentQuote) return;
-      const items = collectQuoteItems();
+      const manual = isManualQuote(currentQuote);
+      const parsedManual = manual ? parseManualQuote(currentQuote.prompt_text) : null;
+      const items = manual ? parsedManual.items : collectQuoteItems();
       if (items.length === 0) {
         showToast('Faltan ítems', 'Agrega al menos un activo con nombre para generar el PDF.', 'error');
         return;
@@ -1037,7 +1069,7 @@
           company: currentQuote,
           roleName,
           employeeName,
-          promptText: currentQuote.prompt_text,
+          promptText: manual ? parsedManual.extras.join('\n') : currentQuote.prompt_text,
           items
         });
 
@@ -1151,12 +1183,14 @@
       doc.text(employeeName ? `Dotación para: ${employeeName}${roleName ? '  (' + roleName + ')' : ''}` : `Dotación para el rol: ${roleName || '—'}`, margin, y);
       y += 7;
 
-      // ── Solicitud original (prompt libre capturado por Dot) ────
+      // ── Solicitud original (prompt libre de Dot) o, en las manuales,
+      //    las condiciones: muestras, fecha de entrega y notas ─────
       if (promptText) {
-        doc.setFont('helvetica', 'italic');
+        const manualPdf = isManualQuote(company);
+        doc.setFont('helvetica', manualPdf ? 'normal' : 'italic');
         doc.setFontSize(8);
         doc.setTextColor(100, 116, 139);
-        const wrapped = doc.splitTextToSize(`Solicitud original: "${promptText}"`, pageW - margin * 2);
+        const wrapped = doc.splitTextToSize(manualPdf ? promptText : `Solicitud original: "${promptText}"`, pageW - margin * 2);
         doc.text(wrapped, margin, y);
         y += wrapped.length * 4 + 5;
       }
