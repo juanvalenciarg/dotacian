@@ -386,8 +386,9 @@
               <label for="filterQuoteStatus">Estado</label>
               <select id="filterQuoteStatus" class="search-input" onchange="renderQuotesTable()">
                 <option value="">Todos</option>
-                <option value="pendiente">Pendiente</option>
-                <option value="generado">Generado</option>
+                <option value="nueva">Nuevas</option>
+                <option value="en_proceso">En proceso</option>
+                <option value="entregada">Entregadas</option>
               </select>
             </div>
           </div>
@@ -425,7 +426,12 @@
                   style="margin: 0.25rem 0 0 0; color: var(--color-text-secondary); font-size: 0.875rem;">-</p>
               </div>
               <div style="display: flex; align-items: center; gap: 1rem;">
-                <span id="cardStatus" class="role-badge" style="background: #FEF3C7; color: #92400E;">Pendiente</span>
+                <select id="cardStatus" class="role-badge" onchange="changeQuoteStatus(this.value)" title="Cambiar estado"
+                  style="border: none; cursor: pointer; font-weight: 700; padding-right: 0.5rem; background: #FEF3C7; color: #92400E;">
+                  <option value="nueva">Nueva</option>
+                  <option value="en_proceso">En proceso</option>
+                  <option value="entregada">Entregada</option>
+                </select>
                 <button onclick="closeDrawer()"
                   style="background: none; border: none; font-size: 1.5rem; color: #94A3B8; cursor: pointer; line-height: 1;">&times;</button>
               </div>
@@ -734,11 +740,71 @@
         const { data, error } = await _supabase.rpc('admin_list_dot_quote_requests');
         if (error) throw error;
 
-        allQuotes = data || [];
+        allQuotes = (data || []).map(q => ({ ...q, status: normalizeQuoteStatus(q.status) }));
+        updateQuoteStatusFilterCounts();
         renderQuotesTable();
       } catch (err) {
         console.error('Error cargando solicitudes de cotización:', err);
         tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #EF4444; padding: 2rem;">Error al cargar solicitudes. Asegúrate de haber ejecutado la migración de Supabase.</td></tr>`;
+      }
+    }
+
+    // Estados de la solicitud (ver supabase_migration_quote_status.sql). Los
+    // valores viejos (pendiente/generado) se leen como nueva/en_proceso.
+    const QUOTE_STATUS = {
+      nueva: { label: 'Nueva', filterLabel: 'Nuevas', bg: '#FEF3C7', color: '#92400E' },
+      en_proceso: { label: 'En proceso', filterLabel: 'En proceso', bg: '#DBEAFE', color: '#1E40AF' },
+      entregada: { label: 'Entregada', filterLabel: 'Entregadas', bg: '#D1FAE5', color: '#065F46' }
+    };
+
+    function normalizeQuoteStatus(status) {
+      if (status === 'pendiente') return 'nueva';
+      if (status === 'generado') return 'en_proceso';
+      return QUOTE_STATUS[status] ? status : 'nueva';
+    }
+
+    function quoteStatusBadge(status) {
+      const st = QUOTE_STATUS[status] || QUOTE_STATUS.nueva;
+      return `<span class="role-badge" style="background:${st.bg}; color:${st.color};">${st.label}</span>`;
+    }
+
+    function updateQuoteStatusFilterCounts() {
+      const select = document.getElementById('filterQuoteStatus');
+      Array.from(select.options).forEach(opt => {
+        if (!opt.value) {
+          opt.textContent = `Todos (${allQuotes.length})`;
+          return;
+        }
+        const count = allQuotes.filter(q => q.status === opt.value).length;
+        opt.textContent = `${QUOTE_STATUS[opt.value].filterLabel} (${count})`;
+      });
+    }
+
+    function paintCardStatus(status) {
+      const select = document.getElementById('cardStatus');
+      const st = QUOTE_STATUS[status] || QUOTE_STATUS.nueva;
+      select.value = status;
+      select.style.background = st.bg;
+      select.style.color = st.color;
+    }
+
+    async function changeQuoteStatus(newStatus) {
+      if (!currentQuote || newStatus === currentQuote.status) return;
+      const previous = currentQuote.status;
+      paintCardStatus(newStatus);
+      try {
+        const { error } = await _supabase.rpc('admin_set_dot_quote_status', { p_id: currentQuote.id, p_status: newStatus });
+        if (error) throw error;
+        currentQuote.status = newStatus;
+        const idx = allQuotes.findIndex(q => q.id === currentQuote.id);
+        if (idx >= 0) allQuotes[idx] = { ...allQuotes[idx], status: newStatus };
+        updateQuoteStatusFilterCounts();
+        renderQuotesTable();
+        showToast('Estado actualizado', `La solicitud quedó como "${QUOTE_STATUS[newStatus].label}".`, 'success');
+      } catch (err) {
+        console.error('Error cambiando el estado de la cotización:', err);
+        paintCardStatus(previous);
+        showToast('Error', 'No se pudo cambiar el estado. ¿Ya ejecutaste la migración de estados en Supabase?', 'error');
       }
     }
 
@@ -764,9 +830,7 @@
         const detail = q.item_name
           ? `${escapeQuoteHtml(q.item_name)}${q.item_qty ? ' ×' + q.item_qty : ''}`
           : 'Kit completo (prompt libre)';
-        const statusBadge = q.status === 'generado'
-          ? '<span class="role-badge" style="background:#D1FAE5; color:#065F46;">Generado</span>'
-          : '<span class="role-badge" style="background:#FEF3C7; color:#92400E;">Pendiente</span>';
+        const statusBadge = quoteStatusBadge(q.status);
 
         const tr = document.createElement('tr');
         tr.onclick = () => openQuoteDrawer(q.id);
@@ -815,16 +879,7 @@
       document.getElementById('viewQuoteDate').textContent = formatDate(q.created_at);
       document.getElementById('viewQuotePrompt').textContent = q.prompt_text || '—';
 
-      const statusBadge = document.getElementById('cardStatus');
-      if (q.status === 'generado') {
-        statusBadge.textContent = 'Generado';
-        statusBadge.style.background = '#D1FAE5';
-        statusBadge.style.color = '#065F46';
-      } else {
-        statusBadge.textContent = 'Pendiente';
-        statusBadge.style.background = '#FEF3C7';
-        statusBadge.style.color = '#92400E';
-      }
+      paintCardStatus(q.status);
 
       document.getElementById('quoteItemsRows').innerHTML = '';
       quoteItemRowSeq = 0;
@@ -968,18 +1023,18 @@
         const { error } = await _supabase.rpc('admin_mark_dot_quote_generated', { p_id: currentQuote.id });
         if (error) throw error;
 
-        currentQuote.status = 'generado';
+        // Generar el PDF pasa una solicitud "nueva" a "en proceso"; si ya
+        // estaba más adelante se respeta (igual que el RPC).
+        if (currentQuote.status === 'nueva') currentQuote.status = 'en_proceso';
         currentQuote.pdf_generated_at = new Date().toISOString();
         const idx = allQuotes.findIndex(q => q.id === currentQuote.id);
-        if (idx >= 0) allQuotes[idx] = { ...allQuotes[idx], status: 'generado', pdf_generated_at: currentQuote.pdf_generated_at };
+        if (idx >= 0) allQuotes[idx] = { ...allQuotes[idx], status: currentQuote.status, pdf_generated_at: currentQuote.pdf_generated_at };
 
-        const statusBadge = document.getElementById('cardStatus');
-        statusBadge.textContent = 'Generado';
-        statusBadge.style.background = '#D1FAE5';
-        statusBadge.style.color = '#065F46';
+        paintCardStatus(currentQuote.status);
+        updateQuoteStatusFilterCounts();
         renderQuotesTable();
 
-        showToast('PDF generado', 'La cotización se descargó y se marcó como generada.', 'success');
+        showToast('PDF generado', 'La cotización se descargó.', 'success');
       } catch (err) {
         console.error('Error generando PDF de cotización:', err);
         showToast('Error', 'No se pudo generar el PDF de cotización.', 'error');

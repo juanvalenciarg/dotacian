@@ -2113,8 +2113,8 @@
 
     // ── Mis cotizaciones ─────────────────────────────────────────
     // Lista de solicitudes de la empresa (company_dot_quote_requests: las
-    // manuales y las de Dot). "generado" = el equipo ya armó la cotización
-    // en el panel admin.
+    // manuales y las de Dot), con el estado que les pone el admin en
+    // Gestión de Cotizaciones: nueva, en_proceso o entregada.
     async function openMisCotizacionesModal() {
       document.getElementById('misCotizacionesModal').classList.add('active');
       const list = document.getElementById('misCotizacionesList');
@@ -2123,7 +2123,7 @@
 
       try {
         const { data, error } = await _supabase.from('company_dot_quote_requests')
-          .select('id, prompt_text, target_mode, target_role, target_employee_name, item_name, item_qty, item_size, status, pdf_generated_at, created_at')
+          .select('id, prompt_text, target_mode, target_role, target_employee_name, item_name, item_qty, item_size, status, created_at')
           .eq('company_id', currentCompanyId)
           .order('created_at', { ascending: false });
         if (error) throw error;
@@ -2137,17 +2137,24 @@
         }
 
         list.innerHTML = data.map(q => {
-          const ready = q.status === 'generado';
-          const badge = ready
-            ? '<span style="font-size: 0.7rem; font-weight: 800; color: #059669; background: #ECFDF5; padding: 3px 10px; border-radius: 99px; text-transform: uppercase; letter-spacing: 0.03em;">Lista</span>'
-            : '<span style="font-size: 0.7rem; font-weight: 800; color: #D97706; background: #FFFBEB; padding: 3px 10px; border-radius: 99px; text-transform: uppercase; letter-spacing: 0.03em;">En preparación</span>';
+          // Mismos estados que Gestión de Cotizaciones (admin); los valores
+          // viejos pendiente/generado se leen como nueva/en_proceso.
+          const status = q.status === 'pendiente' ? 'nueva' : (q.status === 'generado' ? 'en_proceso' : q.status);
+          const st = {
+            nueva: { label: 'Nueva', color: '#D97706', bg: '#FFFBEB' },
+            en_proceso: { label: 'En proceso', color: '#1D4ED8', bg: '#EFF6FF' },
+            entregada: { label: 'Entregada', color: '#059669', bg: '#ECFDF5' }
+          }[status] || { label: 'Nueva', color: '#D97706', bg: '#FFFBEB' };
+          const badge = `<span style="font-size: 0.7rem; font-weight: 800; color: ${st.color}; background: ${st.bg}; padding: 3px 10px; border-radius: 99px; text-transform: uppercase; letter-spacing: 0.03em; flex-shrink: 0;">${st.label}</span>`;
           const target = q.target_mode === 'empleado'
             ? `Para ${escapeManualHtml(q.target_employee_name || 'una persona')}${q.target_role ? ` · ${escapeManualHtml(q.target_role)}` : ''}`
             : `Rol ${escapeManualHtml(q.target_role || '—')}`;
           const created = new Date(q.created_at).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
-          const readyNote = ready && q.pdf_generated_at
-            ? `<div style="font-size: 0.8rem; color: #059669; margin-top: 0.6rem;">El equipo de Dotacian generó tu cotización el ${new Date(q.pdf_generated_at).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })}.</div>`
-            : '';
+          const readyNote = status === 'entregada'
+            ? '<div style="font-size: 0.8rem; color: #059669; margin-top: 0.6rem;">El equipo de Dotacian ya te entregó esta cotización.</div>'
+            : (status === 'en_proceso'
+              ? '<div style="font-size: 0.8rem; color: #1D4ED8; margin-top: 0.6rem;">El equipo de Dotacian está preparando tu cotización.</div>'
+              : '');
           return `
             <details style="border: 1px solid var(--color-border); border-radius: 12px; padding: 0.85rem 1rem; background: white;">
               <summary style="cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
