@@ -1236,7 +1236,7 @@
                   </span>
                   <span>
                     <span class="studio-garment-name">Camiseta básica</span>
-                    <span class="studio-garment-meta">Cuello redondo · Manga corta</span>
+                    <span class="studio-garment-meta">Personalizable · Cuello redondo o en V</span>
                   </span>
                 </button>
                 <button type="button" class="studio-garment studio-garment-option" data-garment="camisa" aria-pressed="false">
@@ -1263,7 +1263,7 @@
                   </span>
                   <span>
                     <span class="studio-garment-name">Camiseta tipo polo</span>
-                    <span class="studio-garment-meta">Cuello polo en rib · Tapeta con 2 botones</span>
+                    <span class="studio-garment-meta">Personalizable · Cuello polo · Tapeta</span>
                   </span>
                 </button>
                 <button type="button" class="studio-garment studio-garment-option" data-garment="pantalon" aria-pressed="false">
@@ -1451,15 +1451,20 @@
 
     // --- Prendas configurables (cuello, manga, cierre, bolsillos y color por zonas) ---
     const OPTION_GROUPS = {
-      cuello: { label: 'Cuello', choices: { v: 'Solapa en V', camisero: 'Camisero', mao: 'Mao', polo: 'Polo', redondo: 'Redondo', capucha: 'Capucha' } },
+      cuello: { label: 'Cuello', choices: { v: 'Solapa en V', camisero: 'Camisero', mao: 'Mao', polo: 'Polo', redondo: 'Redondo', enV: 'En V', maoRib: 'Mao en rib', capucha: 'Capucha' } },
       manga: { label: 'Manga', choices: { corta: 'Corta', larga: 'Larga con puño' } },
-      cierre: { label: 'Cierre', choices: { oculto: 'Oculto', cruzado: 'Doble botonadura', botones: 'Botones', cremallera: 'Cremallera', ninguno: 'Sin cierre' } },
+      cierre: { label: 'Cierre', choices: { oculto: 'Oculto', cruzado: 'Doble botonadura', botones: 'Botones', botones3: 'Tapeta 3 botones', cremallera: 'Cremallera', mediaCremallera: 'Media cremallera', ninguno: 'Sin cierre' } },
       bolsillos: { label: 'Bolsillos', choices: { ninguno: 'Ninguno', pecho: 'Pecho', inferiores: 'Inferiores', ambos: 'Pecho e inferiores', canguro: 'Canguro', completos: 'Frontales y traseros', frontales: 'Solo frontales' } },
       // Pantalón
       cintura: { label: 'Cintura', choices: { pretina: 'Pretina con pasadores', resorte: 'Resorte' } },
       largo: { label: 'Largo', choices: { largo: 'Largo', tobillero: 'Tobillero', bermuda: 'Bermuda' } }
     };
-    const COLLAR_TYPES = { v: 'revere', camisero: 'shirt', mao: 'mandarin', polo: 'polo', redondo: 'rib', capucha: 'hood' };
+    const COLLAR_TYPES = { v: 'revere', camisero: 'shirt', mao: 'mandarin', polo: 'polo', redondo: 'rib', enV: 'rib', maoRib: 'mandarin', capucha: 'hood' };
+
+    // Nombre de una opción: la prenda puede renombrarla (ej. "Tapeta 2 botones" en el polo).
+    function choiceLabel(conf, group, value) {
+      return (conf.labels && conf.labels[group] && conf.labels[group][value]) || OPTION_GROUPS[group].choices[value];
+    }
     const TOP_GROUPS = ['cuello', 'manga', 'cierre', 'bolsillos'];
     const PANTS_GROUPS = ['cintura', 'largo', 'bolsillos'];
     const PANTS_HEM = { largo: -0.83, tobillero: -0.6, bermuda: -0.22 };
@@ -1498,6 +1503,9 @@
       t.collar = COLLAR_TYPES[o.cuello];
       // Escote según el cuello (ej. redondo más bajo que polo en la misma base).
       if (conf.neckDip && conf.neckDip[o.cuello] != null) t.neckDip = conf.neckDip[o.cuello];
+      // Escote en V: profundidad del recorte del frente (torsoPoint); el ribete sigue la forma.
+      t.vNeck = (conf.vNeck && conf.vNeck[o.cuello]) || null;
+      t.collarRib = o.cuello === 'maoRib';
       if ('drawstrings' in top) t.drawstrings = o.cuello === 'capucha';
       if (o.cuello !== 'v' && conf.target === 'top') {
         // Fuera de la solapa en V, el cuello camisero / polo usa puntas normales.
@@ -1511,8 +1519,9 @@
       const open = o.cuello !== 'v';
       t.placket = open && o.cierre === 'botones'
         ? (conf.placket || { halfWidth: 0.021, buttons: 7, spacing: 0.108, standButton: o.cuello === 'camisero' })
-        : false;
-      t.zipper = open && o.cierre === 'cremallera' ? { inset: 0.004 } : null;
+        : (open && o.cierre === 'botones3' ? { ...conf.placket, buttons: 3, length: 0.24 } : false);
+      t.zipper = open && o.cierre === 'cremallera' ? { inset: 0.004 }
+        : (open && o.cierre === 'mediaCremallera' ? { inset: 0.004, length: 0.2 } : null);
       t.doubleBreasted = o.cierre === 'cruzado' ? conf.doubleBreasted : null;
       const chest = o.bolsillos === 'pecho' || o.bolsillos === 'ambos';
       const lower = o.bolsillos === 'inferiores' || o.bolsillos === 'ambos';
@@ -1576,9 +1585,9 @@
       const chest = o.bolsillos === 'pecho' || o.bolsillos === 'ambos';
       const top = conf.target === 'top' ? cfg.set.top : cfg;
       cfg.summary = {
-        cuello: OPTION_GROUPS.cuello.choices[o.cuello],
-        manga: OPTION_GROUPS.manga.choices[o.manga],
-        cierre: OPTION_GROUPS.cierre.choices[o.cierre],
+        cuello: choiceLabel(conf, 'cuello', o.cuello),
+        manga: choiceLabel(conf, 'manga', o.manga),
+        cierre: choiceLabel(conf, 'cierre', o.cierre),
         bolsillo: o.bolsillos === 'ninguno' ? null : OPTION_GROUPS.bolsillos.choices[o.bolsillos]
       };
       // El bolsillo de pecho ocupa el pecho izquierdo: ahí ya no va logo.
@@ -1677,18 +1686,18 @@
     const GARMENTS = {
       camiseta: {
         label: 'Camiseta básica',
-        meta: 'Personalizable · Cuello redondo · Manga corta',
+        meta: 'Personalizable · Cuello redondo o en V',
         configurable: {
+          // Tejido de punto: cuello redondo o en V, sin cierre (el polo es la prenda con tapeta).
           choices: {
-            cuello: ['redondo', 'polo'],
-            cierre: ['ninguno', 'botones'],
+            cuello: ['redondo', 'enV'],
+            cierre: ['ninguno'],
             bolsillos: ['ninguno', 'pecho']
           },
           defaults: { cuello: 'redondo', manga: 'corta', cierre: 'ninguno', bolsillos: 'ninguno' },
           zoneDefaults: {},
-          neckDip: { redondo: 0.07, polo: 0.025 },
-          // Tapeta corta (como el polo) cuando lleva botones.
-          placket: { halfWidth: 0.019, length: 0.17, buttons: 2, spacing: 0.07, firstOffset: 0.05, standButton: false },
+          neckDip: { redondo: 0.07, enV: 0.03 },
+          vNeck: { enV: 0.17 },
           sleeves: {
             corta: {
               angleStart: deg(50), angleEnd: deg(50), length: 0.27, hemTilt: 0.085, forward: deg(12), start: -0.18,
@@ -1904,16 +1913,18 @@
 
       polo: {
         label: 'Camiseta tipo polo',
-        meta: 'Personalizable · Cuello polo · Tapeta con 2 botones',
+        meta: 'Personalizable · Cuello polo · Tapeta',
         configurable: {
+          // Tejido piqué: cuello polo o mao en rib, siempre con tapeta.
           choices: {
-            cuello: ['polo', 'redondo'],
-            cierre: ['botones', 'ninguno'],
+            cuello: ['polo', 'maoRib'],
+            cierre: ['botones', 'botones3', 'mediaCremallera'],
             bolsillos: ['ninguno', 'pecho']
           },
+          labels: { cierre: { botones: 'Tapeta 2 botones' } },
           defaults: { cuello: 'polo', manga: 'corta', cierre: 'botones', bolsillos: 'ninguno' },
           zoneDefaults: {},
-          neckDip: { polo: 0.025, redondo: 0.07 },
+          neckDip: { polo: 0.025, maoRib: 0.02 },
           placket: { halfWidth: 0.019, length: 0.17, buttons: 2, spacing: 0.07, firstOffset: 0.05, standButton: false },
           sleeves: {
             corta: {
@@ -2391,7 +2402,16 @@
       const waist = Math.exp(-Math.pow((p.y + 0.38) / 0.24, 2));
       const fold = cfg.waistFold * waist * Math.sin(angle * 9 + p.y * 14);
       const len = Math.hypot(q.x, q.z) || 1;
-      return new THREE.Vector3(q.x + fold * q.x / len, y, q.z + fold * q.z / len);
+      const px = q.x + fold * q.x / len;
+      const pz = q.z + fold * q.z / len;
+      // Escote en V: el frente se recorta con una línea en V que va de los
+      // costados del cuello hasta el centro, `vNeck` más abajo.
+      if (cfg.vNeck && pz > 0) {
+        const top = cfg.profile[last];
+        const lineY = top.y - cfg.vNeck * Math.max(0, 1 - Math.abs(px) / (top.a * 1.05));
+        if (y > lineY) y = lineY;
+      }
+      return new THREE.Vector3(px, y, pz);
     }
 
     function buildTorso(cfg) {
@@ -3129,8 +3149,10 @@
       // Cierre de cremallera al centro del frente (bata): dientes, cinta y tirador.
       if (cfg.zipper) {
         const neckY = torsoPoint(cfg, 1, 0.25).y - (cfg.zipper.inset || 0);
+        // Media cremallera (polo): solo un tramo desde el cuello.
+        const endY = cfg.zipper.length ? neckY - cfg.zipper.length : hemY;
         const teeth = [];
-        for (let i = 0; i <= 40; i++) teeth.push([0, THREE.MathUtils.lerp(neckY, hemY, i / 40)]);
+        for (let i = 0; i <= 40; i++) teeth.push([0, THREE.MathUtils.lerp(neckY, endY, i / 40)]);
         zipper.push(tunicLine(cfg, 'front', teeth, 0.0034, 0.0035));
         [-1, 1].forEach(sg => {
           const tape = teeth.map(([, y]) => [sg * 0.009, y]);
@@ -3284,7 +3306,7 @@
       } else if (cfg.collar === 'hood') {
         addCollar(buildHood(cfg));
       } else if (cfg.collar === 'mandarin') {
-        addCollar(buildMandarinCollar(cfg));
+        addCollar(buildMandarinCollar(cfg), !!cfg.collarRib);
       } else if (cfg.collar === 'revere') {
         // Cuello de solapa abierto en V, con vivo en el borde.
         const [stand, leaf, , standTop] = buildShirtCollar(cfg);
@@ -3684,12 +3706,14 @@
           return;
         }
         card.hidden = false;
-        document.getElementById('studioOptions').innerHTML = groupsFor(cfg.configurable).map(group => [group, OPTION_GROUPS[group]]).map(([group, g]) => `
+        document.getElementById('studioOptions').innerHTML = groupsFor(cfg.configurable)
+          .filter(group => choicesFor(cfg.configurable, group).length > 1)
+          .map(group => [group, OPTION_GROUPS[group]]).map(([group, g]) => `
           <div class="studio-field-label"><span>${g.label}</span></div>
           <div class="studio-option-group" role="group" aria-label="${g.label}">
             ${choicesFor(cfg.configurable, group).map(value => {
               const off = choiceDisabled(cfg.options, group, value);
-              return `<button type="button" class="studio-placement${cfg.options[group] === value ? ' active' : ''}" data-option-group="${group}" data-option-value="${value}"${off ? ' disabled title="Con solapa en V el cierre va oculto"' : ''}>${g.choices[value]}</button>`;
+              return `<button type="button" class="studio-placement${cfg.options[group] === value ? ' active' : ''}" data-option-group="${group}" data-option-value="${value}"${off ? ' disabled title="Con solapa en V el cierre va oculto"' : ''}>${choiceLabel(cfg.configurable, group, value)}</button>`;
             }).join('')}
           </div>`).join('');
       }
