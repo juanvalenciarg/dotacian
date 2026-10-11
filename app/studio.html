@@ -1449,17 +1449,59 @@
 
     // --- Prendas configurables (cuello, manga, cierre, bolsillos y color por zonas) ---
     const OPTION_GROUPS = {
-      cuello: { label: 'Cuello', choices: { camisero: 'Camisero', mao: 'Mao', polo: 'Polo', redondo: 'Redondo' } },
+      cuello: { label: 'Cuello', choices: { v: 'Solapa en V', camisero: 'Camisero', mao: 'Mao', polo: 'Polo', redondo: 'Redondo' } },
       manga: { label: 'Manga', choices: { corta: 'Corta', larga: 'Larga con puño' } },
-      cierre: { label: 'Cierre', choices: { botones: 'Botones', cremallera: 'Cremallera', ninguno: 'Sin cierre' } },
+      cierre: { label: 'Cierre', choices: { oculto: 'Oculto', botones: 'Botones', cremallera: 'Cremallera', ninguno: 'Sin cierre' } },
       bolsillos: { label: 'Bolsillos', choices: { ninguno: 'Ninguno', pecho: 'Pecho', inferiores: 'Inferiores', ambos: 'Pecho e inferiores' } }
     };
-    const COLLAR_TYPES = { camisero: 'shirt', mao: 'mandarin', polo: 'polo', redondo: 'rib' };
+    const COLLAR_TYPES = { v: 'revere', camisero: 'shirt', mao: 'mandarin', polo: 'polo', redondo: 'rib' };
+    // Opciones que ofrece cada prenda si no define las suyas (configurable.choices).
+    const DEFAULT_CHOICES = {
+      cuello: ['camisero', 'mao', 'polo', 'redondo'],
+      manga: ['corta', 'larga'],
+      cierre: ['botones', 'cremallera', 'ninguno'],
+      bolsillos: ['ninguno', 'pecho', 'inferiores', 'ambos']
+    };
     const COLOR_ZONES = {
       cuello: 'Cuello',
       puno: 'Puños y mangas',
-      detalle: 'Franjas de bolsillos'
+      detalle: 'Franjas de bolsillos',
+      vivos: 'Vivos'
     };
+
+    function choicesFor(conf, group) {
+      return (conf.choices && conf.choices[group]) || DEFAULT_CHOICES[group];
+    }
+
+    // Combinaciones que no se pueden fabricar: con solapa en V el cierre va oculto.
+    function choiceDisabled(o, group, value) {
+      return group === 'cierre' && o.cuello === 'v' && value !== 'oculto';
+    }
+
+    // Aplica las opciones a la parte superior (la prenda o la túnica del conjunto).
+    function applyTopOptions(top, o, conf) {
+      const t = { ...top };
+      t.collar = COLLAR_TYPES[o.cuello];
+      if (o.cuello !== 'v' && conf.target === 'top') {
+        // Fuera de la solapa en V, el cuello camisero / polo usa puntas normales.
+        t.collarTip = 1;
+        t.collarStandH = 0.026;
+      }
+      t.lapels = o.cuello === 'v' ? conf.lapels : null;
+      t.concealedPlacket = o.cuello === 'v' ? conf.concealedPlacket
+        : (o.cierre === 'oculto' ? { x: conf.concealedPlacket ? conf.concealedPlacket.x : 0.022 } : null);
+      t.sleeve = conf.sleeves[o.manga];
+      const open = o.cuello !== 'v';
+      t.placket = open && o.cierre === 'botones'
+        ? { halfWidth: 0.021, buttons: 7, spacing: 0.108, standButton: o.cuello === 'camisero' }
+        : false;
+      t.zipper = open && o.cierre === 'cremallera' ? { inset: 0.004 } : null;
+      const chest = o.bolsillos === 'pecho' || o.bolsillos === 'ambos';
+      const lower = o.bolsillos === 'inferiores' || o.bolsillos === 'ambos';
+      t.pocket = chest ? conf.chestPocket : null;
+      t.lowerPockets = lower ? conf.lowerPockets : null;
+      return t;
+    }
 
     // Arma la configuración de la prenda con las opciones elegidas. Las prendas
     // sin `configurable` se devuelven tal cual.
@@ -1469,19 +1511,19 @@
       const conf = base.configurable;
       const o = { ...conf.defaults };
       Object.keys(OPTION_GROUPS).forEach(g => {
-        if (opts && OPTION_GROUPS[g].choices[opts[g]]) o[g] = opts[g];
+        if (opts && choicesFor(conf, g).includes(opts[g])) o[g] = opts[g];
       });
-      const cfg = { ...base };
-      cfg.collar = COLLAR_TYPES[o.cuello];
-      cfg.sleeve = conf.sleeves[o.manga];
-      cfg.placket = o.cierre === 'botones'
-        ? { halfWidth: 0.021, buttons: 7, spacing: 0.108, standButton: o.cuello === 'camisero' }
-        : false;
-      cfg.zipper = o.cierre === 'cremallera' ? { inset: 0.004 } : null;
+      // Con solapa en V el cierre siempre va oculto.
+      if (o.cuello === 'v') o.cierre = 'oculto';
+      let cfg;
+      if (conf.target === 'top') {
+        // Conjunto (túnica + pantalón): las opciones cambian la túnica.
+        cfg = { ...base, set: { ...base.set, top: applyTopOptions(base.set.top, o, conf) } };
+      } else {
+        cfg = applyTopOptions(base, o, conf);
+      }
       const chest = o.bolsillos === 'pecho' || o.bolsillos === 'ambos';
-      const lower = o.bolsillos === 'inferiores' || o.bolsillos === 'ambos';
-      cfg.pocket = chest ? conf.chestPocket : null;
-      cfg.lowerPockets = lower ? conf.lowerPockets : null;
+      const top = conf.target === 'top' ? cfg.set.top : cfg;
       cfg.summary = {
         cuello: OPTION_GROUPS.cuello.choices[o.cuello],
         manga: OPTION_GROUPS.manga.choices[o.manga],
@@ -1493,14 +1535,16 @@
       if (chest) delete cfg.logoPlacements.pechoIzq;
       cfg.defaultPlacement = cfg.logoPlacements[base.defaultPlacement] ? base.defaultPlacement : Object.keys(cfg.logoPlacements)[0];
       cfg.options = o;
+      cfg.hasLowerPockets = !!top.lowerPockets;
       return cfg;
     }
 
     // Zonas de contraste que existen con las opciones elegidas.
     function zonesForConfig(cfg) {
       if (!cfg || !cfg.configurable) return [];
+      if (cfg.configurable.zones) return cfg.configurable.zones;
       const zones = ['cuello', 'puno'];
-      if (cfg.lowerPockets) zones.push('detalle');
+      if (cfg.hasLowerPockets) zones.push('detalle');
       return zones;
     }
 
@@ -1877,7 +1921,42 @@
       // Conjunto: túnica (a la izquierda) + pantalón de resorte (a la derecha).
       limpieza: {
         label: 'Uniforme de limpieza',
-        meta: 'Túnica con vivos + pantalón de resorte',
+        meta: 'Personalizable · Túnica con vivos + pantalón de resorte',
+        // Las opciones cambian la túnica (set.top); el pantalón sigue el color del cuerpo.
+        configurable: {
+          target: 'top',
+          choices: {
+            cuello: ['v', 'camisero', 'mao', 'redondo'],
+            cierre: ['oculto', 'botones', 'cremallera']
+          },
+          defaults: { cuello: 'v', manga: 'corta', cierre: 'oculto', bolsillos: 'inferiores' },
+          zones: ['cuello', 'puno', 'vivos'],
+          zoneDefaults: { vivos: 'blanco' },
+          lapels: { yTop: 0.405, yBottom: 0.235, inTop: 0.034, outTop: 0.145 },
+          concealedPlacket: { x: 0.022, fromY: 0.235 },
+          sleeves: {
+            corta: {
+              angleStart: deg(50), angleEnd: deg(50), length: 0.25, hemTilt: 0.06, forward: deg(12), start: -0.18,
+              rBase: [0.156, 0.148], rEnd: [0.126, 0.114], flare: false,
+              shoulder: new THREE.Vector3(0.333, 0.334, 0),
+              cuff: { length: 0.055, scale: 1.06, button: false, piping: true }
+            },
+            larga: {
+              angleStart: deg(50), angleEnd: deg(84), length: 0.86, hemTilt: 0, forward: deg(9), start: -0.18,
+              rBase: [0.156, 0.148], rEnd: [0.066, 0.062], flare: false,
+              shoulder: new THREE.Vector3(0.333, 0.334, 0),
+              cuff: { length: 0.075, scale: 1.1, button: false, piping: true }
+            }
+          },
+          chestPocket: { x0: 0.078, x1: 0.205, yTop: 0.165, yBottom: 0.02 },
+          lowerPockets: { yTop: -0.40, yBottom: -0.58, x0: 0.075, x1: 0.235 },
+          // Coordenadas con el desplazamiento de la túnica a la izquierda.
+          logoPlacements: {
+            pechoIzq: { x: -0.43 + 0.15, y: 0.17, defaultCm: 7 },
+            pechoDer: { x: -0.43 - 0.15, y: 0.17, defaultCm: 7 },
+            espalda: { x: -0.43, y: 0.06, defaultCm: 22 }
+          }
+        },
         summary: { cuello: 'Solapa en V con vivo', manga: 'Corta con puño y vivo', bolsillo: 'Inferiores con vivo' },
         colors: ['azulMarino', 'negro', 'gris'],
         thumbColor: 'azulMarino',
@@ -3217,7 +3296,7 @@
 
       // Zonas de color (cuello, puños, franjas de bolsillos): misma tela que el
       // cuerpo; si el cliente no elige otro color siguen el color del cuerpo.
-      const zoneColors = { cuello: null, puno: null, detalle: null };
+      const zoneColors = { cuello: null, puno: null, detalle: null, vivos: null };
       const zoneTargets = {};
       const zoneMaterials = {};
       const zoneRibMaterials = {};
@@ -3234,6 +3313,8 @@
           zoneMaterials[z].color.copy(c ? zoneTargets[z] : fabric.color);
           zoneRibMaterials[z].color.copy(zoneMaterials[z].color);
         });
+        // Vivos (ribetes): zona "vivos"; si no tiene color, siguen el cuerpo.
+        pipingMaterial.color.copy(zoneMaterials.vivos.color);
       }
 
       // Cremallera: dientes y tirador metálicos oscuros.
@@ -3416,7 +3497,10 @@
         document.getElementById('studioOptions').innerHTML = Object.entries(OPTION_GROUPS).map(([group, g]) => `
           <div class="studio-field-label"><span>${g.label}</span></div>
           <div class="studio-option-group" role="group" aria-label="${g.label}">
-            ${Object.entries(g.choices).map(([value, label]) => `<button type="button" class="studio-placement${cfg.options[group] === value ? ' active' : ''}" data-option-group="${group}" data-option-value="${value}">${label}</button>`).join('')}
+            ${choicesFor(cfg.configurable, group).map(value => {
+              const off = choiceDisabled(cfg.options, group, value);
+              return `<button type="button" class="studio-placement${cfg.options[group] === value ? ' active' : ''}" data-option-group="${group}" data-option-value="${value}"${off ? ' disabled title="Con solapa en V el cierre va oculto"' : ''}>${g.choices[value]}</button>`;
+            }).join('')}
           </div>`).join('');
       }
 
@@ -3437,7 +3521,7 @@
 
       document.getElementById('studioOptions').addEventListener('click', e => {
         const btn = e.target.closest('[data-option-group]');
-        if (btn) setOption(btn.dataset.optionGroup, btn.dataset.optionValue);
+        if (btn && !btn.disabled) setOption(btn.dataset.optionGroup, btn.dataset.optionValue);
       });
 
       // --- Color por zonas ---
