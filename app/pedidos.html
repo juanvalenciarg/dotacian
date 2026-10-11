@@ -907,6 +907,25 @@
         <div id="ordersFilters" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;"></div>
         <div id="ordersList" style="display: flex; flex-direction: column; gap: 1rem; max-width: 960px;"></div>
       </div>
+      <!-- Confirmar acción del cliente sobre el pedido -->
+      <div class="modal-overlay" id="orderConfirmModal" style="z-index: 1100;">
+        <div class="modal-content" style="max-width: 440px; text-align: center;">
+          <div id="orderConfirmIcon"
+            style="width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; background: #ECFDF5;">
+            <svg width="28" height="28" fill="none" stroke="#059669" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h2 id="orderConfirmTitle"
+            style="font-family: var(--font-family-heading); color: var(--color-navy); font-size: 1.35rem; margin-bottom: 0.5rem;"></h2>
+          <p id="orderConfirmText" style="color: var(--color-text-secondary); font-size: 0.875rem; line-height: 1.5; margin: 0 0 1.5rem;"></p>
+          <div style="display: flex; gap: 0.75rem;">
+            <button type="button" class="btn btn-outline" style="flex: 1; font-size: 0.875rem; padding: 0.7rem;"
+              onclick="closeOrderConfirm(false)">Cancelar</button>
+            <button type="button" id="orderConfirmBtn" class="btn btn-primary"
+              style="flex: 1; font-size: 0.875rem; padding: 0.7rem; border: none; color: white; background: #059669;"
+              onclick="closeOrderConfirm(true)"></button>
+          </div>
+        </div>
+      </div>
     </main>
   </div>
 
@@ -996,6 +1015,117 @@
         const check = cls === 'done' ? '✓' : '';
         return `<div class="order-step ${cls}"><div class="order-step-dot">${check}</div><div class="order-step-label">${s.label}</div></div>`;
       }).join('')}</div>`;
+    }
+
+    // ── Acciones del cliente (RPC client_order_action, ver
+    //    supabase_migration_orders_client_actions.sql) ─────────────
+    const ORDER_ACTIONS = {
+      aprobar_muestras: { label: 'Aprobar muestras', primary: true, confirm: ['Aprobar muestras', 'Al aprobarlas, Dotacian inicia la producción de tu pedido.', 'Sí, aprobar'] },
+      cambios_muestras: { label: 'Pedir cambios en las muestras', comment: '¿Qué quieres cambiar de las muestras? Tela, color, talla, logo...' },
+      confirmar_recibido: { label: 'Confirmar recibido', primary: true, confirm: ['Confirmar recibido', 'Confirma que recibiste el pedido completo. Quedará como Entregado.', 'Sí, lo recibí'] },
+      reportar_problema: { label: 'Reportar un problema', danger: true, comment: 'Cuéntanos qué pasó: faltantes, tallas equivocadas, daños, retrasos...' }
+    };
+
+    function actionsForStage(stage) {
+      if (stage === 'muestras') return ['aprobar_muestras', 'cambios_muestras'];
+      if (stage === 'despachado') return ['confirmar_recibido', 'reportar_problema'];
+      if (stage === 'entregado') return ['reportar_problema'];
+      return [];
+    }
+
+    function renderOrderActions(o) {
+      const actions = actionsForStage(o.stage);
+      if (!actions.length) return '';
+      const hint = {
+        muestras: 'Cuando recibas las muestras, apruébalas o pide cambios.',
+        despachado: 'Tu pedido va en camino. Confírmanos cuando lo recibas.',
+        entregado: '¿Algo no llegó bien? Avísanos.'
+      }[o.stage] || '';
+      return `
+        <div style="margin-top: 0.75rem; padding: 0.85rem; border-radius: 12px; border: 1px solid #BAE6FD; background: #F0F9FF;">
+          <div style="font-size: 0.8125rem; color: #075985; margin-bottom: 0.6rem;">${hint}</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+            ${actions.map(key => {
+              const a = ORDER_ACTIONS[key];
+              const style = a.primary
+                ? 'background: #0F172A; color: white; border: none;'
+                : (a.danger ? 'background: white; color: #B91C1C; border: 1.5px solid #FECACA;' : 'background: white; color: var(--color-navy); border: 1.5px solid var(--color-border);');
+              return `<button type="button" onclick="startOrderAction('${o.id}', '${key}')"
+                style="${style} padding: 0.5rem 0.95rem; border-radius: 10px; font-size: 0.8125rem; font-weight: 700; cursor: pointer;">${a.label}</button>`;
+            }).join('')}
+          </div>
+          <div id="orderComment-${o.id}" style="display: none; margin-top: 0.6rem;">
+            <textarea id="orderCommentText-${o.id}"
+              style="width: 100%; height: 70px; padding: 0.6rem 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.8125rem; resize: none; font-family: inherit;"></textarea>
+            <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.4rem;">
+              <button type="button" onclick="document.getElementById('orderComment-${o.id}').style.display = 'none'"
+                style="background: white; border: 1.5px solid var(--color-border); color: var(--color-navy); padding: 0.45rem 0.9rem; border-radius: 10px; font-size: 0.8rem; font-weight: 700; cursor: pointer;">Cancelar</button>
+              <button type="button" id="orderCommentSend-${o.id}"
+                style="background: #0F172A; border: none; color: white; padding: 0.45rem 0.9rem; border-radius: 10px; font-size: 0.8rem; font-weight: 700; cursor: pointer;">Enviar</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    let _orderConfirmResolve = null;
+
+    function askOrderConfirm([title, text, button]) {
+      document.getElementById('orderConfirmTitle').textContent = title;
+      document.getElementById('orderConfirmText').textContent = text;
+      document.getElementById('orderConfirmBtn').textContent = button;
+      document.getElementById('orderConfirmModal').classList.add('active');
+      return new Promise(resolve => { _orderConfirmResolve = resolve; });
+    }
+
+    function closeOrderConfirm(confirmed) {
+      document.getElementById('orderConfirmModal').classList.remove('active');
+      if (_orderConfirmResolve) _orderConfirmResolve(confirmed);
+      _orderConfirmResolve = null;
+    }
+
+    async function startOrderAction(orderId, key) {
+      const a = ORDER_ACTIONS[key];
+      if (a.comment) {
+        const box = document.getElementById(`orderComment-${orderId}`);
+        const text = document.getElementById(`orderCommentText-${orderId}`);
+        text.placeholder = a.comment;
+        text.value = '';
+        box.style.display = 'block';
+        text.focus();
+        document.getElementById(`orderCommentSend-${orderId}`).onclick = () => {
+          const comment = text.value.trim();
+          if (!comment) {
+            showToast('Falta el comentario', 'Escribe el detalle para que Dotacian pueda ayudarte.', 'error');
+            return;
+          }
+          runOrderAction(orderId, key, comment);
+        };
+        return;
+      }
+      if (a.confirm && !(await askOrderConfirm(a.confirm))) return;
+      runOrderAction(orderId, key, '');
+    }
+
+    async function runOrderAction(orderId, key, comment) {
+      try {
+        const { error } = await _supabase.rpc('client_order_action', { p_id: orderId, p_action: key, p_comment: comment });
+        if (error) throw error;
+        showToast({
+          aprobar_muestras: 'Muestras aprobadas',
+          cambios_muestras: 'Cambios enviados',
+          confirmar_recibido: '¡Pedido recibido!',
+          reportar_problema: 'Problema reportado'
+        }[key], {
+          aprobar_muestras: 'Dotacian iniciará la producción de tu pedido.',
+          cambios_muestras: 'Dotacian revisará tus comentarios sobre las muestras.',
+          confirmar_recibido: 'Gracias por confirmar la entrega.',
+          reportar_problema: 'Dotacian revisará tu reporte y se pondrá en contacto.'
+        }[key]);
+        await loadOrders();
+      } catch (err) {
+        console.error('Error actualizando el pedido:', err);
+        showToast('Error', 'No se pudo actualizar el pedido. Intenta de nuevo.', 'error');
+      }
     }
 
     function setOrdersFilter(key) {
@@ -1099,6 +1229,8 @@
 
             ${o.last_note ? `<div style="margin-top: 0.75rem; padding: 0.7rem 0.875rem; border-radius: 10px; background: #F8FAFC; border: 1px solid var(--color-border); font-size: 0.8125rem; color: #334155;"><strong style="color: var(--color-navy);">Última actualización:</strong> ${escapeOrderHtml(o.last_note)}</div>` : ''}
 
+            ${renderOrderActions(o)}
+
             <details style="margin-top: 0.75rem;">
               <summary style="cursor: pointer; font-size: 0.8125rem; font-weight: 700; color: var(--color-cyan);">Ver detalle e historial</summary>
               ${pricing ? `
@@ -1124,7 +1256,7 @@
                 ${history.length ? history.map(h => `
                   <div>
                     <div style="font-size: 0.8125rem; font-weight: 700; color: var(--color-navy);">${escapeOrderHtml(ORDER_STAGE_LABELS[h.stage] || h.stage)}
-                      <span style="font-weight: 500; color: #94A3B8; font-size: 0.75rem;"> · ${formatOrderDate(h.at, true)}</span></div>
+                      <span style="font-weight: 500; color: #94A3B8; font-size: 0.75rem;"> · ${formatOrderDate(h.at, true)} · ${h.by === 'cliente' ? 'Tú' : 'Dotacian'}</span></div>
                     ${h.note ? `<div style="font-size: 0.8rem; color: #475569;">${escapeOrderHtml(h.note)}</div>` : ''}
                   </div>`).join('') : '<div style="font-size: 0.8rem; color: #94A3B8;">Sin movimientos todavía.</div>'}
               </div>

@@ -518,6 +518,7 @@
                 <div class="form-section-title">
                   <div class="form-section-title-label">Estado del pedido</div>
                 </div>
+                <div id="orderClientAlert" style="display: none; margin-bottom: 0.85rem; padding: 0.75rem 0.875rem; border-radius: 10px; background: #FFFBEB; border: 1px solid #FDE68A; color: #92400E; font-size: 0.8125rem; line-height: 1.45;"></div>
                 <div id="orderSteps"></div>
 
                 <div class="form-grid" style="margin-top: 1rem;">
@@ -718,7 +719,8 @@
           <td style="font-weight: 700; white-space: nowrap;">${formatOrderNumber(o.order_number)}</td>
           <td><span class="user-name">${escapeOrderHtml(o.company_name || 'Empresa')}</span></td>
           <td style="white-space: nowrap;">${formatQuoteNumber(o.quote_number)}</td>
-          <td>${stageBadge(o.stage)}</td>
+          <td>${stageBadge(o.stage)}${o.client_alert
+            ? '<br><span class="role-badge" style="background:#FFFBEB; color:#92400E; margin-top: 4px; display: inline-block;">Respuesta del cliente</span>' : ''}</td>
           <td>${o.estimated_delivery ? formatOrderDate(o.estimated_delivery) : '<span style="color: #94A3B8;">Sin definir</span>'}</td>
           <td>${formatOrderDate(o.updated_at)}</td>`;
         tbody.appendChild(tr);
@@ -733,6 +735,14 @@
       document.getElementById('cardOrderNumber').textContent = `No. ${formatOrderNumber(o.order_number)} · Cotización ${formatQuoteNumber(o.quote_number)}`;
       document.getElementById('cardOrderCompany').textContent = o.company_name || 'Empresa';
       document.getElementById('orderSteps').innerHTML = renderOrderSteps(o);
+      const alertBox = document.getElementById('orderClientAlert');
+      if (o.client_alert) {
+        alertBox.innerHTML = `<strong>Respuesta del cliente</strong> · ${escapeOrderHtml(formatOrderDate(o.client_alert_at, true))}<div style="margin-top: 0.3rem;">${escapeOrderHtml(o.client_alert)}</div>
+          <div style="margin-top: 0.35rem; font-size: 0.75rem; opacity: 0.8;">Al guardar el pedido, este aviso se marca como atendido.</div>`;
+        alertBox.style.display = 'block';
+      } else {
+        alertBox.style.display = 'none';
+      }
 
       const stageSelect = document.getElementById('orderStageSelect');
       stageSelect.innerHTML = [...stagesForOrder(o), { key: 'cancelado', label: 'Cancelado' }]
@@ -748,7 +758,7 @@
       document.getElementById('orderHistory').innerHTML = history.length ? history.map(h => `
         <div>
           <div style="font-size: 0.8125rem; font-weight: 700; color: #0F172A;">${escapeOrderHtml(ORDER_STAGE_LABELS[h.stage] || h.stage)}
-            <span style="font-weight: 500; color: #94A3B8; font-size: 0.75rem;"> · ${formatOrderDate(h.at, true)}</span></div>
+            <span style="font-weight: 500; color: #94A3B8; font-size: 0.75rem;"> · ${formatOrderDate(h.at, true)} · ${h.by === 'cliente' ? 'Cliente' : 'Dotacian'}</span></div>
           ${h.note ? `<div style="font-size: 0.8rem; color: #475569;">${escapeOrderHtml(h.note)}</div>` : ''}
         </div>`).join('') : '<div style="font-size: 0.8rem; color: #94A3B8;">Sin movimientos.</div>';
 
