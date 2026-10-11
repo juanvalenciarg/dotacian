@@ -1222,8 +1222,15 @@
     };
     const DESIGN_PLACEMENT_LABELS = {
       pechoIzq: 'Pecho izquierdo', pechoDer: 'Pecho derecho', pechoCentro: 'Centro del pecho',
-      espalda: 'Espalda', bolsilloTrasero: 'Bolsillo trasero', musloIzq: 'Muslo izquierdo'
+      espalda: 'Espalda', bolsilloTrasero: 'Bolsillo trasero', musloIzq: 'Muslo izquierdo',
+      nuca: 'Nuca', mangaIzq: 'Manga izquierda', mangaDer: 'Manga derecha'
     };
+
+    // Logos de un diseño: la lista `logos` o, en diseños anteriores, el logo único.
+    function designLogos(d) {
+      if (d && Array.isArray(d.logos) && d.logos.length) return d.logos.filter(l => l && l.path);
+      return d && d.logo_path ? [{ path: d.logo_path, nombre: d.logo_nombre, ubicacion: d.logo_ubicacion, ancho_cm: d.logo_ancho_cm }] : [];
+    }
 
     // Opciones de las prendas configurables (studio_designs.opciones), en texto.
     const DESIGN_OPTION_TEXT = {
@@ -1292,7 +1299,7 @@
         const designs = names.map(name => ({ name, design: (data || []).find(d => d.nombre === name) }));
         quoteDesignsById = {};
         designs.forEach(x => { if (x.design) quoteDesignsById[x.design.id] = x.design; });
-        const logoPaths = designs.map(x => x.design && x.design.logo_path).filter(Boolean);
+        const logoPaths = designs.flatMap(x => designLogos(x.design).map(l => l.path));
         const logoUrls = {};
         if (logoPaths.length) {
           const { data: signed } = await _supabase.storage.from('studio-logos').createSignedUrls(logoPaths, 3600);
@@ -1304,16 +1311,14 @@
             return `<div class="quote-design-card" style="color: #92400E; background: #FFFBEB; border-color: #FDE68A; font-size: 0.8125rem;">
               El diseño "${escapeQuoteHtml(name)}" ya no existe en el Studio de la empresa (pudo haberse borrado o renombrado).</div>`;
           }
-          const logoUrl = d.logo_path ? logoUrls[d.logo_path] : null;
+          const dLogos = designLogos(d);
           const extra = describeDesignOptions(d.opciones, DESIGN_COLOR_LABELS);
           const rows = [
             ['Prenda', DESIGN_GARMENT_LABELS[d.prenda] || d.prenda],
             ['Color', DESIGN_COLOR_LABELS[d.color] || d.color],
             ...(extra.opciones ? [['Opciones', extra.opciones]] : []),
             ...(extra.contraste ? [['Contraste', extra.contraste]] : []),
-            ['Logo', d.logo_path
-              ? `${DESIGN_PLACEMENT_LABELS[d.logo_ubicacion] || d.logo_ubicacion || 'Ubicación por definir'}${d.logo_ancho_cm ? ` · ${d.logo_ancho_cm} cm de ancho` : ''}`
-              : 'Sin logo']
+            ...(dLogos.length ? [] : [['Logos', 'Sin logo']])
           ];
           return `
             <div class="quote-design-card">
@@ -1326,12 +1331,21 @@
                     style="padding: 0.3rem 0.7rem; font-size: 0.75rem; border-radius: 8px; flex-shrink: 0;">Ver en 3D</button>
                 </div>
                 ${rows.map(([k, v]) => `<div style="font-size: 0.8rem; color: #475569;"><span style="color: #94A3B8;">${k}:</span> ${escapeQuoteHtml(v)}</div>`).join('')}
-                ${logoUrl ? `
+                ${dLogos.map(l => {
+                  const url = logoUrls[l.path];
+                  const where = `${DESIGN_PLACEMENT_LABELS[l.ubicacion] || l.ubicacion || 'Ubicación por definir'}${l.ancho_cm ? ` · ${l.ancho_cm} cm` : ''}`;
+                  return `
                 <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: 0.35rem;">
-                  <div class="quote-design-logo"><img src="${escapeQuoteAttr(logoUrl)}" alt="Logo"></div>
-                  <a href="${escapeQuoteAttr(logoUrl)}" target="_blank" rel="noopener" download="${escapeQuoteAttr(d.logo_nombre || 'logo')}"
-                    style="font-size: 0.8rem; font-weight: 700; color: #0891B2; text-decoration: none;">Descargar logo${d.logo_nombre ? ` (${escapeQuoteHtml(d.logo_nombre)})` : ''}</a>
-                </div>` : (d.logo_path ? '<div style="font-size: 0.75rem; color: #B91C1C;">No se pudo cargar el logo.</div>' : '')}
+                  <div class="quote-design-logo">${url ? `<img src="${escapeQuoteAttr(url)}" alt="Logo">` : ''}</div>
+                  <div style="min-width: 0;">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: #0F172A;">${escapeQuoteHtml(where)}</div>
+                    ${url
+                      ? `<a href="${escapeQuoteAttr(url)}" target="_blank" rel="noopener" download="${escapeQuoteAttr(l.nombre || 'logo')}"
+                          style="font-size: 0.78rem; font-weight: 700; color: #0891B2; text-decoration: none;">Descargar logo${l.nombre ? ` (${escapeQuoteHtml(l.nombre)})` : ''}</a>`
+                      : '<span style="font-size: 0.75rem; color: #B91C1C;">No se pudo cargar el logo.</span>'}
+                  </div>
+                </div>`;
+                }).join('')}
               </div>
             </div>`;
         }).join('');

@@ -913,6 +913,23 @@
       background: #FEF2F2;
     }
 
+    /* Varios logos por prenda */
+    .studio-logo-item {
+      padding-bottom: 0.85rem;
+      margin-bottom: 0.85rem;
+      border-bottom: 1px dashed var(--color-border);
+    }
+
+    .studio-logo-item .studio-placements {
+      display: grid;
+      gap: 0.4rem;
+    }
+
+    .studio-placement:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
     /* Prendas configurables: opciones y color por zonas */
     .studio-option-group {
       display: grid;
@@ -1303,26 +1320,15 @@
             </div>
 
             <div class="studio-card">
-              <div class="studio-card-label">Logo</div>
+              <div class="studio-card-label">Logos</div>
+              <div id="studioLogoList"></div>
               <input type="file" id="studioLogoInput" accept="image/png,image/jpeg,image/svg+xml,image/webp" hidden>
               <button type="button" class="studio-logo-drop" id="studioLogoDrop">
                 <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                Subir logo del cliente
-                <small>PNG, JPG, SVG o WEBP · máx. 5 MB</small>
+                <span id="studioLogoDropLabel">Subir logo del cliente</span>
+                <small>PNG, JPG, SVG o WEBP · máx. 5 MB · hasta 5 logos</small>
               </button>
-              <div class="studio-logo-file" id="studioLogoFile" hidden>
-                <img class="studio-logo-thumb" id="studioLogoThumb" alt="Logo cargado">
-                <span class="studio-logo-name" id="studioLogoName"></span>
-                <button type="button" class="studio-logo-remove" id="studioLogoRemove">Quitar</button>
-              </div>
               <p class="studio-logo-error" id="studioLogoError" hidden></p>
-
-              <div id="studioLogoControls" hidden>
-                <div class="studio-field-label"><span>Ubicación</span></div>
-                <div class="studio-placements" id="studioPlacements" role="group" aria-label="Ubicación del logo"></div>
-                <div class="studio-field-label"><span>Ancho del logo</span><span id="studioLogoSizeLabel">9 cm</span></div>
-                <input type="range" class="studio-range" id="studioLogoSize" min="5" max="30" step="1" value="9">
-              </div>
               <p class="studio-logo-hint">Para mejores resultados usa un PNG con fondo transparente.</p>
             </div>
 
@@ -1336,7 +1342,7 @@
                 <div id="studioSummaryPocketRow" hidden><span>Bolsillo</span><span id="studioSummaryPocket"></span></div>
                 <div><span>Color</span><span id="studioSummaryColor">Blanco</span></div>
                 <div id="studioSummaryContrastRow" hidden><span>Contraste</span><span id="studioSummaryContrast" style="text-align: right;"></span></div>
-                <div><span>Logo</span><span id="studioSummaryLogo">Sin logo</span></div>
+                <div><span>Logos</span><span id="studioSummaryLogo" style="text-align: right;">Sin logo</span></div>
               </div>
             </div>
 
@@ -1510,8 +1516,28 @@
       pechoCentro: { label: 'Centro del pecho', short: 'Centro', side: 'front' },
       espalda: { label: 'Espalda', short: 'Espalda', side: 'back' },
       bolsilloTrasero: { label: 'Bolsillo trasero', short: 'Bolsillo tras.', side: 'back' },
-      musloIzq: { label: 'Muslo izquierdo', short: 'Muslo izq.', side: 'front' }
+      musloIzq: { label: 'Muslo izquierdo', short: 'Muslo izq.', side: 'front' },
+      nuca: { label: 'Nuca', short: 'Nuca', side: 'back' },
+      // Mangas: la izquierda de quien la usa queda a la derecha vista de frente (+x).
+      mangaIzq: { label: 'Manga izquierda', short: 'Manga izq.', side: 'right' },
+      mangaDer: { label: 'Manga derecha', short: 'Manga der.', side: 'left' }
     };
+
+    const MAX_LOGOS = 5;
+
+    // Ubicaciones de logo de la prenda: las propias (logoPlacements) más nuca y
+    // mangas en las prendas superiores.
+    function logoSpots(cfg) {
+      const spots = { ...cfg.logoPlacements };
+      if (cfg.pants || cfg.set || !cfg.sleeve) return spots;
+      if (cfg.collar !== 'hood' && cfg.profile && !spots.nuca) {
+        spots.nuca = { x: 0, y: cfg.profile[cfg.profile.length - 1].y - 0.11, defaultCm: 6 };
+      }
+      const y = cfg.sleeve.shoulder.y - 0.085;
+      spots.mangaIzq = { sleeve: 1, y, defaultCm: 6 };
+      spots.mangaDer = { sleeve: -1, y, defaultCm: 6 };
+      return spots;
+    }
 
     // Ancho del torso modelado (≈0.68 unidades) equivale a ~52 cm de una talla M.
     const CM_PER_UNIT = 76;
@@ -2953,7 +2979,9 @@
         const axis = buildSleeveAxis(sl, side);
         if (sl.cuff) {
           const cuffStart = 1 - sl.cuff.length / sl.length;
-          fabricParts.push(buildSleeve(sl, axis, side, sl.start, cuffStart + 0.01, 1, 90));
+          const sleeveGeo = buildSleeve(sl, axis, side, sl.start, cuffStart + 0.01, 1, 90);
+          sleeveGeo.userData.sleeve = true; // los logos de manga se proyectan aquí
+          fabricParts.push(sleeveGeo);
           const cuff = buildSleeve(sl, axis, side, cuffStart, 1, sl.cuff.scale, 8);
           cuffParts.push({ geo: cuff, rib: !!sl.cuff.rib });
           if (sl.cuff.piping) pipingParts.push(buildRim(sleeveRing(sl, axis, side, cuffStart, sl.cuff.scale), 0.0045));
@@ -2973,7 +3001,9 @@
           const normal = pOut.clone().sub(center).normalize();
           buttonParts.push({ point: p, normal, radius: 0.008 });
         } else {
-          fabricParts.push(buildSleeve(sl, axis, side, sl.start, 1));
+          const sleeveGeo = buildSleeve(sl, axis, side, sl.start, 1);
+          sleeveGeo.userData.sleeve = true;
+          fabricParts.push(sleeveGeo);
           fabricParts.push(buildRim(sleeveRing(sl, axis, side, 1), 0.0055));
         }
       });
@@ -3228,7 +3258,7 @@
 
       const shirt = new THREE.Group();
       scene.add(shirt);
-      const garment = { key: null, cfg: null, torsoMesh: null, pocketMesh: null, extraMeshes: [] };
+      const garment = { key: null, cfg: null, torsoMesh: null, pocketMesh: null, extraMeshes: [], sleeveMeshes: [] };
 
       function disposeShirt() {
         [...shirt.children].forEach(child => {
@@ -3241,6 +3271,7 @@
         disposeShirt();
         const built = buildGarmentParts(cfg);
         garment.extraMeshes = [];
+        garment.sleeveMeshes = [];
         built.fabricParts.forEach(geo => {
           const mesh = new THREE.Mesh(geo, fabric);
           mesh.castShadow = true;
@@ -3249,6 +3280,7 @@
           if (geo === built.torso) garment.torsoMesh = mesh;
           if (geo === built.pocket) garment.pocketMesh = mesh;
           if (built.decalExtra && built.decalExtra.includes(geo)) garment.extraMeshes.push(mesh);
+          if (geo.userData.sleeve) garment.sleeveMeshes.push(mesh);
         });
         if (!built.pocket) garment.pocketMesh = null;
         built.ribParts.forEach(geo => {
@@ -3393,15 +3425,8 @@
         if (!cfg || !cfg.configurable || cfg.options[group] === value) return;
         const next = garmentConfig(garment.key, { ...cfg.options, [group]: value });
         buildShirt(garment.key, next);
-        if (!next.logoPlacements[logoState.placement]) {
-          logoState.placement = next.defaultPlacement;
-          logoState.sizeCm = next.logoPlacements[logoState.placement].defaultCm;
-          logoSize.value = logoState.sizeCm;
-          logoSizeLabel.textContent = `${logoState.sizeCm} cm`;
-        }
-        syncPlacementButtons();
-        placeLogo();
-        updateLogoSummary();
+        // Los logos siguen en su lugar salvo que la opción quite esa ubicación.
+        reassignLogoPlacements(next);
         renderOptionControls();
         renderZoneControls();
         updateDesignSummary();
@@ -3541,60 +3566,72 @@
       requestAnimationFrame(tick);
 
 
-      // --- Logo ---
-      // La imagen se procesa solo en el navegador: se dibuja en un canvas y se
-      // proyecta sobre el torso con un "decal" que sigue la curvatura de la tela.
+      // --- Logos ---
+      // Cada logo se procesa solo en el navegador: se dibuja en un canvas y se
+      // proyecta sobre la prenda con un "decal" que sigue la curvatura de la tela.
       // file: archivo original (para subirlo al guardar); storedPath: ruta en el
-      // bucket studio-logos si este logo ya está guardado.
-      const logoState = { texture: null, aspect: 1, placement: 'pechoIzq', sizeCm: GARMENTS.camiseta.logoPlacements.pechoIzq.defaultCm, name: '', file: null, storedPath: null };
-      const logoMaterial = new THREE.MeshStandardMaterial({
-        transparent: true,
-        depthWrite: false,
-        polygonOffset: true,
-        polygonOffsetFactor: -4,
-        roughness: 0.85,
-        metalness: 0,
-        envMapIntensity: 0.4,
-        side: THREE.DoubleSide
-      });
-      let logoMeshes = [];
+      // bucket studio-logos si ese logo ya está guardado.
+      const logos = [];
+      let logoSeq = 0;
       const raycaster = new THREE.Raycaster();
 
       const logoInput = document.getElementById('studioLogoInput');
       const logoDrop = document.getElementById('studioLogoDrop');
-      const logoFileRow = document.getElementById('studioLogoFile');
-      const logoControls = document.getElementById('studioLogoControls');
+      const logoDropLabel = document.getElementById('studioLogoDropLabel');
+      const logoList = document.getElementById('studioLogoList');
       const logoError = document.getElementById('studioLogoError');
-      const logoSize = document.getElementById('studioLogoSize');
-      const logoSizeLabel = document.getElementById('studioLogoSizeLabel');
 
       function showLogoError(msg) {
         logoError.textContent = msg;
         logoError.hidden = !msg;
       }
 
+      function newLogoMaterial(tex) {
+        return new THREE.MeshStandardMaterial({
+          map: tex,
+          transparent: true,
+          depthWrite: false,
+          polygonOffset: true,
+          polygonOffsetFactor: -4,
+          roughness: 0.85,
+          metalness: 0,
+          envMapIntensity: 0.4,
+          side: THREE.DoubleSide
+        });
+      }
+
       function updateLogoSummary() {
         const el = document.getElementById('studioSummaryLogo');
-        el.textContent = logoState.texture
-          ? `${LOGO_PLACEMENTS[logoState.placement].label} · ${logoState.sizeCm} cm`
+        el.textContent = logos.length
+          ? logos.map(l => `${LOGO_PLACEMENTS[l.placement].short} ${l.sizeCm} cm`).join(' · ')
           : 'Sin logo';
       }
 
-      function placeLogo() {
-        logoMeshes.forEach(m => {
+      function clearLogoMeshes(logo) {
+        logo.meshes.forEach(m => {
           shirt.remove(m);
           m.geometry.dispose();
         });
-        logoMeshes = [];
-        if (!logoState.texture) return;
+        logo.meshes = [];
+      }
 
-        const spot = garment.cfg.logoPlacements[logoState.placement];
+      function placeOneLogo(logo) {
+        clearLogoMeshes(logo);
+        const spot = logoSpots(garment.cfg)[logo.placement];
         if (!spot) return;
-        const front = LOGO_PLACEMENTS[logoState.placement].side === 'front';
-        const origin = new THREE.Vector3(spot.x, spot.y, front ? 2 : -2);
-        const dir = new THREE.Vector3(0, 0, front ? -1 : 1);
-        // El logo se proyecta sobre el torso y, si existe, sobre el bolsillo.
-        const targets = [garment.torsoMesh, garment.pocketMesh, ...garment.extraMeshes].filter(Boolean);
+        let origin, dir, targets;
+        if (spot.sleeve) {
+          // Manga: se proyecta desde el costado sobre la parte alta de la manga.
+          origin = new THREE.Vector3(spot.sleeve * 2, spot.y, 0);
+          dir = new THREE.Vector3(-spot.sleeve, 0, 0);
+          targets = garment.sleeveMeshes;
+        } else {
+          const front = LOGO_PLACEMENTS[logo.placement].side === 'front';
+          origin = new THREE.Vector3(spot.x, spot.y, front ? 2 : -2);
+          dir = new THREE.Vector3(0, 0, front ? -1 : 1);
+          // El logo se proyecta sobre el torso y, si existe, sobre el bolsillo.
+          targets = [garment.torsoMesh, garment.pocketMesh, ...garment.extraMeshes].filter(Boolean);
+        }
         targets.forEach(m => m.updateMatrixWorld());
         raycaster.set(origin, dir);
         const hit = raycaster.intersectObjects(targets, false)[0];
@@ -3610,19 +3647,92 @@
         helper.position.copy(hit.point);
         helper.lookAt(hit.point.clone().add(normal));
 
-        const width = logoState.sizeCm / CM_PER_UNIT;
-        const height = width / logoState.aspect;
-        targets.forEach(target => {
+        const width = logo.sizeCm / CM_PER_UNIT;
+        const height = width / logo.aspect;
+        const hitTargets = spot.sleeve ? [hit.object] : targets;
+        hitTargets.forEach(target => {
           const geo = new DecalGeometry(target, hit.point, helper.rotation, new THREE.Vector3(width, height, 0.2));
           if (!geo.attributes.position || geo.attributes.position.count === 0) {
             geo.dispose();
             return;
           }
-          const mesh = new THREE.Mesh(geo, logoMaterial);
+          const mesh = new THREE.Mesh(geo, logo.material);
           mesh.renderOrder = target === garment.pocketMesh ? 2 : 1;
           shirt.add(mesh);
-          logoMeshes.push(mesh);
+          logo.meshes.push(mesh);
         });
+      }
+
+      function placeLogo() {
+        logos.forEach(placeOneLogo);
+      }
+
+      function viewForPlacement(key) {
+        const side = LOGO_PLACEMENTS[key].side;
+        return side === 'front' || side === 'back' || side === 'left' || side === 'right' ? side : 'front';
+      }
+
+      function freePlacement(cfg, except) {
+        const spots = logoSpots(cfg);
+        const used = new Set(logos.filter(l => l !== except).map(l => l.placement));
+        return [cfg.defaultPlacement, ...Object.keys(spots)].find(k => spots[k] && !used.has(k)) || null;
+      }
+
+      // Tras cambiar de prenda u opciones: cada logo conserva su ubicación si
+      // sigue existiendo y está libre; si no, toma la primera libre (o se quita).
+      function reassignLogoPlacements(cfg) {
+        const spots = logoSpots(cfg);
+        const used = new Set();
+        // 1) Se quedan donde están los que siguen siendo válidos.
+        const pending = [];
+        logos.forEach(l => {
+          if (spots[l.placement] && !used.has(l.placement)) used.add(l.placement);
+          else pending.push(l);
+        });
+        // 2) Los demás toman una ubicación libre; si no queda ninguna, se quitan.
+        let removed = 0;
+        pending.forEach(l => {
+          const key = [cfg.defaultPlacement, ...Object.keys(spots)].find(k => spots[k] && !used.has(k));
+          if (!key) {
+            removeLogo(l.id, true);
+            removed++;
+            return;
+          }
+          l.placement = key;
+          l.sizeCm = spots[key].defaultCm;
+          used.add(key);
+        });
+        renderLogoList();
+        placeLogo();
+        updateLogoSummary();
+        showLogoError(removed
+          ? `Esta prenda tiene ${Object.keys(spots).length} ubicaciones para logo: se ${removed === 1 ? 'quitó 1 logo' : `quitaron ${removed} logos`}.`
+          : '');
+      }
+
+      function renderLogoList() {
+        const spots = logoSpots(garment.cfg);
+        const keys = Object.keys(spots);
+        logoList.innerHTML = logos.map((l, i) => {
+          const used = new Set(logos.filter(o => o !== l).map(o => o.placement));
+          return `
+            <div class="studio-logo-item" data-logo-id="${l.id}">
+              <div class="studio-logo-file">
+                <img class="studio-logo-thumb" src="${l.url}" alt="Logo ${i + 1}">
+                <span class="studio-logo-name">${escapeHtml(l.name)}</span>
+                <button type="button" class="studio-logo-remove" data-logo-remove="${l.id}">Quitar</button>
+              </div>
+              <div class="studio-field-label"><span>Ubicación</span></div>
+              <div class="studio-placements" role="group" aria-label="Ubicación del logo" style="grid-template-columns: repeat(${Math.min(keys.length, 3)}, 1fr);">
+                ${keys.map(k => `<button type="button" class="studio-placement${k === l.placement ? ' active' : ''}" data-logo-place="${l.id}" data-placement="${k}"${used.has(k) ? ' disabled title="Ya tiene otro logo"' : ''}>${LOGO_PLACEMENTS[k].short}</button>`).join('')}
+              </div>
+              <div class="studio-field-label"><span>Ancho del logo</span><span data-logo-size-label="${l.id}">${l.sizeCm} cm</span></div>
+              <input type="range" class="studio-range" data-logo-size="${l.id}" min="4" max="30" step="1" value="${l.sizeCm}">
+            </div>`;
+        }).join('');
+        const full = logos.length >= MAX_LOGOS;
+        logoDrop.hidden = full;
+        logoDropLabel.textContent = logos.length ? 'Agregar otro logo' : 'Subir logo del cliente';
       }
 
       // opts (al abrir un diseño guardado): placement, sizeCm, storedPath, silent.
@@ -3630,6 +3740,10 @@
         return new Promise(resolve => {
         showLogoError('');
         if (!file) return resolve(false);
+        if (logos.length >= MAX_LOGOS) {
+          showLogoError(`Puedes agregar hasta ${MAX_LOGOS} logos por prenda.`);
+          return resolve(false);
+        }
         if (!/^image\/(png|jpeg|svg\+xml|webp)$/.test(file.type)) {
           showLogoError('Formato no compatible. Usa PNG, JPG, SVG o WEBP.');
           return resolve(false);
@@ -3651,35 +3765,41 @@
           canvas.height = Math.max(1, Math.round(h * scale));
           canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
 
-          if (logoState.texture) logoState.texture.dispose();
           const tex = new THREE.CanvasTexture(canvas);
           tex.colorSpace = THREE.SRGBColorSpace;
           tex.anisotropy = 8;
-          logoState.texture = tex;
-          logoState.aspect = canvas.width / canvas.height;
-          logoState.name = file.name;
-          logoState.file = file;
-          logoState.storedPath = opts.storedPath || null;
-          const spots = garment.cfg.logoPlacements;
-          if (opts.placement && spots[opts.placement]) {
-            logoState.placement = opts.placement;
-            logoState.sizeCm = opts.sizeCm || spots[opts.placement].defaultCm;
-            logoSize.value = logoState.sizeCm;
-            logoSizeLabel.textContent = `${logoState.sizeCm} cm`;
-            syncPlacementButtons();
+          const spots = logoSpots(garment.cfg);
+          const logo = {
+            id: `logo${++logoSeq}`,
+            texture: tex,
+            material: newLogoMaterial(tex),
+            aspect: canvas.width / canvas.height,
+            name: file.name,
+            file,
+            url,
+            storedPath: opts.storedPath || null,
+            placement: null,
+            sizeCm: 0,
+            meshes: []
+          };
+          const wanted = opts.placement && spots[opts.placement] && !logos.some(l => l.placement === opts.placement)
+            ? opts.placement
+            : freePlacement(garment.cfg, null);
+          if (!wanted) {
+            URL.revokeObjectURL(url);
+            tex.dispose();
+            showLogoError('Ya no quedan ubicaciones libres en esta prenda.');
+            return resolve(false);
           }
-          logoMaterial.map = tex;
-          logoMaterial.needsUpdate = true;
+          logo.placement = wanted;
+          logo.sizeCm = (opts.placement === wanted && opts.sizeCm) || spots[wanted].defaultCm;
+          logos.push(logo);
+          logoInput.value = '';
 
-          document.getElementById('studioLogoThumb').src = url;
-          document.getElementById('studioLogoName').textContent = file.name;
-          logoDrop.hidden = true;
-          logoFileRow.hidden = false;
-          logoControls.hidden = false;
-
-          placeLogo();
+          renderLogoList();
+          placeOneLogo(logo);
           updateLogoSummary();
-          if (!opts.silent) goToView(LOGO_PLACEMENTS[logoState.placement].side === 'front' ? 'front' : 'back');
+          if (!opts.silent) goToView(viewForPlacement(logo.placement));
           resolve(true);
         };
         img.onerror = () => {
@@ -3691,27 +3811,29 @@
         });
       }
 
-      function removeLogo() {
-        const thumb = document.getElementById('studioLogoThumb');
-        if (thumb.src) URL.revokeObjectURL(thumb.src);
-        thumb.removeAttribute('src');
-        if (logoState.texture) logoState.texture.dispose();
-        logoState.texture = null;
-        logoState.file = null;
-        logoState.storedPath = null;
-        logoMaterial.map = null;
-        placeLogo();
-        logoInput.value = '';
-        logoDrop.hidden = false;
-        logoFileRow.hidden = true;
-        logoControls.hidden = true;
+      function removeLogo(id, skipRender) {
+        const i = logos.findIndex(l => l.id === id);
+        if (i < 0) return;
+        const [logo] = logos.splice(i, 1);
+        clearLogoMeshes(logo);
+        URL.revokeObjectURL(logo.url);
+        logo.texture.dispose();
+        logo.material.dispose();
         showLogoError('');
+        if (!skipRender) {
+          renderLogoList();
+          updateLogoSummary();
+        }
+      }
+
+      function clearLogos() {
+        [...logos].forEach(l => removeLogo(l.id, true));
+        renderLogoList();
         updateLogoSummary();
       }
 
       logoDrop.addEventListener('click', () => logoInput.click());
       logoInput.addEventListener('change', () => loadLogoFile(logoInput.files[0]));
-      document.getElementById('studioLogoRemove').addEventListener('click', removeLogo);
 
       ['dragenter', 'dragover'].forEach(evt => logoDrop.addEventListener(evt, e => {
         e.preventDefault();
@@ -3723,45 +3845,47 @@
       }));
       logoDrop.addEventListener('drop', e => loadLogoFile(e.dataTransfer.files[0]));
 
-      document.getElementById('studioPlacements').addEventListener('click', e => {
-        const btn = e.target.closest('.studio-placement');
-        if (!btn) return;
-        const key = btn.dataset.placement;
-        const spot = garment.cfg.logoPlacements[key];
+      logoList.addEventListener('click', e => {
+        const remove = e.target.closest('[data-logo-remove]');
+        if (remove) {
+          removeLogo(remove.dataset.logoRemove);
+          return;
+        }
+        const btn = e.target.closest('[data-logo-place]');
+        if (!btn || btn.disabled) return;
+        const logo = logos.find(l => l.id === btn.dataset.logoPlace);
+        const spot = logo && logoSpots(garment.cfg)[btn.dataset.placement];
         if (!spot) return;
-        logoState.placement = key;
-        logoState.sizeCm = spot.defaultCm;
-        logoSize.value = logoState.sizeCm;
-        logoSizeLabel.textContent = `${logoState.sizeCm} cm`;
-        syncPlacementButtons();
-        placeLogo();
+        logo.placement = btn.dataset.placement;
+        logo.sizeCm = spot.defaultCm;
+        renderLogoList();
+        placeOneLogo(logo);
         updateLogoSummary();
-        goToView(LOGO_PLACEMENTS[key].side === 'front' ? 'front' : 'back');
+        goToView(viewForPlacement(logo.placement));
       });
 
       // Al empezar a ajustar el tamaño, la cámara gira hacia el lado del logo.
-      ['pointerdown', 'focus'].forEach(evt => logoSize.addEventListener(evt, () => {
-        const side = LOGO_PLACEMENTS[logoState.placement].side === 'front' ? 'front' : 'back';
+      logoList.addEventListener('pointerdown', e => {
+        const range = e.target.closest('[data-logo-size]');
+        const logo = range && logos.find(l => l.id === range.dataset.logoSize);
+        if (!logo) return;
+        const side = viewForPlacement(logo.placement);
         const target = VIEW_ANGLES[side];
         const diff = Math.atan2(Math.sin(target - currentAzimuth()), Math.cos(target - currentAzimuth()));
         if (Math.abs(diff) > 0.2) goToView(side);
-      }));
+      });
 
-      logoSize.addEventListener('input', () => {
-        logoState.sizeCm = parseInt(logoSize.value, 10);
-        logoSizeLabel.textContent = `${logoState.sizeCm} cm`;
-        placeLogo();
+      logoList.addEventListener('input', e => {
+        const range = e.target.closest('[data-logo-size]');
+        const logo = range && logos.find(l => l.id === range.dataset.logoSize);
+        if (!logo) return;
+        logo.sizeCm = parseInt(range.value, 10);
+        logoList.querySelector(`[data-logo-size-label="${logo.id}"]`).textContent = `${logo.sizeCm} cm`;
+        placeOneLogo(logo);
         updateLogoSummary();
       });
 
       // --- Prenda ---
-      // Cada prenda tiene sus propias ubicaciones de logo.
-      function syncPlacementButtons() {
-        const keys = Object.keys(garment.cfg.logoPlacements);
-        const wrap = document.getElementById('studioPlacements');
-        wrap.style.gridTemplateColumns = `repeat(${keys.length}, 1fr)`;
-        wrap.innerHTML = keys.map(k => `<button type="button" class="studio-placement${k === logoState.placement ? ' active' : ''}" data-placement="${k}">${LOGO_PLACEMENTS[k].short}</button>`).join('');
-      }
 
       // Cambia de prenda. `opts` y `zones` vienen de un diseño guardado (prendas
       // configurables); sin ellos se usan los valores por defecto de la prenda.
@@ -3777,14 +3901,8 @@
         Object.keys(zoneSource).forEach(z => {
           if (z in zoneColors && resolveColor(zoneSource[z])) zoneColors[z] = zoneSource[z];
         });
-        // Cada prenda arranca con su ubicación de logo habitual.
-        logoState.placement = cfg.defaultPlacement;
-        logoState.sizeCm = cfg.logoPlacements[logoState.placement].defaultCm;
-        logoSize.value = logoState.sizeCm;
-        logoSizeLabel.textContent = `${logoState.sizeCm} cm`;
-        syncPlacementButtons();
-        placeLogo();
-        updateLogoSummary();
+        // Los logos se acomodan a las ubicaciones de la nueva prenda.
+        reassignLogoPlacements(cfg);
 
         document.querySelectorAll('.studio-garment-option').forEach(b => {
           const on = b.dataset.garment === key;
@@ -3813,7 +3931,7 @@
       document.querySelectorAll('.studio-garment-option').forEach(btn => {
         btn.addEventListener('click', () => setGarment(btn.dataset.garment));
       });
-      syncPlacementButtons();
+      renderLogoList();
 
       // --- Diseños guardados ---
       // Cada diseño (prenda, color y logo) se guarda en la tabla studio_designs
@@ -3921,31 +4039,33 @@
         refreshSaveButtons();
         setSaveMsg('Guardando…');
         const updating = !!currentDesign && !asNew;
-        const previousPath = updating ? currentDesign.logo_path : null;
-        let uploadedPath = null;
+        const previousPaths = updating ? designLogoList(currentDesign).map(l => l.path) : [];
+        const uploadedPaths = [];
         try {
-          // Se sube el logo si es nuevo o si se guarda como un diseño aparte
-          // (cada diseño tiene su propio archivo para poder borrarlo sin afectar a otros).
-          let logoPath = null;
-          if (logoState.file) {
-            const reuse = updating && logoState.storedPath && logoState.storedPath === previousPath;
-            if (reuse) {
-              logoPath = previousPath;
-            } else {
-              uploadedPath = await uploadLogo(logoState.file);
-              logoPath = uploadedPath;
+          // Se sube cada logo nuevo (o todos, si se guarda como un diseño aparte:
+          // cada diseño tiene sus propios archivos para poder borrarlos sin afectar a otros).
+          const savedLogos = [];
+          for (const l of logos) {
+            let path = updating && l.storedPath && previousPaths.includes(l.storedPath) ? l.storedPath : null;
+            if (!path) {
+              path = await uploadLogo(l.file);
+              uploadedPaths.push(path);
             }
+            savedLogos.push({ path, nombre: l.name, ubicacion: l.placement, ancho_cm: l.sizeCm });
           }
+          const first = savedLogos[0] || null;
 
           const row = {
             company_id: companyId,
             nombre,
             prenda: garment.key,
             color: currentColorKey(),
-            logo_path: logoPath,
-            logo_nombre: logoState.file ? logoState.name : null,
-            logo_ubicacion: logoState.file ? logoState.placement : null,
-            logo_ancho_cm: logoState.file ? logoState.sizeCm : null,
+            // El primer logo también va en las columnas de siempre (compatibilidad).
+            logo_path: first ? first.path : null,
+            logo_nombre: first ? first.nombre : null,
+            logo_ubicacion: first ? first.ubicacion : null,
+            logo_ancho_cm: first ? first.ancho_cm : null,
+            logos: savedLogos.length ? savedLogos : null,
             // Prendas configurables: cuello, manga, cierre, bolsillos y colores por zona.
             opciones: garment.cfg.configurable ? { ...garment.cfg.options, zonas: { ...zoneColors } } : null,
             updated_at: new Date().toISOString()
@@ -3954,21 +4074,29 @@
           const runQuery = r => updating
             ? window._supabase.from(DESIGNS_TABLE).update(r).eq('id', currentDesign.id).select().single()
             : window._supabase.from(DESIGNS_TABLE).insert(r).select().single();
-          let { data, error } = await runQuery(row);
-          // Si todavía no existe la columna `opciones` (migración pendiente), se
+          let attempt = { ...row };
+          let { data, error } = await runQuery(attempt);
+          // Si todavía no existe alguna columna nueva (migración pendiente), se
           // guarda sin ella para no perder el diseño.
-          if (error && /opciones/i.test(error.message || '')) {
-            console.warn('Falta la columna opciones en studio_designs; se guarda sin opciones.');
-            const { opciones, ...rest } = row;
-            ({ data, error } = await runQuery(rest));
+          for (const col of ['opciones', 'logos']) {
+            if (error && new RegExp(col, 'i').test(error.message || '')) {
+              console.warn(`Falta la columna ${col} en studio_designs; se guarda sin ella.`);
+              delete attempt[col];
+              ({ data, error } = await runQuery(attempt));
+            }
           }
           if (error) throw error;
 
-          // El archivo anterior ya no lo usa nadie.
-          if (updating && previousPath && previousPath !== logoPath) await removeStoredLogo(previousPath);
+          // Los archivos anteriores que ya no usa el diseño se borran.
+          const keptPaths = savedLogos.map(l => l.path);
+          if (updating) {
+            for (const path of previousPaths) {
+              if (!keptPaths.includes(path)) await removeStoredLogo(path);
+            }
+          }
 
           currentDesign = data;
-          logoState.storedPath = logoPath;
+          logos.forEach((l, i) => { l.storedPath = savedLogos[i].path; });
           setSaveMsg('');
           const syncedRoles = updating ? await syncDesignInRoles(data) : [];
           if (window.showToast) {
@@ -3978,12 +4106,21 @@
           await loadDesigns();
         } catch (err) {
           console.error('Error guardando diseño:', err);
-          if (uploadedPath) await removeStoredLogo(uploadedPath);
+          for (const path of uploadedPaths) await removeStoredLogo(path);
           setSaveMsg(friendlyError(err), true);
         } finally {
           saving = false;
           refreshSaveButtons();
         }
+      }
+
+      // Logos de un diseño guardado: la lista `logos` o, en diseños anteriores,
+      // el logo único de las columnas logo_*.
+      function designLogoList(d) {
+        if (d && Array.isArray(d.logos) && d.logos.length) return d.logos.filter(l => l && l.path);
+        return d && d.logo_path
+          ? [{ path: d.logo_path, nombre: d.logo_nombre, ubicacion: d.logo_ubicacion, ancho_cm: d.logo_ancho_cm }]
+          : [];
       }
 
       function designMeta(d) {
@@ -3994,7 +4131,9 @@
           const cfg = garmentConfig(d.prenda, d.opciones);
           parts.push(`Cuello ${cfg.summary.cuello.toLowerCase()}`, `manga ${cfg.summary.manga.toLowerCase()}`);
         }
-        if (d.logo_path && LOGO_PLACEMENTS[d.logo_ubicacion]) parts.push(`Logo ${LOGO_PLACEMENTS[d.logo_ubicacion].label.toLowerCase()}`);
+        const dl = designLogoList(d);
+        if (dl.length === 1 && LOGO_PLACEMENTS[dl[0].ubicacion]) parts.push(`Logo ${LOGO_PLACEMENTS[dl[0].ubicacion].label.toLowerCase()}`);
+        else if (dl.length > 1) parts.push(`${dl.length} logos`);
         return parts.join(' · ');
       }
 
@@ -4144,20 +4283,19 @@
         // Siempre se reconstruye: el diseño puede tener otras opciones o zonas.
         setGarment(d.prenda, d.opciones || {}, (d.opciones && d.opciones.zonas) || null);
         if (resolveColor(d.color)) setColor(d.color);
-        removeLogo();
-        if (d.logo_path) {
-          const { data, error } = await window._supabase.storage.from(LOGOS_BUCKET).download(d.logo_path);
+        clearLogos();
+        let failed = 0;
+        for (const l of designLogoList(d)) {
+          const { data, error } = await window._supabase.storage.from(LOGOS_BUCKET).download(l.path);
           if (error || !data) {
             console.error('Error descargando logo:', error);
-            setSaveMsg('El diseño se abrió, pero no pudimos cargar su logo.', true);
-          } else {
-            const file = new File([data], d.logo_nombre || 'logo', { type: data.type });
-            await loadLogoFile(file, { placement: d.logo_ubicacion, sizeCm: d.logo_ancho_cm, storedPath: d.logo_path, silent: true });
-            setSaveMsg('');
+            failed++;
+            continue;
           }
-        } else {
-          setSaveMsg('');
+          const file = new File([data], l.nombre || 'logo', { type: data.type });
+          await loadLogoFile(file, { placement: l.ubicacion, sizeCm: l.ancho_cm, storedPath: l.path, silent: true });
         }
+        setSaveMsg(failed ? 'El diseño se abrió, pero no pudimos cargar todos sus logos.' : '', !!failed);
         currentDesign = d;
         designNameInput.value = d.nombre;
         refreshSaveButtons();
@@ -4295,7 +4433,7 @@
 
       function startNewDesign() {
         currentDesign = null;
-        logoState.storedPath = null;
+        logos.forEach(l => { l.storedPath = null; });
         designNameInput.value = '';
         setSaveMsg('');
         refreshSaveButtons();
@@ -4424,7 +4562,7 @@
         return out.toDataURL('image/png');
       }
 
-      window.dotacianStudio = { scene, camera, controls, shirt, fabric, logoState, setGarment, garment, snapshot };
+      window.dotacianStudio = { scene, camera, controls, shirt, fabric, logos, setGarment, garment, snapshot };
     }
 
     if (!webglAvailable()) {

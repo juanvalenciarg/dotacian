@@ -516,7 +516,8 @@
     };
     const PLACEMENT_LABELS = {
       pechoIzq: 'Pecho izquierdo', pechoDer: 'Pecho derecho', pechoCentro: 'Centro del pecho',
-      espalda: 'Espalda', bolsilloTrasero: 'Bolsillo trasero', musloIzq: 'Muslo izquierdo'
+      espalda: 'Espalda', bolsilloTrasero: 'Bolsillo trasero', musloIzq: 'Muslo izquierdo',
+      nuca: 'Nuca', mangaIzq: 'Manga izquierda', mangaDer: 'Manga derecha'
     };
 
     let catalogDesigns = [];
@@ -598,8 +599,9 @@
 
       root.innerHTML = list.map(d => {
         const roles = rolesByDesign[d.id] || [];
+        const extraLogos = Array.isArray(d.logos) ? d.logos.length - 1 : 0;
         const logo = d.logo_path
-          ? `Logo: ${escapeHtml(PLACEMENT_LABELS[d.logo_ubicacion] || 'sí')}${d.logo_ancho_cm ? ` · ${d.logo_ancho_cm} cm` : ''}`
+          ? `Logo: ${escapeHtml(PLACEMENT_LABELS[d.logo_ubicacion] || 'sí')}${d.logo_ancho_cm ? ` · ${d.logo_ancho_cm} cm` : ''}${extraLogos > 0 ? ` · +${extraLogos} más` : ''}`
           : 'Sin logo';
         return `
           <article class="catalog-card">

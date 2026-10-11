@@ -1451,8 +1451,16 @@
     };
     const MANUAL_PLACEMENT_LABELS = {
       pechoIzq: 'Pecho izquierdo', pechoDer: 'Pecho derecho', pechoCentro: 'Centro del pecho',
-      espalda: 'Espalda', bolsilloTrasero: 'Bolsillo trasero', musloIzq: 'Muslo izquierdo'
+      espalda: 'Espalda', bolsilloTrasero: 'Bolsillo trasero', musloIzq: 'Muslo izquierdo',
+      nuca: 'Nuca', mangaIzq: 'Manga izquierda', mangaDer: 'Manga derecha'
     };
+
+    // Logos de un diseño: la lista `logos` o, en diseños anteriores, el logo único.
+    function designLogos(d) {
+      if (d && Array.isArray(d.logos) && d.logos.length) return d.logos.filter(l => l && l.path);
+      return d && d.logo_path ? [{ path: d.logo_path, nombre: d.logo_nombre, ubicacion: d.logo_ubicacion, ancho_cm: d.logo_ancho_cm }] : [];
+    }
+
 
     // Opciones de las prendas configurables (studio_designs.opciones), en texto.
     const DESIGN_OPTION_TEXT = {
@@ -1482,8 +1490,9 @@
       const extra = describeDesignOptions(d.opciones, MANUAL_COLOR_LABELS);
       if (extra.opciones) parts.push(extra.opciones);
       if (extra.contraste) parts.push(`contraste: ${extra.contraste}`);
-      parts.push(d.logo_path
-        ? `logo en ${MANUAL_PLACEMENT_LABELS[d.logo_ubicacion] || d.logo_ubicacion || 'ubicación por definir'}${d.logo_ancho_cm ? ` de ${d.logo_ancho_cm} cm` : ''}`
+      const dLogos = designLogos(d);
+      parts.push(dLogos.length
+        ? `${dLogos.length === 1 ? 'logo en' : 'logos en'} ${dLogos.map(l => `${MANUAL_PLACEMENT_LABELS[l.ubicacion] || l.ubicacion || 'ubicación por definir'}${l.ancho_cm ? ` de ${l.ancho_cm} cm` : ''}`).join(', ')}`
         : 'sin logo');
       return `Diseño Studio "${d.nombre}": ${parts.join(' · ')}`;
     }
