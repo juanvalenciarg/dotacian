@@ -503,16 +503,16 @@
     </main>
   </div>
 
-  <script src="/assets/js/studio-renders.js?v=3"></script>
+  <script src="/assets/js/studio-renders.js?v=4"></script>
   <script>
     // Catálogo de Uniformes: los diseños que la empresa guardó en Dotacian
     // Studio (tabla studio_designs). Los archivados no se muestran.
     const GARMENT_LABELS = {
-      camiseta: 'Camiseta básica', camisa: 'Camisa manga larga', hoodie: 'Hoodie', filipina: 'Filipina de chef',
+      camiseta: 'Camiseta básica', camisa: 'Camisa', hoodie: 'Hoodie', filipina: 'Filipina de chef',
       polo: 'Camiseta tipo polo', pantalon: 'Pantalón chino', limpieza: 'Uniforme de limpieza', bata: 'Bata'
     };
     const COLOR_LABELS = {
-      blanco: 'Blanco', negro: 'Negro', azul: 'Azul', rojo: 'Rojo', beige: 'Beige', azulMarino: 'Azul marino', gris: 'Gris', grafito: 'Gris grafito'
+      blanco: 'Blanco', negro: 'Negro', azul: 'Azul', rojo: 'Rojo', beige: 'Beige', azulMarino: 'Azul marino', gris: 'Gris', grafito: 'Gris grafito', vinotinto: 'Vinotinto', verde: 'Verde', menta: 'Verde menta', celeste: 'Celeste', turquesa: 'Turquesa', naranja: 'Naranja', amarillo: 'Amarillo', morado: 'Morado', rosado: 'Rosado', cafe: 'Café'
     };
     const PLACEMENT_LABELS = {
       pechoIzq: 'Pecho izquierdo', pechoDer: 'Pecho derecho', pechoCentro: 'Centro del pecho',
@@ -604,7 +604,7 @@
         return `
           <article class="catalog-card">
             <a class="catalog-render" href="/app/uniformes/studio?diseno=${encodeURIComponent(d.id)}" aria-label="Abrir ${escapeHtml(d.nombre)} en Dotacian Studio">
-              <span class="catalog-render-img" data-render="${escapeHtml(d.prenda)}" data-color="${escapeHtml(d.color)}"></span>
+              <span class="catalog-render-img" data-render="${escapeHtml(d.prenda)}" data-color="${escapeHtml(d.color)}" data-opciones="${escapeHtml(d.opciones ? JSON.stringify(d.opciones) : '')}"></span>
               ${d.logo_path && logoUrls[d.logo_path] ? `<span class="catalog-logo"><img src="${escapeHtml(logoUrls[d.logo_path])}" alt="Logo"></span>` : ''}
             </a>
             <div class="catalog-body">
@@ -620,7 +620,7 @@
       }).join('');
 
       if (window.DSRenders) {
-        root.querySelectorAll('[data-render]').forEach(el => window.DSRenders.fillRender(el, el.dataset.render, el.dataset.color));
+        root.querySelectorAll('[data-render]').forEach(el => window.DSRenders.fillRender(el, el.dataset.render, el.dataset.color, el.dataset.opciones ? JSON.parse(el.dataset.opciones) : null));
       }
     }
 

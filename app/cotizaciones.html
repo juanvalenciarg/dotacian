@@ -1443,21 +1443,45 @@
     let _manualQuoteDesignsByName = {};
 
     const MANUAL_GARMENT_LABELS = {
-      camiseta: 'Camiseta básica', camisa: 'Camisa manga larga', hoodie: 'Hoodie', filipina: 'Filipina de chef',
+      camiseta: 'Camiseta básica', camisa: 'Camisa', hoodie: 'Hoodie', filipina: 'Filipina de chef',
       polo: 'Camiseta tipo polo', pantalon: 'Pantalón chino', limpieza: 'Uniforme de limpieza', bata: 'Bata'
     };
     const MANUAL_COLOR_LABELS = {
-      blanco: 'Blanco', negro: 'Negro', azul: 'Azul', rojo: 'Rojo', beige: 'Beige', azulMarino: 'Azul marino', gris: 'Gris', grafito: 'Gris grafito'
+      blanco: 'Blanco', negro: 'Negro', azul: 'Azul', rojo: 'Rojo', beige: 'Beige', azulMarino: 'Azul marino', gris: 'Gris', grafito: 'Gris grafito', vinotinto: 'Vinotinto', verde: 'Verde', menta: 'Verde menta', celeste: 'Celeste', turquesa: 'Turquesa', naranja: 'Naranja', amarillo: 'Amarillo', morado: 'Morado', rosado: 'Rosado', cafe: 'Café'
     };
     const MANUAL_PLACEMENT_LABELS = {
       pechoIzq: 'Pecho izquierdo', pechoDer: 'Pecho derecho', pechoCentro: 'Centro del pecho',
       espalda: 'Espalda', bolsilloTrasero: 'Bolsillo trasero', musloIzq: 'Muslo izquierdo'
     };
 
+    // Opciones de las prendas configurables (studio_designs.opciones), en texto.
+    const DESIGN_OPTION_TEXT = {
+      cuello: { camisero: 'cuello camisero', mao: 'cuello mao', polo: 'cuello polo', redondo: 'cuello redondo' },
+      manga: { corta: 'manga corta', larga: 'manga larga con puño' },
+      cierre: { botones: 'cierre de botones', cremallera: 'cierre de cremallera', ninguno: 'sin cierre' },
+      bolsillos: { ninguno: 'sin bolsillos', pecho: 'bolsillo de pecho', inferiores: 'bolsillos inferiores', ambos: 'bolsillos de pecho e inferiores' }
+    };
+    const DESIGN_ZONE_TEXT = { cuello: 'cuello', puno: 'puños', detalle: 'franjas de bolsillos' };
+
+    function describeDesignOptions(opciones, colorLabels) {
+      if (!opciones) return { opciones: '', contraste: '' };
+      const parts = Object.keys(DESIGN_OPTION_TEXT)
+        .map(g => DESIGN_OPTION_TEXT[g][opciones[g]])
+        .filter(Boolean);
+      const zonas = opciones.zonas || {};
+      const contraste = Object.keys(DESIGN_ZONE_TEXT)
+        .filter(z => zonas[z])
+        .map(z => `${DESIGN_ZONE_TEXT[z]} ${(colorLabels[zonas[z]] || zonas[z]).toLowerCase()}`);
+      return { opciones: parts.join(' · '), contraste: contraste.join(', ') };
+    }
+
     function describeManualDesign(name) {
       const d = _manualQuoteDesignsByName[(name || '').trim().toLowerCase()];
       if (!d) return '';
       const parts = [MANUAL_GARMENT_LABELS[d.prenda] || d.prenda, MANUAL_COLOR_LABELS[d.color] || d.color];
+      const extra = describeDesignOptions(d.opciones, MANUAL_COLOR_LABELS);
+      if (extra.opciones) parts.push(extra.opciones);
+      if (extra.contraste) parts.push(`contraste: ${extra.contraste}`);
       parts.push(d.logo_path
         ? `logo en ${MANUAL_PLACEMENT_LABELS[d.logo_ubicacion] || d.logo_ubicacion || 'ubicación por definir'}${d.logo_ancho_cm ? ` de ${d.logo_ancho_cm} cm` : ''}`
         : 'sin logo');
@@ -1490,7 +1514,7 @@
         const [roleDefs, employeesRes, designsRes] = await Promise.all([
           fetchActiveRolesWithId(currentCompanyId),
           _supabase.from('company_employees').select('id, first_name, last_name, role, role_status, id_document, email, phone').eq('company_id', currentCompanyId),
-          _supabase.from('studio_designs').select('id, nombre, prenda, color, logo_path, logo_ubicacion, logo_ancho_cm').eq('company_id', currentCompanyId)
+          _supabase.from('studio_designs').select('*').eq('company_id', currentCompanyId)
         ]);
         _manualQuoteRoleDefs = (roleDefs || []).slice().sort((a, b) => a.role_name.localeCompare(b.role_name));
         // Solo empleados activos (los desactivados no reciben dotación).

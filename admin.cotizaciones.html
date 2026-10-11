@@ -688,7 +688,7 @@
   </div>
 
   <script src="assets/js/utils.js?v=4"></script>
-  <script src="assets/js/studio-renders.js?v=3"></script>
+  <script src="assets/js/studio-renders.js?v=4"></script>
   <script>
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
@@ -1214,16 +1214,37 @@
     // ver supabase_migration_admin_studio_designs.sql) para mostrar la prenda
     // en su color, el logo y sus medidas.
     const DESIGN_GARMENT_LABELS = {
-      camiseta: 'Camiseta básica', camisa: 'Camisa manga larga', hoodie: 'Hoodie', filipina: 'Filipina de chef',
+      camiseta: 'Camiseta básica', camisa: 'Camisa', hoodie: 'Hoodie', filipina: 'Filipina de chef',
       polo: 'Camiseta tipo polo', pantalon: 'Pantalón chino', limpieza: 'Uniforme de limpieza', bata: 'Bata'
     };
     const DESIGN_COLOR_LABELS = {
-      blanco: 'Blanco', negro: 'Negro', azul: 'Azul', rojo: 'Rojo', beige: 'Beige', azulMarino: 'Azul marino', gris: 'Gris', grafito: 'Gris grafito'
+      blanco: 'Blanco', negro: 'Negro', azul: 'Azul', rojo: 'Rojo', beige: 'Beige', azulMarino: 'Azul marino', gris: 'Gris', grafito: 'Gris grafito', vinotinto: 'Vinotinto', verde: 'Verde', menta: 'Verde menta', celeste: 'Celeste', turquesa: 'Turquesa', naranja: 'Naranja', amarillo: 'Amarillo', morado: 'Morado', rosado: 'Rosado', cafe: 'Café'
     };
     const DESIGN_PLACEMENT_LABELS = {
       pechoIzq: 'Pecho izquierdo', pechoDer: 'Pecho derecho', pechoCentro: 'Centro del pecho',
       espalda: 'Espalda', bolsilloTrasero: 'Bolsillo trasero', musloIzq: 'Muslo izquierdo'
     };
+
+    // Opciones de las prendas configurables (studio_designs.opciones), en texto.
+    const DESIGN_OPTION_TEXT = {
+      cuello: { camisero: 'cuello camisero', mao: 'cuello mao', polo: 'cuello polo', redondo: 'cuello redondo' },
+      manga: { corta: 'manga corta', larga: 'manga larga con puño' },
+      cierre: { botones: 'cierre de botones', cremallera: 'cierre de cremallera', ninguno: 'sin cierre' },
+      bolsillos: { ninguno: 'sin bolsillos', pecho: 'bolsillo de pecho', inferiores: 'bolsillos inferiores', ambos: 'bolsillos de pecho e inferiores' }
+    };
+    const DESIGN_ZONE_TEXT = { cuello: 'cuello', puno: 'puños', detalle: 'franjas de bolsillos' };
+
+    function describeDesignOptions(opciones, colorLabels) {
+      if (!opciones) return { opciones: '', contraste: '' };
+      const parts = Object.keys(DESIGN_OPTION_TEXT)
+        .map(g => DESIGN_OPTION_TEXT[g][opciones[g]])
+        .filter(Boolean);
+      const zonas = opciones.zonas || {};
+      const contraste = Object.keys(DESIGN_ZONE_TEXT)
+        .filter(z => zonas[z])
+        .map(z => `${DESIGN_ZONE_TEXT[z]} ${(colorLabels[zonas[z]] || zonas[z]).toLowerCase()}`);
+      return { opciones: parts.join(' · '), contraste: contraste.join(', ') };
+    }
 
     function getQuoteDesignNames(promptText) {
       const names = [];
@@ -1284,16 +1305,19 @@
               El diseño "${escapeQuoteHtml(name)}" ya no existe en el Studio de la empresa (pudo haberse borrado o renombrado).</div>`;
           }
           const logoUrl = d.logo_path ? logoUrls[d.logo_path] : null;
+          const extra = describeDesignOptions(d.opciones, DESIGN_COLOR_LABELS);
           const rows = [
             ['Prenda', DESIGN_GARMENT_LABELS[d.prenda] || d.prenda],
             ['Color', DESIGN_COLOR_LABELS[d.color] || d.color],
+            ...(extra.opciones ? [['Opciones', extra.opciones]] : []),
+            ...(extra.contraste ? [['Contraste', extra.contraste]] : []),
             ['Logo', d.logo_path
               ? `${DESIGN_PLACEMENT_LABELS[d.logo_ubicacion] || d.logo_ubicacion || 'Ubicación por definir'}${d.logo_ancho_cm ? ` · ${d.logo_ancho_cm} cm de ancho` : ''}`
               : 'Sin logo']
           ];
           return `
             <div class="quote-design-card">
-              <div class="quote-design-render" data-render="${escapeQuoteAttr(d.prenda)}" data-color="${escapeQuoteAttr(d.color)}"
+              <div class="quote-design-render" data-render="${escapeQuoteAttr(d.prenda)}" data-color="${escapeQuoteAttr(d.color)}" data-opciones="${escapeQuoteAttr(d.opciones ? JSON.stringify(d.opciones) : '')}"
                 onclick="openDesign3d('${escapeQuoteAttr(d.id)}')" title="Ver en 3D" style="cursor: pointer;"></div>
               <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.35rem;">
                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
@@ -1313,7 +1337,7 @@
         }).join('');
 
         if (window.DSRenders) {
-          list.querySelectorAll('[data-render]').forEach(el => window.DSRenders.fillRender(el, el.dataset.render, el.dataset.color));
+          list.querySelectorAll('[data-render]').forEach(el => window.DSRenders.fillRender(el, el.dataset.render, el.dataset.color, el.dataset.opciones ? JSON.parse(el.dataset.opciones) : null));
         }
       } catch (err) {
         console.error('Error cargando diseños de Studio:', err);

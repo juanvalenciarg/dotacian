@@ -3343,7 +3343,7 @@
                de uno; si no, la imagen del activo -->
           <div style="width:44px; height:44px; background:#f1f5f9; border-radius:10px; overflow:hidden; flex-shrink:0; display:flex; align-items:center; justify-content:center;">
             ${studioDesign ? `
-            <span class="delivery-design-thumb" data-render="${escapeAttr(studioDesign.prenda)}" data-color="${escapeAttr(studioDesign.color)}"></span>
+            <span class="delivery-design-thumb" data-render="${escapeAttr(studioDesign.prenda)}" data-color="${escapeAttr(studioDesign.color)}" data-opciones="${escapeAttr(studioDesign.opciones ? JSON.stringify(studioDesign.opciones) : '')}"></span>
             ` : `
             <img src="${img}" style="width:100%; height:100%; object-fit:contain;"
               onerror="this.parentElement.style.background='#e2e8f0'; this.parentElement.innerHTML='<span style=\\'font-size:0.65rem; font-weight:700; color:#94a3b8;\\'>Kit</span>';">
@@ -3410,7 +3410,7 @@
       `;
       refreshDeliveryRowDetail(wrapper);
       const thumb = wrapper.querySelector('.delivery-design-thumb');
-      if (thumb && window.DSRenders) window.DSRenders.fillRender(thumb, thumb.dataset.render, thumb.dataset.color);
+      if (thumb && window.DSRenders) window.DSRenders.fillRender(thumb, thumb.dataset.render, thumb.dataset.color, thumb.dataset.opciones ? JSON.parse(thumb.dataset.opciones) : null);
 
       return wrapper;
     }
@@ -4799,7 +4799,7 @@
           // Diseños de Dotacian Studio, para mostrar su miniatura en
           // "Entregar dotación" (los ítems del rol guardan design_id).
           _supabase.from('studio_designs')
-            .select('id, prenda, color')
+            .select('*')
             .eq('company_id', companyId)
         ]);
 
@@ -4871,7 +4871,7 @@
     }
   </script>
   <script src="/assets/js/utils.js?v=4"></script>
-  <script src="/assets/js/studio-renders.js?v=3"></script>
+  <script src="/assets/js/studio-renders.js?v=4"></script>
 </body>
 
 </html>

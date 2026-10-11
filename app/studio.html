@@ -913,6 +913,117 @@
       background: #FEF2F2;
     }
 
+    /* Prendas configurables: opciones y color por zonas */
+    .studio-option-group {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.4rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .studio-swatches.compact {
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.35rem;
+    }
+
+    .studio-swatches.compact .studio-swatch {
+      padding: 0.3rem 0;
+    }
+
+    .studio-swatches.compact .studio-swatch-dot {
+      width: 26px;
+      height: 26px;
+    }
+
+    .studio-color-custom {
+      position: relative;
+      display: block;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: conic-gradient(#EF4444, #F59E0B, #22C55E, #06B6D4, #6366F1, #EC4899, #EF4444);
+      border: 1px solid rgba(15, 23, 42, 0.15);
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .studio-color-custom input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      border: none;
+      padding: 0;
+    }
+
+    .studio-swatch-custom {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .studio-zone {
+      margin-top: 0.6rem;
+    }
+
+    .studio-zone-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 0.35rem;
+    }
+
+    .studio-zone-dots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      align-items: center;
+    }
+
+    .studio-zone-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1px solid rgba(15, 23, 42, 0.15);
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .studio-zone-dot.studio-zone-custom {
+      border: none;
+    }
+
+    .studio-zone-dot.studio-zone-custom .studio-color-custom {
+      width: 20px;
+      height: 20px;
+    }
+
+    .studio-zone-dot.active,
+    .studio-swatch-custom.active .studio-color-custom {
+      box-shadow: 0 0 0 2px white, 0 0 0 4px var(--color-cyan);
+    }
+
+    .studio-zone-same {
+      height: 22px;
+      padding: 0 0.55rem;
+      border-radius: 999px;
+      border: 1.5px solid var(--color-border);
+      background: white;
+      font-family: inherit;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #475569;
+      cursor: pointer;
+    }
+
+    .studio-zone-same.active {
+      border-color: var(--color-cyan);
+      background: #F0FDFF;
+      color: var(--color-navy);
+    }
+
     .studio-summary {
       display: flex;
       flex-direction: column;
@@ -1116,8 +1227,8 @@
                     <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 2.5 12 6l3-3.5"></path><path d="M9 2.5 4 4.5 2.5 21h4L8 9v13h8V9l1.5 12h4L20 4.5l-5-2"></path><line x1="12" y1="6" x2="12" y2="22"></line></svg>
                   </span>
                   <span>
-                    <span class="studio-garment-name">Camisa manga larga</span>
-                    <span class="studio-garment-meta">Cuello camisero · Botones · Bolsillo</span>
+                    <span class="studio-garment-name">Camisa</span>
+                    <span class="studio-garment-meta">Personalizable · Cuello, manga, cierre y bolsillos</span>
                   </span>
                 </button>
                 <button type="button" class="studio-garment studio-garment-option" data-garment="hoodie" aria-pressed="false">
@@ -1162,7 +1273,7 @@
                   </span>
                   <span>
                     <span class="studio-garment-name">Bata</span>
-                    <span class="studio-garment-meta">Cuello en contraste · Cremallera · Bolsillos con franja</span>
+                    <span class="studio-garment-meta">Personalizable · Cuello en contraste · Cremallera</span>
                   </span>
                 </button>
                 <button type="button" class="studio-garment studio-garment-option" data-garment="filipina" aria-pressed="false">
@@ -1180,9 +1291,15 @@
               </div>
             </div>
 
+            <div class="studio-card" id="studioOptionsCard" hidden>
+              <div class="studio-card-label">Personaliza la prenda</div>
+              <div id="studioOptions"></div>
+            </div>
+
             <div class="studio-card">
               <div class="studio-card-label">Color</div>
               <div class="studio-swatches" id="studioSwatches"></div>
+              <div id="studioZones" hidden></div>
             </div>
 
             <div class="studio-card">
@@ -1215,8 +1332,10 @@
                 <div><span>Prenda</span><span id="studioSummaryGarment">Camiseta básica</span></div>
                 <div id="studioSummaryCollarRow"><span>Cuello</span><span id="studioSummaryCollar">Redondo</span></div>
                 <div id="studioSummarySleeveRow"><span>Manga</span><span id="studioSummarySleeve">Corta</span></div>
+                <div id="studioSummaryClosureRow" hidden><span>Cierre</span><span id="studioSummaryClosure"></span></div>
                 <div id="studioSummaryPocketRow" hidden><span>Bolsillo</span><span id="studioSummaryPocket"></span></div>
                 <div><span>Color</span><span id="studioSummaryColor">Blanco</span></div>
+                <div id="studioSummaryContrastRow" hidden><span>Contraste</span><span id="studioSummaryContrast" style="text-align: right;"></span></div>
                 <div><span>Logo</span><span id="studioSummaryLogo">Sin logo</span></div>
               </div>
             </div>
@@ -1298,8 +1417,86 @@
       beige: { label: 'Beige', hex: '#C8B48E' },
       azulMarino: { label: 'Azul marino', hex: '#1F2A44' },
       gris: { label: 'Gris', hex: '#5E646E' },
-      grafito: { label: 'Gris grafito', hex: '#3C4049' }
+      grafito: { label: 'Gris grafito', hex: '#3C4049' },
+      vinotinto: { label: 'Vinotinto', hex: '#7A1E2C' },
+      verde: { label: 'Verde', hex: '#2F6B4F' },
+      menta: { label: 'Verde menta', hex: '#7CC6A4' },
+      celeste: { label: 'Celeste', hex: '#8EC5E6' },
+      turquesa: { label: 'Turquesa', hex: '#1C9AA0' },
+      naranja: { label: 'Naranja', hex: '#E26A2C' },
+      amarillo: { label: 'Amarillo', hex: '#E8B930' },
+      morado: { label: 'Morado', hex: '#5B3E8E' },
+      rosado: { label: 'Rosado', hex: '#E79BB5' },
+      cafe: { label: 'Café', hex: '#6A4A35' }
     };
+
+    // Paleta completa de las prendas configurables (cuerpo y zonas de contraste).
+    const FULL_PALETTE = ['blanco', 'negro', 'grafito', 'gris', 'azulMarino', 'azul', 'celeste', 'turquesa',
+      'verde', 'menta', 'beige', 'cafe', 'amarillo', 'naranja', 'rojo', 'vinotinto', 'rosado', 'morado'];
+
+    // Color guardado: una clave de SHIRT_COLORS o un HEX personalizado (#RRGGBB).
+    function resolveColor(value) {
+      if (SHIRT_COLORS[value]) return SHIRT_COLORS[value];
+      if (/^#[0-9a-f]{6}$/i.test(value || '')) return { label: `Personalizado ${value.toUpperCase()}`, hex: value };
+      return null;
+    }
+
+    // --- Prendas configurables (cuello, manga, cierre, bolsillos y color por zonas) ---
+    const OPTION_GROUPS = {
+      cuello: { label: 'Cuello', choices: { camisero: 'Camisero', mao: 'Mao', polo: 'Polo', redondo: 'Redondo' } },
+      manga: { label: 'Manga', choices: { corta: 'Corta', larga: 'Larga con puño' } },
+      cierre: { label: 'Cierre', choices: { botones: 'Botones', cremallera: 'Cremallera', ninguno: 'Sin cierre' } },
+      bolsillos: { label: 'Bolsillos', choices: { ninguno: 'Ninguno', pecho: 'Pecho', inferiores: 'Inferiores', ambos: 'Pecho e inferiores' } }
+    };
+    const COLLAR_TYPES = { camisero: 'shirt', mao: 'mandarin', polo: 'polo', redondo: 'rib' };
+    const COLOR_ZONES = {
+      cuello: 'Cuello',
+      puno: 'Puños y mangas',
+      detalle: 'Franjas de bolsillos'
+    };
+
+    // Arma la configuración de la prenda con las opciones elegidas. Las prendas
+    // sin `configurable` se devuelven tal cual.
+    function garmentConfig(key, opts) {
+      const base = GARMENTS[key];
+      if (!base || !base.configurable) return base;
+      const conf = base.configurable;
+      const o = { ...conf.defaults };
+      Object.keys(OPTION_GROUPS).forEach(g => {
+        if (opts && OPTION_GROUPS[g].choices[opts[g]]) o[g] = opts[g];
+      });
+      const cfg = { ...base };
+      cfg.collar = COLLAR_TYPES[o.cuello];
+      cfg.sleeve = conf.sleeves[o.manga];
+      cfg.placket = o.cierre === 'botones'
+        ? { halfWidth: 0.021, buttons: 7, spacing: 0.108, standButton: o.cuello === 'camisero' }
+        : false;
+      cfg.zipper = o.cierre === 'cremallera' ? { inset: 0.004 } : null;
+      const chest = o.bolsillos === 'pecho' || o.bolsillos === 'ambos';
+      const lower = o.bolsillos === 'inferiores' || o.bolsillos === 'ambos';
+      cfg.pocket = chest ? conf.chestPocket : null;
+      cfg.lowerPockets = lower ? conf.lowerPockets : null;
+      cfg.summary = {
+        cuello: OPTION_GROUPS.cuello.choices[o.cuello],
+        manga: OPTION_GROUPS.manga.choices[o.manga],
+        cierre: OPTION_GROUPS.cierre.choices[o.cierre],
+        bolsillo: o.bolsillos === 'ninguno' ? null : OPTION_GROUPS.bolsillos.choices[o.bolsillos]
+      };
+      // El bolsillo de pecho ocupa el pecho izquierdo: ahí ya no va logo.
+      cfg.logoPlacements = { ...conf.logoPlacements };
+      if (chest) delete cfg.logoPlacements.pechoIzq;
+      cfg.defaultPlacement = cfg.logoPlacements[base.defaultPlacement] ? base.defaultPlacement : Object.keys(cfg.logoPlacements)[0];
+      cfg.options = o;
+      return cfg;
+    }
+
+    // Zonas de contraste que existen con las opciones elegidas.
+    function zonesForConfig(cfg) {
+      if (!cfg || !cfg.configurable) return [];
+      const zones = ['cuello', 'puno'];
+      if (cfg.lowerPockets) zones.push('detalle');
+      return zones;
+    }
 
     // Colores de cada prenda (si la prenda no define `colors`, usa estos).
     const DEFAULT_COLORS = ['blanco', 'negro', 'azul', 'rojo'];
@@ -1402,8 +1599,8 @@
       },
 
       camisa: {
-        label: 'Camisa manga larga',
-        meta: 'Cuello camisero · Botones · Bolsillo',
+        label: 'Camisa',
+        meta: 'Personalizable · Cuello, manga, cierre y bolsillos',
         summary: { cuello: 'Camisero', manga: 'Larga con puño', bolsillo: 'Pecho izquierdo' },
         profile: [
           { y: -0.80, a: 0.330, b: 0.160, n: 2.6 },
@@ -1437,6 +1634,32 @@
         placket: { halfWidth: 0.021, buttons: 7, spacing: 0.108 },
         pocket: { x0: 0.078, x1: 0.205, yTop: 0.165, yBottom: 0.02 },
         groundY: -0.86,
+        // Opciones que el cliente puede cambiar (ver garmentConfig).
+        configurable: {
+          defaults: { cuello: 'camisero', manga: 'larga', cierre: 'botones', bolsillos: 'pecho' },
+          zoneDefaults: {},
+          sleeves: {
+            corta: {
+              angleStart: deg(50), angleEnd: deg(50), length: 0.27, hemTilt: 0.06, forward: deg(12), start: -0.18,
+              rBase: [0.150, 0.142], rEnd: [0.124, 0.112], flare: false,
+              shoulder: new THREE.Vector3(0.330, 0.336, 0),
+              cuff: { length: 0.04, scale: 1.04, button: false }
+            },
+            larga: {
+              angleStart: deg(50), angleEnd: deg(84), length: 0.88, hemTilt: 0, forward: deg(9), start: -0.18,
+              rBase: [0.150, 0.142], rEnd: [0.064, 0.060], flare: false,
+              shoulder: new THREE.Vector3(0.330, 0.336, 0),
+              cuff: { length: 0.075, scale: 1.1 }
+            }
+          },
+          chestPocket: { x0: 0.078, x1: 0.205, yTop: 0.165, yBottom: 0.02 },
+          lowerPockets: { yTop: -0.42, yBottom: -0.64, x0: 0.07, x1: 0.235, accentBand: 0.034 },
+          logoPlacements: {
+            pechoIzq: { x: 0.15, y: 0.13, defaultCm: 7 },
+            pechoDer: { x: -0.1415, y: 0.095, defaultCm: 7 },
+            espalda: { x: 0, y: 0.06, defaultCm: 26 }
+          }
+        },
         // En la camisa el logo va en el pecho derecho, al lado opuesto del bolsillo.
         defaultPlacement: 'pechoDer',
         logoPlacements: {
@@ -1749,7 +1972,6 @@
           cuff: { length: 0.04, scale: 1.04, button: false } // dobladillo doblado
         },
         collar: 'shirt',
-        collarAccent: true,
         collarStandH: 0.022, // pie de cuello bajo: el cuello cae plano, como en la referencia
         collarTip: 1.15,
         placket: false,
@@ -1758,6 +1980,32 @@
         princessSeams: { x: 0.14, topY: 0.27, bend: 0.03 },
         lowerPockets: { yTop: -0.43, yBottom: -0.66, x0: 0.07, x1: 0.24, accentBand: 0.034 },
         groundY: -0.86,
+        configurable: {
+          defaults: { cuello: 'camisero', manga: 'corta', cierre: 'cremallera', bolsillos: 'inferiores' },
+          // Como en la referencia: cuello y franjas de los bolsillos en vinotinto.
+          zoneDefaults: { cuello: 'vinotinto', detalle: 'vinotinto' },
+          sleeves: {
+            corta: {
+              angleStart: deg(50), angleEnd: deg(50), length: 0.27, hemTilt: 0.06, forward: deg(12), start: -0.18,
+              rBase: [0.156, 0.148], rEnd: [0.128, 0.116], flare: false,
+              shoulder: new THREE.Vector3(0.333, 0.334, 0),
+              cuff: { length: 0.04, scale: 1.04, button: false }
+            },
+            larga: {
+              angleStart: deg(50), angleEnd: deg(84), length: 0.86, hemTilt: 0, forward: deg(9), start: -0.18,
+              rBase: [0.156, 0.148], rEnd: [0.066, 0.062], flare: false,
+              shoulder: new THREE.Vector3(0.333, 0.334, 0),
+              cuff: { length: 0.075, scale: 1.1 }
+            }
+          },
+          chestPocket: { x0: 0.078, x1: 0.205, yTop: 0.165, yBottom: 0.02 },
+          lowerPockets: { yTop: -0.43, yBottom: -0.66, x0: 0.07, x1: 0.24, accentBand: 0.034 },
+          logoPlacements: {
+            pechoIzq: { x: 0.16, y: 0.17, defaultCm: 7 },
+            pechoDer: { x: -0.16, y: 0.17, defaultCm: 7 },
+            espalda: { x: 0, y: 0.06, defaultCm: 24 }
+          }
+        },
         defaultPlacement: 'pechoIzq',
         logoPlacements: {
           pechoIzq: { x: 0.16, y: 0.17, defaultCm: 7 },
@@ -2666,7 +2914,8 @@
         g.translate(dx, dy, 0);
       });
       const offsetButtons = (list, [dx, dy]) => list.map(b => ({ ...b, point: b.point.clone().add(new THREE.Vector3(dx, dy, 0)) }));
-      [top.fabricParts, top.ribParts, top.trimParts, top.pipingParts || [], top.shadeParts || []].forEach(l => move(l, cfg.set.topOffset));
+      [top.fabricParts, top.ribParts, top.trimParts, top.pipingParts || [], top.shadeParts || [],
+        (top.collarParts || []).map(p => p.geo), (top.cuffParts || []).map(p => p.geo)].forEach(l => move(l, cfg.set.topOffset));
       [bottom.fabricParts, bottom.ribParts, bottom.trimParts, bottom.pipingParts || []].forEach(l => move(l, cfg.set.bottomOffset));
       return {
         torso: top.torso,
@@ -2677,6 +2926,8 @@
         trimParts: [...top.trimParts, ...bottom.trimParts],
         pipingParts: [...(top.pipingParts || []), ...(bottom.pipingParts || [])],
         shadeParts: [...(top.shadeParts || [])],
+        collarParts: [...(top.collarParts || [])],
+        cuffParts: [...(top.cuffParts || [])],
         buttonParts: [...offsetButtons(top.buttonParts, cfg.set.topOffset), ...offsetButtons(bottom.buttonParts, cfg.set.bottomOffset)]
       };
     }
@@ -2689,8 +2940,10 @@
       const trimParts = [];  // herretes y ojales
       const buttonParts = [];
       const pipingParts = []; // vivos en color contraste (túnica)
-      const accentParts = []; // piezas en el color de contraste de la prenda (cfg.accent)
+      const accentParts = []; // zona "detalle": franjas de los bolsillos
       const zipperParts = []; // cremallera
+      const collarParts = []; // zona "cuello": { geo, rib }
+      const cuffParts = [];   // zona "puño": { geo, rib }
       if (cfg.pants) return buildPantsParts(cfg);
       const torso = buildTorso(cfg);
       fabricParts.push(torso);
@@ -2702,10 +2955,10 @@
           const cuffStart = 1 - sl.cuff.length / sl.length;
           fabricParts.push(buildSleeve(sl, axis, side, sl.start, cuffStart + 0.01, 1, 90));
           const cuff = buildSleeve(sl, axis, side, cuffStart, 1, sl.cuff.scale, 8);
-          (sl.cuff.rib ? ribParts : fabricParts).push(cuff);
+          cuffParts.push({ geo: cuff, rib: !!sl.cuff.rib });
           if (sl.cuff.piping) pipingParts.push(buildRim(sleeveRing(sl, axis, side, cuffStart, sl.cuff.scale), 0.0045));
-          else fabricParts.push(buildRim(sleeveRing(sl, axis, side, cuffStart, sl.cuff.scale), 0.0035));
-          fabricParts.push(buildRim(sleeveRing(sl, axis, side, 1, sl.cuff.scale), 0.0045));
+          else cuffParts.push({ geo: buildRim(sleeveRing(sl, axis, side, cuffStart, sl.cuff.scale), 0.0035) });
+          cuffParts.push({ geo: buildRim(sleeveRing(sl, axis, side, 1, sl.cuff.scale), 0.0045) });
           if (sl.cuff.rib) {
             // El puño en rib no lleva botón; la manga se recoge al entrar al puño.
             fabricParts.push(buildRim(sleeveRing(sl, axis, side, cuffStart + 0.01, 1), 0.004));
@@ -2725,16 +2978,18 @@
         }
       });
 
+      // El cuello va en su zona de color (igual al cuerpo salvo que el cliente lo cambie).
+      const addCollar = (geos, rib = false) => geos.forEach(geo => collarParts.push({ geo, rib }));
       if (cfg.collar === 'rib') {
-        fabricParts.push(buildRim(torsoRing(cfg, 1, -0.004, 1.06), 0.016));
+        addCollar([buildRim(torsoRing(cfg, 1, -0.004, 1.06), 0.016)]);
       } else if (cfg.collar === 'hood') {
         fabricParts.push(...buildHood(cfg));
       } else if (cfg.collar === 'mandarin') {
-        fabricParts.push(...buildMandarinCollar(cfg));
+        addCollar(buildMandarinCollar(cfg));
       } else if (cfg.collar === 'revere') {
         // Cuello de solapa abierto en V, con vivo en el borde.
         const [stand, leaf, , standTop] = buildShirtCollar(cfg);
-        fabricParts.push(stand, leaf, standTop);
+        addCollar([stand, leaf, standTop]);
         // Vivo solo en el borde exterior del cuello (no en las puntas, que van bajo las solapas).
         const outer = [];
         for (let j = 0; j <= 140; j++) outer.push(collarLeafPoint(cfg, 1, j / 140));
@@ -2742,13 +2997,10 @@
       } else if (cfg.collar === 'polo') {
         // Mismo corte del cuello camisero, pero en tejido rib.
         const [stand, leaf, ...rims] = buildShirtCollar(cfg);
-        ribParts.push(stand, leaf);
-        fabricParts.push(...rims);
-      } else if (cfg.collarAccent) {
-        // Cuello camisero completo en el color de contraste (bata).
-        accentParts.push(...buildShirtCollar(cfg));
+        addCollar([stand, leaf], true);
+        addCollar(rims);
       } else {
-        fabricParts.push(...buildShirtCollar(cfg));
+        addCollar(buildShirtCollar(cfg));
       }
 
       if (cfg.waistband) {
@@ -2798,7 +3050,7 @@
         if (td.pockets.length && !pocket) pocket = td.pockets[0];
       }
 
-      return { torso, pocket, fabricParts, ribParts, trimParts, buttonParts, pipingParts, shadeParts, accentParts, zipperParts };
+      return { torso, pocket, fabricParts, ribParts, trimParts, buttonParts, pipingParts, shadeParts, accentParts, zipperParts, collarParts, cuffParts };
     }
 
     function buildButtonGeometry(radius) {
@@ -2933,10 +3185,26 @@
       // Vivos (ribetes en contraste) de la túnica: siempre blancos.
       const pipingMaterial = new THREE.MeshStandardMaterial({ color: new THREE.Color('#F2F2EE'), roughness: 0.6, metalness: 0 });
 
-      // Piezas en color de contraste (cuello y franjas de la bata): misma tela,
-      // con el color fijo de la prenda (cfg.accent).
-      const accentMaterial = fabric.clone();
-      accentMaterial.color = new THREE.Color('#7A1E2C');
+      // Zonas de color (cuello, puños, franjas de bolsillos): misma tela que el
+      // cuerpo; si el cliente no elige otro color siguen el color del cuerpo.
+      const zoneColors = { cuello: null, puno: null, detalle: null };
+      const zoneTargets = {};
+      const zoneMaterials = {};
+      const zoneRibMaterials = {};
+      Object.keys(COLOR_ZONES).forEach(z => {
+        zoneTargets[z] = new THREE.Color();
+        zoneMaterials[z] = fabric.clone();
+        zoneRibMaterials[z] = ribMaterial.clone();
+      });
+
+      function syncZoneMaterials() {
+        Object.keys(COLOR_ZONES).forEach(z => {
+          const c = zoneColors[z] && resolveColor(zoneColors[z]);
+          if (c) zoneTargets[z].set(c.hex);
+          zoneMaterials[z].color.copy(c ? zoneTargets[z] : fabric.color);
+          zoneRibMaterials[z].color.copy(zoneMaterials[z].color);
+        });
+      }
 
       // Cremallera: dientes y tirador metálicos oscuros.
       const zipperMaterial = new THREE.MeshStandardMaterial({ color: new THREE.Color('#2A2D33'), roughness: 0.35, metalness: 0.55 });
@@ -2946,7 +3214,7 @@
       const BUTTON_DARK = new THREE.Color('#1F2328');
       const BUTTON_LIGHT = new THREE.Color('#E8E8E4');
       function setButtonColor() {
-        const cfg = GARMENTS[garment.key];
+        const cfg = garment.cfg;
         if (cfg && cfg.buttonContrast) {
           const lum = 0.2126 * fabric.color.r + 0.7152 * fabric.color.g + 0.0722 * fabric.color.b;
           buttonMaterial.color.copy(lum > 0.25 ? BUTTON_DARK : BUTTON_LIGHT);
@@ -2960,7 +3228,7 @@
 
       const shirt = new THREE.Group();
       scene.add(shirt);
-      const garment = { key: null, torsoMesh: null, pocketMesh: null, extraMeshes: [] };
+      const garment = { key: null, cfg: null, torsoMesh: null, pocketMesh: null, extraMeshes: [] };
 
       function disposeShirt() {
         [...shirt.children].forEach(child => {
@@ -2969,8 +3237,7 @@
         });
       }
 
-      function buildShirt(key) {
-        const cfg = GARMENTS[key];
+      function buildShirt(key, cfg = GARMENTS[key]) {
         disposeShirt();
         const built = buildGarmentParts(cfg);
         garment.extraMeshes = [];
@@ -2998,13 +3265,15 @@
           mesh.castShadow = true;
           shirt.add(mesh);
         });
-        if (cfg.accent) accentMaterial.color.set(cfg.accent);
-        (built.accentParts || []).forEach(geo => {
-          const mesh = new THREE.Mesh(geo, accentMaterial);
+        const addZone = (geo, zone, rib) => {
+          const mesh = new THREE.Mesh(geo, rib ? zoneRibMaterials[zone] : zoneMaterials[zone]);
           mesh.castShadow = true;
           mesh.receiveShadow = true;
           shirt.add(mesh);
-        });
+        };
+        (built.accentParts || []).forEach(geo => addZone(geo, 'detalle', false));
+        (built.collarParts || []).forEach(p => addZone(p.geo, 'cuello', p.rib));
+        (built.cuffParts || []).forEach(p => addZone(p.geo, 'puno', p.rib));
         (built.zipperParts || []).forEach(geo => {
           const mesh = new THREE.Mesh(geo, zipperMaterial);
           mesh.castShadow = true;
@@ -3023,6 +3292,7 @@
           shirt.add(mesh);
         });
         garment.key = key;
+        garment.cfg = cfg;
         ground.position.y = cfg.groundY;
       }
 
@@ -3056,28 +3326,151 @@
       let colorKey = 'blanco';
 
       function setColor(key) {
-        const c = SHIRT_COLORS[key];
+        const c = resolveColor(key);
         if (!c) return;
         colorKey = key;
         targetColor.set(c.hex);
         document.querySelectorAll('#studioSwatches .studio-swatch').forEach(b => b.classList.toggle('active', b.dataset.color === key));
+        const custom = document.querySelector('#studioSwatches .studio-swatch-custom');
+        if (custom) custom.classList.toggle('active', !SHIRT_COLORS[key]);
         document.getElementById('studioSummaryColor').textContent = c.label;
       }
 
-      function syncColorSwatches() {
-        const cfg = GARMENTS[garment.key];
-        const keys = (cfg && cfg.colors) || DEFAULT_COLORS;
+      // Selector "otro color" (HEX libre) para el cuerpo o una zona.
+      function customColorHtml(attrs, value) {
+        return `<label class="studio-color-custom" title="Otro color">
+          <input type="color" ${attrs} value="${/^#[0-9a-f]{6}$/i.test(value || '') ? value : '#888888'}">
+        </label>`;
+      }
+
+      function syncColorSwatches(preferKey) {
+        const cfg = garment.cfg;
+        const configurable = !!(cfg && cfg.configurable);
+        const keys = configurable ? FULL_PALETTE : ((cfg && cfg.colors) || DEFAULT_COLORS);
         const wrap = document.getElementById('studioSwatches');
-        wrap.style.gridTemplateColumns = `repeat(${Math.max(keys.length, 3)}, 1fr)`;
-        wrap.innerHTML = keys.map(k => `<button type="button" class="studio-swatch" data-color="${k}"><span class="studio-swatch-dot" style="background: ${SHIRT_COLORS[k].hex};"></span>${SHIRT_COLORS[k].label}</button>`).join('');
-        setColor(keys.includes(colorKey) ? colorKey : keys[0]);
+        wrap.classList.toggle('compact', configurable);
+        if (configurable) {
+          // Paleta completa: solo puntos (el nombre aparece en el resumen) + color libre.
+          wrap.style.gridTemplateColumns = '';
+          wrap.innerHTML = keys.map(k => `<button type="button" class="studio-swatch" data-color="${k}" title="${SHIRT_COLORS[k].label}"><span class="studio-swatch-dot" style="background: ${SHIRT_COLORS[k].hex};"></span></button>`).join('') +
+            `<span class="studio-swatch studio-swatch-custom">${customColorHtml('data-body-color', colorKey)}</span>`;
+        } else {
+          wrap.style.gridTemplateColumns = `repeat(${Math.max(keys.length, 3)}, 1fr)`;
+          wrap.innerHTML = keys.map(k => `<button type="button" class="studio-swatch" data-color="${k}"><span class="studio-swatch-dot" style="background: ${SHIRT_COLORS[k].hex};"></span>${SHIRT_COLORS[k].label}</button>`).join('');
+        }
+        const wanted = preferKey && (keys.includes(preferKey) || (configurable && resolveColor(preferKey))) ? preferKey : null;
+        const keep = keys.includes(colorKey) || (configurable && resolveColor(colorKey));
+        setColor(wanted || (keep ? colorKey : keys[0]));
       }
 
       document.getElementById('studioSwatches').addEventListener('click', e => {
-        const btn = e.target.closest('.studio-swatch');
+        const btn = e.target.closest('button.studio-swatch');
         if (btn) setColor(btn.dataset.color);
       });
+      document.getElementById('studioSwatches').addEventListener('input', e => {
+        if (e.target.matches('input[data-body-color]')) setColor(e.target.value);
+      });
       syncColorSwatches();
+
+      // --- Opciones de la prenda (cuello, manga, cierre, bolsillos) ---
+      function renderOptionControls() {
+        const card = document.getElementById('studioOptionsCard');
+        const cfg = garment.cfg;
+        if (!cfg || !cfg.configurable) {
+          card.hidden = true;
+          return;
+        }
+        card.hidden = false;
+        document.getElementById('studioOptions').innerHTML = Object.entries(OPTION_GROUPS).map(([group, g]) => `
+          <div class="studio-field-label"><span>${g.label}</span></div>
+          <div class="studio-option-group" role="group" aria-label="${g.label}">
+            ${Object.entries(g.choices).map(([value, label]) => `<button type="button" class="studio-placement${cfg.options[group] === value ? ' active' : ''}" data-option-group="${group}" data-option-value="${value}">${label}</button>`).join('')}
+          </div>`).join('');
+      }
+
+      function setOption(group, value) {
+        const cfg = garment.cfg;
+        if (!cfg || !cfg.configurable || cfg.options[group] === value) return;
+        const next = garmentConfig(garment.key, { ...cfg.options, [group]: value });
+        buildShirt(garment.key, next);
+        if (!next.logoPlacements[logoState.placement]) {
+          logoState.placement = next.defaultPlacement;
+          logoState.sizeCm = next.logoPlacements[logoState.placement].defaultCm;
+          logoSize.value = logoState.sizeCm;
+          logoSizeLabel.textContent = `${logoState.sizeCm} cm`;
+        }
+        syncPlacementButtons();
+        placeLogo();
+        updateLogoSummary();
+        renderOptionControls();
+        renderZoneControls();
+        updateDesignSummary();
+        // Se gira la prenda para mostrar lo que cambió.
+        if (group === 'manga') goToView('right');
+        else goToView('front');
+      }
+
+      document.getElementById('studioOptions').addEventListener('click', e => {
+        const btn = e.target.closest('[data-option-group]');
+        if (btn) setOption(btn.dataset.optionGroup, btn.dataset.optionValue);
+      });
+
+      // --- Color por zonas ---
+      function renderZoneControls() {
+        const wrap = document.getElementById('studioZones');
+        const zones = zonesForConfig(garment.cfg);
+        wrap.hidden = zones.length === 0;
+        wrap.innerHTML = zones.length ? `<div class="studio-field-label"><span>Detalles en contraste</span></div>` + zones.map(z => {
+          const current = zoneColors[z];
+          return `
+            <div class="studio-zone">
+              <div class="studio-zone-label">${COLOR_ZONES[z]}</div>
+              <div class="studio-zone-dots">
+                <button type="button" class="studio-zone-same${current ? '' : ' active'}" data-zone="${z}" data-zone-color="">Igual</button>
+                ${FULL_PALETTE.map(k => `<button type="button" class="studio-zone-dot${current === k ? ' active' : ''}" data-zone="${z}" data-zone-color="${k}" title="${SHIRT_COLORS[k].label}" style="background: ${SHIRT_COLORS[k].hex};"></button>`).join('')}
+                <span class="studio-zone-dot studio-zone-custom${current && !SHIRT_COLORS[current] ? ' active' : ''}">${customColorHtml(`data-zone-custom="${z}"`, current)}</span>
+              </div>
+            </div>`;
+        }).join('') : '';
+      }
+
+      function setZoneColor(zone, value) {
+        zoneColors[zone] = value || null;
+        renderZoneControls();
+        updateDesignSummary();
+      }
+
+      document.getElementById('studioZones').addEventListener('click', e => {
+        const btn = e.target.closest('button[data-zone]');
+        if (btn) setZoneColor(btn.dataset.zone, btn.dataset.zoneColor);
+      });
+      document.getElementById('studioZones').addEventListener('change', e => {
+        if (e.target.matches('input[data-zone-custom]')) setZoneColor(e.target.dataset.zoneCustom, e.target.value);
+      });
+
+      function zonesSummary() {
+        return zonesForConfig(garment.cfg)
+          .filter(z => zoneColors[z])
+          .map(z => `${COLOR_ZONES[z]} ${resolveColor(zoneColors[z]).label.toLowerCase()}`)
+          .join(' · ');
+      }
+
+      function updateDesignSummary() {
+        const cfg = garment.cfg;
+        document.getElementById('studioSummaryGarment').textContent = cfg.label;
+        document.getElementById('studioSummaryCollar').textContent = cfg.summary.cuello || '';
+        document.getElementById('studioSummaryCollarRow').hidden = !cfg.summary.cuello;
+        document.getElementById('studioSummarySleeve').textContent = cfg.summary.manga || '';
+        document.getElementById('studioSummarySleeveRow').hidden = !cfg.summary.manga;
+        document.getElementById('studioSummaryClosure').textContent = cfg.summary.cierre || '';
+        document.getElementById('studioSummaryClosureRow').hidden = !cfg.summary.cierre;
+        const pocketRow = document.getElementById('studioSummaryPocketRow');
+        pocketRow.hidden = !cfg.summary.bolsillo;
+        document.getElementById('studioSummaryPocket').textContent = cfg.summary.bolsillo || '';
+        const contrast = zonesSummary();
+        document.getElementById('studioSummaryContrast').textContent = contrast;
+        document.getElementById('studioSummaryContrastRow').hidden = !contrast;
+      }
 
       // --- Vistas y giro ---
       let viewAnim = null;
@@ -3140,6 +3533,7 @@
         setButtonColor();
         ribMaterial.color.copy(fabric.color);
         shadeMaterial.color.copy(fabric.color).multiplyScalar(0.35);
+        syncZoneMaterials();
         controls.update();
         renderer.render(scene, camera);
         requestAnimationFrame(tick);
@@ -3194,7 +3588,7 @@
         logoMeshes = [];
         if (!logoState.texture) return;
 
-        const spot = GARMENTS[garment.key].logoPlacements[logoState.placement];
+        const spot = garment.cfg.logoPlacements[logoState.placement];
         if (!spot) return;
         const front = LOGO_PLACEMENTS[logoState.placement].side === 'front';
         const origin = new THREE.Vector3(spot.x, spot.y, front ? 2 : -2);
@@ -3266,7 +3660,7 @@
           logoState.name = file.name;
           logoState.file = file;
           logoState.storedPath = opts.storedPath || null;
-          const spots = GARMENTS[garment.key].logoPlacements;
+          const spots = garment.cfg.logoPlacements;
           if (opts.placement && spots[opts.placement]) {
             logoState.placement = opts.placement;
             logoState.sizeCm = opts.sizeCm || spots[opts.placement].defaultCm;
@@ -3333,7 +3727,7 @@
         const btn = e.target.closest('.studio-placement');
         if (!btn) return;
         const key = btn.dataset.placement;
-        const spot = GARMENTS[garment.key].logoPlacements[key];
+        const spot = garment.cfg.logoPlacements[key];
         if (!spot) return;
         logoState.placement = key;
         logoState.sizeCm = spot.defaultCm;
@@ -3363,16 +3757,26 @@
       // --- Prenda ---
       // Cada prenda tiene sus propias ubicaciones de logo.
       function syncPlacementButtons() {
-        const keys = Object.keys(GARMENTS[garment.key].logoPlacements);
+        const keys = Object.keys(garment.cfg.logoPlacements);
         const wrap = document.getElementById('studioPlacements');
         wrap.style.gridTemplateColumns = `repeat(${keys.length}, 1fr)`;
         wrap.innerHTML = keys.map(k => `<button type="button" class="studio-placement${k === logoState.placement ? ' active' : ''}" data-placement="${k}">${LOGO_PLACEMENTS[k].short}</button>`).join('');
       }
 
-      function setGarment(key) {
-        const cfg = GARMENTS[key];
-        if (!cfg || key === garment.key) return;
-        buildShirt(key);
+      // Cambia de prenda. `opts` y `zones` vienen de un diseño guardado (prendas
+      // configurables); sin ellos se usan los valores por defecto de la prenda.
+      function setGarment(key, opts = null, zones = null) {
+        const base = GARMENTS[key];
+        if (!base) return;
+        const changing = key !== garment.key;
+        if (!changing && !opts && !zones) return;
+        const cfg = garmentConfig(key, opts);
+        buildShirt(key, cfg);
+        Object.keys(zoneColors).forEach(z => { zoneColors[z] = null; });
+        const zoneSource = zones || (base.configurable && base.configurable.zoneDefaults) || {};
+        Object.keys(zoneSource).forEach(z => {
+          if (z in zoneColors && resolveColor(zoneSource[z])) zoneColors[z] = zoneSource[z];
+        });
         // Cada prenda arranca con su ubicación de logo habitual.
         logoState.placement = cfg.defaultPlacement;
         logoState.sizeCm = cfg.logoPlacements[logoState.placement].defaultCm;
@@ -3387,17 +3791,15 @@
           b.classList.toggle('active', on);
           b.setAttribute('aria-pressed', on ? 'true' : 'false');
         });
-        document.getElementById('studioSummaryGarment').textContent = cfg.label;
-        syncColorSwatches();
-        document.getElementById('studioSummaryCollar').textContent = cfg.summary.cuello || '';
-        document.getElementById('studioSummaryCollarRow').hidden = !cfg.summary.cuello;
-        document.getElementById('studioSummarySleeve').textContent = cfg.summary.manga || '';
-        document.getElementById('studioSummarySleeveRow').hidden = !cfg.summary.manga;
-        const pocketRow = document.getElementById('studioSummaryPocketRow');
-        pocketRow.hidden = !cfg.summary.bolsillo;
-        document.getElementById('studioSummaryPocket').textContent = cfg.summary.bolsillo || '';
-        setCameraDistance(cfg.cameraDistance || CAMERA_DISTANCE);
-        goToView('front');
+        // Al elegir una prenda configurable se arranca con su color de catálogo.
+        syncColorSwatches(changing && base.configurable ? base.thumbColor : null);
+        renderOptionControls();
+        renderZoneControls();
+        updateDesignSummary();
+        if (changing) {
+          setCameraDistance(cfg.cameraDistance || CAMERA_DISTANCE);
+          goToView('front');
+        }
       }
 
       function setCameraDistance(d) {
@@ -3544,13 +3946,22 @@
             logo_nombre: logoState.file ? logoState.name : null,
             logo_ubicacion: logoState.file ? logoState.placement : null,
             logo_ancho_cm: logoState.file ? logoState.sizeCm : null,
+            // Prendas configurables: cuello, manga, cierre, bolsillos y colores por zona.
+            opciones: garment.cfg.configurable ? { ...garment.cfg.options, zonas: { ...zoneColors } } : null,
             updated_at: new Date().toISOString()
           };
 
-          const query = updating
-            ? window._supabase.from(DESIGNS_TABLE).update(row).eq('id', currentDesign.id).select().single()
-            : window._supabase.from(DESIGNS_TABLE).insert(row).select().single();
-          const { data, error } = await query;
+          const runQuery = r => updating
+            ? window._supabase.from(DESIGNS_TABLE).update(r).eq('id', currentDesign.id).select().single()
+            : window._supabase.from(DESIGNS_TABLE).insert(r).select().single();
+          let { data, error } = await runQuery(row);
+          // Si todavía no existe la columna `opciones` (migración pendiente), se
+          // guarda sin ella para no perder el diseño.
+          if (error && /opciones/i.test(error.message || '')) {
+            console.warn('Falta la columna opciones en studio_designs; se guarda sin opciones.');
+            const { opciones, ...rest } = row;
+            ({ data, error } = await runQuery(rest));
+          }
           if (error) throw error;
 
           // El archivo anterior ya no lo usa nadie.
@@ -3577,8 +3988,12 @@
 
       function designMeta(d) {
         const g = GARMENTS[d.prenda];
-        const c = SHIRT_COLORS[d.color];
+        const c = resolveColor(d.color);
         const parts = [g ? g.label : d.prenda, c ? c.label : d.color];
+        if (g && g.configurable && d.opciones) {
+          const cfg = garmentConfig(d.prenda, d.opciones);
+          parts.push(`Cuello ${cfg.summary.cuello.toLowerCase()}`, `manga ${cfg.summary.manga.toLowerCase()}`);
+        }
         if (d.logo_path && LOGO_PLACEMENTS[d.logo_ubicacion]) parts.push(`Logo ${LOGO_PLACEMENTS[d.logo_ubicacion].label.toLowerCase()}`);
         return parts.join(' · ');
       }
@@ -3726,8 +4141,9 @@
         setSaveMsg('Abriendo diseño…');
         // Los diseños ya creados se conservan aunque su prenda se deshabilite.
         showGarmentOption(d.prenda, true);
-        setGarment(d.prenda);
-        if (SHIRT_COLORS[d.color]) setColor(d.color);
+        // Siempre se reconstruye: el diseño puede tener otras opciones o zonas.
+        setGarment(d.prenda, d.opciones || {}, (d.opciones && d.opciones.zonas) || null);
+        if (resolveColor(d.color)) setColor(d.color);
         removeLogo();
         if (d.logo_path) {
           const { data, error } = await window._supabase.storage.from(LOGOS_BUCKET).download(d.logo_path);
@@ -3966,16 +4382,24 @@
 
       // Foto (PNG) de una prenda para las tarjetas del DS Hub del admin, que
       // carga esta página oculta con ?embed=1 y llama a esta función.
-      function snapshot(key, snapColor = 'blanco') {
+      function snapshot(key, snapColor = 'blanco', opts = null) {
         if (!GARMENTS[key]) return null;
-        buildShirt(key);
-        const allowed = GARMENTS[key].colors || DEFAULT_COLORS;
-        const c = SHIRT_COLORS[allowed.includes(snapColor) ? snapColor : (GARMENTS[key].thumbColor || allowed[0])];
+        const cfg = garmentConfig(key, opts);
+        buildShirt(key, cfg);
+        const allowed = cfg.configurable ? FULL_PALETTE : (cfg.colors || DEFAULT_COLORS);
+        const valid = cfg.configurable ? resolveColor(snapColor) : (allowed.includes(snapColor) && SHIRT_COLORS[snapColor]);
+        const c = valid || SHIRT_COLORS[cfg.thumbColor || allowed[0]];
         fabric.color.set(c.hex);
         targetColor.set(c.hex);
         setButtonColor();
         ribMaterial.color.copy(fabric.color);
         shadeMaterial.color.copy(fabric.color).multiplyScalar(0.35);
+        Object.keys(zoneColors).forEach(z => { zoneColors[z] = null; });
+        const zoneSource = (opts && opts.zonas) || (cfg.configurable && cfg.configurable.zoneDefaults) || {};
+        Object.keys(zoneSource).forEach(z => {
+          if (z in zoneColors && resolveColor(zoneSource[z])) zoneColors[z] = zoneSource[z];
+        });
+        syncZoneMaterials();
         viewAnim = null;
         controls.autoRotate = false;
         // Vista 3/4 para que se lean mangas, cuello y volumen.
