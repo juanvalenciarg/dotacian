@@ -1156,6 +1156,15 @@
                     <span class="studio-garment-meta">Túnica con vivos + pantalón de resorte</span>
                   </span>
                 </button>
+                <button type="button" class="studio-garment studio-garment-option" data-garment="bata" aria-pressed="false">
+                  <span class="studio-garment-icon">
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 3 4 5.5 2.5 11l3 .8L7 9v12h10V9l1.5 2.8 3-.8L20 5.5 15 3"></path><path d="M9 3l3 3 3-3"></path><path d="M12 6v15"></path><path d="M8 15h3M13 15h3"></path></svg>
+                  </span>
+                  <span>
+                    <span class="studio-garment-name">Bata</span>
+                    <span class="studio-garment-meta">Cuello en contraste · Cremallera · Bolsillos con franja</span>
+                  </span>
+                </button>
                 <button type="button" class="studio-garment studio-garment-option" data-garment="filipina" aria-pressed="false">
                   <span class="studio-garment-icon">
                     <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 3h6v2H9z"></path><path d="M9 5 4 7 2.5 21h4L8 10v12h8V10l1.5 11h4L20 7l-5-2"></path><path d="M9 5l4 17"></path><circle cx="10.5" cy="10" r="0.6"></circle><circle cx="14.5" cy="10" r="0.6"></circle><circle cx="10.8" cy="14" r="0.6"></circle><circle cx="14.8" cy="14" r="0.6"></circle></svg>
@@ -1288,7 +1297,8 @@
       rojo: { label: 'Rojo', hex: '#B4232C' },
       beige: { label: 'Beige', hex: '#C8B48E' },
       azulMarino: { label: 'Azul marino', hex: '#1F2A44' },
-      gris: { label: 'Gris', hex: '#5E646E' }
+      gris: { label: 'Gris', hex: '#5E646E' },
+      grafito: { label: 'Gris grafito', hex: '#3C4049' }
     };
 
     // Colores de cada prenda (si la prenda no define `colors`, usa estos).
@@ -1698,6 +1708,61 @@
           pechoIzq: { x: -0.43 + 0.15, y: 0.17, defaultCm: 7 },
           pechoDer: { x: -0.43 - 0.15, y: 0.17, defaultCm: 7 },
           espalda: { x: -0.43, y: 0.06, defaultCm: 22 }
+        }
+      },
+
+      // Bata de limpieza / servicio: entallada, cierre de cremallera, cuello
+      // camisero y franjas de los bolsillos en color de contraste (vinotinto).
+      bata: {
+        label: 'Bata',
+        meta: 'Cuello en contraste · Cremallera · Bolsillos con franja',
+        summary: { cuello: 'Camisero en vinotinto', manga: 'Corta con dobladillo', bolsillo: 'Inferiores con franja vinotinto' },
+        colors: ['grafito', 'azulMarino', 'negro', 'gris'],
+        thumbColor: 'grafito',
+        accent: '#7A1E2C', // vinotinto del cuello y las franjas
+        profile: [
+          { y: -0.80, a: 0.360, b: 0.176, n: 2.6 },
+          { y: -0.55, a: 0.346, b: 0.168, n: 2.6 },
+          { y: -0.22, a: 0.312, b: 0.156, n: 2.6 }, // talle entallado
+          { y: 0.06, a: 0.336, b: 0.176, n: 2.5 },
+          { y: 0.24, a: 0.346, b: 0.177, n: 2.4 },
+          { y: 0.325, a: 0.314, b: 0.156, n: 2.3 },
+          { y: 0.385, a: 0.236, b: 0.128, n: 2.1 },
+          { y: 0.422, a: 0.160, b: 0.111, n: 2.0 },
+          { y: 0.437, a: 0.116, b: 0.103, n: 2.0 }
+        ],
+        neckStart: 5,
+        neckDip: 0.03,
+        hemCurve: 0,
+        waistFold: 0.002,
+        sleeve: {
+          angleStart: deg(50),
+          angleEnd: deg(50),
+          length: 0.27,
+          hemTilt: 0.06,
+          forward: deg(12),
+          start: -0.18,
+          rBase: [0.156, 0.148],
+          rEnd: [0.128, 0.116],
+          flare: false,
+          shoulder: new THREE.Vector3(0.333, 0.334, 0),
+          cuff: { length: 0.04, scale: 1.04, button: false } // dobladillo doblado
+        },
+        collar: 'shirt',
+        collarAccent: true,
+        collarStandH: 0.022, // pie de cuello bajo: el cuello cae plano, como en la referencia
+        collarTip: 1.15,
+        placket: false,
+        pocket: null,
+        zipper: { inset: 0.004 },
+        princessSeams: { x: 0.14, topY: 0.27, bend: 0.03 },
+        lowerPockets: { yTop: -0.43, yBottom: -0.66, x0: 0.07, x1: 0.24, accentBand: 0.034 },
+        groundY: -0.86,
+        defaultPlacement: 'pechoIzq',
+        logoPlacements: {
+          pechoIzq: { x: 0.16, y: 0.17, defaultCm: 7 },
+          pechoDer: { x: -0.16, y: 0.17, defaultCm: 7 },
+          espalda: { x: 0, y: 0.06, defaultCm: 24 }
         }
       }
     };
@@ -2503,7 +2568,7 @@
     }
 
     function buildTunicDetails(cfg) {
-      const fabric = [], piping = [], pockets = [], shade = [];
+      const fabric = [], piping = [], pockets = [], shade = [], accent = [], zipper = [];
       if (cfg.lapels) {
         const lp = buildLapels(cfg);
         fabric.push(...lp.fabric);
@@ -2517,6 +2582,25 @@
         const pts = [];
         for (let i = 0; i <= 30; i++) pts.push([cfg.concealedPlacket.x, THREE.MathUtils.lerp(topY, hemY, i / 30)]);
         fabric.push(tunicLine(cfg, 'front', pts, 0.0022));
+      }
+      // Cierre de cremallera al centro del frente (bata): dientes, cinta y tirador.
+      if (cfg.zipper) {
+        const neckY = torsoPoint(cfg, 1, 0.25).y - (cfg.zipper.inset || 0);
+        const teeth = [];
+        for (let i = 0; i <= 40; i++) teeth.push([0, THREE.MathUtils.lerp(neckY, hemY, i / 40)]);
+        zipper.push(tunicLine(cfg, 'front', teeth, 0.0034, 0.0035));
+        [-1, 1].forEach(sg => {
+          const tape = teeth.map(([, y]) => [sg * 0.009, y]);
+          fabric.push(tunicLine(cfg, 'front', tape, 0.0014, 0.0022));
+        });
+        const top = frontPointAt(cfg, frontV(cfg, neckY - 0.03), 0);
+        const pull = new THREE.BoxGeometry(0.011, 0.028, 0.004);
+        const holder = new THREE.Object3D();
+        holder.position.copy(top.point.clone().addScaledVector(top.normal, 0.008));
+        holder.lookAt(holder.position.clone().add(top.normal));
+        holder.updateMatrix();
+        pull.applyMatrix4(holder.matrix);
+        zipper.push(pull);
       }
       // Costuras de pinza (princesa) al frente y atrás.
       if (cfg.princessSeams) {
@@ -2549,12 +2633,26 @@
           for (let j = 1; j <= cols; j++) border.push(at(0, j));
           for (let i = 1; i <= rows; i++) border.push(at(i, cols));
           fabric.push(buildRim(border, 0.0022, false));
-          const top = [];
-          for (let j = 0; j <= cols; j++) top.push(at(rows, j));
-          piping.push(buildRim(top, 0.0045, false));
+          if (lp.accentBand) {
+            // Franja en color de contraste en la boca del bolsillo (bata).
+            const bandAt = (i, j) => {
+              const y = THREE.MathUtils.lerp(lp.yTop - lp.accentBand, lp.yTop, i / 4);
+              const x = sg * THREE.MathUtils.lerp(lp.x0 - 0.004, lp.x1 + 0.004, j / cols);
+              const { point, normal } = frontPointAt(cfg, frontV(cfg, y), x);
+              return point.addScaledVector(normal, offset + 0.0018);
+            };
+            accent.push(buildGrid(4, cols, (v, u) => bandAt(Math.round(v * 4), Math.round(u * cols)), (v, u) => ({ u, v })));
+            const bandEdge = [];
+            for (let j = 0; j <= cols; j++) bandEdge.push(bandAt(0, j));
+            accent.push(buildRim(bandEdge, 0.0016, false));
+          } else {
+            const top = [];
+            for (let j = 0; j <= cols; j++) top.push(at(rows, j));
+            piping.push(buildRim(top, 0.0045, false));
+          }
         });
       }
-      return { fabric, piping, pockets, shade };
+      return { fabric, piping, pockets, shade, accent, zipper };
     }
 
     // Conjunto (túnica + pantalón) lado a lado, como en la foto de catálogo.
@@ -2591,6 +2689,8 @@
       const trimParts = [];  // herretes y ojales
       const buttonParts = [];
       const pipingParts = []; // vivos en color contraste (túnica)
+      const accentParts = []; // piezas en el color de contraste de la prenda (cfg.accent)
+      const zipperParts = []; // cremallera
       if (cfg.pants) return buildPantsParts(cfg);
       const torso = buildTorso(cfg);
       fabricParts.push(torso);
@@ -2644,6 +2744,9 @@
         const [stand, leaf, ...rims] = buildShirtCollar(cfg);
         ribParts.push(stand, leaf);
         fabricParts.push(...rims);
+      } else if (cfg.collarAccent) {
+        // Cuello camisero completo en el color de contraste (bata).
+        accentParts.push(...buildShirtCollar(cfg));
       } else {
         fabricParts.push(...buildShirtCollar(cfg));
       }
@@ -2685,15 +2788,17 @@
       }
 
       const shadeParts = []; // interior visible de la prenda (abertura en V)
-      if (cfg.lapels || cfg.concealedPlacket || cfg.princessSeams || cfg.lowerPockets) {
+      if (cfg.lapels || cfg.concealedPlacket || cfg.princessSeams || cfg.lowerPockets || cfg.zipper) {
         const td = buildTunicDetails(cfg);
         fabricParts.push(...td.fabric, ...td.pockets);
         pipingParts.push(...td.piping);
         shadeParts.push(...td.shade);
+        accentParts.push(...td.accent);
+        zipperParts.push(...td.zipper);
         if (td.pockets.length && !pocket) pocket = td.pockets[0];
       }
 
-      return { torso, pocket, fabricParts, ribParts, trimParts, buttonParts, pipingParts, shadeParts };
+      return { torso, pocket, fabricParts, ribParts, trimParts, buttonParts, pipingParts, shadeParts, accentParts, zipperParts };
     }
 
     function buildButtonGeometry(radius) {
@@ -2828,6 +2933,14 @@
       // Vivos (ribetes en contraste) de la túnica: siempre blancos.
       const pipingMaterial = new THREE.MeshStandardMaterial({ color: new THREE.Color('#F2F2EE'), roughness: 0.6, metalness: 0 });
 
+      // Piezas en color de contraste (cuello y franjas de la bata): misma tela,
+      // con el color fijo de la prenda (cfg.accent).
+      const accentMaterial = fabric.clone();
+      accentMaterial.color = new THREE.Color('#7A1E2C');
+
+      // Cremallera: dientes y tirador metálicos oscuros.
+      const zipperMaterial = new THREE.MeshStandardMaterial({ color: new THREE.Color('#2A2D33'), roughness: 0.35, metalness: 0.55 });
+
       // Botones: mismo tono de la tela (un poco más oscuros) o, en prendas con
       // buttonContrast (filipina), oscuros sobre tela clara y claros sobre oscura.
       const BUTTON_DARK = new THREE.Color('#1F2328');
@@ -2882,6 +2995,18 @@
         });
         (built.pipingParts || []).forEach(geo => {
           const mesh = new THREE.Mesh(geo, pipingMaterial);
+          mesh.castShadow = true;
+          shirt.add(mesh);
+        });
+        if (cfg.accent) accentMaterial.color.set(cfg.accent);
+        (built.accentParts || []).forEach(geo => {
+          const mesh = new THREE.Mesh(geo, accentMaterial);
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+          shirt.add(mesh);
+        });
+        (built.zipperParts || []).forEach(geo => {
+          const mesh = new THREE.Mesh(geo, zipperMaterial);
           mesh.castShadow = true;
           shirt.add(mesh);
         });
