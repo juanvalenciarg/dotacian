@@ -1703,6 +1703,8 @@
             cierre: ['ninguno'],
             bolsillos: ['ninguno', 'pecho']
           },
+          // Manga larga sin puño: termina en dobladillo, igual que la corta.
+          labels: { manga: { larga: 'Larga' } },
           defaults: { cuello: 'redondo', manga: 'corta', cierre: 'ninguno', bolsillos: 'ninguno' },
           zoneDefaults: {},
           neckDip: { redondo: 0.07, enV: 0.03 },
@@ -1718,7 +1720,7 @@
               angleStart: deg(50), angleEnd: deg(84), length: 0.86, hemTilt: 0, forward: deg(9), start: -0.18,
               rBase: [0.160, 0.152], rEnd: [0.074, 0.070], flare: false,
               shoulder: new THREE.Vector3(0.335, 0.332, 0),
-              cuff: { length: 0.085, scale: 0.8, rib: true }
+              cuff: null
             }
           },
           chestPocket: { x0: 0.078, x1: 0.205, yTop: 0.165, yBottom: 0.02 },
@@ -1810,6 +1812,12 @@
         groundY: -0.86,
         // Opciones que el cliente puede cambiar (ver garmentConfig).
         configurable: {
+          // Camisa: cuello camisero o mao, siempre con botones y bolsillo de pecho.
+          choices: {
+            cuello: ['camisero', 'mao'],
+            cierre: ['botones'],
+            bolsillos: ['pecho']
+          },
           defaults: { cuello: 'camisero', manga: 'larga', cierre: 'botones', bolsillos: 'pecho' },
           zoneDefaults: {},
           sleeves: {
