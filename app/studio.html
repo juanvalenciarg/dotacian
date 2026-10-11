@@ -3728,7 +3728,7 @@
       ground.receiveShadow = true;
       scene.add(ground);
 
-      buildShirt('camiseta');
+      buildShirt('camiseta', garmentConfig('camiseta'));
 
       function resize() {
         const w = viewer.clientWidth;
@@ -3859,6 +3859,10 @@
         renderZoneControls();
         updateDesignSummary();
       }
+
+      // La prenda inicial (camiseta) también muestra sus opciones.
+      renderOptionControls();
+      renderZoneControls();
 
       document.getElementById('studioZones').addEventListener('click', e => {
         const btn = e.target.closest('button[data-zone]');
