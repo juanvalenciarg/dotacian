@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <link rel="icon" type="image/svg+xml" href="assets/logos/favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dotacian | Gestión de Pedidos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- PDF Generation Support Library -->
+
+  <style>
+    .search-container {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+
+    .search-input-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .search-input-group label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-navy);
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #E2E8F0;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: inherit;
+      background: white;
+      box-sizing: border-box;
+    }
+
+    .search-input:focus {
+      border-color: var(--color-brand-primary);
+    }
+
+    .drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(2px);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .drawer-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .user-card {
+      position: fixed;
+      top: 0;
+      right: -700px;
+      width: 100%;
+      max-width: 640px;
+      height: 100vh;
+      background: white;
+      z-index: 1000;
+      box-shadow: -4px 0 15px rgba(0, 0, 0, 0.05);
+      transition: right 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .user-card.active {
+      right: 0;
+    }
+
+    .drawer-header {
+      padding: 2rem 2rem 1.5rem 2rem;
+      border-bottom: 1px solid #F1F5F9;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: white;
+    }
+
+    .drawer-content {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+      background: #FFFFFF;
+    }
+
+    .drawer-footer {
+      padding: 1.5rem 2rem;
+      border-top: 1px solid #E2E8F0;
+      background: #F8FAFC;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .form-section {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-section-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .form-section-title-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .role-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+    }
+
+    .form-control {
+      box-sizing: border-box;
+      padding: 0.75rem 1rem;
+      border: 1px solid #CBD5E1;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      color: #334155;
+      background: white;
+      transition: all 0.2s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--color-cyan);
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+    }
+
+    .toast-container {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 9999;
+    }
+
+    /* Table Styles */
+    .table-container {
+      background: white;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      overflow-x: auto;
+      margin-top: 2rem;
+    }
+
+    .users-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .users-table th {
+      background: #F8FAFC;
+      color: #475569;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #E2E8F0;
+    }
+
+    .users-table td {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #E2E8F0;
+      color: #334155;
+      font-size: 0.875rem;
+    }
+
+    .users-table tbody tr {
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .users-table tbody tr:hover {
+      background-color: #F1F5F9;
+    }
+
+    .users-table .user-name {
+      font-weight: 600;
+      color: #0F172A;
+    }
+
+    .quote-item-row {
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 0.85rem;
+      margin-bottom: 0.75rem;
+      background: white;
+    }
+
+    .quote-item-row-top {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .quote-item-row-top input {
+      min-width: 0;
+    }
+
+    .quote-item-remove-btn {
+      flex-shrink: 0;
+      width: 38px;
+      border: none;
+      background: #FEF2F2;
+      color: #EF4444;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    .quote-item-remove-btn:hover {
+      background: #FEE2E2;
+    }
+
+    .quote-item-spec-fields {
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.6rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .quote-item-spec-fields label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #64748B;
+      margin-bottom: 0.3rem;
+    }
+
+    .quote-item-spec-fields .form-control {
+      width: 100%;
+      padding: 0.5rem 0.6rem;
+      font-size: 0.825rem;
+    }
+  
+    /* Diseños de Studio en la ficha de la cotización */
+    .quote-design-card {
+      display: flex;
+      gap: 1rem;
+      background: white;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 0.85rem;
+    }
+
+    .quote-design-render {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      flex-shrink: 0;
+      border-radius: 10px;
+      background: #F1F5F9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .quote-design-render img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .quote-design-logo {
+      width: 72px;
+      height: 72px;
+      border-radius: 10px;
+      border: 1px solid #E2E8F0;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.35rem;
+      flex-shrink: 0;
+    }
+
+    .quote-design-logo img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .ds-render-loading {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 3px solid #CBD5E1;
+      border-top-color: #06B6D4;
+      animation: quote-design-spin 0.9s linear infinite;
+    }
+
+    .ds-render-missing {
+      font-size: 0.72rem;
+      color: #94A3B8;
+      text-align: center;
+    }
+
+    @keyframes quote-design-spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Barra de estado de los pedidos */
+    .order-steps { display: flex; align-items: flex-start; margin: 0.5rem 0 0.25rem; }
+    .order-step { flex: 1; position: relative; text-align: center; min-width: 0; }
+    .order-step::before { content: ''; position: absolute; top: 11px; left: -50%; width: 100%; height: 3px; background: #E2E8F0; z-index: 0; }
+    .order-step:first-child::before { display: none; }
+    .order-step.done::before, .order-step.current::before { background: #06B6D4; }
+    .order-step-dot { position: relative; z-index: 1; width: 24px; height: 24px; margin: 0 auto; border-radius: 50%; background: white; border: 3px solid #E2E8F0; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: 800; }
+    .order-step.done .order-step-dot { background: #06B6D4; border-color: #06B6D4; }
+    .order-step.current .order-step-dot { border-color: #06B6D4; box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.18); }
+    .order-step.current .order-step-dot::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #06B6D4; }
+    .order-step-label { margin-top: 0.4rem; font-size: 0.68rem; font-weight: 600; color: #94A3B8; line-height: 1.25; }
+    .order-step.done .order-step-label { color: #334155; }
+    .order-step.current .order-step-label { color: #0F172A; font-weight: 800; }
+</style>
+</head>
+
+<body>
+  <div class="app-layout admin-dark">
+    <!-- Sidebar -->
+    <aside class="sidebar" style="background-color: #020617;">
+      <div class="sidebar-brand" style="padding: 1.5rem 2rem;">
+        <a href="admin.html">
+          <img src="assets/logos/logo_dotacian_admin.png" alt="dotacian admin"
+            style="width: 100%; max-width: 180px; height: auto; display: block;">
+        </a>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="admin.html" id="nav-dashboard" class="nav-item">Dashboard</a>
+        <a href="admin.empresas.html" id="nav-users" class="nav-item">Gestión de Empresas</a>
+        <a href="admin.studio.html" id="nav-studio" class="nav-item">DS Hub</a>
+        <a href="admin.sellers.html" id="nav-sellers" class="nav-item">Gestión de Fabricantes</a>
+        <a href="admin.cotizaciones.html" id="nav-cotizaciones" class="nav-item">Gestión de Cotizaciones</a>
+        <a href="admin.pedidos.html" id="nav-pedidos" class="nav-item active">Gestión de Pedidos</a>
+        <a href="admin.leads.html" id="nav-leads" class="nav-item">Gestión de Leads</a>
+        <a href="admin.facturas.html" class="nav-item">Facturación</a>
+        <a href="admin.blog.html" id="nav-blog" class="nav-item">Gestión de Blog</a>
+        <a href="#" class="nav-item">Logs de Sistema</a>
+        <a href="#" class="nav-item">Seguridad</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="app-header">
+        <h1 id="pageTitle">Gestión de Pedidos</h1>
+        <div class="header-right" style="position: relative; display: flex; align-items: center;">
+          <div id="header-company-badge" onclick="toggleUserPopover(event)"
+            style="background: white; padding: 0.5rem 1rem; border-radius: 1.25rem; border: 1px solid #E2E8F0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 0.75rem; cursor: pointer; transition: all 0.3s ease; position: relative;">
+            <div id="badge-industry-icon"
+              style="width: 32px; height: 32px; background: #F1F5F9; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--color-cyan); font-size: 1.2rem;">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            <div style="display: flex; flex-direction: column;">
+              <span id="admin-name-display"
+                style="font-weight: 700; color: #0F172A; font-size: 0.85rem; line-height: 1.2;">Administrador</span>
+              <span style="font-size: 0.65rem; color: #64748B; font-weight: 600; text-transform: uppercase;">Panel Admin</span>
+            </div>
+            <div style="margin-left: 0.25rem; color: #64748B;">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </div>
+
+            <!-- Popover -->
+            <div id="user-popover" class="user-popover" style="top: calc(100% + 0.5rem); right: 0;">
+              <div class="popover-label">Usuario</div>
+              <div id="pop-user-name" class="popover-value" style="font-size: 0.9rem;">Administrador</div>
+              <div class="popover-label">Correo Electrónico</div>
+              <div id="pop-user-email" class="popover-value" style="margin-bottom: 0; font-size: 0.8rem;">Cargando...</div>
+              <hr style="margin: 1rem 0; border: none; border-top: 1px solid #E2E8F0;">
+              <a href="#" onclick="logoutUser(); return false;"
+                style="color: #EF4444; font-size: 0.85rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; transition: color 0.2s;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Cerrar Sesión
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="app-container">
+
+        <div id="orderManagementView">
+          <!-- Buscador -->
+          <div class="search-container">
+            <div class="search-input-group">
+              <label for="searchOrder">Buscar por empresa o número</label>
+              <input type="text" id="searchOrder" class="search-input" placeholder="Empresa, PED-0001 o COT-0001..."
+                oninput="renderOrdersTable()">
+            </div>
+            <div class="search-input-group" style="flex: 0 0 240px;">
+              <label for="filterOrderStage">Etapa</label>
+              <select id="filterOrderStage" class="search-input" onchange="renderOrdersTable()">
+                <option value="">Todas</option>
+                <option value="curso">En curso</option>
+                <option value="confirmado">Confirmado</option>
+                <option value="muestras">Muestras</option>
+                <option value="produccion">En producción</option>
+                <option value="calidad">Control de calidad</option>
+                <option value="despachado">Despachado</option>
+                <option value="entregado">Entregado</option>
+                <option value="cancelado">Cancelado</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Tabla de pedidos -->
+          <div class="table-container">
+            <table class="users-table">
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>Empresa</th>
+                  <th>Cotización</th>
+                  <th>Etapa</th>
+                  <th>Entrega estimada</th>
+                  <th>Actualizado</th>
+                </tr>
+              </thead>
+              <tbody id="ordersTableBody">
+                <tr>
+                  <td colspan="6" style="text-align: center; color: #64748B; padding: 2rem;">Cargando pedidos...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Drawer de detalle -->
+          <div id="drawerOverlay" class="drawer-overlay" onclick="closeDrawer()"></div>
+          <div id="orderCard" class="user-card">
+            <div class="drawer-header">
+              <div>
+                <h2 style="margin: 0; font-family: var(--font-family-heading); color: var(--color-navy); font-size: 1.25rem;">Pedido</h2>
+                <p id="cardOrderNumber" style="margin: 0.25rem 0 0 0; color: var(--color-navy); font-size: 0.875rem; font-weight: 700;"></p>
+                <p id="cardOrderCompany" style="margin: 0.25rem 0 0 0; color: var(--color-text-secondary); font-size: 0.875rem;">-</p>
+              </div>
+              <button onclick="closeDrawer()"
+                style="background: none; border: none; font-size: 1.5rem; color: #94A3B8; cursor: pointer; line-height: 1;">&times;</button>
+            </div>
+
+            <div class="drawer-content">
+              <div class="form-section">
+                <div class="form-section-title">
+                  <div class="form-section-title-label">Estado del pedido</div>
+                </div>
+                <div id="orderSteps"></div>
+
+                <div class="form-grid" style="margin-top: 1rem;">
+                  <div class="form-group">
+                    <label for="orderStageSelect">Etapa</label>
+                    <select id="orderStageSelect" class="form-control"></select>
+                  </div>
+                  <div class="form-group">
+                    <label for="orderEstimatedDate">Entrega estimada</label>
+                    <input type="date" id="orderEstimatedDate" class="form-control">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="orderNote">Nota para el cliente (opcional)</label>
+                  <textarea id="orderNote" class="form-control" rows="3"
+                    placeholder="Ej. Las muestras de tela salen mañana; la producción inicia el lunes..."
+                    style="resize: vertical; font-family: inherit;"></textarea>
+                </div>
+                <div id="orderRequestedDate" style="font-size: 0.8rem; color: #64748B;"></div>
+              </div>
+
+              <div class="form-section">
+                <div class="form-section-title">
+                  <div class="form-section-title-label">Historial</div>
+                </div>
+                <div id="orderHistory" style="border-left: 2px solid #E2E8F0; padding-left: 0.85rem; display: flex; flex-direction: column; gap: 0.6rem;"></div>
+              </div>
+
+              <div class="form-section">
+                <div class="form-section-title">
+                  <div class="form-section-title-label">Cotización aprobada</div>
+                  <a id="orderQuoteLink" href="admin.cotizaciones.html" style="font-size: 0.8rem; font-weight: 700; color: #0891B2; text-decoration: none;">Ver en Cotizaciones →</a>
+                </div>
+                <div id="orderQuoteSummary" style="font-size: 0.8125rem; color: #334155;"></div>
+              </div>
+            </div>
+
+            <div class="drawer-footer">
+              <button class="btn btn-outline" onclick="closeDrawer()">Cerrar</button>
+              <button class="btn btn-primary" id="btnSaveOrder" onclick="saveOrder()">Guardar cambios</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="assets/js/utils.js?v=4"></script>
+  <script>
+    const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storageKey: 'dotacian-admin-token' } });
+
+    // ── Gestión de Pedidos ────────────────────────────────────────
+    // Pedidos creados al aprobarse una cotización (company_orders, ver
+    // supabase_migration_orders.sql). Aquí se cambia la etapa, la fecha
+    // estimada y la nota que ve el cliente en /app/pedidos.
+    const ORDER_STAGES = [
+      { key: 'confirmado', label: 'Confirmado' },
+      { key: 'muestras', label: 'Muestras' },
+      { key: 'produccion', label: 'En producción' },
+      { key: 'calidad', label: 'Control de calidad' },
+      { key: 'despachado', label: 'Despachado' },
+      { key: 'entregado', label: 'Entregado' }
+    ];
+    const ORDER_STAGE_LABELS = Object.fromEntries(ORDER_STAGES.map(s => [s.key, s.label]));
+    ORDER_STAGE_LABELS.cancelado = 'Cancelado';
+    const ORDER_STAGE_COLORS = {
+      confirmado: ['#FEF3C7', '#92400E'], muestras: ['#FFEDD5', '#9A3412'], produccion: ['#DBEAFE', '#1E40AF'],
+      calidad: ['#EDE9FE', '#5B21B6'], despachado: ['#E0F2FE', '#075985'], entregado: ['#D1FAE5', '#065F46'],
+      cancelado: ['#FEE2E2', '#991B1B']
+    };
+
+    let allOrders = [];
+    let currentOrder = null;
+
+    function escapeOrderHtml(str) {
+      return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function formatOrderNumber(n) { return n ? `PED-${String(n).padStart(4, '0')}` : '—'; }
+    function formatQuoteNumber(n) { return n ? `COT-${String(n).padStart(4, '0')}` : '—'; }
+
+    function formatOrderDate(value, withTime) {
+      if (!value) return '—';
+      const d = /^\d{4}-\d{2}-\d{2}$/.test(value) ? new Date(value + 'T00:00:00') : new Date(value);
+      return d.toLocaleDateString('es-MX', withTime
+        ? { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }
+        : { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function formatMoney(value, currency) {
+      const n = Number(value) || 0;
+      try {
+        return new Intl.NumberFormat({ COP: 'es-CO', MXN: 'es-MX', USD: 'en-US' }[currency] || 'es-CO', { style: 'currency', currency, maximumFractionDigits: currency === 'COP' ? 0 : 2 }).format(n);
+      } catch (e) {
+        return `${currency} ${n.toFixed(2)}`;
+      }
+    }
+
+    function stageBadge(stage) {
+      const [bg, color] = ORDER_STAGE_COLORS[stage] || ['#F1F5F9', '#334155'];
+      return `<span class="role-badge" style="background:${bg}; color:${color};">${ORDER_STAGE_LABELS[stage] || stage}</span>`;
+    }
+
+    function quoteAsksSamples(o) {
+      const line = (o.prompt_text || '').split('\n').find(l => l.startsWith('Muestras:'));
+      return !!line && !/no requiere/i.test(line);
+    }
+
+    function stagesForOrder(o) {
+      return ORDER_STAGES.filter(s => s.key !== 'muestras' || quoteAsksSamples(o) || o.stage === 'muestras');
+    }
+
+    function renderOrderSteps(o) {
+      if (o.stage === 'cancelado') {
+        return '<div style="padding: 0.6rem 0.8rem; border-radius: 10px; background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; font-size: 0.8125rem;">Pedido cancelado.</div>';
+      }
+      const stages = stagesForOrder(o);
+      const currentIdx = stages.findIndex(s => s.key === o.stage);
+      return `<div class="order-steps">${stages.map((s, idx) => {
+        const cls = o.stage === 'entregado' || idx < currentIdx ? 'done' : (idx === currentIdx ? 'current' : '');
+        return `<div class="order-step ${cls}"><div class="order-step-dot">${cls === 'done' ? '✓' : ''}</div><div class="order-step-label">${s.label}</div></div>`;
+      }).join('')}</div>`;
+    }
+
+    async function checkAdminAuth() {
+      const { data: { session } } = await _supabase.auth.getSession();
+      if (!session) {
+        window.location.href = 'login.admin.html';
+        return;
+      }
+      const { data: adminData, error } = await _supabase
+        .from('admin_profile')
+        .select('id')
+        .eq('id', session.user.id)
+        .maybeSingle();
+      if (error || !adminData) {
+        await _supabase.auth.signOut();
+        window.location.href = 'login.admin.html?error=unauthorized';
+      } else {
+        const emailEl = document.getElementById('pop-user-email');
+        if (emailEl) emailEl.textContent = session.user.email;
+        loadOrders();
+      }
+    }
+
+    checkAdminAuth();
+
+    async function loadOrders() {
+      const tbody = document.getElementById('ordersTableBody');
+      try {
+        const { data, error } = await _supabase.rpc('admin_list_orders');
+        if (error) throw error;
+        allOrders = data || [];
+        updateStageFilterCounts();
+        renderOrdersTable();
+      } catch (err) {
+        console.error('Error cargando pedidos:', err);
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #EF4444; padding: 2rem;">Error al cargar pedidos. Asegúrate de haber ejecutado la migración de pedidos en Supabase.</td></tr>';
+      }
+    }
+
+    function matchesStageFilter(o, filter) {
+      if (!filter) return true;
+      if (filter === 'curso') return o.stage !== 'entregado' && o.stage !== 'cancelado';
+      return o.stage === filter;
+    }
+
+    function updateStageFilterCounts() {
+      Array.from(document.getElementById('filterOrderStage').options).forEach(opt => {
+        const base = opt.textContent.replace(/ \(\d+\)$/, '');
+        opt.textContent = `${base} (${allOrders.filter(o => matchesStageFilter(o, opt.value)).length})`;
+      });
+    }
+
+    function renderOrdersTable() {
+      const tbody = document.getElementById('ordersTableBody');
+      const search = (document.getElementById('searchOrder').value || '').toLowerCase().trim();
+      const filter = document.getElementById('filterOrderStage').value;
+      const rows = allOrders.filter(o => matchesStageFilter(o, filter) && (!search ||
+        (o.company_name || '').toLowerCase().includes(search) ||
+        formatOrderNumber(o.order_number).toLowerCase().includes(search) ||
+        formatQuoteNumber(o.quote_number).toLowerCase().includes(search)));
+
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #64748B; padding: 2rem;">${allOrders.length ? 'No hay pedidos que coincidan con el filtro.' : 'Aún no hay pedidos. Se crean cuando un cliente aprueba una cotización.'}</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = '';
+      rows.forEach(o => {
+        const tr = document.createElement('tr');
+        tr.onclick = () => openOrderDrawer(o.id);
+        tr.innerHTML = `
+          <td style="font-weight: 700; white-space: nowrap;">${formatOrderNumber(o.order_number)}</td>
+          <td><span class="user-name">${escapeOrderHtml(o.company_name || 'Empresa')}</span></td>
+          <td style="white-space: nowrap;">${formatQuoteNumber(o.quote_number)}</td>
+          <td>${stageBadge(o.stage)}</td>
+          <td>${o.estimated_delivery ? formatOrderDate(o.estimated_delivery) : '<span style="color: #94A3B8;">Sin definir</span>'}</td>
+          <td>${formatOrderDate(o.updated_at)}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openOrderDrawer(id) {
+      const o = allOrders.find(x => x.id === id);
+      if (!o) return;
+      currentOrder = o;
+
+      document.getElementById('cardOrderNumber').textContent = `No. ${formatOrderNumber(o.order_number)} · Cotización ${formatQuoteNumber(o.quote_number)}`;
+      document.getElementById('cardOrderCompany').textContent = o.company_name || 'Empresa';
+      document.getElementById('orderSteps').innerHTML = renderOrderSteps(o);
+
+      const stageSelect = document.getElementById('orderStageSelect');
+      stageSelect.innerHTML = [...stagesForOrder(o), { key: 'cancelado', label: 'Cancelado' }]
+        .map(s => `<option value="${s.key}">${s.label}</option>`).join('');
+      stageSelect.value = o.stage;
+      document.getElementById('orderEstimatedDate').value = o.estimated_delivery || '';
+      document.getElementById('orderNote').value = '';
+
+      const requested = (o.prompt_text || '').split('\n').find(l => l.startsWith('Fecha de entrega requerida:'));
+      document.getElementById('orderRequestedDate').textContent = requested ? `El cliente pidió: ${requested.replace('Fecha de entrega requerida: ', '')}` : '';
+
+      const history = Array.isArray(o.history) ? o.history.slice().reverse() : [];
+      document.getElementById('orderHistory').innerHTML = history.length ? history.map(h => `
+        <div>
+          <div style="font-size: 0.8125rem; font-weight: 700; color: #0F172A;">${escapeOrderHtml(ORDER_STAGE_LABELS[h.stage] || h.stage)}
+            <span style="font-weight: 500; color: #94A3B8; font-size: 0.75rem;"> · ${formatOrderDate(h.at, true)}</span></div>
+          ${h.note ? `<div style="font-size: 0.8rem; color: #475569;">${escapeOrderHtml(h.note)}</div>` : ''}
+        </div>`).join('') : '<div style="font-size: 0.8rem; color: #94A3B8;">Sin movimientos.</div>';
+
+      const pricing = o.pricing && Array.isArray(o.pricing.items) ? o.pricing : null;
+      const target = o.target_mode === 'empleado'
+        ? `${escapeOrderHtml(o.target_employee_name || 'Persona específica')}${o.target_role ? ` · ${escapeOrderHtml(o.target_role)}` : ''}`
+        : `Rol: ${escapeOrderHtml(o.target_role || '—')}`;
+      document.getElementById('orderQuoteSummary').innerHTML = `
+        <div style="font-weight: 700; color: #0F172A; margin-bottom: 0.5rem;">${target}</div>
+        ${pricing ? `
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; background: white; border: 1px solid #E2E8F0; border-radius: 8px;">
+          <tbody>${pricing.items.map(it => `
+            <tr style="border-bottom: 1px solid #F1F5F9;">
+              <td style="padding: 0.4rem 0.6rem;">${escapeOrderHtml(it.name)}${it.size ? ` <span style="color: #64748B;">(talla ${escapeOrderHtml(it.size)})</span>` : ''}</td>
+              <td style="padding: 0.4rem 0.6rem; text-align: center;">${it.qty}</td>
+              <td style="padding: 0.4rem 0.6rem; text-align: right;">${formatMoney((it.unit_price || 0) * it.qty, pricing.currency)}</td>
+            </tr>`).join('')}
+            <tr><td colspan="2" style="padding: 0.5rem 0.6rem; font-weight: 800;">Total (IVA incluido)</td>
+              <td style="padding: 0.5rem 0.6rem; text-align: right; font-weight: 800;">${formatMoney(pricing.total, pricing.currency)}</td></tr>
+          </tbody>
+        </table>` : `<div style="white-space: pre-wrap;">${escapeOrderHtml(o.prompt_text || '')}</div>`}`;
+
+      document.getElementById('drawerOverlay').classList.add('active');
+      document.getElementById('orderCard').classList.add('active');
+    }
+
+    function closeDrawer() {
+      document.getElementById('drawerOverlay').classList.remove('active');
+      document.getElementById('orderCard').classList.remove('active');
+      currentOrder = null;
+    }
+
+    async function saveOrder() {
+      if (!currentOrder) return;
+      const stage = document.getElementById('orderStageSelect').value;
+      const estimated = document.getElementById('orderEstimatedDate').value || null;
+      const note = document.getElementById('orderNote').value.trim();
+      if (stage === 'cancelado' && currentOrder.stage !== 'cancelado' && !note) {
+        showToast('Falta el motivo', 'Escribe en la nota por qué se cancela el pedido; el cliente la verá.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('btnSaveOrder');
+      btn.disabled = true;
+      btn.textContent = 'Guardando...';
+      try {
+        const { error } = await _supabase.rpc('admin_update_order', {
+          p_id: currentOrder.id, p_stage: stage, p_note: note, p_estimated_delivery: estimated
+        });
+        if (error) throw error;
+        const id = currentOrder.id;
+        showToast('Pedido actualizado', `${formatOrderNumber(currentOrder.order_number)} quedó en "${ORDER_STAGE_LABELS[stage]}".`, 'success');
+        await loadOrders();
+        openOrderDrawer(id);
+      } catch (err) {
+        console.error('Error actualizando pedido:', err);
+        showToast('Error', 'No se pudo actualizar el pedido.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Guardar cambios';
+      }
+    }
+
+    function showToast(title, message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.style.cssText = "background: white; border-left: 4px solid " + (type === 'error' ? '#EF4444' : '#10B981') + "; padding: 1rem 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 1rem; min-width: 300px;";
+      toast.innerHTML = `
+        <div>
+          <div style="font-weight: 700; font-size: 0.9rem; color: #0F172A;">${title}</div>
+          <div style="font-size: 0.875rem; color: #64748B;">${message}</div>
+        </div>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => { toast.remove(); }, 4000);
+    }
+  </script>
+</body>
+
+</html>

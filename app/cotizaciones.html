@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <link rel="icon" type="image/svg+xml" href="/assets/logos/favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dotacian | Cotizaciones</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap"
+    rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .bodega-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-en-bodega {
+      background: #DBEAFE;
+      color: #1D4ED8;
+    }
+
+    .badge-listo {
+      background: #D1FAE5;
+      color: #065F46;
+    }
+
+    .badge-en-transito {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      border: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .stat-value {
+      font-family: var(--font-family-heading);
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--color-navy);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.8125rem;
+      color: var(--color-text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    .action-btn {
+      padding: 0.4rem 0.9rem;
+      border-radius: var(--radius-md);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+
+    .action-btn-primary {
+      background: var(--color-cyan);
+      color: var(--color-navy);
+    }
+
+    .action-btn-primary:hover {
+      filter: brightness(1.08);
+    }
+
+    .action-btn-outline {
+      background: white;
+      border: 1.5px solid var(--color-border);
+      color: var(--color-navy);
+    }
+
+    .action-btn-outline:hover {
+      border-color: var(--color-cyan);
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-pill {
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1.5px solid var(--color-border);
+      background: white;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-pill.active,
+    .filter-pill:hover {
+      border-color: var(--color-cyan);
+      color: var(--color-navy);
+      background: var(--color-cyan-dim);
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(14, 23, 44, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 1.5rem;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 2rem;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: none;
+      border: none;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+
+    .modal-close:hover {
+      color: var(--color-navy);
+    }
+
+    /* Cotizar con Dot — chat */
+    .dot-chat-modal-content {
+      max-width: 460px;
+      display: flex;
+      flex-direction: column;
+      height: 640px;
+      max-height: 85vh;
+      padding: 1.75rem 1.75rem 1.25rem;
+    }
+
+    .dot-chat-header {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin-bottom: 0.25rem;
+      padding-right: 2rem;
+      flex-shrink: 0;
+    }
+
+    .dot-chat-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .dot-chat-title {
+      font-family: var(--font-family-heading);
+      color: var(--color-navy);
+      font-size: 1.125rem;
+      font-weight: 800;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .dot-chat-subtitle {
+      color: var(--color-text-muted);
+      font-size: 0.75rem;
+      margin: 0;
+    }
+
+    .dot-chat-history {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      padding: 1rem 0.25rem;
+    }
+
+    .dot-chat-bubble {
+      max-width: 88%;
+      padding: 0.7rem 0.95rem;
+      border-radius: 1rem;
+      font-size: 0.8125rem;
+      line-height: 1.45;
+    }
+
+    .dot-chat-bubble.assistant {
+      background: #F1F5F9;
+      color: var(--color-navy);
+      align-self: flex-start;
+      border-top-left-radius: 0.3rem;
+    }
+
+    .dot-chat-bubble.user {
+      background: var(--color-navy);
+      color: white;
+      align-self: flex-end;
+      border-top-right-radius: 0.3rem;
+      white-space: pre-wrap;
+    }
+
+    .dot-typing-dots {
+      display: inline-flex;
+      gap: 3px;
+      align-items: center;
+      padding: 0.15rem 0;
+    }
+
+    .dot-typing-dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #94A3B8;
+      animation: dotTypingBounce 1.2s infinite ease-in-out;
+    }
+
+    .dot-typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+    .dot-typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes dotTypingBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+      30% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    .dot-chat-quick-replies,
+    .dot-chat-select-wrap {
+      display: flex;
+      gap: 0.5rem;
+      align-self: flex-start;
+      flex-wrap: wrap;
+      max-width: 90%;
+    }
+
+    .dot-quick-reply-btn {
+      padding: 0.55rem 1rem;
+      border-radius: 99px;
+      border: 1.5px solid var(--color-cyan);
+      background: white;
+      color: var(--color-navy);
+      font-size: 0.8125rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .dot-quick-reply-btn:hover {
+      background: var(--color-cyan-dim);
+    }
+
+    .dot-chat-select-wrap {
+      align-items: center;
+    }
+
+    .dot-chat-select {
+      flex: 1;
+      min-width: 180px;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      font-size: 0.8125rem;
+      background: white;
+      color: var(--color-navy);
+    }
+
+    .dot-chat-confirm-btn {
+      padding: 0.6rem 0.9rem;
+      border-radius: 10px;
+      border: none;
+      background: var(--color-cyan);
+      color: white;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .dot-chat-confirm-btn:hover {
+      background: var(--color-cyan-hover);
+    }
+
+    .dot-chat-input-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-end;
+      border-top: 1px solid var(--color-border);
+      padding-top: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .dot-chat-textarea {
+      flex: 1;
+      resize: none;
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 0.7rem 0.9rem;
+      font-size: 0.8125rem;
+      font-family: inherit;
+      outline: none;
+      max-height: 100px;
+      color: var(--color-navy);
+    }
+
+    .dot-chat-textarea:focus {
+      border-color: var(--color-cyan);
+    }
+
+    .dot-chat-send-btn {
+      width: 42px;
+      height: 42px;
+      flex-shrink: 0;
+      border: none;
+      border-radius: 12px;
+      background: var(--color-navy);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .dot-chat-send-btn:hover {
+      background: var(--color-navy-mid);
+    }
+
+    .dot-chat-send-btn:disabled {
+      background: #CBD5E1;
+      cursor: not-allowed;
+    }
+
+    .kpi-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      max-width: 1100px;
+      margin: 0 auto 3rem auto;
+    }
+
+    .large-kpi-card {
+      background: linear-gradient(145deg, #ffffff, #f8fafc);
+      border-radius: 1.5rem;
+      padding: 3rem 2rem;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+    }
+
+    .large-kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--color-cyan), var(--color-navy));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .large-kpi-card:hover {
+      border-color: rgba(6, 182, 212, 0.3);
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    }
+
+    .large-kpi-card:hover::before {
+      opacity: 1;
+    }
+
+    .large-kpi-icon-wrapper {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-cyan-dim);
+      color: var(--color-cyan);
+      box-shadow: inset 0 0 0 1px rgba(6, 182, 212, 0.1);
+    }
+
+    .kpi-icon-2 {
+      background: #FEF3C7;
+      color: #D97706;
+      box-shadow: inset 0 0 0 1px rgba(217, 119, 6, 0.1);
+    }
+
+    .large-kpi-value {
+      font-family: var(--font-family-heading);
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--color-navy);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.03em;
+    }
+
+    .large-kpi-label {
+      font-size: 1.125rem;
+      color: var(--color-text-secondary);
+      font-weight: 600;
+      font-family: var(--font-family-heading);
+    }
+
+    .large-kpi-subtext {
+      font-size: 0.8125rem;
+      color: var(--color-text-muted);
+      margin-top: 1.25rem;
+      padding: 0.35rem 1rem;
+      background: var(--color-bg);
+      border-radius: 999px;
+      border: 1px solid var(--color-border);
+      transition: all 0.2s;
+    }
+
+    .large-kpi-card:hover .large-kpi-subtext {
+      background: white;
+      border-color: var(--color-cyan);
+      color: var(--color-navy);
+    }
+
+    /* ── Alerts Panel ─────────────────────────────────────── */
+    .alerts-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(14, 23, 44, 0.45);
+      backdrop-filter: blur(3px);
+      z-index: 1999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .alerts-backdrop.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .alerts-panel {
+      position: fixed;
+      top: 0;
+      right: -460px;
+      width: 440px;
+      max-width: 95vw;
+      height: 100vh;
+      background: #fff;
+      z-index: 2000;
+      box-shadow: -8px 0 40px rgba(0, 0, 0, 0.14);
+      display: flex;
+      flex-direction: column;
+      transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .alerts-panel.open {
+      right: 0;
+    }
+
+    .alerts-panel-header {
+      padding: 1.5rem 1.5rem 1rem;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .alerts-section-title {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+      margin: 1.25rem 0 0.75rem;
+    }
+
+    .alert-item {
+      display: flex;
+      gap: 0.875rem;
+      align-items: flex-start;
+      padding: 0.875rem 1rem;
+      border-radius: 12px;
+      margin-bottom: 0.5rem;
+      border: 1px solid transparent;
+      transition: background 0.15s;
+    }
+
+    .alert-item:hover {
+      background: #F8FAFC;
+    }
+
+    .alert-item.alert-warning {
+      background: #FFFBEB;
+      border-color: #FDE68A;
+    }
+
+    .alert-item.alert-danger {
+      background: #FEF2F2;
+      border-color: #FECACA;
+    }
+
+    .alert-item-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .alert-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: #EF4444;
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 800;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 0.5rem;
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 1001;
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.5);
+      z-index: 900;
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .app-layout.sidebar-open .sidebar-overlay {
+      display: block;
+      opacity: 1;
+    }
+
+    @media (max-width: 992px) {
+      .main-content {
+        margin-left: 0;
+      }
+
+      .mobile-menu-toggle {
+        display: none;
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        padding: 0.5rem;
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        z-index: 1001;
+      }
+
+      .sidebar {
+        z-index: 1000;
+      }
+
+      .welcome-banner {
+        padding: 5rem 1.5rem 2rem 1.5rem;
+      }
+
+      .header-right {
+        position: static !important;
+        flex-direction: column;
+        align-items: flex-start !important;
+        margin-top: 1rem;
+        gap: 1rem !important;
+      }
+    }
+
+    /* Main Content Refinement */
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      padding: 0;
+      background: #F8FAFC;
+    }
+
+    .app-header {
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: transparent;
+      border: none;
+      position: absolute;
+      top: 0;
+      left: var(--sidebar-width);
+      right: 0;
+      z-index: 10;
+    }
+
+    @media (max-width: 992px) {
+      .app-header {
+        left: 0;
+        padding: 1rem 1.5rem;
+      }
+      .main-content {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-layout" id="app-layout-wrapper">
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <!-- Sidebar (shared) -->
+        <aside class="sidebar" style="display: flex; flex-direction: column;">
+      <!-- TOP: dot AI -->
+      <div class="sidebar-header" style="position: relative; display: flex; justify-content: center; padding: 1.5rem 0.25rem 1rem 0.25rem !important; overflow: visible;">
+        <a href="/app/home" style="display: flex; align-items: center; justify-content: center; text-decoration: none; width: 100%;">
+          <img src="/assets/logos/logo_dotacian.png" alt="dotacian" style="width: 100%; max-width: 108px; height: auto; object-fit: contain; filter: brightness(0) invert(1);">
+        </a>
+      </div>
+      
+      <!-- MIDDLE: Navigation -->
+      <nav class="sidebar-nav" style="flex: 1; display: flex; flex-direction: column; overflow-y: auto;">
+        <a href="/app/home" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
+          <span class="nav-label">Home</span>
+        </a>
+        <a href="/app/uniformes" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /><path d="m3.3 7 8.7 5 8.7-5" /><path d="M12 22V12" /></svg></span>
+          <span class="nav-label">Uniformes</span>
+        </a>
+        <a href="/app/roles" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+          <span class="nav-label">Roles</span>
+        </a>
+        <a href="/app/empleados" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          <span class="nav-label">Empleados</span>
+        </a>
+        <a href="/app/cotizaciones" class="nav-item active">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg></span>
+          <span class="nav-label">Cotizaciones</span>
+        </a>
+        <a href="/app/pedidos" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span>
+          <span class="nav-label">Pedidos</span>
+        </a>
+        <a href="/app/bodega" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg></span>
+          <span class="nav-label">Bodega</span>
+        </a>
+      </nav>
+
+      <!-- BOTTOM: Secondary Menu -->
+      <div class="sidebar-footer" style="padding: 1.5rem 0 1.5rem 1.75rem; display: flex; justify-content: flex-start; position: relative;">
+        <div class="header-right" style="position: relative; display: flex; justify-content: flex-start; width: 100%; padding: 0;">
+          <div id="header-company-badge" class="sidebar-avatar-badge" onclick="toggleUserPopover(event)">
+            <span id="header-badge-initials">?</span>
+            <span id="company-name-display" style="display: none;"></span>
+            <span id="dash-industry-val" style="display: none;"></span>
+          </div>
+
+          <!-- Popover (Abriendo hacia arriba y a la derecha) -->
+          <div id="user-popover" class="user-popover" style="left: 60px; bottom: 0; top: auto; right: auto; min-width: 260px;">
+            <div class="popover-profile-header">
+              <div class="popover-profile-avatar"><span id="popover-avatar-initials">?</span></div>
+              <div style="min-width: 0;">
+                <div id="pop-user-name" class="popover-profile-name">Cargando...</div>
+                <div id="pop-user-email" class="popover-profile-email">Cargando...</div>
+              </div>
+            </div>
+
+            <div class="popover-label">País</div>
+            <div id="version-tag" style="margin-top: 0.25rem; margin-bottom: 1rem; display: flex;"></div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.15rem;">
+              <a href="#" class="popover-menu-item">
+                <span class="popover-menu-icon">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                  </svg>
+                </span>
+                Alertas
+              </a>
+              <a href="/configuracion.html" class="popover-menu-item">
+                <span class="popover-menu-icon">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path
+                      d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0-2.73.73l.15-.08a2 2 0 0 1-2 0l.43.25a2 2 0 0 1-1-1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1-1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </span>
+                Configuración
+              </a>
+              <hr style="margin: 0.5rem 0; border: none; border-top: 1px solid var(--color-smoke-mid);">
+              <a href="/login.html" class="popover-menu-item popover-menu-item-danger">
+                <span class="popover-menu-icon">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                  </svg>
+                </span>
+                Cerrar Sesión
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="app-header">
+        <div class="header-left" style="display: flex; align-items: center;">
+          <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" viewBox="0 0 24 24">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="header-right" style="display: flex; align-items: center; justify-content: flex-end; width: 100%;"></div>
+      </header>
+
+      <div class="dashboard-content-wrapper" style="padding-top: 5rem;">
+        <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap;">
+          <div>
+            <h1 class="dot-greeting" style="text-align: left; margin-bottom: 0.5rem; font-size: 3rem; background: linear-gradient(90deg, #94A3B8 0%, #1E293B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Cotizaciones</h1>
+            <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;">Solicita cotizaciones de tus uniformes, revísalas y apruébalas</p>
+          </div>
+          <button type="button" onclick="openCotizacionManualModal()"
+            style="flex-shrink: 0; display: flex; align-items: center; gap: 0.6rem; padding: 0.85rem 1.5rem; background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); color: white; border: none; border-radius: 14px; font-size: 0.9375rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(15,23,42,0.25); transition: transform 0.15s;"
+            onmouseover="this.style.transform='translateY(-1px)';" onmouseout="this.style.transform='translateY(0)';">
+            <svg width="18" height="18" fill="none" stroke="#22D3EE" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="12" y1="12" x2="12" y2="18"/><line x1="9" y1="15" x2="15" y2="15"/>
+            </svg>
+            Nueva cotización
+          </button>
+        </div>
+
+        <div id="quotesFilters" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;"></div>
+        <div id="quotesList" style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 900px;"></div>
+      </div>
+
+      <!-- Confirmar respuesta a una cotización (aprobar / rechazar) -->
+      <div class="modal-overlay" id="quoteConfirmModal" style="z-index: 1100;">
+        <div class="modal-content" style="max-width: 440px; text-align: center;">
+          <div id="quoteConfirmIcon"
+            style="width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;"></div>
+          <h2 id="quoteConfirmTitle"
+            style="font-family: var(--font-family-heading); color: var(--color-navy); font-size: 1.35rem; margin-bottom: 0.5rem;"></h2>
+          <p id="quoteConfirmText" style="color: var(--color-text-secondary); font-size: 0.875rem; line-height: 1.5; margin: 0 0 1.25rem;"></p>
+          <div id="quoteConfirmSummary"
+            style="background: #F8FAFC; border: 1px solid var(--color-border); border-radius: 12px; padding: 0.85rem 1rem; text-align: left; margin-bottom: 1.5rem;"></div>
+          <div style="display: flex; gap: 0.75rem;">
+            <button type="button" class="btn btn-outline" style="flex: 1; font-size: 0.875rem; padding: 0.7rem;"
+              onclick="closeQuoteConfirm(false)">Cancelar</button>
+            <button type="button" id="quoteConfirmBtn" class="btn btn-primary" style="flex: 1; font-size: 0.875rem; padding: 0.7rem; border: none; color: white;"
+              onclick="closeQuoteConfirm(true)"></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cotización manual Modal -->
+      <div class="modal-overlay" id="cotizacionManualModal">
+        <div class="modal-content">
+          <button class="modal-close" onclick="closeCotizacionManualModal()">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+
+          <h2
+            style="font-family: var(--font-family-heading); color: var(--color-navy); font-size: 1.5rem; margin-bottom: 0.5rem;">
+            Cotización manual</h2>
+          <p style="color: var(--color-text-secondary); font-size: 0.875rem; margin-bottom: 1.5rem;">Indica qué
+            prendas necesitas cotizar. La solicitud llega al equipo de Dotacian para armar la cotización.</p>
+
+          <div style="display: flex; background: #F1F5F9; border-radius: 12px; padding: 4px; margin-bottom: 1.25rem; gap: 4px;">
+            <button type="button" id="btnManualModeRol" onclick="setManualQuoteMode('rol')"
+              style="flex: 1; padding: 0.6rem; border-radius: 8px; border: none; font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+              Para un rol
+            </button>
+            <button type="button" id="btnManualModeEmpleado" onclick="setManualQuoteMode('empleado')"
+              style="flex: 1; padding: 0.6rem; border-radius: 8px; border: none; font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+              Para una persona
+            </button>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+            <div>
+              <label id="manualTargetLabel" style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Rol</label>
+              <select id="manualTarget" onchange="onManualTargetChange()"
+                style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem; background: white; color: var(--color-navy); font-weight: 600;">
+                <option value="">Cargando...</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Prendas a cotizar</label>
+              <div id="manualItemsList" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
+              <datalist id="manualProductOptions"></datalist>
+              <button type="button" class="btn btn-outline" onclick="addManualQuoteItem()"
+                style="width: 100%; margin-top: 0.5rem; font-size: 0.8rem; padding: 0.6rem;">+ Agregar prenda</button>
+            </div>
+
+            <div>
+              <label style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Muestras</label>
+              <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <label style="display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.75rem 0.875rem; border: 1px solid var(--color-border); border-radius: 10px; cursor: pointer; font-size: 0.875rem; color: var(--color-navy);">
+                  <input type="checkbox" id="manualSampleFabric" style="width: 18px; height: 18px; margin-top: 1px; accent-color: #06B6D4; flex-shrink: 0;">
+                  <span><strong>Muestras de tela primero</strong><br>
+                    <span style="font-size: 0.8rem; color: var(--color-text-secondary);">Recibir la tela para aprobarla antes de producir.</span></span>
+                </label>
+                <label style="display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.75rem 0.875rem; border: 1px solid var(--color-border); border-radius: 10px; cursor: pointer; font-size: 0.875rem; color: var(--color-navy);">
+                  <input type="checkbox" id="manualSamplePerSize" style="width: 18px; height: 18px; margin-top: 1px; accent-color: #06B6D4; flex-shrink: 0;">
+                  <span><strong>Una prenda de muestra por talla</strong><br>
+                    <span style="font-size: 0.8rem; color: var(--color-text-secondary);">Para probar las tallas antes del pedido completo.</span></span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Fecha de entrega requerida</label>
+              <input type="date" id="manualDeliveryDate" onchange="updateManualDeliveryWarning()" oninput="updateManualDeliveryWarning()"
+                style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem; background: white; color: var(--color-navy);">
+              <div id="manualDeliveryWarning" style="display: none; margin-top: 0.5rem; display: flex; gap: 0.5rem; align-items: flex-start; padding: 0.75rem 0.875rem; border-radius: 10px; background: #FFFBEB; border: 1px solid #FDE68A; color: #92400E; font-size: 0.8125rem; line-height: 1.45;">
+                <span style="flex-shrink: 0;">⚠</span>
+                <span>La fecha de entrega es en menos de 10 días. Vamos a hacer lo posible por entregar en ese tiempo, pero los tiempos de entrega pueden variar.</span>
+              </div>
+            </div>
+
+            <div>
+              <label style="font-size: 0.875rem; font-weight: 600; color: var(--color-navy); margin-bottom: 0.5rem; display: block;">Notas del pedido y la entrega (opcional)</label>
+              <textarea id="manualQuoteNotes" placeholder="Ej. dirección o sede de entrega, horario de recepción, persona que recibe, entregas parciales, empaque por empleado..."
+                style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem; background: white; color: var(--color-navy); height: 80px; resize: none; font-family: inherit;"></textarea>
+            </div>
+          </div>
+
+          <div
+            style="display: flex; justify-content: flex-end; gap: 1rem; border-top: 1px solid var(--color-border); padding-top: 1.5rem;">
+            <button class="btn btn-outline" style="font-size: 0.875rem; padding: 0.6rem 1.25rem;"
+              onclick="closeCotizacionManualModal()">Cancelar</button>
+            <button id="btnEnviarCotizacionManual" class="btn btn-primary" style="font-size: 0.875rem; padding: 0.6rem 1.25rem;"
+              onclick="submitCotizacionManual()">Enviar solicitud</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/js/utils.js?v=4"></script>
+  <script>
+    if (typeof window._supabase === 'undefined') {
+      window.SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+      window.SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+      window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, { auth: { storageKey: 'dotacian-client-token', multiTab: false } });
+    }
+
+    let currentCompanyId = null;
+
+    // Roles activos de la empresa con su role_definition.id (identificador
+    // estable, a diferencia de role_name que solo sirve para mostrar). Se
+    // usa para ligar cada lote de bodega a un rol específico, ya que dos
+    // roles pueden tener un ítem con el mismo nombre pero specs distintas.
+    async function fetchActiveRolesWithId(companyId) {
+      const { data: activeRoles, error: roleErr } = await _supabase
+        .from('company_roles')
+        .select('role_name')
+        .eq('company_id', companyId);
+      if (roleErr) throw roleErr;
+      const activeNames = (activeRoles || []).map(r => r.role_name.toLowerCase().trim());
+
+      const { data: defs, error: defErr } = await _supabase
+        .from('role_definition')
+        .select('id, role_name, items')
+        .eq('company_id', companyId);
+      if (defErr) throw defErr;
+
+      return (defs || []).filter(rd => activeNames.includes(rd.role_name.toLowerCase().trim()));
+    }
+
+    // Mismas tallas que el registro de empleados (app/empleados.html), para
+    // que el stock coincida con las tallas de cada persona.
+    const ADJUST_SIZE_LISTS = {
+      superior: [{ options: ['XS', 'S', 'M', 'L', 'XL', '2XL'] }],
+      pantalon: [
+        { label: 'Hombre', options: ['28', '30', '32', '34', '36', '38', '40', '42', '44'] },
+        { label: 'Mujer', options: ['2', '3', '4', '5', '6', '7', '8', '9', '10'] }
+      ],
+      calzado: [{ options: ['26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46'] }]
+    };
+
+    function getAdjustSizeKind(name) {
+      const prenda = (window._adjustGarmentPrendas || {})[name];
+      if (prenda === 'pantalon') return 'pantalon';
+      if (prenda) return 'superior';
+      const n = (name || '').toLowerCase();
+      if (/pantal[oó]n|pant|jeans|bermuda/.test(n)) return 'pantalon';
+      if (/zapato|bota|tenis|calzado/.test(n)) return 'calzado';
+      return 'superior';
+    }
+
+    // ── Cotizaciones de la empresa ───────────────────────────────
+    // Solicitudes (company_dot_quote_requests: las manuales y las de Dot) con
+    // el estado que les pone el admin en Gestión de Cotizaciones. Las
+    // aprobadas enlazan a su pedido (company_orders, /app/pedidos).
+    const QUOTE_FILTERS = {
+      todas: { label: 'Todas', match: () => true },
+      curso: { label: 'En curso', match: s => s === 'nueva' || s === 'en_proceso' },
+      por_aprobar: { label: 'Por aprobar', match: s => s === 'entregada' },
+      aprobada: { label: 'Aprobadas', match: s => s === 'aprobada' },
+      rechazada: { label: 'Rechazadas', match: s => s === 'rechazada' }
+    };
+    let quotesFilter = 'todas';
+    let _allQuotes = [];
+    let _ordersByQuote = {};
+
+    function normalizeQuoteStatusClient(status) {
+      return status === 'pendiente' ? 'nueva' : (status === 'generado' ? 'en_proceso' : status);
+    }
+
+    function setQuotesFilter(key) {
+      quotesFilter = key;
+      renderQuotes();
+    }
+
+    function renderQuoteFilters() {
+      document.getElementById('quotesFilters').innerHTML = Object.entries(QUOTE_FILTERS).map(([key, f]) => {
+        const count = _allQuotes.filter(q => f.match(normalizeQuoteStatusClient(q.status))).length;
+        const active = key === quotesFilter;
+        return `<button type="button" onclick="setQuotesFilter('${key}')"
+          style="padding: 0.45rem 0.95rem; border-radius: 99px; font-size: 0.8125rem; font-weight: 700; cursor: pointer;
+          border: 1.5px solid ${active ? 'var(--color-navy)' : 'var(--color-border)'};
+          background: ${active ? 'var(--color-navy)' : 'white'}; color: ${active ? 'white' : 'var(--color-navy)'};">
+          ${f.label} <span style="opacity: 0.7;">${count}</span></button>`;
+      }).join('');
+    }
+
+    async function loadQuotes() {
+      const list = document.getElementById('quotesList');
+      list.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--color-text-secondary); font-size: 0.875rem;">Cargando cotizaciones...</div>';
+      if (!currentCompanyId) return;
+
+      try {
+        const { data, error } = await _supabase.from('company_dot_quote_requests')
+          .select('*')
+          .eq('company_id', currentCompanyId)
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        _allQuotes = data || [];
+
+        // Pedido de cada cotización aprobada (si ya existe la tabla de pedidos).
+        _ordersByQuote = {};
+        try {
+          const { data: orders } = await _supabase.from('company_orders')
+            .select('id, quote_id, order_number, stage')
+            .eq('company_id', currentCompanyId);
+          (orders || []).forEach(o => { _ordersByQuote[o.quote_id] = o; });
+        } catch (e) { /* sin pedidos todavía */ }
+
+        renderQuotes();
+      } catch (err) {
+        console.error('Error cargando cotizaciones:', err);
+        list.innerHTML = '<div style="padding: 2rem; text-align: center; color: #EF4444; font-size: 0.875rem;">No se pudieron cargar las cotizaciones. Intenta de nuevo.</div>';
+      }
+    }
+
+    function renderQuotes() {
+      renderQuoteFilters();
+      const list = document.getElementById('quotesList');
+      const filter = QUOTE_FILTERS[quotesFilter];
+      const data = _allQuotes.filter(q => filter.match(normalizeQuoteStatusClient(q.status)));
+      {
+        if (data.length === 0) {
+          list.innerHTML = `
+            <div style="padding: 2rem 1rem; text-align: center; color: var(--color-text-secondary); font-size: 0.875rem; border: 1px dashed var(--color-border); border-radius: 12px;">
+              ${_allQuotes.length === 0
+                ? 'Aún no has enviado solicitudes de cotización.<br>Usa <strong>Nueva cotización</strong> para crear la primera.'
+                : 'No hay cotizaciones en este filtro.'}
+            </div>`;
+          return;
+        }
+
+        _misCotizaciones = {};
+        data.forEach(q => { _misCotizaciones[q.id] = q; });
+        list.innerHTML = data.map(q => {
+          // Mismos estados que Gestión de Cotizaciones (admin); los valores
+          // viejos pendiente/generado se leen como nueva/en_proceso.
+          const status = q.status === 'pendiente' ? 'nueva' : (q.status === 'generado' ? 'en_proceso' : q.status);
+          const st = {
+            nueva: { label: 'Nueva', color: '#D97706', bg: '#FFFBEB' },
+            en_proceso: { label: 'En proceso', color: '#1D4ED8', bg: '#EFF6FF' },
+            entregada: { label: 'Por aprobar', color: '#0369A1', bg: '#E0F2FE' },
+            aprobada: { label: 'Aprobada', color: '#059669', bg: '#ECFDF5' },
+            rechazada: { label: 'Rechazada', color: '#B91C1C', bg: '#FEF2F2' }
+          }[status] || { label: 'Nueva', color: '#D97706', bg: '#FFFBEB' };
+          const badge = `<span style="font-size: 0.7rem; font-weight: 800; color: ${st.color}; background: ${st.bg}; padding: 3px 10px; border-radius: 99px; text-transform: uppercase; letter-spacing: 0.03em; flex-shrink: 0;">${st.label}</span>`;
+          const target = q.target_mode === 'empleado'
+            ? `Para ${escapeManualHtml(q.target_employee_name || 'una persona')}${q.target_role ? ` · ${escapeManualHtml(q.target_role)}` : ''}`
+            : `Rol ${escapeManualHtml(q.target_role || '—')}`;
+          const created = new Date(q.created_at).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
+          const readyNote = {
+            entregada: '<div style="font-size: 0.8rem; color: #0369A1; margin-top: 0.6rem;">Revisa la cotización y apruébala, recházala o pide cambios.</div>',
+            en_proceso: q.client_response === 'cambios'
+              ? '<div style="font-size: 0.8rem; color: #1D4ED8; margin-top: 0.6rem;">Recibimos tus cambios. El equipo de Dotacian está actualizando la cotización.</div>'
+              : '<div style="font-size: 0.8rem; color: #1D4ED8; margin-top: 0.6rem;">El equipo de Dotacian está preparando tu cotización.</div>',
+            aprobada: '<div style="font-size: 0.8rem; color: #059669; margin-top: 0.6rem;">Aprobaste esta cotización. El equipo de Dotacian se pondrá en contacto para continuar con el pedido.</div>',
+            rechazada: '<div style="font-size: 0.8rem; color: #B91C1C; margin-top: 0.6rem;">Rechazaste esta cotización.</div>'
+          }[status] || '';
+          const requestedDate = parseRequestedDeliveryDate(q.prompt_text);
+          const urgent = requestedDate && status !== 'entregada' && daysBetween(q.created_at, requestedDate) < URGENT_DELIVERY_DAYS;
+          const urgentNote = urgent
+            ? `<div style="margin-top: 0.6rem; display: flex; gap: 0.5rem; align-items: flex-start; padding: 0.75rem 0.875rem; border-radius: 10px; background: #FFFBEB; border: 1px solid #FDE68A; color: #92400E; font-size: 0.8125rem; line-height: 1.45;"><span style="flex-shrink: 0;">⚠</span><span>La fecha de entrega es en menos de 10 días. Vamos a hacer lo posible por entregar en ese tiempo, pero los tiempos de entrega pueden variar.</span></div>`
+            : '';
+          // Precios: el cliente los ve cuando el equipo marca la cotización
+          // como entregada (ver supabase_migration_quote_pricing.sql).
+          const pricing = ['entregada', 'aprobada', 'rechazada'].includes(status) && q.pricing && Array.isArray(q.pricing.items) ? q.pricing : null;
+          const money = v => formatMoneyBodega(v, pricing ? pricing.currency : 'COP');
+          const pricingHtml = pricing ? `
+            <div style="margin-top: 0.75rem; border: 1px solid var(--color-border); border-radius: 10px; overflow: hidden;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
+                <thead><tr style="background: #F8FAFC; color: #64748B; text-align: left; font-size: 0.7rem; text-transform: uppercase;">
+                  <th style="padding: 0.45rem 0.6rem;">Prenda</th><th style="padding: 0.45rem 0.6rem; text-align: center;">Cant.</th>
+                  <th style="padding: 0.45rem 0.6rem; text-align: right;">P. unit.</th><th style="padding: 0.45rem 0.6rem; text-align: right;">Subtotal</th>
+                </tr></thead>
+                <tbody>${pricing.items.map(it => `
+                  <tr style="border-top: 1px solid #F1F5F9;">
+                    <td style="padding: 0.45rem 0.6rem;">${escapeManualHtml(it.name)}${it.size ? ` <span style="color: #64748B;">(talla ${escapeManualHtml(it.size)})</span>` : ''}</td>
+                    <td style="padding: 0.45rem 0.6rem; text-align: center;">${it.qty}</td>
+                    <td style="padding: 0.45rem 0.6rem; text-align: right;">${money(it.unit_price)}</td>
+                    <td style="padding: 0.45rem 0.6rem; text-align: right;">${money((it.unit_price || 0) * it.qty)}</td>
+                  </tr>`).join('')}</tbody>
+              </table>
+              <div style="padding: 0.6rem; border-top: 1px solid var(--color-border); font-size: 0.8rem; color: #334155;">
+                ${pricing.samples_cost ? `<div style="display: flex; justify-content: space-between;"><span>Muestras</span><span>${money(pricing.samples_cost)}</span></div>` : ''}
+                ${pricing.shipping_cost ? `<div style="display: flex; justify-content: space-between;"><span>Envío</span><span>${money(pricing.shipping_cost)}</span></div>` : ''}
+                <div style="display: flex; justify-content: space-between;"><span>Subtotal</span><span>${money(pricing.subtotal)}</span></div>
+                <div style="display: flex; justify-content: space-between;"><span>IVA (${pricing.tax_rate}%)</span><span>${money(pricing.tax)}</span></div>
+                <div style="display: flex; justify-content: space-between; font-weight: 800; color: var(--color-navy); font-size: 0.95rem; margin-top: 0.3rem;"><span>Total</span><span>${money(pricing.total)}</span></div>
+                <div style="font-size: 0.75rem; color: #64748B; margin-top: 0.3rem;">Cotización válida por ${pricing.validity_days} días.</div>
+              </div>
+            </div>` : '';
+          return `
+            <details style="border: 1px solid var(--color-border); border-radius: 12px; padding: 0.85rem 1rem; background: white;">
+              <summary style="cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+                <div style="min-width: 0;">
+                  ${q.quote_number ? `<div style="font-size: 0.75rem; font-weight: 800; color: var(--color-cyan); letter-spacing: 0.03em;">No. ${formatQuoteNumberBodega(q.quote_number)}</div>` : ''}
+                  <div style="font-weight: 700; color: var(--color-navy); font-size: 0.9rem;">${target}</div>
+                  ${pricing ? `<div style="font-size: 0.85rem; font-weight: 800; color: var(--color-navy); margin-top: 2px;">Total ${money(pricing.total)}</div>` : ''}
+                  <div style="font-size: 0.8rem; color: var(--color-text-secondary); margin-top: 2px;">Enviada el ${created}${urgent ? ' · <span style="color: #B45309; font-weight: 700;">Entrega en menos de 10 días</span>' : ''}</div>
+                </div>
+                ${badge}
+              </summary>
+              <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #F1F5F9; font-size: 0.8125rem; color: #334155; white-space: pre-wrap; line-height: 1.5;">${escapeManualHtml(q.prompt_text || '')}</div>
+              ${urgentNote}
+              ${pricingHtml}
+              ${readyNote}
+              ${_ordersByQuote[q.id] ? `
+              <a href="/app/pedidos?pedido=${encodeURIComponent(_ordersByQuote[q.id].id)}"
+                style="display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 0.6rem; font-size: 0.8125rem; font-weight: 700; color: var(--color-cyan); text-decoration: none;">
+                Ver pedido No. ${formatOrderNumber(_ordersByQuote[q.id].order_number)} →</a>` : ''}
+              ${pricing ? `
+              <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem;">
+                <button type="button" class="btn btn-outline" onclick="downloadClientQuotePDF('${q.id}')"
+                  style="font-size: 0.8rem; padding: 0.45rem 0.9rem;">Descargar PDF</button>
+                ${status === 'entregada' ? `
+                <button type="button" class="btn btn-primary" onclick="respondToQuote('${q.id}', 'aprobar')"
+                  style="font-size: 0.8rem; padding: 0.45rem 0.9rem;">Aprobar</button>
+                <button type="button" class="btn btn-outline" onclick="toggleQuoteChangesForm('${q.id}')"
+                  style="font-size: 0.8rem; padding: 0.45rem 0.9rem;">Solicitar cambios</button>
+                <button type="button" class="btn btn-outline" onclick="respondToQuote('${q.id}', 'rechazar')"
+                  style="font-size: 0.8rem; padding: 0.45rem 0.9rem; color: #B91C1C; border-color: #FECACA;">Rechazar</button>` : ''}
+              </div>
+              <div id="quoteChanges-${q.id}" style="display: none; margin-top: 0.6rem;">
+                <textarea id="quoteChangesText-${q.id}" placeholder="Cuéntanos qué quieres cambiar: cantidades, tallas, fecha de entrega, precio..."
+                  style="width: 100%; height: 70px; padding: 0.6rem 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.8125rem; resize: none; font-family: inherit;"></textarea>
+                <div style="display: flex; justify-content: flex-end; margin-top: 0.4rem;">
+                  <button type="button" class="btn btn-primary" onclick="respondToQuote('${q.id}', 'cambios')"
+                    style="font-size: 0.8rem; padding: 0.45rem 0.9rem;">Enviar cambios</button>
+                </div>
+              </div>` : ''}
+            </details>`;
+        }).join('');
+      }
+    }
+
+    // Fecha de entrega que guarda la cotización manual en el texto
+    // ("Fecha de entrega requerida: 20 de octubre de 2026") y aviso cuando
+    // hay menos de 10 días entre la solicitud y esa fecha.
+    const URGENT_DELIVERY_DAYS = 10;
+    const SPANISH_MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+    function parseRequestedDeliveryDate(promptText) {
+      const m = (promptText || '').match(/Fecha de entrega requerida: (\d{1,2}) de ([a-záéíóú]+) de (\d{4})/i);
+      if (!m) return null;
+      const month = SPANISH_MONTHS.indexOf(m[2].toLowerCase());
+      if (month < 0) return null;
+      return new Date(parseInt(m[3], 10), month, parseInt(m[1], 10));
+    }
+
+    function daysBetween(from, to) {
+      const a = new Date(from); a.setHours(0, 0, 0, 0);
+      const b = new Date(to); b.setHours(0, 0, 0, 0);
+      return Math.round((b - a) / 86400000);
+    }
+
+    function updateManualDeliveryWarning() {
+      const value = document.getElementById('manualDeliveryDate').value;
+      const warning = document.getElementById('manualDeliveryWarning');
+      const urgent = value && daysBetween(new Date(), new Date(value + 'T00:00:00')) < URGENT_DELIVERY_DAYS;
+      warning.style.display = urgent ? 'flex' : 'none';
+    }
+
+    function formatMoneyBodega(value, currency) {
+      const n = Number(value) || 0;
+      try {
+        return new Intl.NumberFormat({ COP: 'es-CO', MXN: 'es-MX', USD: 'en-US' }[currency] || 'es-CO', { style: 'currency', currency, maximumFractionDigits: currency === 'COP' ? 0 : 2 }).format(n);
+      } catch (e) {
+        return `${currency} ${n.toFixed(2)}`;
+      }
+    }
+
+    function formatQuoteNumberBodega(n) {
+      return `COT-${String(n).padStart(4, '0')}`;
+    }
+
+    let _misCotizaciones = {};
+
+    // Ventana de confirmación para aprobar o rechazar (en vez de confirm()).
+    let _quoteConfirmResolve = null;
+
+    function askQuoteConfirm(q, action) {
+      const approve = action === 'aprobar';
+      const number = q.quote_number ? formatQuoteNumberBodega(q.quote_number) : '';
+      const icon = document.getElementById('quoteConfirmIcon');
+      icon.style.background = approve ? '#ECFDF5' : '#FEF2F2';
+      icon.innerHTML = approve
+        ? '<svg width="28" height="28" fill="none" stroke="#059669" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'
+        : '<svg width="28" height="28" fill="none" stroke="#DC2626" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+      document.getElementById('quoteConfirmTitle').textContent = approve ? 'Aprobar cotización' : 'Rechazar cotización';
+      document.getElementById('quoteConfirmText').textContent = approve
+        ? 'Al aprobarla, el equipo de Dotacian se pondrá en contacto contigo para continuar con el pedido.'
+        : 'Si la rechazas, la cotización queda cerrada. Si solo necesitas ajustes, usa "Solicitar cambios".';
+
+      const target = q.target_mode === 'empleado'
+        ? `${q.target_employee_name || 'Una persona'}${q.target_role ? ' · ' + q.target_role : ''}`
+        : `Rol ${q.target_role || '—'}`;
+      const total = q.pricing ? formatMoneyBodega(q.pricing.total, q.pricing.currency) : '';
+      document.getElementById('quoteConfirmSummary').innerHTML = `
+        ${number ? `<div style="font-size: 0.75rem; font-weight: 800; color: var(--color-cyan); letter-spacing: 0.03em;">No. ${escapeManualHtml(number)}</div>` : ''}
+        <div style="font-weight: 700; color: var(--color-navy); font-size: 0.9rem; margin-top: 2px;">${escapeManualHtml(target)}</div>
+        ${total ? `<div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.875rem;"><span style="color: var(--color-text-secondary);">Total</span><strong style="color: var(--color-navy);">${escapeManualHtml(total)}</strong></div>` : ''}`;
+
+      const btn = document.getElementById('quoteConfirmBtn');
+      btn.textContent = approve ? 'Sí, aprobar' : 'Sí, rechazar';
+      btn.style.background = approve ? '#059669' : '#DC2626';
+
+      document.getElementById('quoteConfirmModal').classList.add('active');
+      return new Promise(resolve => { _quoteConfirmResolve = resolve; });
+    }
+
+    function closeQuoteConfirm(confirmed) {
+      document.getElementById('quoteConfirmModal').classList.remove('active');
+      if (_quoteConfirmResolve) _quoteConfirmResolve(confirmed);
+      _quoteConfirmResolve = null;
+    }
+
+    function toggleQuoteChangesForm(id) {
+      const box = document.getElementById(`quoteChanges-${id}`);
+      box.style.display = box.style.display === 'none' ? 'block' : 'none';
+      if (box.style.display === 'block') document.getElementById(`quoteChangesText-${id}`).focus();
+    }
+
+    // Aprobar, rechazar o pedir cambios (RPC client_respond_dot_quote).
+    async function respondToQuote(id, action) {
+      const q = _misCotizaciones[id];
+      if (!q) return;
+      const comment = action === 'cambios' ? document.getElementById(`quoteChangesText-${id}`).value.trim() : '';
+      if (action === 'cambios' && !comment) {
+        showToast('Faltan los cambios', 'Describe qué quieres cambiar de la cotización.', 'error');
+        return;
+      }
+      const number = q.quote_number ? ` ${formatQuoteNumberBodega(q.quote_number)}` : '';
+      if ((action === 'aprobar' || action === 'rechazar') && !(await askQuoteConfirm(q, action))) return;
+
+      try {
+        const { error } = await _supabase.rpc('client_respond_dot_quote', { p_id: id, p_action: action, p_comment: comment });
+        if (error) throw error;
+        showToast(
+          { aprobar: 'Cotización aprobada', rechazar: 'Cotización rechazada', cambios: 'Cambios enviados' }[action],
+          { aprobar: 'El equipo de Dotacian se pondrá en contacto para continuar con el pedido.',
+            rechazar: 'Gracias por avisarnos.',
+            cambios: 'El equipo de Dotacian actualizará la cotización.' }[action]);
+        loadQuotes();
+      } catch (err) {
+        console.error('Error respondiendo la cotización:', err);
+        showToast('Error', 'No se pudo enviar tu respuesta. Intenta de nuevo.', 'error');
+      }
+    }
+
+    // Lee el detalle de la cotización manual: datos del diseño por prenda y
+    // condiciones (muestras, fecha de entrega, notas). Mismo formato que
+    // parseManualQuote en admin.cotizaciones.html.
+    function parseManualQuoteBodega(promptText) {
+      const designs = [];
+      const extras = [];
+      (promptText || '').split('\n').forEach(line => {
+        if (/^- \d+ × /.test(line)) { designs.push(''); return; }
+        const detail = line.trim();
+        if (!detail || detail === 'Cotización manual:') return;
+        if (/^\s/.test(line) && designs.length) { designs[designs.length - 1] = detail; return; }
+        extras.push(detail);
+      });
+      return { designs, extras };
+    }
+
+    // PDF de la cotización con precios, generado en el navegador.
+    async function downloadClientQuotePDF(id) {
+      const q = _misCotizaciones[id];
+      const pricing = q && q.pricing;
+      const jsPDFClass = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+      if (!pricing || !jsPDFClass) {
+        showToast('Error', 'No se pudo generar el PDF. Recarga la página.', 'error');
+        return;
+      }
+
+      let companyName = '';
+      try {
+        const { data } = await _supabase.from('company_profile').select('company_name').eq('id', currentCompanyId).maybeSingle();
+        companyName = (data && data.company_name) || '';
+      } catch (e) { /* el PDF sale sin nombre de empresa */ }
+
+      const { designs, extras } = parseManualQuoteBodega(q.prompt_text);
+      const money = v => formatMoneyBodega(v, pricing.currency).replace(/ /g, ' ');
+      const number = q.quote_number ? formatQuoteNumberBodega(q.quote_number) : '';
+      const doc = new jsPDFClass({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const pageW = doc.internal.pageSize.getWidth();
+      const pageH = doc.internal.pageSize.getHeight();
+      const margin = 18;
+      const right = pageW - margin - 2;
+
+      doc.setFillColor(14, 23, 44);
+      doc.rect(0, 0, pageW, 32, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(20);
+      doc.text('dotacian', margin, 20);
+      doc.setFontSize(11);
+      doc.text(`Cotización${number ? ' No. ' + number : ''}`, pageW - margin, 18, { align: 'right' });
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text(new Date(q.priced_at || q.created_at).toLocaleDateString('es-MX'), pageW - margin, 25, { align: 'right' });
+
+      let y = 44;
+      doc.setTextColor(15, 23, 42);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      if (companyName) { doc.text(companyName, margin, y); y += 6; }
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      const target = q.target_mode === 'empleado'
+        ? `Dotación para: ${q.target_employee_name || ''}${q.target_role ? ' (' + q.target_role + ')' : ''}`
+        : `Dotación para el rol: ${q.target_role || '—'}`;
+      doc.text(target, margin, y);
+      y += 8;
+
+      const cols = { name: margin + 2, specs: margin + 48, qty: margin + 112, unit: margin + 146, total: right };
+      const header = () => {
+        doc.setFillColor(6, 182, 212);
+        doc.rect(margin, y, pageW - margin * 2, 8, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.text('PRENDA', cols.name, y + 5.5);
+        doc.text('ESPECIFICACIONES', cols.specs, y + 5.5);
+        doc.text('CANT.', cols.qty, y + 5.5);
+        doc.text('P. UNIT.', cols.unit, y + 5.5, { align: 'right' });
+        doc.text('SUBTOTAL', cols.total, y + 5.5, { align: 'right' });
+        y += 8;
+      };
+      header();
+
+      pricing.items.forEach((it, idx) => {
+        const specs = [it.size ? `Talla: ${it.size}` : '', designs[idx] || ''].filter(Boolean).join(' · ') || '—';
+        const nameLines = doc.splitTextToSize(it.name, cols.specs - cols.name - 4);
+        const specLines = doc.splitTextToSize(specs, cols.qty - cols.specs - 4);
+        const rowH = Math.max(nameLines.length, specLines.length, 1) * 4.6 + 4;
+        if (y + rowH > pageH - 20) { doc.addPage(); y = 20; header(); }
+        if (idx % 2 === 0) { doc.setFillColor(248, 250, 252); doc.rect(margin, y, pageW - margin * 2, rowH, 'F'); }
+        doc.setTextColor(15, 23, 42);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.5);
+        doc.text(nameLines, cols.name, y + 5.5);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.5);
+        doc.setTextColor(71, 85, 105);
+        doc.text(specLines, cols.specs, y + 5.5);
+        doc.setFontSize(8.5);
+        doc.setTextColor(15, 23, 42);
+        doc.text(String(it.qty), cols.qty, y + 5.5);
+        doc.text(money(it.unit_price), cols.unit, y + 5.5, { align: 'right' });
+        doc.setFont('helvetica', 'bold');
+        doc.text(money((it.unit_price || 0) * it.qty), cols.total, y + 5.5, { align: 'right' });
+        y += rowH;
+      });
+
+      const lines = [['Prendas', pricing.items_total]];
+      if (pricing.samples_cost) lines.push(['Muestras', pricing.samples_cost]);
+      if (pricing.shipping_cost) lines.push(['Envío', pricing.shipping_cost]);
+      lines.push(['Subtotal', pricing.subtotal], [`IVA (${pricing.tax_rate}%)`, pricing.tax]);
+      if (y + lines.length * 5.5 + 40 > pageH - 15) { doc.addPage(); y = 20; }
+      y += 4;
+      doc.setFontSize(8.5);
+      lines.forEach(([label, value]) => {
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(71, 85, 105);
+        doc.text(label, cols.unit, y + 4, { align: 'right' });
+        doc.setTextColor(15, 23, 42);
+        doc.text(money(value), cols.total, y + 4, { align: 'right' });
+        y += 5.5;
+      });
+      doc.setFillColor(14, 23, 44);
+      doc.rect(margin + 100, y + 1, pageW - margin * 2 - 100, 9, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(255, 255, 255);
+      doc.text('TOTAL', cols.unit, y + 7, { align: 'right' });
+      doc.text(money(pricing.total), cols.total, y + 7, { align: 'right' });
+      y += 16;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(71, 85, 105);
+      [...extras, `Precios en ${pricing.currency}. Cotización válida por ${pricing.validity_days} días.`].forEach(text => {
+        const wrapped = doc.splitTextToSize(text, pageW - margin * 2);
+        if (y + wrapped.length * 4 > pageH - 12) { doc.addPage(); y = 20; }
+        doc.text(wrapped, margin, y);
+        y += wrapped.length * 4 + 1.5;
+      });
+
+      doc.save(`cotizacion-${number || 'dotacian'}.pdf`);
+    }
+
+    function formatOrderNumber(n) {
+      return `PED-${String(n).padStart(4, '0')}`;
+    }
+
+    // ── Cotización manual ────────────────────────────────────────
+    // Formulario (rol o persona + prendas, talla y cantidad) que guarda la
+    // solicitud en company_dot_quote_requests, la misma tabla que "Cotizar
+    // con Dot", para que el panel admin (admin.cotizaciones.html) la vea.
+    let manualQuoteMode = 'rol';
+    let _manualQuoteRoleDefs = [];
+    let _manualQuoteEmployees = [];
+    let _manualQuoteItemSeq = 0;
+    let _manualQuoteDesignsByName = {};
+
+    const MANUAL_GARMENT_LABELS = {
+      camiseta: 'Camiseta básica', camisa: 'Camisa manga larga', hoodie: 'Hoodie', filipina: 'Filipina de chef',
+      polo: 'Camiseta tipo polo', pantalon: 'Pantalón chino', limpieza: 'Uniforme de limpieza'
+    };
+    const MANUAL_COLOR_LABELS = {
+      blanco: 'Blanco', negro: 'Negro', azul: 'Azul', rojo: 'Rojo', beige: 'Beige', azulMarino: 'Azul marino', gris: 'Gris'
+    };
+    const MANUAL_PLACEMENT_LABELS = {
+      pechoIzq: 'Pecho izquierdo', pechoDer: 'Pecho derecho', pechoCentro: 'Centro del pecho',
+      espalda: 'Espalda', bolsilloTrasero: 'Bolsillo trasero', musloIzq: 'Muslo izquierdo'
+    };
+
+    function describeManualDesign(name) {
+      const d = _manualQuoteDesignsByName[(name || '').trim().toLowerCase()];
+      if (!d) return '';
+      const parts = [MANUAL_GARMENT_LABELS[d.prenda] || d.prenda, MANUAL_COLOR_LABELS[d.color] || d.color];
+      parts.push(d.logo_path
+        ? `logo en ${MANUAL_PLACEMENT_LABELS[d.logo_ubicacion] || d.logo_ubicacion || 'ubicación por definir'}${d.logo_ancho_cm ? ` de ${d.logo_ancho_cm} cm` : ''}`
+        : 'sin logo');
+      return `Diseño Studio "${d.nombre}": ${parts.join(' · ')}`;
+    }
+
+    function escapeManualHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    async function openCotizacionManualModal() {
+      document.getElementById('cotizacionManualModal').classList.add('active');
+      document.getElementById('manualQuoteNotes').value = '';
+      document.getElementById('manualSampleFabric').checked = false;
+      document.getElementById('manualSamplePerSize').checked = false;
+      const dateInput = document.getElementById('manualDeliveryDate');
+      dateInput.value = '';
+      document.getElementById('manualDeliveryWarning').style.display = 'none';
+      const today = new Date();
+      dateInput.min = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      document.getElementById('manualItemsList').innerHTML = '';
+      document.getElementById('manualProductOptions').innerHTML = '';
+      document.getElementById('manualTarget').innerHTML = '<option value="">Cargando...</option>';
+      addManualQuoteItem();
+      if (!currentCompanyId) return;
+
+      try {
+        const [roleDefs, employeesRes, designsRes] = await Promise.all([
+          fetchActiveRolesWithId(currentCompanyId),
+          _supabase.from('company_employees').select('id, first_name, last_name, role, role_status, id_document, email, phone').eq('company_id', currentCompanyId),
+          _supabase.from('studio_designs').select('id, nombre, prenda, color, logo_path, logo_ubicacion, logo_ancho_cm').eq('company_id', currentCompanyId)
+        ]);
+        _manualQuoteRoleDefs = (roleDefs || []).slice().sort((a, b) => a.role_name.localeCompare(b.role_name));
+        // Solo empleados activos (los desactivados no reciben dotación).
+        _manualQuoteEmployees = (employeesRes.data || [])
+          .filter(e => !e.role_status || e.role_status === 'active')
+          .sort((a, b) => `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`));
+
+        // Tipo de prenda de los diseños de Studio, para la lista de tallas.
+        // También se guarda el diseño completo por nombre de prenda, para
+        // incluir color y logo en la solicitud (ya se definieron en Studio).
+        const designById = {};
+        (designsRes.data || []).forEach(d => { designById[d.id] = d; });
+        window._adjustGarmentPrendas = window._adjustGarmentPrendas || {};
+        _manualQuoteDesignsByName = {};
+        _manualQuoteRoleDefs.forEach(rd => (rd.items || []).forEach(it => {
+          const design = it.name && it.design_id ? designById[it.design_id] : null;
+          if (design) {
+            window._adjustGarmentPrendas[it.name.trim()] = design.prenda;
+            _manualQuoteDesignsByName[it.name.trim().toLowerCase()] = design;
+          }
+        }));
+      } catch (err) {
+        console.error('Error cargando roles/empleados para la cotización manual:', err);
+      }
+      setManualQuoteMode('rol');
+    }
+
+    function closeCotizacionManualModal() {
+      document.getElementById('cotizacionManualModal').classList.remove('active');
+    }
+
+    function setManualQuoteMode(mode) {
+      manualQuoteMode = mode;
+      [['rol', 'btnManualModeRol'], ['empleado', 'btnManualModeEmpleado']].forEach(([m, id]) => {
+        const btn = document.getElementById(id);
+        btn.style.background = m === mode ? 'var(--color-cyan)' : 'transparent';
+        btn.style.color = m === mode ? 'var(--color-navy)' : 'var(--color-text-secondary)';
+      });
+      document.getElementById('manualTargetLabel').textContent = mode === 'rol' ? 'Rol' : 'Persona';
+
+      const select = document.getElementById('manualTarget');
+      if (mode === 'rol') {
+        select.innerHTML = '<option value="">Selecciona un rol...</option>' +
+          _manualQuoteRoleDefs.map(rd => `<option value="${escapeManualHtml(rd.role_name)}">${escapeManualHtml(rd.role_name)}</option>`).join('');
+      } else {
+        select.innerHTML = '<option value="">Selecciona una persona...</option>' +
+          _manualQuoteEmployees.map(e => {
+            const name = `${e.first_name || ''} ${e.last_name || ''}`.trim();
+            const role = e.role ? ` — ${e.role}` : '';
+            // Si hay dos personas con el mismo nombre, se agrega un dato
+            // que las distinga (documento, correo o celular).
+            const sameName = _manualQuoteEmployees.filter(o => `${o.first_name || ''} ${o.last_name || ''}`.trim() === name).length > 1;
+            const extra = sameName ? (e.id_document || e.email || e.phone || '') : '';
+            const label = name + role + (extra ? ` (${extra})` : '');
+            return `<option value="${escapeManualHtml(e.id)}">${escapeManualHtml(label)}</option>`;
+          }).join('');
+      }
+      onManualTargetChange();
+    }
+
+    function getManualQuoteRoleName() {
+      const value = document.getElementById('manualTarget').value;
+      if (!value) return '';
+      if (manualQuoteMode === 'rol') return value;
+      const emp = _manualQuoteEmployees.find(e => e.id === value);
+      return emp ? (emp.role || '') : '';
+    }
+
+    // Sugerencias de producto: la dotación física configurada para el rol.
+    function onManualTargetChange() {
+      const roleName = getManualQuoteRoleName().toLowerCase().trim();
+      const rd = _manualQuoteRoleDefs.find(r => r.role_name.toLowerCase().trim() === roleName);
+      const names = rd ? (rd.items || []).filter(it => it.name && it.category !== 'digital').map(it => it.name.trim()) : [];
+      document.getElementById('manualProductOptions').innerHTML =
+        Array.from(new Set(names)).map(n => `<option value="${escapeManualHtml(n)}"></option>`).join('');
+    }
+
+    function addManualQuoteItem() {
+      const id = _manualQuoteItemSeq++;
+      const row = document.createElement('div');
+      row.className = 'manual-quote-item';
+      row.style.cssText = 'display: flex; gap: 0.5rem; align-items: center;';
+      row.innerHTML = `
+        <input type="text" class="manual-item-name" list="manualProductOptions" placeholder="Prenda o EPP"
+          oninput="refreshManualItemSizes(this.closest('.manual-quote-item'))"
+          style="flex: 2; min-width: 0; padding: 0.65rem 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem;">
+        <select class="manual-item-size"
+          style="flex: 1; min-width: 0; padding: 0.65rem 0.5rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem; background: white;"></select>
+        <input type="number" class="manual-item-qty" min="1" value="1"
+          style="width: 72px; padding: 0.65rem 0.5rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.875rem;">
+        <button type="button" title="Quitar" onclick="removeManualQuoteItem(this)"
+          style="flex-shrink: 0; width: 34px; height: 34px; border: none; border-radius: 8px; background: #FEF2F2; color: #EF4444; cursor: pointer; font-size: 1rem;">✕</button>
+      `;
+      row.dataset.manualItemId = id;
+      document.getElementById('manualItemsList').appendChild(row);
+      refreshManualItemSizes(row);
+    }
+
+    function removeManualQuoteItem(btn) {
+      const list = document.getElementById('manualItemsList');
+      if (list.children.length <= 1) {
+        const row = btn.closest('.manual-quote-item');
+        row.querySelector('.manual-item-name').value = '';
+        row.querySelector('.manual-item-qty').value = 1;
+        refreshManualItemSizes(row);
+        return;
+      }
+      btn.closest('.manual-quote-item').remove();
+    }
+
+    // Misma lista de tallas que el ajuste de inventario, según el tipo de prenda.
+    function refreshManualItemSizes(row) {
+      if (!row) return;
+      const name = row.querySelector('.manual-item-name').value.trim();
+      const select = row.querySelector('.manual-item-size');
+      const previous = select.value;
+      const groups = ADJUST_SIZE_LISTS[getAdjustSizeKind(name)];
+      const optionHtml = v => `<option value="${v}">${v}</option>`;
+      select.innerHTML = '<option value="">Sin talla</option>' +
+        groups.map(g => g.label
+          ? `<optgroup label="${g.label}">${g.options.map(optionHtml).join('')}</optgroup>`
+          : g.options.map(optionHtml).join('')).join('') +
+        optionHtml('Unitalla');
+      if (previous && Array.from(select.options).some(o => o.value === previous)) select.value = previous;
+    }
+
+    async function submitCotizacionManual() {
+      if (!currentCompanyId) return;
+      const targetValue = document.getElementById('manualTarget').value;
+      if (!targetValue) {
+        showToast('Falta seleccionar', manualQuoteMode === 'rol' ? 'Elige el rol.' : 'Elige la persona.', 'error');
+        return;
+      }
+
+      const items = [];
+      document.querySelectorAll('#manualItemsList .manual-quote-item').forEach(row => {
+        const name = row.querySelector('.manual-item-name').value.trim();
+        const size = row.querySelector('.manual-item-size').value;
+        const qty = parseInt(row.querySelector('.manual-item-qty').value, 10) || 0;
+        if (name && qty > 0) items.push({ name, size, qty });
+      });
+      if (items.length === 0) {
+        showToast('Faltan prendas', 'Agrega al menos una prenda con cantidad mayor a 0.', 'error');
+        return;
+      }
+
+      const deliveryDate = document.getElementById('manualDeliveryDate').value;
+      if (!deliveryDate) {
+        showToast('Falta la fecha', 'Indica la fecha de entrega que necesitas.', 'error');
+        return;
+      }
+      // El min del <input type="date"> no impide escribir a mano un año
+      // pasado (ej. 2020), así que se valida aquí también.
+      if (deliveryDate < document.getElementById('manualDeliveryDate').min) {
+        showToast('Fecha inválida', 'La fecha de entrega no puede ser anterior a hoy.', 'error');
+        return;
+      }
+
+      const notes = document.getElementById('manualQuoteNotes').value.trim();
+      const sampleFabric = document.getElementById('manualSampleFabric').checked;
+      const samplePerSize = document.getElementById('manualSamplePerSize').checked;
+      const emp = manualQuoteMode === 'empleado' ? _manualQuoteEmployees.find(e => e.id === targetValue) : null;
+      const empName = emp ? `${emp.first_name || ''} ${emp.last_name || ''}`.trim() : null;
+
+      const lines = [];
+      items.forEach(it => {
+        lines.push(`- ${it.qty} × ${it.name}${it.size ? ` (talla ${it.size})` : ''}`);
+        const design = describeManualDesign(it.name);
+        if (design) lines.push(`    ${design}`);
+      });
+      const samples = [];
+      if (sampleFabric) samples.push('muestras de tela primero');
+      if (samplePerSize) samples.push('una prenda de muestra por talla');
+      const deliveryLabel = new Date(deliveryDate + 'T00:00:00')
+        .toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
+
+      const promptText = [
+        'Cotización manual:',
+        ...lines,
+        '',
+        `Muestras: ${samples.length ? samples.join(' y ') : 'no requiere'}`,
+        `Fecha de entrega requerida: ${deliveryLabel}`,
+        notes ? `Notas del pedido y la entrega: ${notes}` : ''
+      ].join('\n').trim();
+
+      const btn = document.getElementById('btnEnviarCotizacionManual');
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+      try {
+        const row = {
+          company_id: currentCompanyId,
+          prompt_text: promptText,
+          target_mode: manualQuoteMode,
+          target_role: manualQuoteMode === 'rol' ? targetValue : (emp ? emp.role : null),
+          target_employee_id: emp ? emp.id : null,
+          target_employee_name: empName
+        };
+        // Con una sola prenda se llenan también los campos estructurados.
+        if (items.length === 1) {
+          row.item_name = items[0].name;
+          row.item_qty = items[0].qty;
+          row.item_size = items[0].size || null;
+        }
+        const { data: created, error } = await _supabase.from('company_dot_quote_requests')
+          .insert(row).select('*').single();
+        if (error) throw error;
+        showToast(
+          created && created.quote_number ? `Cotización No. ${formatQuoteNumberBodega(created.quote_number)}` : 'Solicitud enviada',
+          'Puedes seguir su estado en esta página.');
+        loadQuotes();
+        closeCotizacionManualModal();
+      } catch (err) {
+        console.error('Error guardando la cotización manual:', err);
+        showToast('Error', 'No se pudo enviar la solicitud. Intenta de nuevo.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Enviar solicitud';
+      }
+    }
+
+
+    async function initCotizaciones() {
+      try {
+        const { data: sessionData } = await _supabase.auth.getSession();
+        if (!sessionData?.session?.user) {
+          window.location.href = '/login.html';
+          return;
+        }
+        currentCompanyId = await resolveCompanyId(_supabase, sessionData.session.user.id);
+        if (document.getElementById('pop-user-email')) {
+          document.getElementById('pop-user-email').textContent = sessionData.session.user.email;
+        }
+        await loadQuotes();
+        // ?nueva=1 (desde Bodega u otras páginas): abre el formulario.
+        if (new URLSearchParams(window.location.search).get('nueva') === '1') openCotizacionManualModal();
+      } catch (err) {
+        console.error('Error inicializando Cotizaciones:', err);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initCotizaciones();
+    });
+
+    function toggleSidebar() {
+      const layout = document.getElementById('app-layout-wrapper');
+      if (layout) {
+        layout.classList.toggle('sidebar-open');
+      }
+    }
+  </script>
+</body>
+
+</html>

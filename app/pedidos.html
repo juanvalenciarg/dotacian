@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <link rel="icon" type="image/svg+xml" href="/assets/logos/favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dotacian | Pedidos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .bodega-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-en-bodega {
+      background: #DBEAFE;
+      color: #1D4ED8;
+    }
+
+    .badge-listo {
+      background: #D1FAE5;
+      color: #065F46;
+    }
+
+    .badge-en-transito {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      border: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .stat-value {
+      font-family: var(--font-family-heading);
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--color-navy);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.8125rem;
+      color: var(--color-text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    .action-btn {
+      padding: 0.4rem 0.9rem;
+      border-radius: var(--radius-md);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+
+    .action-btn-primary {
+      background: var(--color-cyan);
+      color: var(--color-navy);
+    }
+
+    .action-btn-primary:hover {
+      filter: brightness(1.08);
+    }
+
+    .action-btn-outline {
+      background: white;
+      border: 1.5px solid var(--color-border);
+      color: var(--color-navy);
+    }
+
+    .action-btn-outline:hover {
+      border-color: var(--color-cyan);
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-pill {
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1.5px solid var(--color-border);
+      background: white;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-pill.active,
+    .filter-pill:hover {
+      border-color: var(--color-cyan);
+      color: var(--color-navy);
+      background: var(--color-cyan-dim);
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(14, 23, 44, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 1.5rem;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 2rem;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: none;
+      border: none;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+
+    .modal-close:hover {
+      color: var(--color-navy);
+    }
+
+    /* Cotizar con Dot — chat */
+    .dot-chat-modal-content {
+      max-width: 460px;
+      display: flex;
+      flex-direction: column;
+      height: 640px;
+      max-height: 85vh;
+      padding: 1.75rem 1.75rem 1.25rem;
+    }
+
+    .dot-chat-header {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin-bottom: 0.25rem;
+      padding-right: 2rem;
+      flex-shrink: 0;
+    }
+
+    .dot-chat-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .dot-chat-title {
+      font-family: var(--font-family-heading);
+      color: var(--color-navy);
+      font-size: 1.125rem;
+      font-weight: 800;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .dot-chat-subtitle {
+      color: var(--color-text-muted);
+      font-size: 0.75rem;
+      margin: 0;
+    }
+
+    .dot-chat-history {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      padding: 1rem 0.25rem;
+    }
+
+    .dot-chat-bubble {
+      max-width: 88%;
+      padding: 0.7rem 0.95rem;
+      border-radius: 1rem;
+      font-size: 0.8125rem;
+      line-height: 1.45;
+    }
+
+    .dot-chat-bubble.assistant {
+      background: #F1F5F9;
+      color: var(--color-navy);
+      align-self: flex-start;
+      border-top-left-radius: 0.3rem;
+    }
+
+    .dot-chat-bubble.user {
+      background: var(--color-navy);
+      color: white;
+      align-self: flex-end;
+      border-top-right-radius: 0.3rem;
+      white-space: pre-wrap;
+    }
+
+    .dot-typing-dots {
+      display: inline-flex;
+      gap: 3px;
+      align-items: center;
+      padding: 0.15rem 0;
+    }
+
+    .dot-typing-dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #94A3B8;
+      animation: dotTypingBounce 1.2s infinite ease-in-out;
+    }
+
+    .dot-typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+    .dot-typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes dotTypingBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+      30% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    .dot-chat-quick-replies,
+    .dot-chat-select-wrap {
+      display: flex;
+      gap: 0.5rem;
+      align-self: flex-start;
+      flex-wrap: wrap;
+      max-width: 90%;
+    }
+
+    .dot-quick-reply-btn {
+      padding: 0.55rem 1rem;
+      border-radius: 99px;
+      border: 1.5px solid var(--color-cyan);
+      background: white;
+      color: var(--color-navy);
+      font-size: 0.8125rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .dot-quick-reply-btn:hover {
+      background: var(--color-cyan-dim);
+    }
+
+    .dot-chat-select-wrap {
+      align-items: center;
+    }
+
+    .dot-chat-select {
+      flex: 1;
+      min-width: 180px;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      font-size: 0.8125rem;
+      background: white;
+      color: var(--color-navy);
+    }
+
+    .dot-chat-confirm-btn {
+      padding: 0.6rem 0.9rem;
+      border-radius: 10px;
+      border: none;
+      background: var(--color-cyan);
+      color: white;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .dot-chat-confirm-btn:hover {
+      background: var(--color-cyan-hover);
+    }
+
+    .dot-chat-input-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-end;
+      border-top: 1px solid var(--color-border);
+      padding-top: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .dot-chat-textarea {
+      flex: 1;
+      resize: none;
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 0.7rem 0.9rem;
+      font-size: 0.8125rem;
+      font-family: inherit;
+      outline: none;
+      max-height: 100px;
+      color: var(--color-navy);
+    }
+
+    .dot-chat-textarea:focus {
+      border-color: var(--color-cyan);
+    }
+
+    .dot-chat-send-btn {
+      width: 42px;
+      height: 42px;
+      flex-shrink: 0;
+      border: none;
+      border-radius: 12px;
+      background: var(--color-navy);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .dot-chat-send-btn:hover {
+      background: var(--color-navy-mid);
+    }
+
+    .dot-chat-send-btn:disabled {
+      background: #CBD5E1;
+      cursor: not-allowed;
+    }
+
+    .kpi-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      max-width: 1100px;
+      margin: 0 auto 3rem auto;
+    }
+
+    .large-kpi-card {
+      background: linear-gradient(145deg, #ffffff, #f8fafc);
+      border-radius: 1.5rem;
+      padding: 3rem 2rem;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+    }
+
+    .large-kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--color-cyan), var(--color-navy));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .large-kpi-card:hover {
+      border-color: rgba(6, 182, 212, 0.3);
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    }
+
+    .large-kpi-card:hover::before {
+      opacity: 1;
+    }
+
+    .large-kpi-icon-wrapper {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-cyan-dim);
+      color: var(--color-cyan);
+      box-shadow: inset 0 0 0 1px rgba(6, 182, 212, 0.1);
+    }
+
+    .kpi-icon-2 {
+      background: #FEF3C7;
+      color: #D97706;
+      box-shadow: inset 0 0 0 1px rgba(217, 119, 6, 0.1);
+    }
+
+    .large-kpi-value {
+      font-family: var(--font-family-heading);
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--color-navy);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.03em;
+    }
+
+    .large-kpi-label {
+      font-size: 1.125rem;
+      color: var(--color-text-secondary);
+      font-weight: 600;
+      font-family: var(--font-family-heading);
+    }
+
+    .large-kpi-subtext {
+      font-size: 0.8125rem;
+      color: var(--color-text-muted);
+      margin-top: 1.25rem;
+      padding: 0.35rem 1rem;
+      background: var(--color-bg);
+      border-radius: 999px;
+      border: 1px solid var(--color-border);
+      transition: all 0.2s;
+    }
+
+    .large-kpi-card:hover .large-kpi-subtext {
+      background: white;
+      border-color: var(--color-cyan);
+      color: var(--color-navy);
+    }
+
+    /* ── Alerts Panel ─────────────────────────────────────── */
+    .alerts-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(14, 23, 44, 0.45);
+      backdrop-filter: blur(3px);
+      z-index: 1999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .alerts-backdrop.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .alerts-panel {
+      position: fixed;
+      top: 0;
+      right: -460px;
+      width: 440px;
+      max-width: 95vw;
+      height: 100vh;
+      background: #fff;
+      z-index: 2000;
+      box-shadow: -8px 0 40px rgba(0, 0, 0, 0.14);
+      display: flex;
+      flex-direction: column;
+      transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .alerts-panel.open {
+      right: 0;
+    }
+
+    .alerts-panel-header {
+      padding: 1.5rem 1.5rem 1rem;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .alerts-section-title {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+      margin: 1.25rem 0 0.75rem;
+    }
+
+    .alert-item {
+      display: flex;
+      gap: 0.875rem;
+      align-items: flex-start;
+      padding: 0.875rem 1rem;
+      border-radius: 12px;
+      margin-bottom: 0.5rem;
+      border: 1px solid transparent;
+      transition: background 0.15s;
+    }
+
+    .alert-item:hover {
+      background: #F8FAFC;
+    }
+
+    .alert-item.alert-warning {
+      background: #FFFBEB;
+      border-color: #FDE68A;
+    }
+
+    .alert-item.alert-danger {
+      background: #FEF2F2;
+      border-color: #FECACA;
+    }
+
+    .alert-item-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .alert-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: #EF4444;
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 800;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 0.5rem;
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 1001;
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.5);
+      z-index: 900;
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .app-layout.sidebar-open .sidebar-overlay {
+      display: block;
+      opacity: 1;
+    }
+
+    @media (max-width: 992px) {
+      .main-content {
+        margin-left: 0;
+      }
+
+      .mobile-menu-toggle {
+        display: none;
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        padding: 0.5rem;
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        z-index: 1001;
+      }
+
+      .sidebar {
+        z-index: 1000;
+      }
+
+      .welcome-banner {
+        padding: 5rem 1.5rem 2rem 1.5rem;
+      }
+
+      .header-right {
+        position: static !important;
+        flex-direction: column;
+        align-items: flex-start !important;
+        margin-top: 1rem;
+        gap: 1rem !important;
+      }
+    }
+
+    /* Main Content Refinement */
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      padding: 0;
+      background: #F8FAFC;
+    }
+
+    .app-header {
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: transparent;
+      border: none;
+      position: absolute;
+      top: 0;
+      left: var(--sidebar-width);
+      right: 0;
+      z-index: 10;
+    }
+
+    @media (max-width: 992px) {
+      .app-header {
+        left: 0;
+        padding: 1rem 1.5rem;
+      }
+      .main-content {
+        margin-left: 0;
+      }
+    }
+
+    /* Barra de estado de los pedidos */
+    .order-steps {
+      display: flex;
+      align-items: flex-start;
+      margin: 1.25rem 0 0.5rem;
+    }
+
+    .order-step {
+      flex: 1;
+      position: relative;
+      text-align: center;
+      min-width: 0;
+    }
+
+    .order-step::before {
+      content: '';
+      position: absolute;
+      top: 13px;
+      left: -50%;
+      width: 100%;
+      height: 3px;
+      background: #E2E8F0;
+      z-index: 0;
+    }
+
+    .order-step:first-child::before {
+      display: none;
+    }
+
+    .order-step.done::before,
+    .order-step.current::before {
+      background: #06B6D4;
+    }
+
+    .order-step-dot {
+      position: relative;
+      z-index: 1;
+      width: 28px;
+      height: 28px;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid #E2E8F0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+
+    .order-step.done .order-step-dot {
+      background: #06B6D4;
+      border-color: #06B6D4;
+    }
+
+    .order-step.current .order-step-dot {
+      border-color: #06B6D4;
+      box-shadow: 0 0 0 5px rgba(6, 182, 212, 0.18);
+    }
+
+    .order-step.current .order-step-dot::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #06B6D4;
+    }
+
+    .order-step-label {
+      margin-top: 0.45rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #94A3B8;
+      line-height: 1.25;
+      padding: 0 0.15rem;
+    }
+
+    .order-step.done .order-step-label {
+      color: #334155;
+    }
+
+    .order-step.current .order-step-label {
+      color: var(--color-navy);
+      font-weight: 800;
+    }
+
+    @media (max-width: 640px) {
+      .order-step-label {
+        font-size: 0.65rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-layout" id="app-layout-wrapper">
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <!-- Sidebar (shared) -->
+        <aside class="sidebar" style="display: flex; flex-direction: column;">
+      <!-- TOP: dot AI -->
+      <div class="sidebar-header" style="position: relative; display: flex; justify-content: center; padding: 1.5rem 0.25rem 1rem 0.25rem !important; overflow: visible;">
+        <a href="/app/home" style="display: flex; align-items: center; justify-content: center; text-decoration: none; width: 100%;">
+          <img src="/assets/logos/logo_dotacian.png" alt="dotacian" style="width: 100%; max-width: 108px; height: auto; object-fit: contain; filter: brightness(0) invert(1);">
+        </a>
+      </div>
+      
+      <!-- MIDDLE: Navigation -->
+      <nav class="sidebar-nav" style="flex: 1; display: flex; flex-direction: column; overflow-y: auto;">
+        <a href="/app/home" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
+          <span class="nav-label">Home</span>
+        </a>
+        <a href="/app/uniformes" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /><path d="m3.3 7 8.7 5 8.7-5" /><path d="M12 22V12" /></svg></span>
+          <span class="nav-label">Uniformes</span>
+        </a>
+        <a href="/app/roles" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+          <span class="nav-label">Roles</span>
+        </a>
+        <a href="/app/empleados" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          <span class="nav-label">Empleados</span>
+        </a>
+        <a href="/app/cotizaciones" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg></span>
+          <span class="nav-label">Cotizaciones</span>
+        </a>
+        <a href="/app/pedidos" class="nav-item active">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span>
+          <span class="nav-label">Pedidos</span>
+        </a>
+        <a href="/app/bodega" class="nav-item">
+          <span class="nav-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg></span>
+          <span class="nav-label">Bodega</span>
+        </a>
+      </nav>
+
+      <!-- BOTTOM: Secondary Menu -->
+      <div class="sidebar-footer" style="padding: 1.5rem 0 1.5rem 1.75rem; display: flex; justify-content: flex-start; position: relative;">
+        <div class="header-right" style="position: relative; display: flex; justify-content: flex-start; width: 100%; padding: 0;">
+          <div id="header-company-badge" class="sidebar-avatar-badge" onclick="toggleUserPopover(event)">
+            <span id="header-badge-initials">?</span>
+            <span id="company-name-display" style="display: none;"></span>
+            <span id="dash-industry-val" style="display: none;"></span>
+          </div>
+
+          <!-- Popover (Abriendo hacia arriba y a la derecha) -->
+          <div id="user-popover" class="user-popover" style="left: 60px; bottom: 0; top: auto; right: auto; min-width: 260px;">
+            <div class="popover-profile-header">
+              <div class="popover-profile-avatar"><span id="popover-avatar-initials">?</span></div>
+              <div style="min-width: 0;">
+                <div id="pop-user-name" class="popover-profile-name">Cargando...</div>
+                <div id="pop-user-email" class="popover-profile-email">Cargando...</div>
+              </div>
+            </div>
+
+            <div class="popover-label">País</div>
+            <div id="version-tag" style="margin-top: 0.25rem; margin-bottom: 1rem; display: flex;"></div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.15rem;">
+              <a href="#" class="popover-menu-item">
+                <span class="popover-menu-icon">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                  </svg>
+                </span>
+                Alertas
+              </a>
+              <a href="/configuracion.html" class="popover-menu-item">
+                <span class="popover-menu-icon">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path
+                      d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0-2.73.73l.15-.08a2 2 0 0 1-2 0l.43.25a2 2 0 0 1-1-1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1-1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </span>
+                Configuración
+              </a>
+              <hr style="margin: 0.5rem 0; border: none; border-top: 1px solid var(--color-smoke-mid);">
+              <a href="/login.html" class="popover-menu-item popover-menu-item-danger">
+                <span class="popover-menu-icon">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                  </svg>
+                </span>
+                Cerrar Sesión
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="app-header">
+        <div class="header-left" style="display: flex; align-items: center;">
+          <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" viewBox="0 0 24 24">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="header-right" style="display: flex; align-items: center; justify-content: flex-end; width: 100%;"></div>
+      </header>
+
+      <div class="dashboard-content-wrapper" style="padding-top: 5rem;">
+        <div style="margin-bottom: 2rem;">
+          <h1 class="dot-greeting" style="text-align: left; margin-bottom: 0.5rem; font-size: 3rem; background: linear-gradient(90deg, #94A3B8 0%, #1E293B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Pedidos</h1>
+          <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;">Sigue el avance de tus pedidos desde que apruebas la cotización hasta la entrega</p>
+        </div>
+
+        <div id="ordersFilters" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;"></div>
+        <div id="ordersList" style="display: flex; flex-direction: column; gap: 1rem; max-width: 960px;"></div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/js/utils.js?v=4"></script>
+  <script>
+    if (typeof window._supabase === 'undefined') {
+      window.SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
+      window.SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
+      window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, { auth: { storageKey: 'dotacian-client-token', multiTab: false } });
+    }
+
+    let currentCompanyId = null;
+
+    // ── Pedidos ───────────────────────────────────────────────────
+    // Se crean solos cuando el cliente aprueba una cotización (company_orders,
+    // ver supabase_migration_orders.sql). Dotacian actualiza la etapa, la
+    // fecha estimada y las notas en Gestión de Pedidos (admin.pedidos.html).
+    const ORDER_STAGES = [
+      { key: 'confirmado', label: 'Confirmado' },
+      { key: 'muestras', label: 'Muestras' },
+      { key: 'produccion', label: 'En producción' },
+      { key: 'calidad', label: 'Control de calidad' },
+      { key: 'despachado', label: 'Despachado' },
+      { key: 'entregado', label: 'Entregado' }
+    ];
+    const ORDER_STAGE_LABELS = Object.fromEntries(ORDER_STAGES.map(s => [s.key, s.label]));
+    ORDER_STAGE_LABELS.cancelado = 'Cancelado';
+
+    const ORDER_FILTERS = {
+      todos: { label: 'Todos', match: () => true },
+      curso: { label: 'En curso', match: s => s !== 'entregado' && s !== 'cancelado' },
+      entregado: { label: 'Entregados', match: s => s === 'entregado' },
+      cancelado: { label: 'Cancelados', match: s => s === 'cancelado' }
+    };
+    let ordersFilter = 'todos';
+    let _orders = [];
+    let _quotesById = {};
+
+    function escapeOrderHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function formatOrderNumber(n) {
+      return `PED-${String(n).padStart(4, '0')}`;
+    }
+
+    function formatQuoteNumber(n) {
+      return `COT-${String(n).padStart(4, '0')}`;
+    }
+
+    function formatMoneyOrder(value, currency) {
+      const n = Number(value) || 0;
+      try {
+        return new Intl.NumberFormat({ COP: 'es-CO', MXN: 'es-MX', USD: 'en-US' }[currency] || 'es-CO', { style: 'currency', currency, maximumFractionDigits: currency === 'COP' ? 0 : 2 }).format(n);
+      } catch (e) {
+        return `${currency} ${n.toFixed(2)}`;
+      }
+    }
+
+    function formatOrderDate(value, withTime) {
+      if (!value) return '';
+      const d = /^\d{4}-\d{2}-\d{2}$/.test(value) ? new Date(value + 'T00:00:00') : new Date(value);
+      return d.toLocaleDateString('es-MX', withTime
+        ? { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }
+        : { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+
+    // La etapa de muestras solo aparece si la cotización las pidió.
+    function quoteAsksSamples(q) {
+      const line = ((q && q.prompt_text) || '').split('\n').find(l => l.startsWith('Muestras:'));
+      return !!line && !/no requiere/i.test(line);
+    }
+
+    function stagesForOrder(order) {
+      const q = _quotesById[order.quote_id];
+      return ORDER_STAGES.filter(s => s.key !== 'muestras' || quoteAsksSamples(q) || order.stage === 'muestras');
+    }
+
+    function renderOrderSteps(order) {
+      const stages = stagesForOrder(order);
+      const currentIdx = stages.findIndex(s => s.key === order.stage);
+      return `<div class="order-steps">${stages.map((s, idx) => {
+        const cls = order.stage === 'entregado' || idx < currentIdx ? 'done' : (idx === currentIdx ? 'current' : '');
+        const check = cls === 'done' ? '✓' : '';
+        return `<div class="order-step ${cls}"><div class="order-step-dot">${check}</div><div class="order-step-label">${s.label}</div></div>`;
+      }).join('')}</div>`;
+    }
+
+    function setOrdersFilter(key) {
+      ordersFilter = key;
+      renderOrders();
+    }
+
+    async function loadOrders() {
+      const list = document.getElementById('ordersList');
+      list.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--color-text-secondary); font-size: 0.875rem;">Cargando pedidos...</div>';
+      if (!currentCompanyId) return;
+      try {
+        const { data, error } = await _supabase.from('company_orders')
+          .select('*')
+          .eq('company_id', currentCompanyId)
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        _orders = data || [];
+
+        _quotesById = {};
+        const quoteIds = _orders.map(o => o.quote_id);
+        if (quoteIds.length) {
+          const { data: quotes } = await _supabase.from('company_dot_quote_requests')
+            .select('*')
+            .in('id', quoteIds);
+          (quotes || []).forEach(q => { _quotesById[q.id] = q; });
+        }
+        renderOrders();
+
+        // ?pedido=<id> (desde Cotizaciones): abre y resalta ese pedido.
+        const wanted = new URLSearchParams(window.location.search).get('pedido');
+        const el = wanted && document.getElementById(`order-${wanted}`);
+        if (el) {
+          el.querySelector('details').open = true;
+          el.style.boxShadow = '0 0 0 3px rgba(6, 182, 212, 0.35)';
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } catch (err) {
+        console.error('Error cargando pedidos:', err);
+        list.innerHTML = '<div style="padding: 2rem; text-align: center; color: #EF4444; font-size: 0.875rem;">No se pudieron cargar los pedidos. Intenta de nuevo.</div>';
+      }
+    }
+
+    function renderOrders() {
+      document.getElementById('ordersFilters').innerHTML = Object.entries(ORDER_FILTERS).map(([key, f]) => {
+        const count = _orders.filter(o => f.match(o.stage)).length;
+        const active = key === ordersFilter;
+        return `<button type="button" onclick="setOrdersFilter('${key}')"
+          style="padding: 0.45rem 0.95rem; border-radius: 99px; font-size: 0.8125rem; font-weight: 700; cursor: pointer;
+          border: 1.5px solid ${active ? 'var(--color-navy)' : 'var(--color-border)'};
+          background: ${active ? 'var(--color-navy)' : 'white'}; color: ${active ? 'white' : 'var(--color-navy)'};">
+          ${f.label} <span style="opacity: 0.7;">${count}</span></button>`;
+      }).join('');
+
+      const list = document.getElementById('ordersList');
+      const orders = _orders.filter(o => ORDER_FILTERS[ordersFilter].match(o.stage));
+      if (orders.length === 0) {
+        list.innerHTML = `
+          <div style="padding: 2.5rem 1rem; text-align: center; color: var(--color-text-secondary); font-size: 0.875rem; border: 1px dashed var(--color-border); border-radius: 14px; background: white;">
+            ${_orders.length === 0
+              ? 'Aún no tienes pedidos. Cuando apruebes una cotización, tu pedido aparecerá aquí.<br><a href="/app/cotizaciones" style="color: var(--color-cyan); font-weight: 700; text-decoration: none;">Ir a Cotizaciones →</a>'
+              : 'No hay pedidos en este filtro.'}
+          </div>`;
+        return;
+      }
+
+      list.innerHTML = orders.map(o => {
+        const q = _quotesById[o.quote_id] || {};
+        const pricing = q.pricing && Array.isArray(q.pricing.items) ? q.pricing : null;
+        const cancelled = o.stage === 'cancelado';
+        const delivered = o.stage === 'entregado';
+        const target = q.target_mode === 'empleado'
+          ? `${escapeOrderHtml(q.target_employee_name || 'Una persona')}${q.target_role ? ` · ${escapeOrderHtml(q.target_role)}` : ''}`
+          : `Rol ${escapeOrderHtml(q.target_role || '—')}`;
+        const stageBadge = cancelled
+          ? '<span style="font-size: 0.7rem; font-weight: 800; color: #B91C1C; background: #FEF2F2; padding: 3px 10px; border-radius: 99px; text-transform: uppercase;">Cancelado</span>'
+          : `<span style="font-size: 0.7rem; font-weight: 800; color: ${delivered ? '#059669' : '#0369A1'}; background: ${delivered ? '#ECFDF5' : '#E0F2FE'}; padding: 3px 10px; border-radius: 99px; text-transform: uppercase;">${ORDER_STAGE_LABELS[o.stage] || o.stage}</span>`;
+        const history = Array.isArray(o.history) ? o.history.slice().reverse() : [];
+
+        return `
+          <div id="order-${o.id}" style="background: white; border: 1px solid var(--color-border); border-radius: 16px; padding: 1.25rem 1.25rem 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+              <div>
+                <div style="font-size: 0.75rem; font-weight: 800; color: var(--color-cyan); letter-spacing: 0.03em;">
+                  No. ${formatOrderNumber(o.order_number)}${q.quote_number ? ` <span style="color: #94A3B8; font-weight: 700;">· Cotización ${formatQuoteNumber(q.quote_number)}</span>` : ''}
+                </div>
+                <div style="font-weight: 800; color: var(--color-navy); font-size: 1rem; margin-top: 2px;">${target}</div>
+                <div style="font-size: 0.8rem; color: var(--color-text-secondary); margin-top: 2px;">
+                  Pedido el ${formatOrderDate(o.created_at)}${pricing ? ` · Total <strong style="color: var(--color-navy);">${formatMoneyOrder(pricing.total, pricing.currency)}</strong>` : ''}
+                </div>
+              </div>
+              <div style="text-align: right;">
+                ${stageBadge}
+                ${o.estimated_delivery && !cancelled ? `<div style="font-size: 0.8rem; color: var(--color-text-secondary); margin-top: 0.4rem;">Entrega estimada: <strong style="color: var(--color-navy);">${formatOrderDate(o.estimated_delivery)}</strong></div>` : ''}
+              </div>
+            </div>
+
+            ${cancelled
+              ? '<div style="margin-top: 1rem; padding: 0.75rem 0.875rem; border-radius: 10px; background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; font-size: 0.8125rem;">Este pedido fue cancelado.</div>'
+              : renderOrderSteps(o)}
+
+            ${o.last_note ? `<div style="margin-top: 0.75rem; padding: 0.7rem 0.875rem; border-radius: 10px; background: #F8FAFC; border: 1px solid var(--color-border); font-size: 0.8125rem; color: #334155;"><strong style="color: var(--color-navy);">Última actualización:</strong> ${escapeOrderHtml(o.last_note)}</div>` : ''}
+
+            <details style="margin-top: 0.75rem;">
+              <summary style="cursor: pointer; font-size: 0.8125rem; font-weight: 700; color: var(--color-cyan);">Ver detalle e historial</summary>
+              ${pricing ? `
+              <div style="margin-top: 0.75rem; border: 1px solid var(--color-border); border-radius: 10px; overflow: hidden;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
+                  <thead><tr style="background: #F8FAFC; color: #64748B; text-align: left; font-size: 0.7rem; text-transform: uppercase;">
+                    <th style="padding: 0.45rem 0.6rem;">Prenda</th><th style="padding: 0.45rem 0.6rem; text-align: center;">Cant.</th>
+                    <th style="padding: 0.45rem 0.6rem; text-align: right;">Subtotal</th>
+                  </tr></thead>
+                  <tbody>${pricing.items.map(it => `
+                    <tr style="border-top: 1px solid #F1F5F9;">
+                      <td style="padding: 0.45rem 0.6rem;">${escapeOrderHtml(it.name)}${it.size ? ` <span style="color: #64748B;">(talla ${escapeOrderHtml(it.size)})</span>` : ''}</td>
+                      <td style="padding: 0.45rem 0.6rem; text-align: center;">${it.qty}</td>
+                      <td style="padding: 0.45rem 0.6rem; text-align: right;">${formatMoneyOrder((it.unit_price || 0) * it.qty, pricing.currency)}</td>
+                    </tr>`).join('')}</tbody>
+                </table>
+                <div style="padding: 0.5rem 0.6rem; border-top: 1px solid var(--color-border); display: flex; justify-content: space-between; font-weight: 800; color: var(--color-navy); font-size: 0.875rem;">
+                  <span>Total (IVA incluido)</span><span>${formatMoneyOrder(pricing.total, pricing.currency)}</span>
+                </div>
+              </div>` : ''}
+              <div style="margin-top: 0.85rem; font-size: 0.75rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.04em;">Historial</div>
+              <div style="margin-top: 0.4rem; border-left: 2px solid #E2E8F0; padding-left: 0.85rem; display: flex; flex-direction: column; gap: 0.6rem;">
+                ${history.length ? history.map(h => `
+                  <div>
+                    <div style="font-size: 0.8125rem; font-weight: 700; color: var(--color-navy);">${escapeOrderHtml(ORDER_STAGE_LABELS[h.stage] || h.stage)}
+                      <span style="font-weight: 500; color: #94A3B8; font-size: 0.75rem;"> · ${formatOrderDate(h.at, true)}</span></div>
+                    ${h.note ? `<div style="font-size: 0.8rem; color: #475569;">${escapeOrderHtml(h.note)}</div>` : ''}
+                  </div>`).join('') : '<div style="font-size: 0.8rem; color: #94A3B8;">Sin movimientos todavía.</div>'}
+              </div>
+              <a href="/app/cotizaciones" style="display: inline-block; margin-top: 0.85rem; font-size: 0.8rem; font-weight: 700; color: var(--color-cyan); text-decoration: none;">Ver cotización →</a>
+            </details>
+          </div>`;
+      }).join('');
+    }
+
+    async function initPedidos() {
+      try {
+        const { data: sessionData } = await _supabase.auth.getSession();
+        if (!sessionData?.session?.user) {
+          window.location.href = '/login.html';
+          return;
+        }
+        currentCompanyId = await resolveCompanyId(_supabase, sessionData.session.user.id);
+        if (document.getElementById('pop-user-email')) {
+          document.getElementById('pop-user-email').textContent = sessionData.session.user.email;
+        }
+        await loadOrders();
+      } catch (err) {
+        console.error('Error inicializando Pedidos:', err);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initPedidos();
+    });
+
+    function toggleSidebar() {
+      const layout = document.getElementById('app-layout-wrapper');
+      if (layout) {
+        layout.classList.toggle('sidebar-open');
+      }
+    }
+  </script>
+</body>
+
+</html>
