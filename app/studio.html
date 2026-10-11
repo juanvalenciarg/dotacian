@@ -1339,6 +1339,8 @@
                 <div id="studioSummaryCollarRow"><span>Cuello</span><span id="studioSummaryCollar">Redondo</span></div>
                 <div id="studioSummarySleeveRow"><span>Manga</span><span id="studioSummarySleeve">Corta</span></div>
                 <div id="studioSummaryClosureRow" hidden><span>Cierre</span><span id="studioSummaryClosure"></span></div>
+                <div id="studioSummaryWaistRow" hidden><span>Cintura</span><span id="studioSummaryWaist"></span></div>
+                <div id="studioSummaryLengthRow" hidden><span>Largo</span><span id="studioSummaryLength"></span></div>
                 <div id="studioSummaryPocketRow" hidden><span>Bolsillo</span><span id="studioSummaryPocket"></span></div>
                 <div><span>Color</span><span id="studioSummaryColor">Blanco</span></div>
                 <div id="studioSummaryContrastRow" hidden><span>Contraste</span><span id="studioSummaryContrast" style="text-align: right;"></span></div>
@@ -1449,18 +1451,30 @@
 
     // --- Prendas configurables (cuello, manga, cierre, bolsillos y color por zonas) ---
     const OPTION_GROUPS = {
-      cuello: { label: 'Cuello', choices: { v: 'Solapa en V', camisero: 'Camisero', mao: 'Mao', polo: 'Polo', redondo: 'Redondo' } },
+      cuello: { label: 'Cuello', choices: { v: 'Solapa en V', camisero: 'Camisero', mao: 'Mao', polo: 'Polo', redondo: 'Redondo', capucha: 'Capucha' } },
       manga: { label: 'Manga', choices: { corta: 'Corta', larga: 'Larga con puño' } },
-      cierre: { label: 'Cierre', choices: { oculto: 'Oculto', botones: 'Botones', cremallera: 'Cremallera', ninguno: 'Sin cierre' } },
-      bolsillos: { label: 'Bolsillos', choices: { ninguno: 'Ninguno', pecho: 'Pecho', inferiores: 'Inferiores', ambos: 'Pecho e inferiores' } }
+      cierre: { label: 'Cierre', choices: { oculto: 'Oculto', cruzado: 'Doble botonadura', botones: 'Botones', cremallera: 'Cremallera', ninguno: 'Sin cierre' } },
+      bolsillos: { label: 'Bolsillos', choices: { ninguno: 'Ninguno', pecho: 'Pecho', inferiores: 'Inferiores', ambos: 'Pecho e inferiores', canguro: 'Canguro', completos: 'Frontales y traseros', frontales: 'Solo frontales' } },
+      // Pantalón
+      cintura: { label: 'Cintura', choices: { pretina: 'Pretina con pasadores', resorte: 'Resorte' } },
+      largo: { label: 'Largo', choices: { largo: 'Largo', tobillero: 'Tobillero', bermuda: 'Bermuda' } }
     };
-    const COLLAR_TYPES = { v: 'revere', camisero: 'shirt', mao: 'mandarin', polo: 'polo', redondo: 'rib' };
+    const COLLAR_TYPES = { v: 'revere', camisero: 'shirt', mao: 'mandarin', polo: 'polo', redondo: 'rib', capucha: 'hood' };
+    const TOP_GROUPS = ['cuello', 'manga', 'cierre', 'bolsillos'];
+    const PANTS_GROUPS = ['cintura', 'largo', 'bolsillos'];
+    const PANTS_HEM = { largo: -0.83, tobillero: -0.6, bermuda: -0.22 };
+
+    function groupsFor(conf) {
+      return conf.kind === 'pants' ? PANTS_GROUPS : TOP_GROUPS;
+    }
     // Opciones que ofrece cada prenda si no define las suyas (configurable.choices).
     const DEFAULT_CHOICES = {
       cuello: ['camisero', 'mao', 'polo', 'redondo'],
       manga: ['corta', 'larga'],
       cierre: ['botones', 'cremallera', 'ninguno'],
-      bolsillos: ['ninguno', 'pecho', 'inferiores', 'ambos']
+      bolsillos: ['ninguno', 'pecho', 'inferiores', 'ambos'],
+      cintura: ['pretina', 'resorte'],
+      largo: ['largo', 'tobillero', 'bermuda']
     };
     const COLOR_ZONES = {
       cuello: 'Cuello',
@@ -1482,6 +1496,9 @@
     function applyTopOptions(top, o, conf) {
       const t = { ...top };
       t.collar = COLLAR_TYPES[o.cuello];
+      // Escote según el cuello (ej. redondo más bajo que polo en la misma base).
+      if (conf.neckDip && conf.neckDip[o.cuello] != null) t.neckDip = conf.neckDip[o.cuello];
+      if ('drawstrings' in top) t.drawstrings = o.cuello === 'capucha';
       if (o.cuello !== 'v' && conf.target === 'top') {
         // Fuera de la solapa en V, el cuello camisero / polo usa puntas normales.
         t.collarTip = 1;
@@ -1493,14 +1510,32 @@
       t.sleeve = conf.sleeves[o.manga];
       const open = o.cuello !== 'v';
       t.placket = open && o.cierre === 'botones'
-        ? { halfWidth: 0.021, buttons: 7, spacing: 0.108, standButton: o.cuello === 'camisero' }
+        ? (conf.placket || { halfWidth: 0.021, buttons: 7, spacing: 0.108, standButton: o.cuello === 'camisero' })
         : false;
       t.zipper = open && o.cierre === 'cremallera' ? { inset: 0.004 } : null;
+      t.doubleBreasted = o.cierre === 'cruzado' ? conf.doubleBreasted : null;
       const chest = o.bolsillos === 'pecho' || o.bolsillos === 'ambos';
       const lower = o.bolsillos === 'inferiores' || o.bolsillos === 'ambos';
       t.pocket = chest ? conf.chestPocket : null;
       t.lowerPockets = lower ? conf.lowerPockets : null;
+      t.kangaroo = o.bolsillos === 'canguro' ? conf.kangaroo : null;
       return t;
+    }
+
+    // Pantalón: cintura (pretina o resorte), largo y bolsillos.
+    function applyPantsOptions(base, o) {
+      const src = base.pants;
+      const pants = { ...src, leg: { ...src.leg, hemY: PANTS_HEM[o.largo] } };
+      if (o.cintura === 'resorte') {
+        pants.elastic = true;
+        pants.waistbandH = 0.075;
+        pants.beltLoops = [];
+        pants.flyX = null;
+      }
+      pants.breakFolds = o.largo === 'largo' ? src.breakFolds : 0;
+      pants.frontPocket = o.bolsillos === 'ninguno' ? null : src.frontPocket;
+      pants.backPocket = o.bolsillos === 'completos' ? src.backPocket : null;
+      return { ...base, pants };
     }
 
     // Arma la configuración de la prenda con las opciones elegidas. Las prendas
@@ -1510,12 +1545,28 @@
       if (!base || !base.configurable) return base;
       const conf = base.configurable;
       const o = { ...conf.defaults };
-      Object.keys(OPTION_GROUPS).forEach(g => {
+      groupsFor(conf).forEach(g => {
         if (opts && choicesFor(conf, g).includes(opts[g])) o[g] = opts[g];
       });
       // Con solapa en V el cierre siempre va oculto.
       if (o.cuello === 'v') o.cierre = 'oculto';
       let cfg;
+      if (conf.kind === 'pants') {
+        cfg = applyPantsOptions(base, o);
+        cfg.summary = {
+          cintura: OPTION_GROUPS.cintura.choices[o.cintura],
+          largo: OPTION_GROUPS.largo.choices[o.largo],
+          bolsillo: o.bolsillos === 'ninguno' ? null : OPTION_GROUPS.bolsillos.choices[o.bolsillos]
+        };
+        cfg.logoPlacements = { ...conf.logoPlacements };
+        // Sin bolsillos traseros el logo del bolsillo trasero no tiene dónde ir.
+        if (o.bolsillos !== 'completos') delete cfg.logoPlacements.bolsilloTrasero;
+        cfg.defaultPlacement = cfg.logoPlacements[base.defaultPlacement] ? base.defaultPlacement : Object.keys(cfg.logoPlacements)[0];
+        cfg.options = o;
+        cfg.hasLowerPockets = false;
+        cfg.hasCuff = false;
+        return cfg;
+      }
       if (conf.target === 'top') {
         // Conjunto (túnica + pantalón): las opciones cambian la túnica.
         cfg = { ...base, set: { ...base.set, top: applyTopOptions(base.set.top, o, conf) } };
@@ -1535,15 +1586,17 @@
       if (chest) delete cfg.logoPlacements.pechoIzq;
       cfg.defaultPlacement = cfg.logoPlacements[base.defaultPlacement] ? base.defaultPlacement : Object.keys(cfg.logoPlacements)[0];
       cfg.options = o;
-      cfg.hasLowerPockets = !!top.lowerPockets;
+      cfg.hasLowerPockets = !!(top.lowerPockets && top.lowerPockets.accentBand);
+      cfg.hasCuff = !!(top.sleeve && top.sleeve.cuff);
       return cfg;
     }
 
     // Zonas de contraste que existen con las opciones elegidas.
     function zonesForConfig(cfg) {
       if (!cfg || !cfg.configurable) return [];
-      if (cfg.configurable.zones) return cfg.configurable.zones;
-      const zones = ['cuello', 'puno'];
+      if (cfg.configurable.zones) return cfg.configurable.zones.filter(z => z !== 'puno' || cfg.hasCuff);
+      const zones = ['cuello'];
+      if (cfg.hasCuff) zones.push('puno');
       if (cfg.hasLowerPockets) zones.push('detalle');
       return zones;
     }
@@ -1624,7 +1677,40 @@
     const GARMENTS = {
       camiseta: {
         label: 'Camiseta básica',
-        meta: 'Cuello redondo · Manga corta',
+        meta: 'Personalizable · Cuello redondo · Manga corta',
+        configurable: {
+          choices: {
+            cuello: ['redondo', 'polo'],
+            cierre: ['ninguno', 'botones'],
+            bolsillos: ['ninguno', 'pecho']
+          },
+          defaults: { cuello: 'redondo', manga: 'corta', cierre: 'ninguno', bolsillos: 'ninguno' },
+          zoneDefaults: {},
+          neckDip: { redondo: 0.07, polo: 0.025 },
+          // Tapeta corta (como el polo) cuando lleva botones.
+          placket: { halfWidth: 0.019, length: 0.17, buttons: 2, spacing: 0.07, firstOffset: 0.05, standButton: false },
+          sleeves: {
+            corta: {
+              angleStart: deg(50), angleEnd: deg(50), length: 0.27, hemTilt: 0.085, forward: deg(12), start: -0.18,
+              rBase: [0.160, 0.152], rEnd: [0.132, 0.118], flare: true,
+              shoulder: new THREE.Vector3(0.335, 0.332, 0),
+              cuff: null
+            },
+            larga: {
+              angleStart: deg(50), angleEnd: deg(84), length: 0.86, hemTilt: 0, forward: deg(9), start: -0.18,
+              rBase: [0.160, 0.152], rEnd: [0.074, 0.070], flare: false,
+              shoulder: new THREE.Vector3(0.335, 0.332, 0),
+              cuff: { length: 0.085, scale: 0.8, rib: true }
+            }
+          },
+          chestPocket: { x0: 0.078, x1: 0.205, yTop: 0.165, yBottom: 0.02 },
+          logoPlacements: {
+            pechoIzq: { x: 0.15, y: 0.17, defaultCm: 9 },
+            pechoDer: { x: -0.15, y: 0.17, defaultCm: 9 },
+            pechoCentro: { x: 0, y: 0.1, defaultCm: 22 },
+            espalda: { x: 0, y: 0.08, defaultCm: 26 }
+          }
+        },
         summary: { cuello: 'Redondo', manga: 'Corta', bolsillo: null },
         // Perfil del torso de abajo (ruedo) hacia arriba (cuello):
         // y = altura, a = medio ancho, b = media profundidad, n = exponente de la superelipse.
@@ -1740,7 +1826,38 @@
 
       hoodie: {
         label: 'Hoodie',
-        meta: 'Capucha · Bolsillo canguro · Puños en rib',
+        meta: 'Personalizable · Capucha · Bolsillo canguro',
+        configurable: {
+          choices: {
+            cuello: ['capucha', 'redondo'],
+            manga: ['larga', 'corta'],
+            cierre: ['ninguno', 'cremallera'],
+            bolsillos: ['canguro', 'ninguno']
+          },
+          defaults: { cuello: 'capucha', manga: 'larga', cierre: 'ninguno', bolsillos: 'canguro' },
+          zoneDefaults: {},
+          neckDip: { capucha: 0.04, redondo: 0.06 },
+          kangaroo: { yTop: -0.27, yBottom: -0.64, topHalf: 0.165, bottomHalf: 0.255 },
+          sleeves: {
+            larga: {
+              angleStart: deg(52), angleEnd: deg(83), length: 0.80, hemTilt: 0, forward: deg(9), start: -0.2,
+              rBase: [0.170, 0.160], rEnd: [0.088, 0.082], flare: false,
+              shoulder: new THREE.Vector3(0.348, 0.312, 0),
+              cuff: { length: 0.085, scale: 0.8, rib: true }
+            },
+            corta: {
+              angleStart: deg(52), angleEnd: deg(52), length: 0.28, hemTilt: 0.06, forward: deg(12), start: -0.2,
+              rBase: [0.170, 0.160], rEnd: [0.142, 0.128], flare: false,
+              shoulder: new THREE.Vector3(0.348, 0.312, 0),
+              cuff: { length: 0.04, scale: 0.96, rib: true }
+            }
+          },
+          logoPlacements: {
+            pechoCentro: { x: 0, y: -0.03, defaultCm: 18 },
+            pechoIzq: { x: 0.15, y: 0.14, defaultCm: 9 },
+            espalda: { x: 0, y: -0.06, defaultCm: 26 }
+          }
+        },
         summary: { cuello: 'Capucha con cordones', manga: 'Larga con puño en rib', bolsillo: 'Canguro' },
         profile: [
           { y: -0.70, a: 0.350, b: 0.182, n: 2.5 },
@@ -1787,7 +1904,38 @@
 
       polo: {
         label: 'Camiseta tipo polo',
-        meta: 'Cuello polo en rib · Tapeta con 2 botones',
+        meta: 'Personalizable · Cuello polo · Tapeta con 2 botones',
+        configurable: {
+          choices: {
+            cuello: ['polo', 'redondo'],
+            cierre: ['botones', 'ninguno'],
+            bolsillos: ['ninguno', 'pecho']
+          },
+          defaults: { cuello: 'polo', manga: 'corta', cierre: 'botones', bolsillos: 'ninguno' },
+          zoneDefaults: {},
+          neckDip: { polo: 0.025, redondo: 0.07 },
+          placket: { halfWidth: 0.019, length: 0.17, buttons: 2, spacing: 0.07, firstOffset: 0.05, standButton: false },
+          sleeves: {
+            corta: {
+              angleStart: deg(50), angleEnd: deg(50), length: 0.25, hemTilt: 0.07, forward: deg(12), start: -0.18,
+              rBase: [0.158, 0.150], rEnd: [0.124, 0.112], flare: false,
+              shoulder: new THREE.Vector3(0.335, 0.334, 0),
+              cuff: { length: 0.035, scale: 0.97, rib: true }
+            },
+            larga: {
+              angleStart: deg(50), angleEnd: deg(84), length: 0.86, hemTilt: 0, forward: deg(9), start: -0.18,
+              rBase: [0.158, 0.150], rEnd: [0.074, 0.070], flare: false,
+              shoulder: new THREE.Vector3(0.335, 0.334, 0),
+              cuff: { length: 0.085, scale: 0.8, rib: true }
+            }
+          },
+          chestPocket: { x0: 0.078, x1: 0.205, yTop: 0.165, yBottom: 0.02 },
+          logoPlacements: {
+            pechoIzq: { x: 0.15, y: 0.17, defaultCm: 8 },
+            pechoDer: { x: -0.15, y: 0.17, defaultCm: 8 },
+            espalda: { x: 0, y: 0.08, defaultCm: 26 }
+          }
+        },
         summary: { cuello: 'Polo en rib', manga: 'Corta con puño en rib', bolsillo: null },
         profile: [
           { y: -0.74, a: 0.340, b: 0.166, n: 2.7 },
@@ -1833,7 +1981,38 @@
 
       filipina: {
         label: 'Filipina de chef',
-        meta: 'Cuello mao · Doble botonadura · Manga larga',
+        meta: 'Personalizable · Cuello mao · Doble botonadura',
+        configurable: {
+          choices: {
+            cuello: ['mao', 'camisero'],
+            manga: ['larga', 'corta'],
+            cierre: ['cruzado', 'botones', 'cremallera'],
+            bolsillos: ['ninguno', 'inferiores']
+          },
+          defaults: { cuello: 'mao', manga: 'larga', cierre: 'cruzado', bolsillos: 'ninguno' },
+          zoneDefaults: {},
+          doubleBreasted: { panelFrom: -0.06, edgeX: 0.115, rows: [-0.07, 0.072], buttons: 5, spacing: 0.105 },
+          sleeves: {
+            larga: {
+              angleStart: deg(50), angleEnd: deg(84), length: 0.86, hemTilt: 0, forward: deg(9), start: -0.18,
+              rBase: [0.155, 0.146], rEnd: [0.072, 0.068], flare: false,
+              shoulder: new THREE.Vector3(0.335, 0.336, 0),
+              cuff: { length: 0.1, scale: 1.1, button: false }
+            },
+            corta: {
+              angleStart: deg(50), angleEnd: deg(50), length: 0.27, hemTilt: 0.06, forward: deg(12), start: -0.18,
+              rBase: [0.155, 0.146], rEnd: [0.126, 0.114], flare: false,
+              shoulder: new THREE.Vector3(0.335, 0.336, 0),
+              cuff: { length: 0.05, scale: 1.06, button: false }
+            }
+          },
+          lowerPockets: { yTop: -0.44, yBottom: -0.66, x0: 0.07, x1: 0.235, accentBand: 0.034 },
+          logoPlacements: {
+            pechoIzq: { x: 0.215, y: 0.19, defaultCm: 7 },
+            pechoDer: { x: -0.205, y: 0.19, defaultCm: 7 },
+            espalda: { x: 0, y: 0.06, defaultCm: 24 }
+          }
+        },
         summary: { cuello: 'Mao', manga: 'Larga con puño', bolsillo: null },
         profile: [
           { y: -0.78, a: 0.345, b: 0.172, n: 2.6 },
@@ -1881,7 +2060,18 @@
 
       pantalon: {
         label: 'Pantalón chino',
-        meta: 'Pretina con pasadores · Bolsillos sesgados',
+        meta: 'Personalizable · Pretina · Bolsillos sesgados',
+        configurable: {
+          kind: 'pants',
+          choices: { bolsillos: ['completos', 'frontales', 'ninguno'] },
+          defaults: { cintura: 'pretina', largo: 'largo', bolsillos: 'completos' },
+          zones: [],
+          zoneDefaults: {},
+          logoPlacements: {
+            bolsilloTrasero: { x: -0.115, y: 0.39, defaultCm: 5 },
+            musloIzq: { x: 0.135, y: 0.08, defaultCm: 6 }
+          }
+        },
         summary: { cuello: null, manga: null, bolsillo: 'Sesgados al frente, de ribete atrás' },
         colors: ['negro', 'beige', 'azul'],
         thumbColor: 'beige', // color de la imagen en DS Hub (se lee mejor que el negro)
@@ -3092,7 +3282,7 @@
       if (cfg.collar === 'rib') {
         addCollar([buildRim(torsoRing(cfg, 1, -0.004, 1.06), 0.016)]);
       } else if (cfg.collar === 'hood') {
-        fabricParts.push(...buildHood(cfg));
+        addCollar(buildHood(cfg));
       } else if (cfg.collar === 'mandarin') {
         addCollar(buildMandarinCollar(cfg));
       } else if (cfg.collar === 'revere') {
@@ -3494,7 +3684,7 @@
           return;
         }
         card.hidden = false;
-        document.getElementById('studioOptions').innerHTML = Object.entries(OPTION_GROUPS).map(([group, g]) => `
+        document.getElementById('studioOptions').innerHTML = groupsFor(cfg.configurable).map(group => [group, OPTION_GROUPS[group]]).map(([group, g]) => `
           <div class="studio-field-label"><span>${g.label}</span></div>
           <div class="studio-option-group" role="group" aria-label="${g.label}">
             ${choicesFor(cfg.configurable, group).map(value => {
@@ -3573,6 +3763,10 @@
         document.getElementById('studioSummarySleeveRow').hidden = !cfg.summary.manga;
         document.getElementById('studioSummaryClosure').textContent = cfg.summary.cierre || '';
         document.getElementById('studioSummaryClosureRow').hidden = !cfg.summary.cierre;
+        document.getElementById('studioSummaryWaist').textContent = cfg.summary.cintura || '';
+        document.getElementById('studioSummaryWaistRow').hidden = !cfg.summary.cintura;
+        document.getElementById('studioSummaryLength').textContent = cfg.summary.largo || '';
+        document.getElementById('studioSummaryLengthRow').hidden = !cfg.summary.largo;
         const pocketRow = document.getElementById('studioSummaryPocketRow');
         pocketRow.hidden = !cfg.summary.bolsillo;
         document.getElementById('studioSummaryPocket').textContent = cfg.summary.bolsillo || '';
