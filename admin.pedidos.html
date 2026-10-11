@@ -568,7 +568,7 @@
 
   <div class="toast-container" id="toast-container"></div>
 
-  <script src="assets/js/utils.js?v=4"></script>
+  <script src="assets/js/utils.js?v=5"></script>
   <script>
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
@@ -691,6 +691,7 @@
     }
 
     function updateStageFilterCounts() {
+      if (window.refreshAdminNavBadges) window.refreshAdminNavBadges();
       Array.from(document.getElementById('filterOrderStage').options).forEach(opt => {
         const base = opt.textContent.replace(/ \(\d+\)$/, '');
         opt.textContent = `${base} (${allOrders.filter(o => matchesStageFilter(o, opt.value)).length})`;

@@ -369,49 +369,62 @@ function setupAutoLogout() {
   resetInactivityTimer();
 }
 
-// Admin Leads Badge
-document.addEventListener('DOMContentLoaded', () => {
-  if (window.location.pathname.includes('admin') && !window.location.pathname.includes('login')) {
-    setTimeout(async () => {
-      const navLeads = document.getElementById('nav-leads');
-      if (navLeads && typeof supabase !== 'undefined') {
-        try {
-          let localSupa = window._supabase;
-          if (!localSupa) {
-            localSupa = supabase.createClient('https://awuhvewotmwelurmjvmu.supabase.co', 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq', { auth: { storageKey: 'dotacian-admin-token', multiTab: false } });
-          }
-          
-          const { count, error } = await localSupa
-            .from('leads_dotacian')
-            .select('*', { count: 'exact', head: true })
-            .eq('status', 'nuevo');
-          
-          if (!error && count > 0) {
-            navLeads.style.display = 'flex';
-            navLeads.style.justifyContent = 'space-between';
-            navLeads.style.alignItems = 'center';
-            
-            const badge = document.createElement('span');
-            badge.style.background = '#EF4444';
-            badge.style.color = 'white';
-            badge.style.borderRadius = '50%';
-            badge.style.width = '20px';
-            badge.style.height = '20px';
-            badge.style.display = 'flex';
-            badge.style.alignItems = 'center';
-            badge.style.justifyContent = 'center';
-            badge.style.fontSize = '0.7rem';
-            badge.style.fontWeight = '700';
-            badge.style.boxShadow = '0 0 0 2px #0F172A';
-            badge.textContent = count > 9 ? '+9' : count;
-            
-            navLeads.appendChild(badge);
-          }
-        } catch(err) {
-          console.error('Error fetching leads count for badge:', err);
-        }
-      }
-    }, 1200); // Give Supabase time to initialize
+// Alertas del menú admin: número rojo junto a Leads, Cotizaciones y Pedidos
+// cuando hay algo pendiente. Se actualiza cada minuto, al volver a la
+// pestaña y cuando una página llama a window.refreshAdminNavBadges().
+function setAdminNavBadge(navId, count, title) {
+  const nav = document.getElementById(navId);
+  if (!nav) return;
+  const old = nav.querySelector('.admin-nav-badge');
+  if (old) old.remove();
+  if (!count) return;
+  nav.style.display = 'flex';
+  nav.style.justifyContent = 'space-between';
+  nav.style.alignItems = 'center';
+  const badge = document.createElement('span');
+  badge.className = 'admin-nav-badge';
+  badge.title = title;
+  badge.style.cssText = 'background:#EF4444;color:white;border-radius:999px;min-width:20px;height:20px;padding:0 6px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;box-shadow:0 0 0 2px #0F172A;flex-shrink:0;';
+  badge.textContent = count > 9 ? '+9' : count;
+  nav.appendChild(badge);
+}
+
+let adminBadgeClient = null;
+window.refreshAdminNavBadges = async function () {
+  if (typeof supabase === 'undefined') return;
+  if (!adminBadgeClient) {
+    adminBadgeClient = supabase.createClient('https://awuhvewotmwelurmjvmu.supabase.co', 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq', { auth: { storageKey: 'dotacian-admin-token', multiTab: false, autoRefreshToken: false } });
   }
+  const supa = adminBadgeClient;
+  try {
+    const { count, error } = await supa.from('leads_dotacian').select('*', { count: 'exact', head: true }).eq('status', 'nuevo');
+    if (!error) setAdminNavBadge('nav-leads', count || 0, 'Leads nuevos');
+  } catch (err) { console.error('Alerta de leads:', err); }
+  try {
+    const { data, error } = await supa.rpc('admin_list_dot_quote_requests');
+    if (!error) {
+      const pending = (data || []).filter(q =>
+        q.status === 'nueva' || q.status === 'pendiente' ||
+        (q.status === 'en_proceso' && q.client_response === 'cambios')).length;
+      setAdminNavBadge('nav-cotizaciones', pending, 'Cotizaciones nuevas o con cambios pedidos por el cliente');
+    }
+  } catch (err) { console.error('Alerta de cotizaciones:', err); }
+  try {
+    const { data, error } = await supa.rpc('admin_list_orders');
+    if (!error) {
+      const pending = (data || []).filter(o => o.client_alert).length;
+      setAdminNavBadge('nav-pedidos', pending, 'Pedidos con respuesta del cliente sin atender');
+    }
+  } catch (err) { console.error('Alerta de pedidos:', err); }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  const path = window.location.pathname;
+  if (!path.includes('admin') || path.includes('login')) return;
+  setTimeout(window.refreshAdminNavBadges, 1200); // Give Supabase time to initialize
+  setInterval(window.refreshAdminNavBadges, 60000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') window.refreshAdminNavBadges();
+  });
 });
 

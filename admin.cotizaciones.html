@@ -687,7 +687,7 @@
     </div>
   </div>
 
-  <script src="assets/js/utils.js?v=4"></script>
+  <script src="assets/js/utils.js?v=5"></script>
   <script src="assets/js/studio-renders.js?v=4"></script>
   <script>
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
@@ -1373,6 +1373,8 @@
     }
 
     function updateQuoteStatusFilterCounts() {
+      // Las alertas del menú (utils.js) se recalculan con cada cambio.
+      if (window.refreshAdminNavBadges) window.refreshAdminNavBadges();
       const select = document.getElementById('filterQuoteStatus');
       Array.from(select.options).forEach(opt => {
         if (!opt.value) {
