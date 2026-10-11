@@ -1254,7 +1254,16 @@
                   </span>
                   <span>
                     <span class="studio-garment-name">Hoodie</span>
-                    <span class="studio-garment-meta">Capucha · Bolsillo canguro · Puños en rib</span>
+                    <span class="studio-garment-meta">Personalizable · Capucha · Bolsillo canguro</span>
+                  </span>
+                </button>
+                <button type="button" class="studio-garment studio-garment-option" data-garment="buzo" aria-pressed="false">
+                  <span class="studio-garment-icon">
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 3.5a3 3 0 0 0 6 0L20 6l1.5 12-3 .5L17 10v11H7V10l-1.5 8.5-3-.5L4 6z"></path><path d="M7 19h10"></path></svg>
+                  </span>
+                  <span>
+                    <span class="studio-garment-name">Buzo</span>
+                    <span class="studio-garment-meta">Personalizable · Cuello redondo · Puños en rib</span>
                   </span>
                 </button>
                 <button type="button" class="studio-garment studio-garment-option" data-garment="polo" aria-pressed="false">
@@ -1837,15 +1846,16 @@
         label: 'Hoodie',
         meta: 'Personalizable · Capucha · Bolsillo canguro',
         configurable: {
+          // Siempre con capucha (el buzo es la prenda sin capucha).
           choices: {
-            cuello: ['capucha', 'redondo'],
+            cuello: ['capucha'],
             manga: ['larga', 'corta'],
             cierre: ['ninguno', 'cremallera'],
             bolsillos: ['canguro', 'ninguno']
           },
           defaults: { cuello: 'capucha', manga: 'larga', cierre: 'ninguno', bolsillos: 'canguro' },
           zoneDefaults: {},
-          neckDip: { capucha: 0.04, redondo: 0.06 },
+          neckDip: { capucha: 0.04 },
           kangaroo: { yTop: -0.27, yBottom: -0.64, topHalf: 0.165, bottomHalf: 0.255 },
           sleeves: {
             larga: {
@@ -1908,6 +1918,85 @@
           pechoCentro: { x: 0, y: -0.03, defaultCm: 18 },
           pechoIzq: { x: 0.15, y: 0.14, defaultCm: 9 },
           espalda: { x: 0, y: -0.06, defaultCm: 26 }
+        }
+      },
+
+      // Buzo: misma base del hoodie, sin capucha.
+      buzo: {
+        label: 'Buzo',
+        meta: 'Personalizable · Cuello redondo · Puños en rib',
+        configurable: {
+          choices: {
+            cuello: ['redondo', 'maoRib'],
+            manga: ['larga', 'corta'],
+            cierre: ['ninguno', 'mediaCremallera'],
+            bolsillos: ['ninguno', 'canguro']
+          },
+          labels: { cuello: { maoRib: 'Cuello alto en rib' } },
+          defaults: { cuello: 'redondo', manga: 'larga', cierre: 'ninguno', bolsillos: 'ninguno' },
+          zoneDefaults: {},
+          neckDip: { redondo: 0.06, maoRib: 0.03 },
+          kangaroo: { yTop: -0.27, yBottom: -0.64, topHalf: 0.165, bottomHalf: 0.255 },
+          sleeves: {
+            larga: {
+              angleStart: deg(52), angleEnd: deg(83), length: 0.80, hemTilt: 0, forward: deg(9), start: -0.2,
+              rBase: [0.170, 0.160], rEnd: [0.088, 0.082], flare: false,
+              shoulder: new THREE.Vector3(0.348, 0.312, 0),
+              cuff: { length: 0.085, scale: 0.8, rib: true }
+            },
+            corta: {
+              angleStart: deg(52), angleEnd: deg(52), length: 0.28, hemTilt: 0.06, forward: deg(12), start: -0.2,
+              rBase: [0.170, 0.160], rEnd: [0.142, 0.128], flare: false,
+              shoulder: new THREE.Vector3(0.348, 0.312, 0),
+              cuff: { length: 0.04, scale: 0.96, rib: true }
+            }
+          },
+          logoPlacements: {
+            pechoCentro: { x: 0, y: 0.06, defaultCm: 20 },
+            pechoIzq: { x: 0.15, y: 0.14, defaultCm: 9 },
+            espalda: { x: 0, y: 0.04, defaultCm: 26 }
+          }
+        },
+        summary: { cuello: 'Redondo', manga: 'Larga con puño en rib', bolsillo: null },
+        profile: [
+          { y: -0.70, a: 0.350, b: 0.182, n: 2.5 },
+          { y: -0.45, a: 0.353, b: 0.180, n: 2.5 },
+          { y: -0.15, a: 0.356, b: 0.184, n: 2.5 },
+          { y: 0.08, a: 0.363, b: 0.194, n: 2.4 },
+          { y: 0.22, a: 0.366, b: 0.192, n: 2.3 },
+          { y: 0.31, a: 0.332, b: 0.172, n: 2.2 },
+          { y: 0.37, a: 0.258, b: 0.147, n: 2.1 },
+          { y: 0.405, a: 0.188, b: 0.130, n: 2.0 },
+          { y: 0.420, a: 0.152, b: 0.122, n: 2.0 }
+        ],
+        neckStart: 5,
+        neckDip: 0.06,
+        hemCurve: 0,
+        waistFold: 0.0045,
+        sleeve: {
+          angleStart: deg(52),
+          angleEnd: deg(83),
+          length: 0.80,
+          hemTilt: 0,
+          forward: deg(9),
+          start: -0.2,
+          rBase: [0.170, 0.160],  // hombro caído y manga holgada
+          rEnd: [0.088, 0.082],
+          flare: false,
+          shoulder: new THREE.Vector3(0.348, 0.312, 0),
+          cuff: { length: 0.085, scale: 0.8, rib: true }
+        },
+        collar: 'rib',
+        placket: false,
+        pocket: null,
+        kangaroo: null, // el canguro es opcional en el buzo
+        waistband: { height: 0.075, scale: 0.93 },
+        groundY: -0.86,
+        defaultPlacement: 'pechoCentro',
+        logoPlacements: {
+          pechoCentro: { x: 0, y: 0.06, defaultCm: 20 },
+          pechoIzq: { x: 0.15, y: 0.14, defaultCm: 9 },
+          espalda: { x: 0, y: 0.04, defaultCm: 26 }
         }
       },
 
