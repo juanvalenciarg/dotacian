@@ -250,6 +250,46 @@
       color: #0F172A;
     }
 
+    /* Columna Cliente: avatar con iniciales, empresa y contacto */
+    .quote-client {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .quote-client-avatar {
+      flex: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .quote-client-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .quote-client-info .user-name {
+      font-size: 0.95rem;
+    }
+
+    .quote-client-contact {
+      font-size: 0.8rem;
+      color: #64748B;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 260px;
+    }
+
     .quote-item-row {
       border: 1px solid #E2E8F0;
       border-radius: 10px;
@@ -446,8 +486,8 @@
           <!-- Buscador -->
           <div class="search-container">
             <div class="search-input-group">
-              <label for="searchQuoteCompany">Buscar por empresa o número</label>
-              <input type="text" id="searchQuoteCompany" class="search-input" placeholder="Nombre de la empresa o COT-0001..."
+              <label for="searchQuoteCompany">Buscar por cliente, contacto o número</label>
+              <input type="text" id="searchQuoteCompany" class="search-input" placeholder="Empresa, contacto, correo o COT-0001..."
                 oninput="renderQuotesTable()">
             </div>
             <div class="search-input-group" style="flex: 0 0 220px;">
@@ -469,7 +509,7 @@
               <thead>
                 <tr>
                   <th>No.</th>
-                  <th>Empresa</th>
+                  <th>Cliente</th>
                   <th>Solicitado para</th>
                   <th>Activo / Detalle</th>
                   <th>Fecha</th>
@@ -496,7 +536,7 @@
                 <p id="cardQuoteNumber"
                   style="margin: 0.25rem 0 0 0; color: var(--color-navy); font-size: 0.875rem; font-weight: 700;"></p>
                 <p id="cardCompany"
-                  style="margin: 0.25rem 0 0 0; color: var(--color-text-secondary); font-size: 0.875rem;">-</p>
+                  style="margin: 0.25rem 0 0 0; color: #0F172A; font-size: 1rem; font-weight: 600;">-</p>
               </div>
               <div style="display: flex; align-items: center; gap: 1rem;">
                 <select id="cardStatus" class="role-badge" onchange="changeQuoteStatus(this.value)" title="Cambiar estado"
@@ -645,6 +685,8 @@
 
             <div class="drawer-footer">
               <button class="btn btn-outline" onclick="closeDrawer()">Cerrar</button>
+              <button class="btn btn-outline" id="btnDeleteQuote" onclick="askDeleteQuote()"
+                style="color: #B91C1C; border-color: #FECACA;">Eliminar</button>
               <button class="btn btn-primary" id="btnGenerateQuotePDF" onclick="generateQuotePDF()"
                 style="display: flex; align-items: center; gap: 0.5rem;">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"
@@ -670,6 +712,23 @@
   </div>
 
   <div class="toast-container" id="toast-container"></div>
+
+  <!-- Confirmar borrado de una cotización -->
+  <div id="deleteQuoteModal" onclick="if (event.target === this) closeDeleteQuote()"
+    style="display: none; position: fixed; inset: 0; z-index: 3000; background: rgba(15, 23, 42, 0.6); align-items: center; justify-content: center; padding: 1.5rem;">
+    <div style="background: white; border-radius: 18px; width: min(440px, 100%); padding: 1.75rem; text-align: center;">
+      <div style="width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; background: #FEF2F2;">
+        <svg width="26" height="26" fill="none" stroke="#DC2626" stroke-width="2.2" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      </div>
+      <h2 id="deleteQuoteTitle" style="margin: 0 0 0.5rem; font-family: var(--font-family-heading); color: #0F172A; font-size: 1.3rem;">Eliminar cotización</h2>
+      <p id="deleteQuoteText" style="margin: 0 0 1.5rem; color: #475569; font-size: 0.875rem; line-height: 1.5;"></p>
+      <div style="display: flex; gap: 0.75rem;">
+        <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeDeleteQuote()">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="btnConfirmDeleteQuote" style="flex: 1; background: #DC2626; color: white; border: none;"
+          onclick="confirmDeleteQuote()">Sí, eliminar</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Visor 3D del diseño (app/studio.html en modo admin) -->
   <div id="design3dModal" onclick="if (event.target === this) closeDesign3d()"
@@ -1361,6 +1420,75 @@
       }
     }
 
+    // ── Borrar cotización (RPC admin_delete_dot_quote) ───────────
+    // Se borra de la base: el cliente deja de verla. Si tiene pedido sin
+    // entregar, se borra también; si ya se entregó, la base no lo permite.
+    let quoteToDelete = null;
+
+    async function askDeleteQuote() {
+      if (!currentQuote) return;
+      quoteToDelete = currentQuote;
+      const number = formatQuoteNumber(currentQuote.quote_number);
+      const text = document.getElementById('deleteQuoteText');
+      const btn = document.getElementById('btnConfirmDeleteQuote');
+      text.textContent = 'Revisando si tiene pedido…';
+      btn.disabled = true;
+      document.getElementById('deleteQuoteTitle').textContent = `Eliminar ${number}`;
+      document.getElementById('deleteQuoteModal').style.display = 'flex';
+
+      let order = null;
+      try {
+        const { data } = await _supabase.rpc('admin_list_orders');
+        order = (data || []).find(o => o.quote_id === currentQuote.id) || null;
+      } catch (e) { /* sin módulo de pedidos */ }
+
+      const company = currentQuote.company_name || 'la empresa';
+      if (order && order.stage === 'entregado') {
+        text.textContent = `No se puede eliminar: su pedido ${formatOrderNumberAdmin(order.order_number)} ya se entregó y sus prendas están en la bodega de ${company}.`;
+        btn.disabled = true;
+        return;
+      }
+      text.textContent = order
+        ? `Se eliminará la cotización y también su pedido ${formatOrderNumberAdmin(order.order_number)} (sin entregar). ${company} dejará de verlos. Esta acción no se puede deshacer.`
+        : `Se eliminará la cotización y ${company} dejará de verla. Esta acción no se puede deshacer.`;
+      btn.disabled = false;
+    }
+
+    function formatOrderNumberAdmin(n) {
+      return `PED-${String(n).padStart(4, '0')}`;
+    }
+
+    function closeDeleteQuote() {
+      document.getElementById('deleteQuoteModal').style.display = 'none';
+      quoteToDelete = null;
+    }
+
+    async function confirmDeleteQuote() {
+      if (!quoteToDelete) return;
+      const q = quoteToDelete;
+      const btn = document.getElementById('btnConfirmDeleteQuote');
+      btn.disabled = true;
+      btn.textContent = 'Eliminando...';
+      try {
+        const { data: deletedOrder, error } = await _supabase.rpc('admin_delete_dot_quote', { p_id: q.id });
+        if (error) throw error;
+        allQuotes = allQuotes.filter(x => x.id !== q.id);
+        closeDeleteQuote();
+        closeDrawer();
+        updateQuoteStatusFilterCounts();
+        renderQuotesTable();
+        showToast('Cotización eliminada', `${formatQuoteNumber(q.quote_number)}${deletedOrder ? ` y su pedido ${deletedOrder}` : ''} ya no aparecen para el cliente.`, 'success');
+      } catch (err) {
+        console.error('Error eliminando cotización:', err);
+        showToast('No se pudo eliminar', err.message && /No se puede borrar|No autorizado/.test(err.message)
+          ? err.message
+          : 'Revisa que hayas ejecutado la migración de borrado en Supabase.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Sí, eliminar';
+      }
+    }
+
     function normalizeQuoteStatus(status) {
       if (status === 'pendiente') return 'nueva';
       if (status === 'generado') return 'en_proceso';
@@ -1421,7 +1549,8 @@
 
       let rows = allQuotes;
       if (search) rows = rows.filter(q =>
-        (q.company_name || '').toLowerCase().includes(search) ||
+        [q.company_name, q.legal_name, q.delivery_contact_1_name, q.delivery_contact_1_email]
+          .some(v => (v || '').toLowerCase().includes(search)) ||
         formatQuoteNumber(q.quote_number).toLowerCase().includes(search));
       if (statusFilter) rows = rows.filter(q => q.status === statusFilter);
 
@@ -1444,7 +1573,7 @@
         tr.onclick = () => openQuoteDrawer(q.id);
         tr.innerHTML = `
           <td style="font-weight: 700; white-space: nowrap;">${formatQuoteNumber(q.quote_number)}</td>
-          <td><span class="user-name">${escapeQuoteHtml(q.company_name || 'Empresa')}</span></td>
+          <td>${quoteClientCell(q)}</td>
           <td>${target}</td>
           <td>${detail}</td>
           <td>${formatDateShort(q.created_at)}${getUrgentDeliveryDays(q) !== null && q.status !== 'entregada'
@@ -1454,6 +1583,36 @@
         `;
         tbody.appendChild(tr);
       });
+    }
+
+    // Nombre visible del cliente: nombre comercial, razón social o contacto.
+    function quoteClientName(q) {
+      return q.company_name || q.legal_name || q.delivery_contact_1_name || 'Empresa sin nombre';
+    }
+
+    // Color estable por empresa para el avatar (mismo cliente, mismo color).
+    const QUOTE_CLIENT_COLORS = [
+      ['#E0F2FE', '#0369A1'], ['#EDE9FE', '#6D28D9'], ['#DCFCE7', '#15803D'], ['#FEF3C7', '#B45309'],
+      ['#FCE7F3', '#BE185D'], ['#E0E7FF', '#4338CA'], ['#CCFBF1', '#0F766E'], ['#FFE4E6', '#BE123C']
+    ];
+
+    function quoteClientCell(q) {
+      const name = quoteClientName(q);
+      const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('') || '?';
+      const key = String(q.company_id || name);
+      let hash = 0;
+      for (let i = 0; i < key.length; i++) hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
+      const [bg, fg] = QUOTE_CLIENT_COLORS[hash % QUOTE_CLIENT_COLORS.length];
+      const contact = [q.delivery_contact_1_name, q.delivery_contact_1_email].filter(Boolean).join(' · ')
+        || (q.legal_name && q.legal_name !== name ? q.legal_name : '');
+      return `
+        <div class="quote-client">
+          <span class="quote-client-avatar" style="background:${bg}; color:${fg};">${escapeQuoteHtml(initials)}</span>
+          <span class="quote-client-info">
+            <span class="user-name">${escapeQuoteHtml(name)}</span>
+            ${contact ? `<span class="quote-client-contact" title="${escapeQuoteAttr(contact)}">${escapeQuoteHtml(contact)}</span>` : ''}
+          </span>
+        </div>`;
     }
 
     function escapeQuoteHtml(str) {
@@ -1481,7 +1640,7 @@
       if (!q) return;
       currentQuote = q;
 
-      document.getElementById('cardCompany').textContent = q.company_name || 'Empresa';
+      document.getElementById('cardCompany').textContent = quoteClientName(q);
       document.getElementById('cardQuoteNumber').textContent = q.quote_number ? `No. ${formatQuoteNumber(q.quote_number)}` : '';
       const manual = isManualQuote(q);
       document.getElementById('viewQuoteSourceLabel').textContent = manual ? 'Solicitud del cliente (cotización manual)' : 'Solicitud del cliente (vía Dot)';
