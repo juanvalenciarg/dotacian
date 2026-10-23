@@ -354,62 +354,99 @@
     }
 
     .studio-garments {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.6rem;
     }
 
     .studio-garment {
+      position: relative;
       width: 100%;
-      text-align: left;
+      text-align: center;
       font-family: inherit;
       cursor: pointer;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 0.85rem;
-      padding: 0.75rem;
+      justify-content: flex-start;
+      gap: 0.5rem;
+      padding: 0.85rem 0.5rem 0.7rem;
       border: 1.5px solid var(--color-border);
       border-radius: 0.9rem;
       background: white;
-      transition: border-color 0.2s, background 0.2s;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+
+    .studio-garment[hidden] {
+      display: none;
     }
 
     .studio-garment:hover {
       border-color: #94A3B8;
     }
 
+    .studio-garment:focus-visible {
+      outline: 2px solid var(--color-cyan);
+      outline-offset: 2px;
+    }
+
     .studio-garment.active {
-      border-color: var(--color-cyan);
-      background: #F0FDFF;
+      border-color: var(--color-navy);
+      background: #F8FAFC;
+      box-shadow: 0 0 0 1px var(--color-navy);
+    }
+
+    .studio-garment.active::after {
+      content: '';
+      position: absolute;
+      top: 0.45rem;
+      right: 0.45rem;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--color-navy) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='5 12 10 17 19 7'/%3E%3C/svg%3E") center / 11px no-repeat;
     }
 
     .studio-garment-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 0.7rem;
-      background: white;
-      border: 1px solid var(--color-border);
+      width: 52px;
+      height: 52px;
+      border-radius: 0.8rem;
+      background: #F1F5F9;
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--color-navy);
       flex-shrink: 0;
+      transition: background 0.2s;
     }
 
-    .studio-garment-name,
-    .studio-garment-meta {
-      display: block;
+    .studio-garment-icon svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .studio-garment.active .studio-garment-icon {
+      background: white;
     }
 
     .studio-garment-name {
+      display: block;
       font-weight: 700;
-      font-size: 0.9rem;
+      font-size: 0.82rem;
+      line-height: 1.25;
       color: var(--color-navy);
     }
 
-    .studio-garment-meta {
-      font-size: 0.75rem;
-      color: #64748B;
+    .studio-garment-tag {
+      display: inline-block;
+      margin-top: 0.3rem;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #0E7490;
+      background: #ECFEFF;
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
     }
 
     .studio-soon {
@@ -1195,7 +1232,7 @@
       <div class="dashboard-content-wrapper" style="padding-top: 5rem;">
         <div class="studio-page-head" style="margin-bottom: 1.5rem;">
           <h1 class="dot-greeting" style="text-align: left; margin-bottom: 0.5rem; font-size: 3rem; background: linear-gradient(90deg, #94A3B8 0%, #1E293B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Dotacian Studio</h1>
-          <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;">Diseña desde cero el uniforme de cada cliente y revísalo en 3D desde cualquier ángulo.</p>
+          <p style="color: #64748B; font-size: 1.1rem; font-weight: 500; margin: 0;">Arma el uniforme de tu equipo y revísalo en 3D desde cualquier ángulo.</p>
         </div>
 
         <nav class="uniform-tabs" aria-label="Secciones de Uniformes">
@@ -1228,7 +1265,7 @@
           <!-- Panel de diseño -->
           <aside class="studio-panel">
             <div class="studio-card">
-              <div class="studio-card-label">Prenda</div>
+              <div class="studio-card-label">Elige la prenda</div>
               <div class="studio-garments" role="group" aria-label="Prenda">
                 <button type="button" class="studio-garment studio-garment-option active" data-garment="camiseta" aria-pressed="true">
                   <span class="studio-garment-icon">
@@ -1236,7 +1273,6 @@
                   </span>
                   <span>
                     <span class="studio-garment-name">Camiseta básica</span>
-                    <span class="studio-garment-meta">Personalizable · Cuello redondo o en V</span>
                   </span>
                 </button>
                 <button type="button" class="studio-garment studio-garment-option" data-garment="camisa" aria-pressed="false">
@@ -1245,7 +1281,6 @@
                   </span>
                   <span>
                     <span class="studio-garment-name">Camisa</span>
-                    <span class="studio-garment-meta">Personalizable · Cuello, manga, cierre y bolsillos</span>
                   </span>
                 </button>
                 <button type="button" class="studio-garment studio-garment-option" data-garment="hoodie" aria-pressed="false">
@@ -1254,7 +1289,6 @@
                   </span>
                   <span>
                     <span class="studio-garment-name">Hoodie</span>
-                    <span class="studio-garment-meta">Personalizable · Capucha · Bolsillo canguro</span>
                   </span>
                 </button>
                 <button type="button" class="studio-garment studio-garment-option" data-garment="buzo" aria-pressed="false">
@@ -1263,7 +1297,6 @@
                   </span>
                   <span>
                     <span class="studio-garment-name">Buzo</span>
-                    <span class="studio-garment-meta">Personalizable · Cuello redondo · Puños en rib</span>
                   </span>
                 </button>
                 <button type="button" class="studio-garment studio-garment-option" data-garment="polo" aria-pressed="false">
@@ -1272,7 +1305,6 @@
                   </span>
                   <span>
                     <span class="studio-garment-name">Camiseta tipo polo</span>
-                    <span class="studio-garment-meta">Personalizable · Cuello polo · Tapeta</span>
                   </span>
                 </button>
                 <button type="button" class="studio-garment studio-garment-option" data-garment="pantalon" aria-pressed="false">
@@ -1281,7 +1313,6 @@
                   </span>
                   <span>
                     <span class="studio-garment-name">Pantalón chino</span>
-                    <span class="studio-garment-meta">Pretina con pasadores · Bolsillos sesgados</span>
                   </span>
                 </button>
                 <button type="button" class="studio-garment studio-garment-option" data-garment="limpieza" aria-pressed="false">
@@ -1290,7 +1321,7 @@
                   </span>
                   <span>
                     <span class="studio-garment-name">Uniforme de limpieza</span>
-                    <span class="studio-garment-meta">Túnica con vivos + pantalón de resorte</span>
+                    <span class="studio-garment-tag">Túnica + pantalón</span>
                   </span>
                 </button>
                 <button type="button" class="studio-garment studio-garment-option" data-garment="bata" aria-pressed="false">
@@ -1299,7 +1330,6 @@
                   </span>
                   <span>
                     <span class="studio-garment-name">Bata</span>
-                    <span class="studio-garment-meta">Personalizable · Cuello en contraste · Cremallera</span>
                   </span>
                 </button>
                 <button type="button" class="studio-garment studio-garment-option" data-garment="filipina" aria-pressed="false">
@@ -1308,7 +1338,6 @@
                   </span>
                   <span>
                     <span class="studio-garment-name">Filipina de chef</span>
-                    <span class="studio-garment-meta">Cuello mao · Doble botonadura · Manga larga</span>
                   </span>
                 </button>
               </div>
