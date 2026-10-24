@@ -603,12 +603,19 @@
                   </select>
                 </div>
               </div>
-              <div class="form-group">
-                <label for="country">País</label>
-                <select id="country">
-                  <option value="México">México</option>
-                  <option value="Colombia">Colombia</option>
-                </select>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="country">País</label>
+                  <select id="country">
+                    <option value="México">México</option>
+                    <option value="Colombia">Colombia</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="celular">Celular <span style="font-weight: 400; color: #94A3B8;">(opcional)</span></label>
+                  <input type="tel" id="celular" placeholder="+52 55 1234 5678" autocomplete="tel" inputmode="tel"
+                    pattern="[0-9+\(\)\s\-]{7,20}" title="Solo números, espacios y +">
+                </div>
               </div>
               <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">Solicitar información</button>
             </form>
@@ -962,11 +969,19 @@
           "country": document.getElementById('country').value,
           "status": "nuevo"
         };
+        const celular = document.getElementById('celular').value.trim();
+        if (celular) formData.celular = celular;
 
         try {
-          const { error } = await _supabase
+          let { error } = await _supabase
             .from('leads_dotacian')
             .insert([formData]);
+
+          // Si la columna "celular" aún no existe en la base, no se pierde el lead.
+          if (error && formData.celular && /celular/i.test(error.message || '')) {
+            const { celular: _omit, ...withoutPhone } = formData;
+            ({ error } = await _supabase.from('leads_dotacian').insert([withoutPhone]));
+          }
 
           if (error) throw error;
           if (typeof gtag === 'function') gtag('event', 'generate_lead', { method: 'formulario_demo' });
