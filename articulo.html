@@ -366,6 +366,14 @@
         }).eq('id', post.id).then(({ error }) => {
           if (error) console.error("Error updating views", error);
         });
+
+        // Historial de vistas (una fila por visita) para las gráficas del admin.
+        _supabaseBlog.from('blog_post_views').insert({
+          post_id: post.id,
+          is_unique: !hasViewed
+        }).then(({ error }) => {
+          if (error) console.warn("No se registró el historial de la vista", error.message);
+        });
         // ---------------------------
 
         const dateObj = new Date(post.created_at);

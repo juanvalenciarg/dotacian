@@ -192,6 +192,227 @@
       border: none;
       cursor: pointer;
     }
+
+    /* ---- Rendimiento del blog ---- */
+    .blog-insights { margin-bottom: 2rem; }
+
+    .blog-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .blog-stat {
+      background: white;
+      border-radius: 1rem;
+      padding: 1.1rem 1.25rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      min-width: 0;
+    }
+
+    .blog-stat-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #64748B;
+    }
+
+    .blog-stat-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1.15;
+      color: #0F172A;
+      margin: 0.25rem 0;
+    }
+
+    .blog-stat-value.is-text {
+      font-size: 1.05rem;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 2.75rem;
+    }
+
+    .blog-stat-sub { font-size: 0.8rem; color: #64748B; }
+
+    .blog-charts {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 1rem;
+    }
+
+    .blog-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 1.25rem 1.25rem 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      min-width: 0;
+    }
+
+    .blog-card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .blog-card-head h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.05rem;
+      color: #0F172A;
+      margin: 0;
+    }
+
+    .blog-card-head p { margin: 0.15rem 0 0; font-size: 0.8rem; color: #64748B; }
+
+    .blog-seg {
+      display: inline-flex;
+      background: #F1F5F9;
+      border-radius: 999px;
+      padding: 0.2rem;
+      flex-shrink: 0;
+    }
+
+    .blog-seg button {
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #64748B;
+      background: none;
+      border: none;
+      border-radius: 999px;
+      padding: 0.35rem 0.8rem;
+      cursor: pointer;
+    }
+
+    .blog-seg button.active { background: #0F172A; color: white; }
+
+    .blog-chart-box { position: relative; height: 300px; }
+
+    .blog-chart-empty {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: #64748B;
+      background: white;
+    }
+
+    .blog-chart-empty[hidden] { display: none; }
+
+    /* ---- Tabla: banner y vistas ---- */
+    .blog-title-cell { display: flex; align-items: center; gap: 0.9rem; }
+
+    .blog-thumb {
+      position: relative;
+      width: 104px;
+      aspect-ratio: 1200 / 630;
+      flex-shrink: 0;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      background: #E2E8F0;
+      border: 1px solid #E2E8F0;
+    }
+
+    .blog-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .blog-thumb.empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #FEF3C7;
+      border-color: #FDE68A;
+    }
+
+    .blog-thumb.empty::after {
+      content: 'Sin banner';
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #92400E;
+    }
+
+    .blog-views { min-width: 110px; }
+    .blog-views .v-total { font-weight: 700; color: var(--color-navy); font-size: 1.05rem; }
+    .blog-views .v-unique { color: #64748B; font-size: 0.8rem; margin-left: 0.35rem; }
+
+    .blog-views .v-bar {
+      height: 5px;
+      border-radius: 999px;
+      background: #E2E8F0;
+      margin-top: 0.4rem;
+      overflow: hidden;
+    }
+
+    .blog-views .v-bar span { display: block; height: 100%; background: var(--color-cyan); border-radius: 999px; }
+
+    /* ---- Editor: vista previa del banner ---- */
+    .cover-preview {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1200 / 630;
+      max-height: 260px;
+      border-radius: 0.6rem;
+      overflow: hidden;
+      background: #F1F5F9;
+      border: 1px dashed #CBD5E1;
+      margin-bottom: 0.6rem;
+    }
+
+    .cover-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .cover-preview-empty {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.85rem;
+      color: #64748B;
+    }
+
+    .cover-preview-empty[hidden], .cover-preview img[hidden], .cover-remove[hidden] { display: none; }
+
+    .cover-remove {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: rgba(15, 23, 42, 0.8);
+      color: white;
+      border: none;
+      border-radius: 999px;
+      padding: 0.3rem 0.75rem;
+      cursor: pointer;
+    }
+
+    .cover-meta { font-size: 0.8rem; margin-bottom: 0.6rem; min-height: 1.1rem; }
+    .cover-meta.ok { color: #15803D; }
+    .cover-meta.warn { color: #B45309; }
+
+    @media (max-width: 1100px) {
+      .blog-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .blog-charts { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+      .blog-stats { grid-template-columns: minmax(0, 1fr); }
+      .blog-title-cell { flex-direction: column; align-items: flex-start; }
+    }
   </style>
 </head>
 
@@ -263,6 +484,64 @@
       </header>
 
       <div class="app-container">
+        <section class="blog-insights" aria-label="Rendimiento del blog">
+          <div class="blog-stats">
+            <div class="blog-stat">
+              <div class="blog-stat-label">Artículos</div>
+              <div class="blog-stat-value" id="statPosts">–</div>
+              <div class="blog-stat-sub" id="statPostsSub">&nbsp;</div>
+            </div>
+            <div class="blog-stat">
+              <div class="blog-stat-label">Vistas totales</div>
+              <div class="blog-stat-value" id="statViews">–</div>
+              <div class="blog-stat-sub">Todas las lecturas acumuladas</div>
+            </div>
+            <div class="blog-stat">
+              <div class="blog-stat-label">Visitantes únicos</div>
+              <div class="blog-stat-value" id="statUnique">–</div>
+              <div class="blog-stat-sub" id="statUniqueSub">&nbsp;</div>
+            </div>
+            <div class="blog-stat">
+              <div class="blog-stat-label">Artículo más visto</div>
+              <div class="blog-stat-value is-text" id="statTop">–</div>
+              <div class="blog-stat-sub" id="statTopSub">&nbsp;</div>
+            </div>
+          </div>
+
+          <div class="blog-charts">
+            <div class="blog-card">
+              <div class="blog-card-head">
+                <div>
+                  <h3>Vistas en el tiempo</h3>
+                  <p id="timelineSub">&nbsp;</p>
+                </div>
+                <div class="blog-seg" id="timelineRange" role="group" aria-label="Rango de fechas">
+                  <button type="button" data-days="7">7 días</button>
+                  <button type="button" data-days="30" class="active">30 días</button>
+                  <button type="button" data-days="90">90 días</button>
+                </div>
+              </div>
+              <div class="blog-chart-box">
+                <canvas id="timelineChart"></canvas>
+                <div class="blog-chart-empty" id="timelineMsg" hidden></div>
+              </div>
+            </div>
+
+            <div class="blog-card">
+              <div class="blog-card-head">
+                <div>
+                  <h3>Vistas por artículo</h3>
+                  <p>Los 8 más leídos · totales y únicas</p>
+                </div>
+              </div>
+              <div class="blog-chart-box">
+                <canvas id="postsChart"></canvas>
+                <div class="blog-chart-empty" id="postsMsg" hidden></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <div class="search-container">
           <h2 style="font-size: 1.25rem; font-family: 'Outfit'; color: #0F172A;">Artículos Publicados</h2>
           <button class="btn-create" onclick="openModal()">
@@ -334,6 +613,12 @@
 
         <div class="form-group">
           <label>Imagen de Portada (Sube un archivo o pega la URL)</label>
+          <div class="cover-preview" id="coverPreview">
+            <img id="coverPreviewImg" alt="Vista previa del banner" hidden>
+            <div class="cover-preview-empty" id="coverPreviewEmpty">Sin banner · el artículo usará la imagen por defecto de Dotacian</div>
+            <button type="button" class="cover-remove" id="coverRemove" onclick="clearCover()" hidden>Quitar</button>
+          </div>
+          <div class="cover-meta" id="coverMeta"></div>
           <div style="display: flex; gap: 0.5rem; align-items: center;">
             <input type="url" id="postImageUrl" class="form-control" style="flex: 1;"
               placeholder="https://ejemplo.com/imagen.jpg">
@@ -344,7 +629,7 @@
               Subir Archivo
             </button>
           </div>
-          <small style="color: #64748B; margin-top: 0.25rem;">Sube la imagen que quieres usar como encabezado.</small>
+          <small style="color: #64748B; margin-top: 0.25rem;">Recomendado: 1200×630 px (horizontal), JPG, PNG o WEBP. Es la imagen del encabezado del artículo.</small>
         </div>
 
         <div class="form-group">
@@ -370,6 +655,7 @@
 
   <script src="assets/js/utils.js?v=5"></script>
   <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     const SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4WG86Fal8RQ3tV0sNXZIow_hikHt0Aq';
@@ -468,6 +754,7 @@
       });
 
       tbody.innerHTML = '';
+      const maxViews = Math.max(1, ...data.map(p => p.views_total || 0));
       data.forEach(post => {
         const tr = document.createElement('tr');
         const date = new Date(post.created_at).toLocaleDateString('es-ES');
@@ -483,11 +770,21 @@
           : `<button class="action-btn" onclick="addTranslation(this)" title="Agregar versión en ${lang === 'en' ? 'español' : 'inglés'}">+ ${lang === 'en' ? 'ES' : 'EN'}</button>`;
 
         tr.innerHTML = `
-          <td><strong>${post.title}</strong><br><small style="color:#64748B;">/${post.slug}</small></td>
+          <td>
+            <div class="blog-title-cell">
+              <div class="blog-thumb${post.image_url ? '' : ' empty'}">${post.image_url ? `<img src="${esc(post.image_url)}" alt="" loading="lazy" onerror="this.parentElement.classList.add('empty'); this.remove();">` : ''}</div>
+              <div><strong>${esc(post.title)}</strong><br><small style="color:#64748B;">/${esc(post.slug)}</small></div>
+            </div>
+          </td>
           <td><span style="font-weight: 700; color: var(--color-navy);">${lang.toUpperCase()}</span> ${translationCell}</td>
           <td>${post.author || '-'}</td>
           <td>${date}</td>
-          <td><span style="font-weight: 700; color: var(--color-navy);">${post.views_total || 0}</span> / <span style="color: #64748B;">${post.views_unique || 0}</span></td>
+          <td>
+            <div class="blog-views" title="Vistas totales / visitantes únicos">
+              <span class="v-total">${fmtNum(post.views_total)}</span><span class="v-unique">${fmtNum(post.views_unique)} únicas</span>
+              <div class="v-bar"><span style="width: ${(post.views_total || 0) > 0 ? Math.max(3, Math.round((post.views_total / maxViews) * 100)) : 0}%;"></span></div>
+            </div>
+          </td>
           <td>
             <button class="action-btn preview" onclick="window.open('articulo.html?slug=${post.slug}', '_blank')" title="Vista Previa"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
             <button class="action-btn edit" onclick='editPost(this)' title="Editar"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
@@ -496,7 +793,228 @@
         `;
         tbody.appendChild(tr);
       });
+
+      renderInsights(data);
     }
+
+    // ---------- Banner: vista previa en el editor ----------
+    let coverToken = 0;
+
+    function updateCoverPreview() {
+      const url = document.getElementById('postImageUrl').value.trim();
+      const img = document.getElementById('coverPreviewImg');
+      const empty = document.getElementById('coverPreviewEmpty');
+      const remove = document.getElementById('coverRemove');
+      const meta = document.getElementById('coverMeta');
+      const token = ++coverToken;
+      meta.textContent = '';
+      meta.className = 'cover-meta';
+
+      if (!url) {
+        img.hidden = true;
+        img.removeAttribute('src');
+        empty.textContent = 'Sin banner · el artículo usará la imagen por defecto de Dotacian';
+        empty.hidden = false;
+        remove.hidden = true;
+        return;
+      }
+
+      img.onload = () => {
+        if (token !== coverToken) return;
+        const w = img.naturalWidth, h = img.naturalHeight;
+        const ratio = h ? w / h : 0;
+        if (w < 1000) {
+          meta.textContent = `${w}×${h} px · Resolución baja: puede verse borrosa. Recomendado 1200×630 px.`;
+          meta.classList.add('warn');
+        } else if (Math.abs(ratio - 1200 / 630) > 0.35) {
+          meta.textContent = `${w}×${h} px · Proporción distinta a 1200×630: se recortará en el encabezado y al compartir.`;
+          meta.classList.add('warn');
+        } else {
+          meta.textContent = `${w}×${h} px · Buen tamaño para el encabezado.`;
+          meta.classList.add('ok');
+        }
+      };
+      img.onerror = () => {
+        if (token !== coverToken) return;
+        img.hidden = true;
+        empty.textContent = 'No se pudo cargar la imagen. Revisa que la URL sea pública y directa a la imagen.';
+        empty.hidden = false;
+      };
+      img.src = url;
+      img.hidden = false;
+      empty.hidden = true;
+      remove.hidden = false;
+    }
+
+    function clearCover() {
+      document.getElementById('postImageUrl').value = '';
+      updateCoverPreview();
+    }
+
+    document.getElementById('postImageUrl').addEventListener('input', updateCoverPreview);
+
+    // ---------- Rendimiento: tarjetas y gráficas ----------
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const fmtNum = n => (n || 0).toLocaleString('es-MX');
+    const CHART_CYAN = '#06B6D4';
+    const CHART_NAVY = '#0F172A';
+    let postsChart = null;
+    let timelineChart = null;
+    let timelineDays = 30;
+
+    function showChartMsg(id, msg) {
+      const el = document.getElementById(id);
+      el.textContent = msg || '';
+      el.hidden = !msg;
+    }
+
+    function renderInsights(posts) {
+      renderStats(posts);
+      renderPostsChart(posts);
+      loadTimeline(timelineDays);
+    }
+
+    function renderStats(posts) {
+      const total = posts.reduce((a, p) => a + (p.views_total || 0), 0);
+      const unique = posts.reduce((a, p) => a + (p.views_unique || 0), 0);
+      const en = posts.filter(p => (p.lang || 'es') === 'en').length;
+      const top = [...posts].sort((a, b) => (b.views_total || 0) - (a.views_total || 0))[0];
+
+      document.getElementById('statPosts').textContent = fmtNum(posts.length);
+      document.getElementById('statPostsSub').textContent = `${posts.length - en} en español · ${en} en inglés`;
+      document.getElementById('statViews').textContent = fmtNum(total);
+      document.getElementById('statUnique').textContent = fmtNum(unique);
+      document.getElementById('statUniqueSub').textContent = total
+        ? `${Math.round((unique / total) * 100)}% de las vistas son de visitantes nuevos`
+        : 'Aún sin visitas';
+      const hasTop = top && (top.views_total || 0) > 0;
+      document.getElementById('statTop').textContent = hasTop ? top.title : 'Aún sin visitas';
+      document.getElementById('statTopSub').textContent = hasTop ? `${fmtNum(top.views_total)} vistas · ${(top.lang || 'es').toUpperCase()}` : '\u00a0';
+    }
+
+    function chartBase() {
+      Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
+      Chart.defaults.color = '#64748B';
+    }
+
+    function renderPostsChart(posts) {
+      if (postsChart) { postsChart.destroy(); postsChart = null; }
+      if (typeof Chart === 'undefined') { showChartMsg('postsMsg', 'No se pudo cargar la librería de gráficas.'); return; }
+      const ranked = [...posts].filter(p => (p.views_total || 0) > 0)
+        .sort((a, b) => b.views_total - a.views_total).slice(0, 8);
+      if (!ranked.length) { showChartMsg('postsMsg', 'Aún no hay vistas registradas en los artículos.'); return; }
+      showChartMsg('postsMsg', '');
+      chartBase();
+      const short = t => t.length > 34 ? t.slice(0, 33) + '…' : t;
+      postsChart = new Chart(document.getElementById('postsChart'), {
+        type: 'bar',
+        data: {
+          labels: ranked.map(p => `[${(p.lang || 'es').toUpperCase()}] ${short(p.title)}`),
+          datasets: [
+            { label: 'Vistas totales', data: ranked.map(p => p.views_total || 0), backgroundColor: CHART_CYAN, borderRadius: 4 },
+            { label: 'Únicas', data: ranked.map(p => p.views_unique || 0), backgroundColor: CHART_NAVY, borderRadius: 4 }
+          ]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } },
+            tooltip: { callbacks: { title: items => ranked[items[0].dataIndex].title } }
+          },
+          scales: {
+            x: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: '#F1F5F9' } },
+            y: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    async function fetchViewEvents(sinceIso) {
+      const rows = [];
+      for (let page = 0; page < 20; page++) {
+        const { data, error } = await _supabase.from('blog_post_views')
+          .select('viewed_at, is_unique')
+          .gte('viewed_at', sinceIso)
+          .order('viewed_at', { ascending: true })
+          .range(page * 1000, page * 1000 + 999);
+        if (error) return { error, rows };
+        rows.push(...data);
+        if (data.length < 1000) break;
+      }
+      return { rows };
+    }
+
+    async function loadTimeline(days) {
+      timelineDays = days;
+      document.querySelectorAll('#timelineRange button').forEach(b => b.classList.toggle('active', Number(b.dataset.days) === days));
+      const sub = document.getElementById('timelineSub');
+      if (timelineChart) { timelineChart.destroy(); timelineChart = null; }
+      if (typeof Chart === 'undefined') { showChartMsg('timelineMsg', 'No se pudo cargar la librería de gráficas.'); return; }
+
+      const since = new Date();
+      since.setHours(0, 0, 0, 0);
+      since.setDate(since.getDate() - (days - 1));
+      const { rows, error } = await fetchViewEvents(since.toISOString());
+      if (days !== timelineDays) return; // el usuario cambió de rango mientras cargaba
+
+      if (error) {
+        const missing = error.code === 'PGRST205' || error.code === '42P01' || /blog_post_views/.test(error.message || '');
+        sub.textContent = '\u00a0';
+        showChartMsg('timelineMsg', missing
+          ? 'Falta activar el historial de vistas. Corre la migración supabase_migration_blog_post_views.sql en Supabase.'
+          : 'No se pudo cargar el historial de vistas.');
+        return;
+      }
+      if (!rows.length) {
+        sub.textContent = '\u00a0';
+        showChartMsg('timelineMsg', 'Aún no hay visitas con fecha. El historial empieza a llenarse desde que se publicó este cambio.');
+        return;
+      }
+      showChartMsg('timelineMsg', '');
+
+      const dayKey = d => d.toLocaleDateString('en-CA');
+      const buckets = new Map();
+      for (let i = 0; i < days; i++) {
+        const d = new Date(since);
+        d.setDate(since.getDate() + i);
+        buckets.set(dayKey(d), { label: d.toLocaleDateString('es-MX', { day: 'numeric', month: 'short' }), total: 0, unique: 0 });
+      }
+      rows.forEach(r => {
+        const b = buckets.get(dayKey(new Date(r.viewed_at)));
+        if (b) { b.total++; if (r.is_unique) b.unique++; }
+      });
+      const list = [...buckets.values()];
+      const inRange = list.reduce((a, b) => a + b.total, 0);
+      sub.textContent = `${fmtNum(inRange)} vistas en los últimos ${days} días`;
+      chartBase();
+      timelineChart = new Chart(document.getElementById('timelineChart'), {
+        type: 'line',
+        data: {
+          labels: list.map(b => b.label),
+          datasets: [
+            { label: 'Vistas totales', data: list.map(b => b.total), borderColor: CHART_CYAN, backgroundColor: 'rgba(6, 182, 212, 0.12)', fill: true, tension: 0.3, pointRadius: days > 30 ? 0 : 3 },
+            { label: 'Únicas', data: list.map(b => b.unique), borderColor: CHART_NAVY, backgroundColor: 'transparent', tension: 0.3, pointRadius: days > 30 ? 0 : 3, borderDash: [5, 4] }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } } },
+          scales: {
+            x: { grid: { display: false }, ticks: { maxTicksLimit: 8, maxRotation: 0 } },
+            y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: '#F1F5F9' } }
+          }
+        }
+      });
+    }
+
+    document.getElementById('timelineRange').addEventListener('click', e => {
+      const btn = e.target.closest('button[data-days]');
+      if (btn) loadTimeline(Number(btn.dataset.days));
+    });
 
     function openModal() {
       document.getElementById('postForm').reset();
@@ -506,6 +1024,7 @@
       document.getElementById('postLang').disabled = false;
       quill.setContents([]);
       document.getElementById('modalTitle').innerText = 'Nuevo Artículo';
+      updateCoverPreview();
       document.getElementById('postModal').classList.add('active');
     }
 
@@ -526,6 +1045,7 @@
       quill.clipboard.dangerouslyPasteHTML(post.content || '');
 
       document.getElementById('modalTitle').innerText = 'Editar Artículo';
+      updateCoverPreview();
       document.getElementById('postModal').classList.add('active');
     }
 
@@ -550,6 +1070,7 @@
       document.getElementById('modalTitle').innerText = targetLang === 'en'
         ? 'Agregar versión en inglés'
         : 'Agregar versión en español';
+      updateCoverPreview();
       document.getElementById('postModal').classList.add('active');
     }
 
@@ -609,6 +1130,7 @@
 
         const { data: { publicUrl } } = _supabase.storage.from('blog-images').getPublicUrl(filePath);
         document.getElementById('postImageUrl').value = publicUrl;
+        updateCoverPreview();
         showToast('Éxito', 'Imagen de portada subida correctamente.');
       } catch (error) {
         console.error(error);
