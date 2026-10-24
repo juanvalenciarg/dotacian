@@ -544,13 +544,85 @@
 
         </div>
 
-        <div class="demo-calendar-container"
-          style="flex: 1.2; width: 100%; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); overflow: hidden; min-height: 650px; position: relative;">
+        <div class="demo-right" style="flex: 1.2; width: 100%;">
+          <div class="demo-tabs" role="tablist" aria-label="How would you like to book">
+            <button type="button" class="demo-tab active" role="tab" id="demo-tab-calendar" aria-selected="true"
+              aria-controls="demo-panel-calendar" data-demo-tab="calendar">Pick a time</button>
+            <button type="button" class="demo-tab" role="tab" id="demo-tab-form" aria-selected="false"
+              aria-controls="demo-panel-form" data-demo-tab="form">Contact me instead</button>
+          </div>
+
+          <div class="demo-calendar-container" id="demo-panel-calendar" role="tabpanel" aria-labelledby="demo-tab-calendar"
+            style="width: 100%; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); overflow: hidden; min-height: 650px; position: relative;">
           <!-- Embedded Google Calendar Scheduling Iframe -->
           <iframe
             src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ0V1Hs33shxkmbR4RK-JI_UAeo_ffqS6jY1nvqWPAD980ATaIYM1y_8S8MOR1-YvQOce6Ug6Vc_?gv=true"
             style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; background: transparent;"
             frameborder="0" title="Google Calendar Appointment Scheduling"></iframe>
+          </div>
+
+          <div class="demo-form-card" id="demo-panel-form" role="tabpanel" aria-labelledby="demo-tab-form" hidden>
+            <h3>Leave us your details</h3>
+            <p>We'll reach out to schedule your demo.</p>
+            <form class="demo-form" id="contact-form">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="first-name">First name</label>
+                  <input type="text" id="first-name" placeholder="E.g. John" required>
+                </div>
+                <div class="form-group">
+                  <label for="last-name">Last name</label>
+                  <input type="text" id="last-name" placeholder="E.g. Smith" required>
+                </div>
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="email">Work email</label>
+                  <input type="email" id="email" placeholder="juan@empresa.com" required>
+                </div>
+                <div class="form-group">
+                  <label for="company">Company</label>
+                  <input type="text" id="company" placeholder="Your company name" required>
+                </div>
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="industry">Industry</label>
+                  <select id="industry">
+                  <option value="hoteleria">Hospitality</option>
+                  <option value="restaurantes" selected>Restaurants</option>
+                  <option value="retail">Retail</option>
+                  <option value="salud">Healthcare</option>
+                  <option value="limpieza">Cleaning</option>
+                  <option value="seguridad">Security</option>
+                  <option value="corporativa">Corporate</option>
+                  <option value="industrial">Industrial</option>
+                  <option value="construccion">Construction</option>
+                  <option value="logistica">Logistics</option>
+                  <option value="otra">Other</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="employees">Approx. no. of employees</label>
+                  <select id="employees">
+                    <option value="1-50">1 - 50</option>
+                    <option value="51-200">51 - 200</option>
+                    <option value="201-500">201 - 500</option>
+                    <option value="501-1000">501 - 1,000</option>
+                    <option value="1000+">More than 1,000</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="country">Country</label>
+                <select id="country">
+                  <option value="México">Mexico</option>
+                  <option value="Colombia">Colombia</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">Request information</button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -898,6 +970,7 @@
             .insert([formData]);
 
           if (error) throw error;
+          if (typeof gtag === 'function') gtag('event', 'generate_lead', { method: 'formulario_demo' });
 
           // Show custom toast instead of alert
           const toast = document.getElementById('success-toast');
@@ -925,6 +998,20 @@
         }
       });
     }
+
+    // Demo: elegir horario o dejar datos
+    document.querySelectorAll('[data-demo-tab]').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const which = tab.dataset.demoTab;
+        document.querySelectorAll('[data-demo-tab]').forEach(t => {
+          const on = t === tab;
+          t.classList.toggle('active', on);
+          t.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        document.getElementById('demo-panel-calendar').hidden = which !== 'calendar';
+        document.getElementById('demo-panel-form').hidden = which !== 'form';
+      });
+    });
   </script>
 </body>
 
