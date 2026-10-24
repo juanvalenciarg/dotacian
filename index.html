@@ -520,7 +520,7 @@
             style="font-size: 3.5rem; font-family: var(--font-family-heading); line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -0.02em; color: white;">
             Agenda una demo de 30 minutos.</h2>
           <p style="font-size: 1.25rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 3rem;">
-            Elige un horario que te convenga. Te mostraremos exactamente cómo funciona Dotacian.
+            Déjanos tus datos o elige directamente un horario. Te mostraremos exactamente cómo funciona Dotacian.
           </p>
           <ul class="demo-features" style="margin-bottom: 4rem;">
             <li
@@ -545,23 +545,14 @@
 
         <div class="demo-right" style="flex: 1.2; width: 100%;">
           <div class="demo-tabs" role="tablist" aria-label="Cómo quieres agendar">
-            <button type="button" class="demo-tab active" role="tab" id="demo-tab-calendar" aria-selected="true"
+            <button type="button" class="demo-tab active" role="tab" id="demo-tab-form" aria-selected="true"
+              aria-controls="demo-panel-form" data-demo-tab="form">Déjanos tus datos</button>
+            <button type="button" class="demo-tab" role="tab" id="demo-tab-calendar" aria-selected="false"
               aria-controls="demo-panel-calendar" data-demo-tab="calendar">Elegir un horario</button>
-            <button type="button" class="demo-tab" role="tab" id="demo-tab-form" aria-selected="false"
-              aria-controls="demo-panel-form" data-demo-tab="form">Prefiero que me contacten</button>
           </div>
 
-          <div class="demo-calendar-container" id="demo-panel-calendar" role="tabpanel" aria-labelledby="demo-tab-calendar"
-            style="width: 100%; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); overflow: hidden; min-height: 650px; position: relative;">
-          <!-- Embedded Google Calendar Scheduling Iframe -->
-          <iframe
-            src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ0V1Hs33shxkmbR4RK-JI_UAeo_ffqS6jY1nvqWPAD980ATaIYM1y_8S8MOR1-YvQOce6Ug6Vc_?gv=true"
-            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; background: transparent;"
-            frameborder="0" title="Google Calendar Appointment Scheduling"></iframe>
-          </div>
-
-          <div class="demo-form-card" id="demo-panel-form" role="tabpanel" aria-labelledby="demo-tab-form" hidden>
-            <h3>Déjanos tus datos</h3>
+          <div class="demo-form-card" id="demo-panel-form" role="tabpanel" aria-labelledby="demo-tab-form">
+            <h3>Cuéntanos de tu operación</h3>
             <p>Te contactamos para coordinar tu demo.</p>
             <form class="demo-form" id="contact-form">
               <div class="form-grid">
@@ -621,6 +612,15 @@
               </div>
               <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">Solicitar información</button>
             </form>
+          </div>
+
+          <div class="demo-calendar-container" id="demo-panel-calendar" role="tabpanel" aria-labelledby="demo-tab-calendar" hidden
+            style="width: 100%; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); overflow: hidden; min-height: 650px; position: relative;">
+          <!-- Embedded Google Calendar Scheduling Iframe -->
+          <iframe
+            src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ0V1Hs33shxkmbR4RK-JI_UAeo_ffqS6jY1nvqWPAD980ATaIYM1y_8S8MOR1-YvQOce6Ug6Vc_?gv=true"
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; background: transparent;"
+            frameborder="0" title="Google Calendar Appointment Scheduling"></iframe>
           </div>
         </div>
       </div>
