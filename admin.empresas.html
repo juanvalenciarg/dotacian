@@ -1186,6 +1186,12 @@
         }));
 
         renderCompaniesTable(allCompanies);
+
+        // Desde la ficha (admin.empresa.html) se llega con ?gestionar=<id>
+        // para abrir el panel de administradores y empleados.
+        const manageId = new URLSearchParams(window.location.search).get('gestionar');
+        const manageCompany = manageId && allCompanies.find(c => c.id === manageId);
+        if (manageCompany && !currentCompanyRecord) openCompanyDrawer(manageCompany);
       } catch (err) {
         console.error("Error cargando empresas:", err);
         if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #EF4444;">Error al cargar empresas.</td></tr>`;
@@ -1202,7 +1208,7 @@
       tbody.innerHTML = '';
       list.forEach((company, index) => {
         const tr = document.createElement('tr');
-        tr.onclick = () => openCompanyDrawer(company);
+        tr.onclick = () => openCompanyDetail(company);
         tr.innerHTML = `
           <td><span style="font-weight: 600; color: #475569;" title="${company.id}">${index + 1}</span></td>
           <td>
@@ -1280,7 +1286,7 @@
           showToast('Sin empresa', 'Este usuario no tiene una empresa asignada todavía.', 'error');
           return;
         }
-        openCompanyDrawer(company);
+        openCompanyDetail(company);
       } catch (err) {
         console.error("Error buscando administrador:", err);
         showToast('Error', 'Hubo un error en la búsqueda.', 'error');
@@ -1290,7 +1296,11 @@
       }
     }
 
-    // -------- Drawer de Empresa --------
+    // -------- Ficha y Drawer de Empresa --------
+
+    function openCompanyDetail(company) {
+      window.location.href = `admin.empresa.html?id=${encodeURIComponent(company.id)}`;
+    }
 
     function openCompanyDrawer(company) {
       currentCompanyRecord = company;
