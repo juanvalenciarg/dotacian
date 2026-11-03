@@ -4349,6 +4349,11 @@
       // Cada prenda tiene sus colores (cfg.colors); el selector se arma según la prenda.
       const targetColor = new THREE.Color(SHIRT_COLORS.blanco.hex);
       let colorKey = 'blanco';
+      // Lo que el cliente eligió a mano: se conserva al cambiar de prenda, en lo
+      // que la prenda nueva también ofrezca.
+      let colorChosen = false;
+      let chosenOptions = {};
+      let chosenZones = {};
 
       function setColor(key) {
         const c = resolveColor(key);
@@ -4411,10 +4416,16 @@
 
       document.getElementById('studioSwatches').addEventListener('click', e => {
         const btn = e.target.closest('button.studio-swatch');
-        if (btn) setColor(btn.dataset.color);
+        if (btn) {
+          colorChosen = true;
+          setColor(btn.dataset.color);
+        }
       });
       document.getElementById('studioSwatches').addEventListener('input', e => {
-        if (e.target.matches('input[data-body-color]')) setColor(e.target.value);
+        if (e.target.matches('input[data-body-color]')) {
+          colorChosen = true;
+          setColor(e.target.value);
+        }
       });
       syncColorSwatches();
 
@@ -4442,6 +4453,7 @@
       function setOption(group, value) {
         const cfg = garment.cfg;
         if (!cfg || !cfg.configurable || cfg.options[group] === value) return;
+        chosenOptions[group] = value;
         const next = garmentConfig(garment.key, { ...cfg.options, [group]: value });
         buildShirt(garment.key, next);
         // Los logos siguen en su lugar salvo que la opción quite esa ubicación.
@@ -4480,6 +4492,7 @@
 
       function setZoneColor(zone, value) {
         zoneColors[zone] = value || null;
+        chosenZones[zone] = zoneColors[zone];
         renderZoneControls();
         updateDesignSummary();
       }
@@ -5047,13 +5060,16 @@
         if (!base) return;
         const changing = key !== garment.key;
         if (!changing && !opts && !zones) return;
-        const cfg = garmentConfig(key, opts);
+        const cfg = garmentConfig(key, opts || chosenOptions);
         buildShirt(key, cfg);
         Object.keys(zoneColors).forEach(z => { zoneColors[z] = null; });
         const zoneSource = zones || (base.configurable && base.configurable.zoneDefaults) || {};
         Object.keys(zoneSource).forEach(z => {
           if (z in zoneColors && resolveColor(zoneSource[z])) zoneColors[z] = zoneSource[z];
         });
+        if (!zones) {
+          zonesForConfig(cfg).filter(z => z in chosenZones).forEach(z => { zoneColors[z] = chosenZones[z]; });
+        }
         // Los logos se acomodan a las ubicaciones de la nueva prenda.
         reassignLogoPlacements(cfg);
 
@@ -5062,8 +5078,8 @@
           b.classList.toggle('active', on);
           b.setAttribute('aria-pressed', on ? 'true' : 'false');
         });
-        // Al elegir una prenda configurable se arranca con su color de catálogo.
-        syncColorSwatches(changing && base.configurable ? base.thumbColor : null);
+        // Si el cliente aún no eligió color, se arranca con el de catálogo de la prenda.
+        syncColorSwatches(changing && base.configurable && !colorChosen ? base.thumbColor : null);
         renderOptionControls();
         renderZoneControls();
         updateDesignSummary();
@@ -5435,7 +5451,11 @@
         // Los diseños ya creados se conservan aunque su prenda se deshabilite.
         showGarmentOption(d.prenda, true);
         // Siempre se reconstruye: el diseño puede tener otras opciones o zonas.
-        setGarment(d.prenda, d.opciones || {}, (d.opciones && d.opciones.zonas) || null);
+        const { zonas, ...designOptions } = d.opciones || {};
+        chosenOptions = designOptions;
+        chosenZones = { ...(zonas || {}) };
+        colorChosen = true;
+        setGarment(d.prenda, d.opciones || {}, zonas || null);
         if (resolveColor(d.color)) setColor(d.color);
         clearLogos();
         let failed = 0;
