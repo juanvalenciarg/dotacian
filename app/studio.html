@@ -1520,6 +1520,8 @@
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
     import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
     import { DecalGeometry } from 'three/addons/geometries/DecalGeometry.js';
+    import { HorizontalBlurShader } from 'three/addons/shaders/HorizontalBlurShader.js';
+    import { VerticalBlurShader } from 'three/addons/shaders/VerticalBlurShader.js';
 
     // Colores de tela disponibles para la camiseta básica.
     const SHIRT_COLORS = {
@@ -3598,30 +3600,225 @@
       return tex;
     }
 
-    // Textura de tejido (punto jersey) generada en un canvas para el relieve.
-    function buildKnitTexture() {
+    // --- Realismo de la tela ---
+    // Tejido de cada prenda: punto (camiseta), piqué (polo), felpa (hoodie, buzo),
+    // popelina (camisa, antifluido) y dril en sarga (bata, filipina, pantalón).
+    const GARMENT_WEAVE = {
+      camiseta: 'jersey', polo: 'pique', hoodie: 'fleece', buzo: 'fleece',
+      camisa: 'poplin', limpieza: 'poplin', bata: 'twill', filipina: 'twill', pantalon: 'twill'
+    };
+    // scale: repeticiones del tejido por metro (un poco más grande que el real para
+    // que se lea en pantalla); strength: relieve del hilo; tone: contraste de color
+    // entre hilos; folds / foldScale: fuerza y tamaño de los pliegues; sheen: brillo
+    // aterciopelado en los bordes (más en la felpa).
+    const WEAVE_LOOK = {
+      jersey: { scale: 20, strength: 0.45, tone: 0.12, folds: 0.035, foldScale: 1.0, sheen: 0.45, roughness: 0.9 },
+      pique: { scale: 15, strength: 0.55, tone: 0.16, folds: 0.03, foldScale: 1.0, sheen: 0.4, roughness: 0.88 },
+      fleece: { scale: 22, strength: 0.3, tone: 0.08, folds: 0.045, foldScale: 0.8, sheen: 0.8, roughness: 0.95 },
+      poplin: { scale: 22, strength: 0.35, tone: 0.08, folds: 0.028, foldScale: 1.2, sheen: 0.25, roughness: 0.78 },
+      twill: { scale: 16, strength: 0.45, tone: 0.12, folds: 0.03, foldScale: 1.1, sheen: 0.25, roughness: 0.82 }
+    };
+
+    function weaveRand(n) {
+      const s = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+      return s - Math.floor(s);
+    }
+
+    // Altura del hilo (0..1) en un punto (x, y) del mosaico de tejido.
+    function weaveHeight(kind, x, y) {
+      if (kind === 'poplin' || kind === 'twill') {
+        // Tejido plano: urdimbre (vertical) y trama (horizontal) que se cruzan;
+        // en la sarga cada hilo pasa por encima de dos, lo que dibuja diagonales.
+        const N = 32;
+        const fx = x * N, fy = y * N;
+        const ix = Math.floor(fx), iy = Math.floor(fy);
+        const tx = fx - ix, ty = fy - iy;
+        const warpUp = kind === 'twill' ? (ix + iy) % 4 < 2 : (ix + iy) % 2 === 0;
+        const warp = Math.sin(Math.PI * tx) * (0.6 + 0.4 * Math.sin(Math.PI * ty)) * (0.85 + 0.15 * weaveRand(ix));
+        const weft = Math.sin(Math.PI * ty) * (0.6 + 0.4 * Math.sin(Math.PI * tx)) * (0.85 + 0.15 * weaveRand(iy + 97));
+        return warpUp ? 0.45 + 0.55 * warp : 0.6 * weft;
+      }
+      // Tejido de punto: columnas de mallas en "V".
+      const W = kind === 'pique' ? 12 : 16;
+      const C = kind === 'pique' ? 16 : 22;
+      const fx = x * W, fy = y * C;
+      const cx = fx - Math.floor(fx) - 0.5;
+      const cy = fy - Math.floor(fy) - 0.5;
+      let h = 0;
+      [-1, 1].forEach(s => {
+        const lx = cx - s * 0.21;
+        const a = s * 0.5;
+        const rx = lx * Math.cos(a) - cy * Math.sin(a);
+        const ry = lx * Math.sin(a) + cy * Math.cos(a);
+        const d = (rx / 0.21) ** 2 + (ry / 0.62) ** 2;
+        h = Math.max(h, Math.max(0, 1 - d));
+      });
+      h = Math.sqrt(h) * (0.85 + 0.15 * weaveRand(Math.floor(fx) * 31 + Math.floor(fy)));
+      // Piqué: celdas en relieve tipo panal.
+      if (kind === 'pique') h *= 0.7 + 0.3 * Math.abs(Math.cos(Math.PI * fx / 2) * Math.cos(Math.PI * fy / 2));
+      return h;
+    }
+
+    // Mapa de tejido generado en un canvas (sin descargar imágenes): R y G guardan
+    // la normal del hilo y B su altura (para variar el tono entre hilos).
+    const weaveTextures = {};
+    function buildWeaveTexture(kind) {
+      if (weaveTextures[kind]) return weaveTextures[kind];
       const size = 256;
+      const hs = new Float32Array(size * size);
+      const fuzz = kind === 'fleece' ? 0.3 : 0.06;
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          hs[y * size + x] = weaveHeight(kind, (x + 0.5) / size, (y + 0.5) / size) + (Math.random() - 0.5) * fuzz;
+        }
+      }
       const canvas = document.createElement('canvas');
       canvas.width = canvas.height = size;
       const ctx = canvas.getContext('2d');
       const img = ctx.createImageData(size, size);
+      const k = 2.5;
       for (let y = 0; y < size; y++) {
         for (let x = 0; x < size; x++) {
-          const col = Math.sin((x / size) * Math.PI * 2 * 48) * 0.5 + 0.5;
-          const row = Math.sin((y / size) * Math.PI * 2 * 64 + (x % 11)) * 0.5 + 0.5;
-          const noise = Math.random();
-          const val = 128 + (col * 0.45 + row * 0.25 + noise * 0.3 - 0.5) * 110;
+          const dx = hs[y * size + (x + 1) % size] - hs[y * size + (x - 1 + size) % size];
+          const dy = hs[((y + 1) % size) * size + x] - hs[((y - 1 + size) % size) * size + x];
+          const nx = -dx * k, ny = -dy * k;
+          const len = Math.hypot(nx, ny, 1);
           const idx = (y * size + x) * 4;
-          img.data[idx] = img.data[idx + 1] = img.data[idx + 2] = val;
+          img.data[idx] = (nx / len * 0.5 + 0.5) * 255;
+          img.data[idx + 1] = (ny / len * 0.5 + 0.5) * 255;
+          img.data[idx + 2] = Math.max(0, Math.min(1, hs[y * size + x])) * 255;
           img.data[idx + 3] = 255;
         }
       }
       ctx.putImageData(img, 0, 0);
       const tex = new THREE.CanvasTexture(canvas);
       tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-      tex.repeat.set(9, 9);
-      tex.anisotropy = 4;
+      tex.anisotropy = 8;
+      weaveTextures[kind] = tex;
       return tex;
+    }
+
+    // El tejido se proyecta desde los tres ejes (triplanar) con la posición real
+    // de la tela, así tiene la misma escala en el cuerpo, las mangas, el cuello y
+    // los logos aunque cada pieza tenga sus propias coordenadas UV. Los pliegues
+    // salen de un ruido 3D con sus derivadas: inclinan la normal y oscurecen el
+    // fondo de cada pliegue (oclusión suave), sin mover la geometría (los logos y
+    // botones siguen apoyados sobre la tela).
+    const CLOTH_FRAGMENT_PARS = /* glsl */`
+      varying vec3 vClothPos;
+      varying vec3 vClothNormal;
+      uniform sampler2D uWeave;
+      uniform float uWeaveScale;
+      uniform float uWeaveStrength;
+      uniform float uWeaveTone;
+      uniform float uFoldStrength;
+      uniform float uFoldScale;
+      uniform float uCrease;
+      float clothHash(vec3 p) {
+        p = fract(p * 0.3183099 + vec3(0.71, 0.113, 0.419));
+        p *= 17.0;
+        return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+      }
+      // Ruido de valor 3D: x = valor (0..1), yzw = gradiente.
+      vec4 clothNoise(vec3 x) {
+        vec3 i = floor(x);
+        vec3 w = fract(x);
+        vec3 u = w * w * w * (w * (w * 6.0 - 15.0) + 10.0);
+        vec3 du = 30.0 * w * w * (w * (w - 2.0) + 1.0);
+        float a = clothHash(i);
+        float b = clothHash(i + vec3(1.0, 0.0, 0.0));
+        float c = clothHash(i + vec3(0.0, 1.0, 0.0));
+        float d = clothHash(i + vec3(1.0, 1.0, 0.0));
+        float e = clothHash(i + vec3(0.0, 0.0, 1.0));
+        float f = clothHash(i + vec3(1.0, 0.0, 1.0));
+        float g = clothHash(i + vec3(0.0, 1.0, 1.0));
+        float h = clothHash(i + vec3(1.0, 1.0, 1.0));
+        float k1 = b - a;
+        float k2 = c - a;
+        float k3 = e - a;
+        float k4 = a - b - c + d;
+        float k5 = a - c - e + g;
+        float k6 = a - b - e + f;
+        float k7 = -a + b + c - d + e - f - g + h;
+        return vec4(
+          a + k1 * u.x + k2 * u.y + k3 * u.z + k4 * u.x * u.y + k5 * u.y * u.z + k6 * u.z * u.x + k7 * u.x * u.y * u.z,
+          du * vec3(k1 + k4 * u.y + k6 * u.z + k7 * u.y * u.z,
+                    k2 + k5 * u.z + k4 * u.x + k7 * u.z * u.x,
+                    k3 + k6 * u.x + k5 * u.y + k7 * u.x * u.y));
+      }
+      // Pliegues: crestas suaves (donde el ruido cruza 0.5) estiradas en vertical,
+      // como la tela que cae, + arrugas más pequeñas. x = altura (0 valle, 1 cresta).
+      vec4 clothRidge(vec3 p, vec3 s) {
+        vec4 n = clothNoise(p * s);
+        float m = 2.0 * n.x - 1.0;
+        return vec4(1.0 - m * m, -4.0 * m * n.yzw * s);
+      }
+      vec4 clothFolds(vec3 p) {
+        vec4 a = clothRidge(p, vec3(8.0, 2.2, 8.0) * uFoldScale);
+        vec4 b = clothRidge(p + 11.7, vec3(20.0, 9.0, 20.0) * uFoldScale);
+        return (a + 0.25 * b) / 1.25;
+      }
+    `;
+    const CLOTH_COLOR = /* glsl */`
+      float clothFace = gl_FrontFacing ? 1.0 : -1.0;
+      vec3 clothN = normalize(vClothNormal) * clothFace;
+      vec4 clothF = clothFolds(vClothPos);
+      // Menos pliegues en pecho y hombros (la tela se apoya), más hacia el ruedo.
+      float clothMask = 0.4 + 0.6 * (1.0 - smoothstep(-0.4, 0.2, vClothPos.y));
+      clothF.yzw *= clothMask;
+      vec3 clothW = pow(abs(clothN), vec3(4.0));
+      clothW /= (clothW.x + clothW.y + clothW.z);
+      vec3 clothP = vClothPos * uWeaveScale;
+      vec3 clothTX = texture2D(uWeave, clothP.zy).xyz;
+      vec3 clothTY = texture2D(uWeave, clothP.xz).xyz;
+      vec3 clothTZ = texture2D(uWeave, clothP.xy).xyz;
+      // De lejos el hilo mide menos de un pixel: se apaga para evitar moiré.
+      float clothDetail = 1.0 - smoothstep(0.004, 0.012, length(fwidth(clothP)));
+      float clothH = mix(0.5, clothTX.z * clothW.x + clothTY.z * clothW.y + clothTZ.z * clothW.z, clothDetail);
+      // Hilos altos un poco más claros; el fondo de los pliegues, más oscuro.
+      diffuseColor.rgb *= (1.0 + uWeaveTone * (clothH - 0.5)) * (1.0 - uCrease * clothMask * (1.0 - smoothstep(0.1, 0.6, clothF.x)));
+    `;
+    const CLOTH_NORMAL = /* glsl */`
+      {
+        vec3 clothG = clothF.yzw - dot(clothF.yzw, clothN) * clothN;
+        vec2 cX = clothTX.xy * 2.0 - 1.0;
+        vec2 cY = clothTY.xy * 2.0 - 1.0;
+        vec2 cZ = clothTZ.xy * 2.0 - 1.0;
+        vec3 clothD = vec3(0.0, cX.y, cX.x) * clothW.x + vec3(cY.x, 0.0, cY.y) * clothW.y + vec3(cZ.x, cZ.y, 0.0) * clothW.z;
+        clothD -= dot(clothD, clothN) * clothN;
+        normal = normalize(normal + mat3(viewMatrix) * (uWeaveStrength * clothDetail * clothD - uFoldStrength * clothG));
+      }
+    `;
+
+    function clothUniforms() {
+      return {
+        uWeave: { value: buildWeaveTexture('jersey') },
+        uWeaveScale: { value: WEAVE_LOOK.jersey.scale },
+        uWeaveStrength: { value: WEAVE_LOOK.jersey.strength },
+        uWeaveTone: { value: WEAVE_LOOK.jersey.tone },
+        uFoldStrength: { value: WEAVE_LOOK.jersey.folds },
+        uFoldScale: { value: WEAVE_LOOK.jersey.foldScale },
+        uCrease: { value: 0.16 }
+      };
+    }
+
+    // Agrega el tejido y los pliegues a un material estándar de three.js.
+    function clothify(material, uniforms) {
+      material.onBeforeCompile = shader => {
+        Object.assign(shader.uniforms, uniforms);
+        shader.vertexShader = shader.vertexShader
+          .replace('#include <common>', '#include <common>\nvarying vec3 vClothPos;\nvarying vec3 vClothNormal;')
+          .replace('#include <project_vertex>', `#include <project_vertex>
+            vClothPos = (modelMatrix * vec4(transformed, 1.0)).xyz;
+            vClothNormal = normalize(mat3(modelMatrix) * objectNormal);`);
+        shader.fragmentShader = shader.fragmentShader
+          .replace('#include <common>', `#include <common>\n${CLOTH_FRAGMENT_PARS}`)
+          .replace('#include <color_fragment>', `#include <color_fragment>\n${CLOTH_COLOR}`)
+          .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>\n${CLOTH_NORMAL}`);
+      };
+      material.customProgramCacheKey = () => 'dotacian-cloth';
+      material.needsUpdate = true;
+      return material;
     }
 
     function initStudio() {
@@ -3629,7 +3826,7 @@
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.08;
+      renderer.toneMappingExposure = 0.85;
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       viewer.prepend(renderer.domElement);
@@ -3654,12 +3851,16 @@
       controls.autoRotateSpeed = 2.2;
       controls.update();
 
-      // Luces: ambiente suave + luz principal con sombra + contraluz.
-      scene.add(new THREE.HemisphereLight(0xffffff, 0xdfe5ec, 0.5));
-      const key = new THREE.DirectionalLight(0xffffff, 1.6);
-      key.position.set(0.9, 5, 1.6);
+      // Celulares y tablets: sombras con menos resolución para que cargue rápido.
+      const LOW_POWER = window.matchMedia('(pointer: coarse)').matches;
+
+      // Luces de estudio: ambiente (RoomEnvironment) + luz principal cálida de lado
+      // con sombra, relleno frío suave y contraluz para separar la silueta.
+      scene.add(new THREE.HemisphereLight(0xffffff, 0xdfe5ec, 0.15));
+      const key = new THREE.DirectionalLight(0xfff4e8, 2.8);
+      key.position.set(1.4, 4.2, 2.6);
       key.castShadow = true;
-      key.shadow.mapSize.set(2048, 2048);
+      key.shadow.mapSize.set(LOW_POWER ? 1024 : 2048, LOW_POWER ? 1024 : 2048);
       key.shadow.camera.left = -1.5;
       key.shadow.camera.right = 1.5;
       key.shadow.camera.top = 1.5;
@@ -3667,37 +3868,46 @@
       key.shadow.bias = -0.0004;
       key.shadow.radius = 6;
       scene.add(key);
-      const fill = new THREE.DirectionalLight(0xffffff, 0.6);
-      fill.position.set(-2.5, 1.2, 2.2);
+      const fill = new THREE.DirectionalLight(0xe8f0ff, 0.45);
+      fill.position.set(-2.8, 1.0, 2.0);
       scene.add(fill);
-      const rim = new THREE.DirectionalLight(0xffffff, 0.7);
-      rim.position.set(-1.5, 1.5, -2.8);
+      const rim = new THREE.DirectionalLight(0xffffff, 0.9);
+      rim.position.set(-1.2, 2.0, -3.0);
       scene.add(rim);
 
-      const knit = buildKnitTexture();
-      const fabric = new THREE.MeshPhysicalMaterial({
+      // Las luces giran con la cámara (como un estudio de fotografía de producto):
+      // frente, lados y espalda se ven igual de bien iluminados.
+      const lightRig = [key, fill, rim].map(l => ({ light: l, base: l.position.clone() }));
+      const Y_AXIS = new THREE.Vector3(0, 1, 0);
+      function aimLights() {
+        const az = Math.atan2(camera.position.x - controls.target.x, camera.position.z - controls.target.z);
+        lightRig.forEach(r => r.light.position.copy(r.base).applyAxisAngle(Y_AXIS, az));
+      }
+
+      // Tela: material PBR con brillo aterciopelado (sheen); el tejido y los
+      // pliegues los agrega clothify() según la prenda (ver applyWeave).
+      const clothParams = clothUniforms();
+      const fabric = clothify(new THREE.MeshPhysicalMaterial({
         color: new THREE.Color(SHIRT_COLORS.blanco.hex),
-        roughness: 0.92,
+        roughness: 0.9,
         metalness: 0,
-        sheen: 0.35,
-        sheenRoughness: 0.85,
+        sheen: 0.45,
+        sheenRoughness: 0.6,
         sheenColor: new THREE.Color(0x9a9a9a),
         specularIntensity: 0.25,
-        bumpMap: knit,
-        bumpScale: 0.6,
-        envMapIntensity: 0.4,
+        envMapIntensity: 0.55,
         side: THREE.DoubleSide
-      });
+      }), clothParams);
 
-      const ribMaterial = fabric.clone();
+      const ribMaterial = clothify(fabric.clone(), clothParams);
       ribMaterial.bumpMap = buildRibTexture();
       ribMaterial.bumpScale = 1.6;
 
       // Interior visible de la prenda (abertura en V): la tela, más oscura.
-      const shadeMaterial = new THREE.MeshStandardMaterial({ roughness: 0.95, metalness: 0, side: THREE.DoubleSide });
+      const shadeMaterial = clothify(new THREE.MeshStandardMaterial({ roughness: 0.95, metalness: 0, side: THREE.DoubleSide }), clothParams);
 
       // Vivos (ribetes en contraste) de la túnica: siempre blancos.
-      const pipingMaterial = new THREE.MeshStandardMaterial({ color: new THREE.Color('#F2F2EE'), roughness: 0.6, metalness: 0 });
+      const pipingMaterial = clothify(new THREE.MeshStandardMaterial({ color: new THREE.Color('#F2F2EE'), roughness: 0.6, metalness: 0 }), clothParams);
 
       // Zonas de color (cuello, puños, franjas de bolsillos): misma tela que el
       // cuerpo; si el cliente no elige otro color siguen el color del cuerpo.
@@ -3707,9 +3917,26 @@
       const zoneRibMaterials = {};
       Object.keys(COLOR_ZONES).forEach(z => {
         zoneTargets[z] = new THREE.Color();
-        zoneMaterials[z] = fabric.clone();
-        zoneRibMaterials[z] = ribMaterial.clone();
+        zoneMaterials[z] = clothify(fabric.clone(), clothParams);
+        zoneRibMaterials[z] = clothify(ribMaterial.clone(), clothParams);
       });
+
+      // Tejido de la prenda: textura, escala, pliegues y brillo (WEAVE_LOOK).
+      const weaveMaterials = [fabric, ribMaterial, ...Object.values(zoneMaterials), ...Object.values(zoneRibMaterials)];
+      function applyWeave(key) {
+        const kind = GARMENT_WEAVE[key] || 'jersey';
+        const look = WEAVE_LOOK[kind];
+        clothParams.uWeave.value = buildWeaveTexture(kind);
+        clothParams.uWeaveScale.value = look.scale;
+        clothParams.uWeaveStrength.value = look.strength;
+        clothParams.uWeaveTone.value = look.tone;
+        clothParams.uFoldStrength.value = look.folds;
+        clothParams.uFoldScale.value = look.foldScale;
+        weaveMaterials.forEach(m => {
+          m.sheen = look.sheen;
+          m.roughness = look.roughness;
+        });
+      }
 
       function syncZoneMaterials() {
         Object.keys(COLOR_ZONES).forEach(z => {
@@ -3812,17 +4039,88 @@
         garment.key = key;
         garment.cfg = cfg;
         ground.position.y = cfg.groundY;
+        applyWeave(key);
+        renderContactShadow(cfg.groundY);
       }
 
       // Sombra suave en el "piso" para dar sensación de volumen.
       const ground = new THREE.Mesh(
         new THREE.PlaneGeometry(6, 6),
-        new THREE.ShadowMaterial({ opacity: 0.08 })
+        new THREE.ShadowMaterial({ opacity: 0.05 })
       );
       ground.rotation.x = -Math.PI / 2;
       ground.position.y = -0.80;
       ground.receiveShadow = true;
       scene.add(ground);
+
+      // Sombra de contacto: la prenda vista desde el piso hacia arriba (lo más
+      // cercano al piso, más oscuro) y difuminada. Solo la cámara gira, así que
+      // se dibuja una vez por prenda y no cuesta nada en cada cuadro.
+      const CONTACT = { size: 2.4, res: LOW_POWER ? 256 : 512, height: 0.6, darkness: 1.4, blur: 3.0, opacity: 0.6 };
+      const contactGroup = new THREE.Group();
+      scene.add(contactGroup);
+      const contactRT = new THREE.WebGLRenderTarget(CONTACT.res, CONTACT.res);
+      const contactBlurRT = new THREE.WebGLRenderTarget(CONTACT.res, CONTACT.res);
+      contactRT.texture.generateMipmaps = contactBlurRT.texture.generateMipmaps = false;
+      const contactGeo = new THREE.PlaneGeometry(CONTACT.size, CONTACT.size).rotateX(Math.PI / 2);
+      const contactPlane = new THREE.Mesh(contactGeo, new THREE.MeshBasicMaterial({
+        map: contactRT.texture, transparent: true, opacity: CONTACT.opacity, depthWrite: false
+      }));
+      contactPlane.renderOrder = 1;
+      contactPlane.scale.y = -1;
+      contactGroup.add(contactPlane);
+      const contactBlurPlane = new THREE.Mesh(contactGeo);
+      contactBlurPlane.visible = false;
+      contactGroup.add(contactBlurPlane);
+      const contactCam = new THREE.OrthographicCamera(-CONTACT.size / 2, CONTACT.size / 2, CONTACT.size / 2, -CONTACT.size / 2, 0, CONTACT.height);
+      contactCam.rotation.x = Math.PI / 2;
+      contactGroup.add(contactCam);
+      const contactDepth = new THREE.MeshDepthMaterial();
+      contactDepth.onBeforeCompile = shader => {
+        shader.uniforms.darkness = { value: CONTACT.darkness };
+        shader.fragmentShader = `uniform float darkness;\n${shader.fragmentShader.replace(
+          'gl_FragColor = vec4( vec3( 1.0 - fragCoordZ ), opacity );',
+          'gl_FragColor = vec4( vec3( 0.0 ), ( 1.0 - fragCoordZ ) * darkness );')}`;
+      };
+      contactDepth.depthTest = contactDepth.depthWrite = false;
+      contactDepth.side = THREE.DoubleSide;
+      const blurH = new THREE.ShaderMaterial(HorizontalBlurShader);
+      const blurV = new THREE.ShaderMaterial(VerticalBlurShader);
+      blurH.depthTest = blurV.depthTest = false;
+
+      function blurContact(amount) {
+        contactBlurPlane.visible = true;
+        contactBlurPlane.material = blurH;
+        blurH.uniforms.tDiffuse.value = contactRT.texture;
+        blurH.uniforms.h.value = amount / CONTACT.res;
+        renderer.setRenderTarget(contactBlurRT);
+        renderer.render(contactBlurPlane, contactCam);
+        contactBlurPlane.material = blurV;
+        blurV.uniforms.tDiffuse.value = contactBlurRT.texture;
+        blurV.uniforms.v.value = amount / CONTACT.res;
+        renderer.setRenderTarget(contactRT);
+        renderer.render(contactBlurPlane, contactCam);
+        contactBlurPlane.visible = false;
+      }
+
+      function renderContactShadow(groundY) {
+        contactGroup.position.y = groundY + 0.002;
+        contactGroup.updateMatrixWorld(true);
+        const clearAlpha = renderer.getClearAlpha();
+        contactPlane.visible = false;
+        ground.visible = false;
+        scene.overrideMaterial = contactDepth;
+        renderer.setClearAlpha(0);
+        renderer.setRenderTarget(contactRT);
+        renderer.render(scene, contactCam);
+        scene.overrideMaterial = null;
+        blurContact(CONTACT.blur * (CONTACT.res / 256));
+        blurContact(CONTACT.blur * 0.4 * (CONTACT.res / 256));
+        renderer.setRenderTarget(null);
+        renderer.setClearAlpha(clearAlpha);
+        contactPlane.visible = true;
+        ground.visible = true;
+      }
 
       buildShirt('camiseta', garmentConfig('camiseta'));
 
@@ -4080,6 +4378,7 @@
         shadeMaterial.color.copy(fabric.color).multiplyScalar(0.35);
         syncZoneMaterials();
         controls.update();
+        aimLights();
         renderer.render(scene, camera);
         requestAnimationFrame(tick);
       }
@@ -4107,7 +4406,8 @@
       }
 
       function newLogoMaterial(tex) {
-        return new THREE.MeshStandardMaterial({
+        // El logo es una impresión sobre la tela: lleva el mismo tejido y pliegues.
+        return clothify(new THREE.MeshStandardMaterial({
           map: tex,
           transparent: true,
           depthWrite: false,
@@ -4115,9 +4415,9 @@
           polygonOffsetFactor: -4,
           roughness: 0.85,
           metalness: 0,
-          envMapIntensity: 0.4,
+          envMapIntensity: 0.55,
           side: THREE.DoubleSide
-        });
+        }), clothParams);
       }
 
       function updateLogoSummary() {
@@ -5190,18 +5490,30 @@
         camera.position.set(Math.sin(azimuth) * dist, 0.12, Math.cos(azimuth) * dist);
         camera.lookAt(controls.target);
         controls.update();
+        aimLights();
         renderer.render(scene, camera);
         // Se reduce a 400 px (suficiente para las tarjetas) para que cada
         // imagen pese poco y quepan muchas en la caché del navegador.
-        const src = renderer.domElement;
+        // Se reduce por mitades: un solo salto grande deja la textura de la tela
+        // con efecto moiré.
+        let src = renderer.domElement;
         const side = 400;
+        while (Math.min(src.width, src.height) > side * 2) {
+          const half = document.createElement('canvas');
+          half.width = Math.round(src.width / 2);
+          half.height = Math.round(src.height / 2);
+          half.getContext('2d').drawImage(src, 0, 0, half.width, half.height);
+          src = half;
+        }
         const scale = Math.min(side / src.width, side / src.height);
         const out = document.createElement('canvas');
         out.width = side;
         out.height = side;
         const w = src.width * scale;
         const h = src.height * scale;
-        out.getContext('2d').drawImage(src, (side - w) / 2, (side - h) / 2, w, h);
+        const outCtx = out.getContext('2d');
+        outCtx.imageSmoothingQuality = 'high';
+        outCtx.drawImage(src, (side - w) / 2, (side - h) / 2, w, h);
         return out.toDataURL('image/png');
       }
 
