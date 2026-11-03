@@ -1441,6 +1441,7 @@
               <div class="studio-card-label">Resumen del diseño</div>
               <div class="studio-summary">
                 <div><span>Prenda</span><span id="studioSummaryGarment">Camiseta básica</span></div>
+                <div id="studioSummaryFitRow" hidden><span>Corte</span><span id="studioSummaryFit"></span></div>
                 <div id="studioSummaryCollarRow"><span>Cuello</span><span id="studioSummaryCollar">Redondo</span></div>
                 <div id="studioSummarySleeveRow"><span>Manga</span><span id="studioSummarySleeve">Corta</span></div>
                 <div id="studioSummaryClosureRow" hidden><span>Cierre</span><span id="studioSummaryClosure"></span></div>
@@ -1558,6 +1559,7 @@
 
     // --- Prendas configurables (cuello, manga, cierre, bolsillos y color por zonas) ---
     const OPTION_GROUPS = {
+      corte: { label: 'Corte', choices: { hombre: 'Hombre', mujer: 'Mujer' } },
       cuello: { label: 'Cuello', choices: { v: 'Solapa en V', camisero: 'Camisero', mao: 'Mao', polo: 'Polo', redondo: 'Redondo', enV: 'En V', maoRib: 'Mao en rib', capucha: 'Capucha' } },
       manga: { label: 'Manga', choices: { corta: 'Corta', larga: 'Larga con puño' } },
       cierre: { label: 'Cierre', choices: { oculto: 'Oculto', cruzado: 'Doble botonadura', botones: 'Botones', botones3: 'Tapeta 3 botones', cremallera: 'Cremallera', mediaCremallera: 'Media cremallera', ninguno: 'Sin cierre' } },
@@ -1572,7 +1574,7 @@
     function choiceLabel(conf, group, value) {
       return (conf.labels && conf.labels[group] && conf.labels[group][value]) || OPTION_GROUPS[group].choices[value];
     }
-    const TOP_GROUPS = ['cuello', 'manga', 'cierre', 'bolsillos'];
+    const TOP_GROUPS = ['corte', 'cuello', 'manga', 'cierre', 'bolsillos'];
     const PANTS_GROUPS = ['cintura', 'largo', 'bolsillos'];
     const PANTS_HEM = { largo: -0.83, tobillero: -0.6, bermuda: -0.22 };
 
@@ -1581,6 +1583,7 @@
     }
     // Opciones que ofrece cada prenda si no define las suyas (configurable.choices).
     const DEFAULT_CHOICES = {
+      corte: ['hombre', 'mujer'],
       cuello: ['camisero', 'mao', 'polo', 'redondo'],
       manga: ['corta', 'larga'],
       cierre: ['botones', 'cremallera', 'ninguno'],
@@ -1635,6 +1638,20 @@
       t.pocket = chest ? conf.chestPocket : null;
       t.lowerPockets = lower ? conf.lowerPockets : null;
       t.kangaroo = o.bolsillos === 'canguro' ? conf.kangaroo : null;
+      if (o.corte === 'mujer') {
+        t.fit = true;
+        const sl = t.sleeve;
+        const short = sl.length < 0.5;
+        t.sleeve = {
+          ...sl,
+          angleStart: sl.angleStart + deg(7),
+          angleEnd: sl.angleEnd + deg(short ? 7 : 3),
+          length: sl.length * (short ? 0.82 : 0.95),
+          rBase: sl.rBase.map(r => r * 0.82),
+          rEnd: sl.rEnd.map(r => r * 0.8),
+          shoulder: new THREE.Vector3(sl.shoulder.x * 0.86, sl.shoulder.y - 0.008, 0)
+        };
+      }
       return t;
     }
 
@@ -1664,6 +1681,7 @@
       groupsFor(conf).forEach(g => {
         if (opts && choicesFor(conf, g).includes(opts[g])) o[g] = opts[g];
       });
+      if (conf.kind !== 'pants' && !o.corte) o.corte = 'hombre';
       // Con solapa en V el cierre siempre va oculto.
       if (o.cuello === 'v') o.cierre = 'oculto';
       let cfg;
@@ -1692,6 +1710,7 @@
       const chest = o.bolsillos === 'pecho' || o.bolsillos === 'ambos';
       const top = conf.target === 'top' ? cfg.set.top : cfg;
       cfg.summary = {
+        corte: OPTION_GROUPS.corte.choices[o.corte],
         cuello: choiceLabel(conf, 'cuello', o.cuello),
         manga: choiceLabel(conf, 'manga', o.manga),
         cierre: choiceLabel(conf, 'cierre', o.cierre),
@@ -1805,19 +1824,19 @@
           labels: { manga: { larga: 'Larga' } },
           defaults: { cuello: 'redondo', manga: 'corta', cierre: 'ninguno', bolsillos: 'ninguno' },
           zoneDefaults: {},
-          neckDip: { redondo: 0.07, enV: 0.03 },
-          vNeck: { enV: 0.17 },
+          neckDip: { redondo: 0.095, enV: 0.03 },
+          vNeck: { enV: 0.16 },
           sleeves: {
             corta: {
-              angleStart: deg(50), angleEnd: deg(50), length: 0.27, hemTilt: 0.085, forward: deg(12), start: -0.18,
+              angleStart: deg(50), angleEnd: deg(50), length: 0.27, hemTilt: 0.012, forward: deg(12), start: -0.18,
               rBase: [0.160, 0.152], rEnd: [0.132, 0.118], flare: true,
-              shoulder: new THREE.Vector3(0.335, 0.332, 0),
+              shoulder: new THREE.Vector3(0.308, 0.35, 0),
               cuff: null
             },
             larga: {
               angleStart: deg(50), angleEnd: deg(84), length: 0.86, hemTilt: 0, forward: deg(9), start: -0.18,
               rBase: [0.160, 0.152], rEnd: [0.074, 0.070], flare: false,
-              shoulder: new THREE.Vector3(0.335, 0.332, 0),
+              shoulder: new THREE.Vector3(0.308, 0.35, 0),
               cuff: null
             }
           },
@@ -1839,9 +1858,9 @@
           { y: 0.08, a: 0.347, b: 0.178, n: 2.6 },
           { y: 0.24, a: 0.352, b: 0.178, n: 2.5 },
           { y: 0.325, a: 0.318, b: 0.158, n: 2.4 },
-          { y: 0.38, a: 0.245, b: 0.130, n: 2.2 },
-          { y: 0.415, a: 0.170, b: 0.106, n: 2.0 },
-          { y: 0.430, a: 0.125, b: 0.096, n: 2.0 }
+          { y: 0.385, a: 0.25, b: 0.132, n: 2.2 },
+          { y: 0.425, a: 0.185, b: 0.112, n: 2.0 },
+          { y: 0.445, a: 0.152, b: 0.104, n: 2.0 }
         ],
         neckStart: 5,   // índice del perfil donde empieza a cerrarse hacia el cuello
         neckDip: 0.07,  // cuánto cae el escote adelante
@@ -1851,13 +1870,13 @@
           angleStart: deg(50),  // caída de la manga respecto a la horizontal (en el hombro)
           angleEnd: deg(50),    // caída en el extremo (igual = manga recta)
           length: 0.27,
-          hemTilt: 0.085,       // la bocamanga se corta en diagonal: más larga arriba que en la axila
+          hemTilt: 0.012,       // la bocamanga se corta en diagonal: más larga arriba que en la axila
           forward: deg(12),     // giro de la manga hacia el frente
           start: -0.18,         // parte que queda dentro del torso para ocultar la unión
           rBase: [0.160, 0.152],// radios (vertical, profundidad) en la sisa
           rEnd: [0.132, 0.118], // radios en la bocamanga
           flare: true,
-          shoulder: new THREE.Vector3(0.335, 0.332, 0), // punto del hombro donde arranca el borde superior
+          shoulder: new THREE.Vector3(0.308, 0.35, 0), // punto del hombro donde arranca el borde superior
           cuff: null
         },
         collar: 'rib',
@@ -1920,7 +1939,7 @@
           zoneDefaults: {},
           sleeves: {
             corta: {
-              angleStart: deg(50), angleEnd: deg(50), length: 0.27, hemTilt: 0.06, forward: deg(12), start: -0.18,
+              angleStart: deg(50), angleEnd: deg(50), length: 0.27, hemTilt: 0.012, forward: deg(12), start: -0.18,
               rBase: [0.150, 0.142], rEnd: [0.124, 0.112], flare: false,
               shoulder: new THREE.Vector3(0.330, 0.336, 0),
               cuff: { length: 0.04, scale: 1.04, button: false }
@@ -1971,7 +1990,7 @@
               cuff: { length: 0.085, scale: 0.8, rib: true }
             },
             corta: {
-              angleStart: deg(52), angleEnd: deg(52), length: 0.28, hemTilt: 0.06, forward: deg(12), start: -0.2,
+              angleStart: deg(52), angleEnd: deg(52), length: 0.28, hemTilt: 0.012, forward: deg(12), start: -0.2,
               rBase: [0.170, 0.160], rEnd: [0.142, 0.128], flare: false,
               shoulder: new THREE.Vector3(0.348, 0.312, 0),
               cuff: { length: 0.04, scale: 0.96, rib: true }
@@ -2051,7 +2070,7 @@
               cuff: { length: 0.085, scale: 0.8, rib: true }
             },
             corta: {
-              angleStart: deg(52), angleEnd: deg(52), length: 0.28, hemTilt: 0.06, forward: deg(12), start: -0.2,
+              angleStart: deg(52), angleEnd: deg(52), length: 0.28, hemTilt: 0.012, forward: deg(12), start: -0.2,
               rBase: [0.170, 0.160], rEnd: [0.142, 0.128], flare: false,
               shoulder: new THREE.Vector3(0.348, 0.312, 0),
               cuff: { length: 0.04, scale: 0.96, rib: true }
@@ -2123,7 +2142,7 @@
           placket: { halfWidth: 0.019, length: 0.17, buttons: 2, spacing: 0.07, firstOffset: 0.05, standButton: false },
           sleeves: {
             corta: {
-              angleStart: deg(50), angleEnd: deg(50), length: 0.25, hemTilt: 0.07, forward: deg(12), start: -0.18,
+              angleStart: deg(50), angleEnd: deg(50), length: 0.25, hemTilt: 0.012, forward: deg(12), start: -0.18,
               rBase: [0.158, 0.150], rEnd: [0.124, 0.112], flare: false,
               shoulder: new THREE.Vector3(0.335, 0.334, 0),
               cuff: { length: 0.035, scale: 0.97, rib: true }
@@ -2162,7 +2181,7 @@
           angleStart: deg(50),
           angleEnd: deg(50),
           length: 0.25,
-          hemTilt: 0.07,
+          hemTilt: 0.012,
           forward: deg(12),
           start: -0.18,
           rBase: [0.158, 0.150],
@@ -2206,7 +2225,7 @@
               cuff: { length: 0.1, scale: 1.1, button: false }
             },
             corta: {
-              angleStart: deg(50), angleEnd: deg(50), length: 0.27, hemTilt: 0.06, forward: deg(12), start: -0.18,
+              angleStart: deg(50), angleEnd: deg(50), length: 0.27, hemTilt: 0.012, forward: deg(12), start: -0.18,
               rBase: [0.155, 0.146], rEnd: [0.126, 0.114], flare: false,
               shoulder: new THREE.Vector3(0.335, 0.336, 0),
               cuff: { length: 0.05, scale: 1.06, button: false }
@@ -2332,7 +2351,7 @@
           concealedPlacket: { x: 0.022, fromY: 0.235 },
           sleeves: {
             corta: {
-              angleStart: deg(50), angleEnd: deg(50), length: 0.25, hemTilt: 0.06, forward: deg(12), start: -0.18,
+              angleStart: deg(50), angleEnd: deg(50), length: 0.25, hemTilt: 0.012, forward: deg(12), start: -0.18,
               rBase: [0.156, 0.148], rEnd: [0.126, 0.114], flare: false,
               shoulder: new THREE.Vector3(0.333, 0.334, 0),
               cuff: { length: 0.055, scale: 1.06, button: false, piping: true }
@@ -2381,7 +2400,7 @@
               angleStart: deg(50),
               angleEnd: deg(50),
               length: 0.25,
-              hemTilt: 0.06,
+              hemTilt: 0.012,
               forward: deg(12),
               start: -0.18,
               rBase: [0.156, 0.148],
@@ -2463,7 +2482,7 @@
           angleStart: deg(50),
           angleEnd: deg(50),
           length: 0.27,
-          hemTilt: 0.06,
+          hemTilt: 0.012,
           forward: deg(12),
           start: -0.18,
           rBase: [0.156, 0.148],
@@ -2487,7 +2506,7 @@
           zoneDefaults: { cuello: 'vinotinto', detalle: 'vinotinto' },
           sleeves: {
             corta: {
-              angleStart: deg(50), angleEnd: deg(50), length: 0.27, hemTilt: 0.06, forward: deg(12), start: -0.18,
+              angleStart: deg(50), angleEnd: deg(50), length: 0.27, hemTilt: 0.012, forward: deg(12), start: -0.18,
               rBase: [0.156, 0.148], rEnd: [0.128, 0.116], flare: false,
               shoulder: new THREE.Vector3(0.333, 0.334, 0),
               cuff: { length: 0.04, scale: 1.04, button: false }
@@ -2531,7 +2550,26 @@
       ['y', 'a', 'b', 'n'].forEach(key => {
         out[key] = catmull(get(i - 1)[key], get(i)[key], get(i + 1)[key], get(i + 2)[key], f);
       });
+      if (cfg.fit) {
+        if (out.y < 0) out.y *= 0.9;
+        out.a *= fitAt(FIT_WIDTH, out.y);
+        out.b *= fitAt(FIT_DEPTH, out.y);
+      }
       return out;
+    }
+
+    // Corte de mujer: [altura, factor] del ancho y la profundidad del torso.
+    const FIT_WIDTH = [[-0.9, 0.93], [-0.68, 0.885], [-0.3, 0.775], [0.1, 0.87], [0.26, 0.85], [0.36, 0.88], [0.44, 0.97]];
+    const FIT_DEPTH = [[-0.9, 0.98], [-0.68, 0.96], [-0.3, 0.8], [0.1, 0.92], [0.44, 0.97]];
+    function fitAt(table, y) {
+      if (y <= table[0][0]) return table[0][1];
+      for (let i = 1; i < table.length; i++) {
+        if (y <= table[i][0]) {
+          const t = (y - table[i - 1][0]) / (table[i][0] - table[i - 1][0]);
+          return THREE.MathUtils.lerp(table[i - 1][1], table[i][1], t * t * (3 - 2 * t));
+        }
+      }
+      return table[table.length - 1][1];
     }
 
     function superellipse(angle, a, b, n) {
@@ -2587,7 +2625,7 @@
       const front = Math.max(0, Math.sin(angle));
       const back = Math.max(0, -Math.sin(angle));
       y -= cfg.neckDip * neckW * neckW * Math.pow(front, cfg.neckDipPower || 2); // potencia alta = escote en V
-      y += 0.008 * neckW * back;
+      y += (cfg.collar === 'rib' ? -0.016 * back * back + 0.006 : 0.008 * back) * neckW;
       // Faldón: los costados del ruedo suben y el frente/espalda bajan en curva.
       if (cfg.hemCurve) {
         const hemW = Math.max(0, 1 - t / 1.2);
@@ -2598,7 +2636,13 @@
       const fold = cfg.waistFold * waist * Math.sin(angle * 9 + p.y * 14);
       const len = Math.hypot(q.x, q.z) || 1;
       const px = q.x + fold * q.x / len;
-      const pz = q.z + fold * q.z / len;
+      let pz = q.z + fold * q.z / len;
+      // Corte de mujer: volumen suave del busto al frente.
+      if (cfg.fit && pz > 0) {
+        const bx = (Math.abs(px) - 0.118) / 0.1;
+        const by = (p.y - 0.135) / 0.105;
+        pz += 0.032 * Math.exp(-bx * bx - by * by);
+      }
       // Escote en V: el frente se recorta con una línea en V que va de los
       // costados del cuello hasta el centro, `vNeck` más abajo.
       if (cfg.vNeck && pz > 0) {
@@ -2787,6 +2831,40 @@
       const p = torsoPoint(cfg, 1, u);
       const scale = 1.025 - 0.07 * h; // la banda se inclina hacia el cuello
       return new THREE.Vector3(p.x * scale, p.y - 0.004 + h * MANDARIN_H, p.z * scale);
+    }
+
+    // Cuello redondo o en V: banda plana de rib que sigue el escote.
+    function buildRibCollar(cfg) {
+      const width = 0.028;
+      const steps = 160;
+      const vs = [];
+      // Por columna: hasta dónde llega la banda en la tela (v0 abajo, v1 en el borde).
+      const vAtY = (u, y) => {
+        let lo = 0, hi = 1;
+        for (let k = 0; k < 18; k++) {
+          const mid = (lo + hi) / 2;
+          if (torsoPoint(cfg, mid, u).y < y) lo = mid; else hi = mid;
+        }
+        return (lo + hi) / 2;
+      };
+      for (let j = 0; j <= steps; j++) {
+        const u = j / steps;
+        const topY = torsoPoint(cfg, 1, u).y;
+        vs.push([vAtY(u, topY - width), vAtY(u, topY - 0.0005)]);
+      }
+      const point = (h, u, out) => {
+        const j = Math.round(u * steps);
+        const p = torsoPoint(cfg, THREE.MathUtils.lerp(vs[j][0], vs[j][1], h), j / steps);
+        const r = Math.hypot(p.x, p.z) || 1;
+        return new THREE.Vector3(p.x + out * p.x / r, p.y, p.z + out * p.z / r);
+      };
+      const band = buildGrid(6, steps, (h, u) => point(h, u, 0.0035), (h, u) => ({ u: u * 3, v: h }));
+      const ring = (h, out) => {
+        const pts = [];
+        for (let j = 0; j < steps; j++) pts.push(point(h, j / steps, out));
+        return pts;
+      };
+      return { band, rims: [buildRim(ring(1, 0.0035), 0.003), buildRim(ring(0, 0.0035), 0.0011)] };
     }
 
     function buildMandarinCollar(cfg) {
@@ -3490,14 +3568,18 @@
           const sleeveGeo = buildSleeve(sl, axis, side, sl.start, 1);
           sleeveGeo.userData.sleeve = true;
           fabricParts.push(sleeveGeo);
-          fabricParts.push(buildRim(sleeveRing(sl, axis, side, 1), 0.0055));
+          fabricParts.push(buildRim(sleeveRing(sl, axis, side, 1), 0.003));
+          // Costura del dobladillo.
+          fabricParts.push(buildRim(sleeveRing(sl, axis, side, 1 - 0.028 / sl.length, 1.004), 0.0012));
         }
       });
 
       // El cuello va en su zona de color (igual al cuerpo salvo que el cliente lo cambie).
       const addCollar = (geos, rib = false) => geos.forEach(geo => collarParts.push({ geo, rib }));
       if (cfg.collar === 'rib') {
-        addCollar([buildRim(torsoRing(cfg, 1, -0.004, 1.06), 0.016)]);
+        const collar = buildRibCollar(cfg);
+        addCollar([collar.band], true);
+        addCollar(collar.rims);
       } else if (cfg.collar === 'hood') {
         addCollar(buildHood(cfg));
       } else if (cfg.collar === 'mandarin') {
@@ -3524,7 +3606,9 @@
         ribParts.push(wb.band);
         fabricParts.push(...wb.rims);
       } else {
-        fabricParts.push(buildRim(torsoRing(cfg, 0, 0.002, 1.004), cfg.hemCurve ? 0.004 : 0.0055));
+        fabricParts.push(buildRim(torsoRing(cfg, 0, 0.002, 1.004), cfg.hemCurve ? 0.004 : 0.003));
+        // Costura del ruedo.
+        if (!cfg.hemCurve) fabricParts.push(buildRim(torsoRing(cfg, frontV(cfg, torsoProfile(cfg, 0).y + 0.03), 0, 1.004), 0.0012));
       }
 
       if (cfg.drawstrings) {
@@ -3612,11 +3696,11 @@
     // entre hilos; folds / foldScale: fuerza y tamaño de los pliegues; sheen: brillo
     // aterciopelado en los bordes (más en la felpa).
     const WEAVE_LOOK = {
-      jersey: { scale: 20, strength: 0.45, tone: 0.12, folds: 0.035, foldScale: 1.0, sheen: 0.45, roughness: 0.9 },
-      pique: { scale: 15, strength: 0.55, tone: 0.16, folds: 0.03, foldScale: 1.0, sheen: 0.4, roughness: 0.88 },
-      fleece: { scale: 22, strength: 0.3, tone: 0.08, folds: 0.045, foldScale: 0.8, sheen: 0.8, roughness: 0.95 },
-      poplin: { scale: 22, strength: 0.35, tone: 0.08, folds: 0.028, foldScale: 1.2, sheen: 0.25, roughness: 0.78 },
-      twill: { scale: 16, strength: 0.45, tone: 0.12, folds: 0.03, foldScale: 1.1, sheen: 0.25, roughness: 0.82 }
+      jersey: { scale: 20, strength: 0.18, tone: 0.05, folds: 0.045, foldScale: 1.0, sheen: 0.45, roughness: 0.9 },
+      pique: { scale: 15, strength: 0.4, tone: 0.1, folds: 0.04, foldScale: 1.0, sheen: 0.4, roughness: 0.88 },
+      fleece: { scale: 22, strength: 0.2, tone: 0.06, folds: 0.055, foldScale: 0.8, sheen: 0.8, roughness: 0.95 },
+      poplin: { scale: 22, strength: 0.25, tone: 0.06, folds: 0.038, foldScale: 1.2, sheen: 0.25, roughness: 0.78 },
+      twill: { scale: 16, strength: 0.35, tone: 0.09, folds: 0.04, foldScale: 1.1, sheen: 0.25, roughness: 0.82 }
     };
 
     function weaveRand(n) {
@@ -3701,9 +3785,9 @@
     // El tejido se proyecta desde los tres ejes (triplanar) con la posición real
     // de la tela, así tiene la misma escala en el cuerpo, las mangas, el cuello y
     // los logos aunque cada pieza tenga sus propias coordenadas UV. Los pliegues
-    // salen de un ruido 3D con sus derivadas: inclinan la normal y oscurecen el
-    // fondo de cada pliegue (oclusión suave), sin mover la geometría (los logos y
-    // botones siguen apoyados sobre la tela).
+    // tienen forma de prenda real: caída vertical hacia el ruedo y tirones que salen
+    // de la axila, más la costura de la sisa. Inclinan la normal y oscurecen los
+    // valles, sin mover la geometría (los logos y botones siguen sobre la tela).
     const CLOTH_FRAGMENT_PARS = /* glsl */`
       varying vec3 vClothPos;
       varying vec3 vClothNormal;
@@ -3714,58 +3798,51 @@
       uniform float uFoldStrength;
       uniform float uFoldScale;
       uniform float uCrease;
+      uniform vec4 uArm;
+      uniform vec2 uArmOffset;
       float clothHash(vec3 p) {
         p = fract(p * 0.3183099 + vec3(0.71, 0.113, 0.419));
         p *= 17.0;
         return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
       }
-      // Ruido de valor 3D: x = valor (0..1), yzw = gradiente.
-      vec4 clothNoise(vec3 x) {
+      float clothNoise(vec3 x) {
         vec3 i = floor(x);
         vec3 w = fract(x);
-        vec3 u = w * w * w * (w * (w * 6.0 - 15.0) + 10.0);
-        vec3 du = 30.0 * w * w * (w * (w - 2.0) + 1.0);
-        float a = clothHash(i);
-        float b = clothHash(i + vec3(1.0, 0.0, 0.0));
-        float c = clothHash(i + vec3(0.0, 1.0, 0.0));
-        float d = clothHash(i + vec3(1.0, 1.0, 0.0));
-        float e = clothHash(i + vec3(0.0, 0.0, 1.0));
-        float f = clothHash(i + vec3(1.0, 0.0, 1.0));
-        float g = clothHash(i + vec3(0.0, 1.0, 1.0));
-        float h = clothHash(i + vec3(1.0, 1.0, 1.0));
-        float k1 = b - a;
-        float k2 = c - a;
-        float k3 = e - a;
-        float k4 = a - b - c + d;
-        float k5 = a - c - e + g;
-        float k6 = a - b - e + f;
-        float k7 = -a + b + c - d + e - f - g + h;
-        return vec4(
-          a + k1 * u.x + k2 * u.y + k3 * u.z + k4 * u.x * u.y + k5 * u.y * u.z + k6 * u.z * u.x + k7 * u.x * u.y * u.z,
-          du * vec3(k1 + k4 * u.y + k6 * u.z + k7 * u.y * u.z,
-                    k2 + k5 * u.z + k4 * u.x + k7 * u.z * u.x,
-                    k3 + k6 * u.x + k5 * u.y + k7 * u.x * u.y));
+        vec3 u = w * w * (3.0 - 2.0 * w);
+        return mix(
+          mix(mix(clothHash(i), clothHash(i + vec3(1.0, 0.0, 0.0)), u.x),
+              mix(clothHash(i + vec3(0.0, 1.0, 0.0)), clothHash(i + vec3(1.0, 1.0, 0.0)), u.x), u.y),
+          mix(mix(clothHash(i + vec3(0.0, 0.0, 1.0)), clothHash(i + vec3(1.0, 0.0, 1.0)), u.x),
+              mix(clothHash(i + vec3(0.0, 1.0, 1.0)), clothHash(i + vec3(1.0, 1.0, 1.0)), u.x), u.y), u.z);
       }
-      // Pliegues: crestas suaves (donde el ruido cruza 0.5) estiradas en vertical,
-      // como la tela que cae, + arrugas más pequeñas. x = altura (0 valle, 1 cresta).
-      vec4 clothRidge(vec3 p, vec3 s) {
-        vec4 n = clothNoise(p * s);
-        float m = 2.0 * n.x - 1.0;
-        return vec4(1.0 - m * m, -4.0 * m * n.yzw * s);
+      // Distancia a la costura de la sisa, del hombro (uArm.xy) a la axila (uArm.zw).
+      float clothSeamDist(vec2 p) {
+        vec2 ab = uArm.zw - uArm.xy;
+        float t = clamp(dot(p - uArm.xy, ab) / dot(ab, ab), 0.0, 1.0);
+        // La sisa se curva hacia adentro a media altura.
+        vec2 c = uArm.xy + ab * t + vec2(-0.03 * sin(t * 3.14159), 0.0);
+        return length(p - c);
       }
-      vec4 clothFolds(vec3 p) {
-        vec4 a = clothRidge(p, vec3(8.0, 2.2, 8.0) * uFoldScale);
-        vec4 b = clothRidge(p + 11.7, vec3(20.0, 9.0, 20.0) * uFoldScale);
-        return (a + 0.25 * b) / 1.25;
+      // Altura de la tela: caída, tirones de la axila y hundimiento de la costura.
+      float clothHeight(vec3 pos) {
+        vec3 p = pos - vec3(uArmOffset, 0.0);
+        vec2 side = vec2(abs(p.x), p.y);
+        float wob = clothNoise(p * vec3(3.2, 1.5, 3.2) * uFoldScale);
+        float body = 1.0 - smoothstep(uArm.z - 0.02, uArm.z + 0.03, side.x);
+        float down = 0.3 + 0.7 * (1.0 - smoothstep(-0.45, 0.15, p.y));
+        float drape = sin((p.x + p.z) * 13.0 * uFoldScale + 6.0 * wob) * down * mix(0.35, 0.6, body);
+        vec2 a = side - uArm.zw;
+        float r = length(a);
+        float pull = sin(atan(a.y, a.x) * 8.0 + wob * 3.0) * exp(-r / 0.2) * smoothstep(0.03, 0.12, r) * body;
+        // La costura se desvanece al llegar al hombro.
+        float seam = uArm.x > 0.0 ? exp(-pow(clothSeamDist(side) / 0.013, 2.0)) * (1.0 - smoothstep(uArm.y - 0.09, uArm.y - 0.02, side.y)) : 0.0;
+        return drape + 0.16 * pull - 0.4 * seam;
       }
     `;
     const CLOTH_COLOR = /* glsl */`
       float clothFace = gl_FrontFacing ? 1.0 : -1.0;
       vec3 clothN = normalize(vClothNormal) * clothFace;
-      vec4 clothF = clothFolds(vClothPos);
-      // Menos pliegues en pecho y hombros (la tela se apoya), más hacia el ruedo.
-      float clothMask = 0.4 + 0.6 * (1.0 - smoothstep(-0.4, 0.2, vClothPos.y));
-      clothF.yzw *= clothMask;
+      float clothF = clothHeight(vClothPos);
       vec3 clothW = pow(abs(clothN), vec3(4.0));
       clothW /= (clothW.x + clothW.y + clothW.z);
       vec3 clothP = vClothPos * uWeaveScale;
@@ -3775,18 +3852,30 @@
       // De lejos el hilo mide menos de un pixel: se apaga para evitar moiré.
       float clothDetail = 1.0 - smoothstep(0.004, 0.012, length(fwidth(clothP)));
       float clothH = mix(0.5, clothTX.z * clothW.x + clothTY.z * clothW.y + clothTZ.z * clothW.z, clothDetail);
-      // Hilos altos un poco más claros; el fondo de los pliegues, más oscuro.
-      diffuseColor.rgb *= (1.0 + uWeaveTone * (clothH - 0.5)) * (1.0 - uCrease * clothMask * (1.0 - smoothstep(0.1, 0.6, clothF.x)));
+      // Interior del cuello: la tela que se ve por dentro queda en sombra.
+      vec3 clothRel = vClothPos - vec3(uArmOffset, 0.0);
+      float clothInside = (1.0 - smoothstep(-0.12, 0.0, dot(clothN.xz, normalize(clothRel.xz + 1e-4))))
+        * smoothstep(0.2, 0.3, clothRel.y) * (1.0 - smoothstep(0.17, 0.24, abs(clothRel.x)));
+      // Hilos altos un poco más claros; los valles y las costuras, más oscuros.
+      diffuseColor.rgb *= (1.0 + uWeaveTone * (clothH - 0.5)) * (1.0 - uCrease * clamp(-clothF, 0.0, 1.0)) * (1.0 - 0.5 * clothInside);
     `;
     const CLOTH_NORMAL = /* glsl */`
       {
-        vec3 clothG = clothF.yzw - dot(clothF.yzw, clothN) * clothN;
+        const float e = 0.004;
+        vec3 clothG = vec3(clothHeight(vClothPos + vec3(e, 0.0, 0.0)) - clothF,
+          clothHeight(vClothPos + vec3(0.0, e, 0.0)) - clothF,
+          clothHeight(vClothPos + vec3(0.0, 0.0, e)) - clothF) / e;
+        clothG -= dot(clothG, clothN) * clothN;
         vec2 cX = clothTX.xy * 2.0 - 1.0;
         vec2 cY = clothTY.xy * 2.0 - 1.0;
         vec2 cZ = clothTZ.xy * 2.0 - 1.0;
         vec3 clothD = vec3(0.0, cX.y, cX.x) * clothW.x + vec3(cY.x, 0.0, cY.y) * clothW.y + vec3(cZ.x, cZ.y, 0.0) * clothW.z;
         clothD -= dot(clothD, clothN) * clothN;
-        normal = normalize(normal + mat3(viewMatrix) * (uWeaveStrength * clothDetail * clothD - uFoldStrength * clothG));
+        // El frente de la prenda es casi plano: se le da la curva del cuerpo para
+        // que la luz baje suave hacia los costados.
+        float clothCurve = clamp(vClothPos.x - uArmOffset.x, -0.34, 0.34) * 0.55;
+        normal = normalize(normal + mat3(viewMatrix) * (uWeaveStrength * clothDetail * clothD
+          - uFoldStrength * clothG + vec3(clothCurve, 0.0, 0.0)));
       }
     `;
 
@@ -3798,7 +3887,9 @@
         uWeaveTone: { value: WEAVE_LOOK.jersey.tone },
         uFoldStrength: { value: WEAVE_LOOK.jersey.folds },
         uFoldScale: { value: WEAVE_LOOK.jersey.foldScale },
-        uCrease: { value: 0.16 }
+        uCrease: { value: 0.3 },
+        uArm: { value: new THREE.Vector4(0, 0, 10, 0) },
+        uArmOffset: { value: new THREE.Vector2() }
       };
     }
 
@@ -4038,15 +4129,28 @@
         });
         garment.key = key;
         garment.cfg = cfg;
-        ground.position.y = cfg.groundY;
+        // El corte de mujer es más corto: el piso sube con el ruedo.
+        const groundY = cfg.fit ? cfg.groundY + 0.07 : cfg.groundY;
+        ground.position.y = groundY;
         applyWeave(key);
-        renderContactShadow(cfg.groundY);
+        // Costura de la sisa: del hombro a la axila de la parte de arriba.
+        const top = cfg.set ? cfg.set.top : cfg;
+        if (top.sleeve) {
+          const sh = top.sleeve.shoulder;
+          const armY = sh.y - top.sleeve.rBase[0] * 1.9;
+          const armX = torsoPoint(top, frontV(top, armY), 0).x;
+          clothParams.uArm.value.set(sh.x, sh.y, armX, armY);
+        } else {
+          clothParams.uArm.value.set(0, 0, 10, 0);
+        }
+        clothParams.uArmOffset.value.set(...(cfg.set ? cfg.set.topOffset : [0, 0]));
+        renderContactShadow(groundY);
       }
 
       // Sombra suave en el "piso" para dar sensación de volumen.
       const ground = new THREE.Mesh(
         new THREE.PlaneGeometry(6, 6),
-        new THREE.ShadowMaterial({ opacity: 0.05 })
+        new THREE.ShadowMaterial({ opacity: 0.02 })
       );
       ground.rotation.x = -Math.PI / 2;
       ground.position.y = -0.80;
@@ -4297,6 +4401,8 @@
       function updateDesignSummary() {
         const cfg = garment.cfg;
         document.getElementById('studioSummaryGarment').textContent = cfg.label;
+        document.getElementById('studioSummaryFit').textContent = cfg.summary.corte || '';
+        document.getElementById('studioSummaryFitRow').hidden = !cfg.summary.corte;
         document.getElementById('studioSummaryCollar').textContent = cfg.summary.cuello || '';
         document.getElementById('studioSummaryCollarRow').hidden = !cfg.summary.cuello;
         document.getElementById('studioSummarySleeve').textContent = cfg.summary.manga || '';
@@ -5071,6 +5177,7 @@
         const parts = [g ? g.label : d.prenda, c ? c.label : d.color];
         if (g && g.configurable && d.opciones) {
           const cfg = garmentConfig(d.prenda, d.opciones);
+          if (cfg.options.corte === 'mujer') parts.push('Corte mujer');
           parts.push(`Cuello ${cfg.summary.cuello.toLowerCase()}`, `manga ${cfg.summary.manga.toLowerCase()}`);
         }
         const dl = designLogoList(d);
