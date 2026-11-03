@@ -1865,7 +1865,6 @@
         neckStart: 5,   // índice del perfil donde empieza a cerrarse hacia el cuello
         neckDip: 0.07,  // cuánto cae el escote adelante
         hemCurve: 0,    // faldón: cuánto suben los costados del ruedo
-        waistFold: 0.0035,
         sleeve: {
           angleStart: deg(50),  // caída de la manga respecto a la horizontal (en el hombro)
           angleEnd: deg(50),    // caída en el extremo (igual = manga recta)
@@ -1909,7 +1908,6 @@
         neckStart: 5,
         neckDip: 0.025,
         hemCurve: 0.085,
-        waistFold: 0.0025,
         sleeve: {
           angleStart: deg(50),
           angleEnd: deg(84),    // la manga larga se curva y cae casi vertical hacia la muñeca
@@ -2017,7 +2015,6 @@
         neckStart: 5,
         neckDip: 0.04,
         hemCurve: 0,
-        waistFold: 0.0045,
         sleeve: {
           angleStart: deg(52),
           angleEnd: deg(83),
@@ -2097,7 +2094,6 @@
         neckStart: 5,
         neckDip: 0.06,
         hemCurve: 0,
-        waistFold: 0.0045,
         sleeve: {
           angleStart: deg(52),
           angleEnd: deg(83),
@@ -2176,7 +2172,6 @@
         neckStart: 5,
         neckDip: 0.025,
         hemCurve: 0,
-        waistFold: 0.0035,
         sleeve: {
           angleStart: deg(50),
           angleEnd: deg(50),
@@ -2253,7 +2248,6 @@
         neckStart: 5,
         neckDip: 0.02,
         hemCurve: 0,
-        waistFold: 0.003,
         sleeve: {
           angleStart: deg(50),
           angleEnd: deg(84),
@@ -2395,7 +2389,6 @@
             neckStart: 5,
             neckDip: 0.025,
             hemCurve: 0,
-            waistFold: 0.002,
             sleeve: {
               angleStart: deg(50),
               angleEnd: deg(50),
@@ -2477,7 +2470,6 @@
         neckStart: 5,
         neckDip: 0.03,
         hemCurve: 0,
-        waistFold: 0.002,
         sleeve: {
           angleStart: deg(50),
           angleEnd: deg(50),
@@ -2631,12 +2623,8 @@
         const hemW = Math.max(0, 1 - t / 1.2);
         y += cfg.hemCurve * hemW * hemW * Math.pow(Math.abs(Math.cos(angle)), 3);
       }
-      // Arrugas suaves de la tela en la cintura.
-      const waist = Math.exp(-Math.pow((p.y + 0.38) / 0.24, 2));
-      const fold = cfg.waistFold * waist * Math.sin(angle * 9 + p.y * 14);
-      const len = Math.hypot(q.x, q.z) || 1;
-      const px = q.x + fold * q.x / len;
-      let pz = q.z + fold * q.z / len;
+      const px = q.x;
+      let pz = q.z;
       // Corte de mujer: volumen suave del busto al frente.
       if (cfg.fit && pz > 0) {
         const bx = (Math.abs(px) - 0.118) / 0.1;
@@ -3693,14 +3681,14 @@
     };
     // scale: repeticiones del tejido por metro (un poco más grande que el real para
     // que se lea en pantalla); strength: relieve del hilo; tone: contraste de color
-    // entre hilos; folds / foldScale: fuerza y tamaño de los pliegues; sheen: brillo
+    // entre hilos; folds: marca de la costura de la sisa; sheen: brillo
     // aterciopelado en los bordes (más en la felpa).
     const WEAVE_LOOK = {
-      jersey: { scale: 20, strength: 0.18, tone: 0.05, folds: 0.045, foldScale: 1.0, sheen: 0.45, roughness: 0.9 },
-      pique: { scale: 15, strength: 0.4, tone: 0.1, folds: 0.04, foldScale: 1.0, sheen: 0.4, roughness: 0.88 },
-      fleece: { scale: 22, strength: 0.2, tone: 0.06, folds: 0.055, foldScale: 0.8, sheen: 0.8, roughness: 0.95 },
-      poplin: { scale: 22, strength: 0.25, tone: 0.06, folds: 0.038, foldScale: 1.2, sheen: 0.25, roughness: 0.78 },
-      twill: { scale: 16, strength: 0.35, tone: 0.09, folds: 0.04, foldScale: 1.1, sheen: 0.25, roughness: 0.82 }
+      jersey: { scale: 20, strength: 0.18, tone: 0.05, folds: 0.045, sheen: 0.45, roughness: 0.9 },
+      pique: { scale: 15, strength: 0.4, tone: 0.1, folds: 0.04, sheen: 0.4, roughness: 0.88 },
+      fleece: { scale: 22, strength: 0.2, tone: 0.06, folds: 0.055, sheen: 0.8, roughness: 0.95 },
+      poplin: { scale: 22, strength: 0.25, tone: 0.06, folds: 0.038, sheen: 0.25, roughness: 0.78 },
+      twill: { scale: 16, strength: 0.35, tone: 0.09, folds: 0.04, sheen: 0.25, roughness: 0.82 }
     };
 
     function weaveRand(n) {
@@ -3785,9 +3773,8 @@
     // El tejido se proyecta desde los tres ejes (triplanar) con la posición real
     // de la tela, así tiene la misma escala en el cuerpo, las mangas, el cuello y
     // los logos aunque cada pieza tenga sus propias coordenadas UV. Los pliegues
-    // tienen forma de prenda real: caída vertical hacia el ruedo y tirones que salen
-    // de la axila, más la costura de la sisa. Inclinan la normal y oscurecen los
-    // valles, sin mover la geometría (los logos y botones siguen sobre la tela).
+    // no llevan: la tela queda lisa, solo se marca la costura de la sisa inclinando
+    // la normal, sin mover la geometría (los logos y botones siguen sobre la tela).
     const CLOTH_FRAGMENT_PARS = /* glsl */`
       varying vec3 vClothPos;
       varying vec3 vClothNormal;
@@ -3796,25 +3783,9 @@
       uniform float uWeaveStrength;
       uniform float uWeaveTone;
       uniform float uFoldStrength;
-      uniform float uFoldScale;
       uniform float uCrease;
       uniform vec4 uArm;
       uniform vec2 uArmOffset;
-      float clothHash(vec3 p) {
-        p = fract(p * 0.3183099 + vec3(0.71, 0.113, 0.419));
-        p *= 17.0;
-        return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
-      }
-      float clothNoise(vec3 x) {
-        vec3 i = floor(x);
-        vec3 w = fract(x);
-        vec3 u = w * w * (3.0 - 2.0 * w);
-        return mix(
-          mix(mix(clothHash(i), clothHash(i + vec3(1.0, 0.0, 0.0)), u.x),
-              mix(clothHash(i + vec3(0.0, 1.0, 0.0)), clothHash(i + vec3(1.0, 1.0, 0.0)), u.x), u.y),
-          mix(mix(clothHash(i + vec3(0.0, 0.0, 1.0)), clothHash(i + vec3(1.0, 0.0, 1.0)), u.x),
-              mix(clothHash(i + vec3(0.0, 1.0, 1.0)), clothHash(i + vec3(1.0, 1.0, 1.0)), u.x), u.y), u.z);
-      }
       // Distancia a la costura de la sisa, del hombro (uArm.xy) a la axila (uArm.zw).
       float clothSeamDist(vec2 p) {
         vec2 ab = uArm.zw - uArm.xy;
@@ -3823,20 +3794,13 @@
         vec2 c = uArm.xy + ab * t + vec2(-0.03 * sin(t * 3.14159), 0.0);
         return length(p - c);
       }
-      // Altura de la tela: caída, tirones de la axila y hundimiento de la costura.
+      // Altura de la tela: solo el hundimiento de la costura; el cuerpo queda liso.
       float clothHeight(vec3 pos) {
         vec3 p = pos - vec3(uArmOffset, 0.0);
+        if (uArm.x <= 0.0) return 0.0;
         vec2 side = vec2(abs(p.x), p.y);
-        float wob = clothNoise(p * vec3(3.2, 1.5, 3.2) * uFoldScale);
-        float body = 1.0 - smoothstep(uArm.z - 0.02, uArm.z + 0.03, side.x);
-        float down = 0.3 + 0.7 * (1.0 - smoothstep(-0.45, 0.15, p.y));
-        float drape = sin((p.x + p.z) * 13.0 * uFoldScale + 6.0 * wob) * down * mix(0.35, 0.6, body);
-        vec2 a = side - uArm.zw;
-        float r = length(a);
-        float pull = sin(atan(a.y, a.x) * 8.0 + wob * 3.0) * exp(-r / 0.2) * smoothstep(0.03, 0.12, r) * body;
         // La costura se desvanece al llegar al hombro.
-        float seam = uArm.x > 0.0 ? exp(-pow(clothSeamDist(side) / 0.013, 2.0)) * (1.0 - smoothstep(uArm.y - 0.09, uArm.y - 0.02, side.y)) : 0.0;
-        return drape + 0.16 * pull - 0.4 * seam;
+        return -0.4 * exp(-pow(clothSeamDist(side) / 0.013, 2.0)) * (1.0 - smoothstep(uArm.y - 0.09, uArm.y - 0.02, side.y));
       }
     `;
     const CLOTH_COLOR = /* glsl */`
@@ -3886,14 +3850,13 @@
         uWeaveStrength: { value: WEAVE_LOOK.jersey.strength },
         uWeaveTone: { value: WEAVE_LOOK.jersey.tone },
         uFoldStrength: { value: WEAVE_LOOK.jersey.folds },
-        uFoldScale: { value: WEAVE_LOOK.jersey.foldScale },
         uCrease: { value: 0.3 },
         uArm: { value: new THREE.Vector4(0, 0, 10, 0) },
         uArmOffset: { value: new THREE.Vector2() }
       };
     }
 
-    // Agrega el tejido y los pliegues a un material estándar de three.js.
+    // Agrega el tejido y la costura a un material estándar de three.js.
     function clothify(material, uniforms) {
       material.onBeforeCompile = shader => {
         Object.assign(shader.uniforms, uniforms);
@@ -3976,7 +3939,7 @@
       }
 
       // Tela: material PBR con brillo aterciopelado (sheen); el tejido y los
-      // pliegues los agrega clothify() según la prenda (ver applyWeave).
+      // la costura los agrega clothify() según la prenda (ver applyWeave).
       const clothParams = clothUniforms();
       const fabric = clothify(new THREE.MeshPhysicalMaterial({
         color: new THREE.Color(SHIRT_COLORS.blanco.hex),
@@ -4012,7 +3975,7 @@
         zoneRibMaterials[z] = clothify(ribMaterial.clone(), clothParams);
       });
 
-      // Tejido de la prenda: textura, escala, pliegues y brillo (WEAVE_LOOK).
+      // Tejido de la prenda: textura, escala, costura y brillo (WEAVE_LOOK).
       const weaveMaterials = [fabric, ribMaterial, ...Object.values(zoneMaterials), ...Object.values(zoneRibMaterials)];
       function applyWeave(key) {
         const kind = GARMENT_WEAVE[key] || 'jersey';
@@ -4022,7 +3985,6 @@
         clothParams.uWeaveStrength.value = look.strength;
         clothParams.uWeaveTone.value = look.tone;
         clothParams.uFoldStrength.value = look.folds;
-        clothParams.uFoldScale.value = look.foldScale;
         weaveMaterials.forEach(m => {
           m.sheen = look.sheen;
           m.roughness = look.roughness;
@@ -4512,7 +4474,7 @@
       }
 
       function newLogoMaterial(tex) {
-        // El logo es una impresión sobre la tela: lleva el mismo tejido y pliegues.
+        // El logo es una impresión sobre la tela: lleva el mismo tejido.
         return clothify(new THREE.MeshStandardMaterial({
           map: tex,
           transparent: true,
