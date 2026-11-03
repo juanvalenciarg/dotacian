@@ -1456,7 +1456,7 @@
                 <div id="studioSummaryWaistRow" hidden><span>Cintura</span><span id="studioSummaryWaist"></span></div>
                 <div id="studioSummaryLengthRow" hidden><span>Largo</span><span id="studioSummaryLength"></span></div>
                 <div id="studioSummaryPocketRow" hidden><span>Bolsillo</span><span id="studioSummaryPocket"></span></div>
-                <div><span>Color</span><span id="studioSummaryColor">Blanco</span></div>
+                <div><span>Color</span><span id="studioSummaryColor">Gris</span></div>
                 <div id="studioSummaryContrastRow" hidden><span>Contraste</span><span id="studioSummaryContrast" style="text-align: right;"></span></div>
                 <div><span>Logos</span><span id="studioSummaryLogo" style="text-align: right;">Sin logo</span></div>
               </div>
@@ -1747,6 +1747,8 @@
 
     // Colores de cada prenda (si la prenda no define `colors`, usa estos).
     const DEFAULT_COLORS = ['blanco', 'negro', 'azul', 'rojo'];
+    // Color con el que arrancan todas las prendas.
+    const DEFAULT_COLOR = 'gris';
 
     // Ubicaciones del logo. Las coordenadas (x, y) y el tamaño sugerido de
     // cada una dependen de la prenda (ver logoPlacements en GARMENTS).
@@ -2309,7 +2311,6 @@
         },
         summary: { cuello: null, manga: null, bolsillo: 'Sesgados al frente, de ribete atrás' },
         colors: ['negro', 'beige', 'azul'],
-        thumbColor: 'beige', // color de la imagen en DS Hub (se lee mejor que el negro)
         pants: {
           waistY: 0.55,
           waistbandH: 0.045,
@@ -2384,7 +2385,6 @@
         },
         summary: { cuello: 'Solapa en V con vivo', manga: 'Corta con puño y vivo', bolsillo: 'Inferiores con vivo' },
         colors: ['azulMarino', 'negro', 'gris'],
-        thumbColor: 'azulMarino',
         cameraDistance: 4.7,
         groundY: -0.86,
         set: {
@@ -2470,7 +2470,6 @@
         meta: 'Cuello en contraste · Cremallera · Bolsillos con franja',
         summary: { cuello: 'Camisero en vinotinto', manga: 'Corta con dobladillo', bolsillo: 'Inferiores con franja vinotinto' },
         colors: ['grafito', 'azulMarino', 'negro', 'gris'],
-        thumbColor: 'grafito',
         accent: '#7A1E2C', // vinotinto del cuello y las franjas
         profile: [
           { y: -0.80, a: 0.360, b: 0.176, n: 2.6 },
@@ -4082,7 +4081,7 @@
       // la costura los agrega clothify() según la prenda (ver applyWeave).
       const clothParams = clothUniforms();
       const fabric = clothify(new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color(SHIRT_COLORS.blanco.hex),
+        color: new THREE.Color(SHIRT_COLORS[DEFAULT_COLOR].hex),
         roughness: 0.9,
         metalness: 0,
         sheen: 0.45,
@@ -4347,11 +4346,10 @@
 
       // --- Color ---
       // Cada prenda tiene sus colores (cfg.colors); el selector se arma según la prenda.
-      const targetColor = new THREE.Color(SHIRT_COLORS.blanco.hex);
-      let colorKey = 'blanco';
+      const targetColor = new THREE.Color(SHIRT_COLORS[DEFAULT_COLOR].hex);
+      let colorKey = DEFAULT_COLOR;
       // Lo que el cliente eligió a mano: se conserva al cambiar de prenda, en lo
       // que la prenda nueva también ofrezca.
-      let colorChosen = false;
       let chosenOptions = {};
       let chosenZones = {};
 
@@ -4387,7 +4385,7 @@
           : `<button type="button" class="studio-swatch${rec}" data-color="${k}">${dot}${c.label}</button>`;
       }
 
-      function syncColorSwatches(preferKey) {
+      function syncColorSwatches() {
         const cfg = garment.cfg;
         const configurable = !!(cfg && cfg.configurable);
         const keys = configurable ? FULL_PALETTE : ((cfg && cfg.colors) || DEFAULT_COLORS);
@@ -4409,23 +4407,16 @@
           html += `<span class="studio-swatch studio-swatch-custom">${customColorHtml('data-body-color', colorKey)}</span>`;
         }
         wrap.innerHTML = html;
-        const wanted = preferKey && (keys.includes(preferKey) || (configurable && resolveColor(preferKey))) ? preferKey : null;
         const keep = keys.includes(colorKey) || (configurable && resolveColor(colorKey));
-        setColor(wanted || (keep ? colorKey : keys[0]));
+        setColor(keep ? colorKey : keys[0]);
       }
 
       document.getElementById('studioSwatches').addEventListener('click', e => {
         const btn = e.target.closest('button.studio-swatch');
-        if (btn) {
-          colorChosen = true;
-          setColor(btn.dataset.color);
-        }
+        if (btn) setColor(btn.dataset.color);
       });
       document.getElementById('studioSwatches').addEventListener('input', e => {
-        if (e.target.matches('input[data-body-color]')) {
-          colorChosen = true;
-          setColor(e.target.value);
-        }
+        if (e.target.matches('input[data-body-color]')) setColor(e.target.value);
       });
       syncColorSwatches();
 
@@ -5078,8 +5069,7 @@
           b.classList.toggle('active', on);
           b.setAttribute('aria-pressed', on ? 'true' : 'false');
         });
-        // Si el cliente aún no eligió color, se arranca con el de catálogo de la prenda.
-        syncColorSwatches(changing && base.configurable && !colorChosen ? base.thumbColor : null);
+        syncColorSwatches();
         renderOptionControls();
         renderZoneControls();
         updateDesignSummary();
@@ -5454,7 +5444,6 @@
         const { zonas, ...designOptions } = d.opciones || {};
         chosenOptions = designOptions;
         chosenZones = { ...(zonas || {}) };
-        colorChosen = true;
         setGarment(d.prenda, d.opciones || {}, zonas || null);
         if (resolveColor(d.color)) setColor(d.color);
         clearLogos();
@@ -5695,13 +5684,13 @@
 
       // Foto (PNG) de una prenda para las tarjetas del DS Hub del admin, que
       // carga esta página oculta con ?embed=1 y llama a esta función.
-      function snapshot(key, snapColor = 'blanco', opts = null) {
+      function snapshot(key, snapColor = DEFAULT_COLOR, opts = null) {
         if (!GARMENTS[key]) return null;
         const cfg = garmentConfig(key, opts);
         buildShirt(key, cfg);
         const allowed = cfg.configurable ? FULL_PALETTE : (cfg.colors || DEFAULT_COLORS);
         const valid = cfg.configurable ? resolveColor(snapColor) : (allowed.includes(snapColor) && SHIRT_COLORS[snapColor]);
-        const c = valid || SHIRT_COLORS[cfg.thumbColor || allowed[0]];
+        const c = valid || SHIRT_COLORS[allowed.includes(DEFAULT_COLOR) ? DEFAULT_COLOR : allowed[0]];
         fabric.color.set(c.hex);
         targetColor.set(c.hex);
         setButtonColor();

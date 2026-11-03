@@ -67,7 +67,7 @@
 
   // Devuelve (promesa) el dataURL de la prenda. Las fotos se generan en fila,
   // una a la vez, sobre el mismo visor.
-  function getRender(key, color = 'blanco', opts = null) {
+  function getRender(key, color = 'gris', opts = null) {
     const cached = readCache(key, color, opts);
     if (cached) return Promise.resolve(cached);
     const job = queue.then(async () => {
@@ -85,7 +85,7 @@
 
   // Llena un contenedor con la imagen de la prenda (o un indicador de carga).
   // `opts`: opciones del diseño (studio_designs.opciones) o null.
-  function fillRender(el, key, color = 'blanco', opts = null) {
+  function fillRender(el, key, color = 'gris', opts = null) {
     if (!el) return;
     const cached = readCache(key, color, opts);
     if (cached) {
