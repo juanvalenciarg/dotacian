@@ -225,9 +225,9 @@
     /* Foto de producto: reemplaza al visor 3D en las prendas que la tienen. */
     .studio-viewer canvas.studio-photo {
       position: absolute;
-      top: 3%;
+      top: 2%;
       left: 0;
-      height: 94%;
+      height: calc(98% - 3.75rem);
       object-fit: contain;
       cursor: default;
       touch-action: auto;
@@ -246,15 +246,15 @@
       opacity: 0;
     }
 
-    .studio-viewer.photo-on .studio-toolbar,
+    .studio-viewer.photo-on .studio-spin-btn,
     .studio-viewer.photo-on .studio-hint {
       display: none;
     }
 
     @media (max-width: 640px) {
       .studio-viewer canvas.studio-photo {
-        top: 3rem;
-        height: calc(100% - 3.5rem);
+        top: 3.25rem;
+        height: calc(100% - 3.25rem - 4.5rem);
       }
     }
 
@@ -4621,22 +4621,34 @@
       // --- Foto de producto ---
       // Prendas con foto: se recorta del fondo blanco y se tiñe de cualquier color
       // conservando sus sombras y su tejido. El logo se imprime en zonas definidas
-      // sobre la foto. Lo que la foto no muestra (otras opciones, colores por zona,
-      // logos de espalda o nuca) se sigue viendo en 3D.
-      // options: opciones de la prenda que coinciden con la foto.
+      // sobre la foto. Lo que las fotos no muestran (otras opciones, colores por zona,
+      // la espalda y el giro) se sigue viendo en 3D.
+      // options: opciones de la prenda que coinciden con las fotos.
+      // views: foto de cada vista; mirror usa la de otra vista volteada.
       // cmPerImage: ancho real en cm que cubre la imagen completa (escala del logo).
-      // logos: centro de cada ubicación, en fracción de la imagen.
+      // logos: centro de cada ubicación visible en esa vista, en fracción de la imagen.
       const PHOTO_VIEWS = {
         camiseta: {
-          src: '/assets/images/studio/camiseta_frente.jpg',
           options: { corte: 'hombre', cuello: 'redondo', manga: 'corta', bolsillos: 'ninguno' },
-          cmPerImage: 101.5,
-          logos: {
-            pechoIzq: { x: 0.61, y: 0.285 },
-            pechoDer: { x: 0.385, y: 0.285 },
-            pechoCentro: { x: 0.497, y: 0.337 },
-            mangaIzq: { x: 0.804, y: 0.32 },
-            mangaDer: { x: 0.192, y: 0.32 }
+          views: {
+            front: {
+              src: '/assets/images/studio/camiseta_frente.jpg',
+              cmPerImage: 101.5,
+              logos: {
+                pechoIzq: { x: 0.61, y: 0.285 },
+                pechoDer: { x: 0.385, y: 0.285 },
+                pechoCentro: { x: 0.497, y: 0.337 },
+                mangaIzq: { x: 0.804, y: 0.32 },
+                mangaDer: { x: 0.192, y: 0.32 }
+              }
+            },
+            // La cámara de "Lado der." ve el costado izquierdo de quien la usa.
+            right: {
+              src: '/assets/images/studio/camiseta_lado.jpg',
+              cmPerImage: 58,
+              logos: { mangaIzq: { x: 0.555, y: 0.265 } }
+            },
+            left: { mirror: 'right', logos: { mangaDer: { x: 0.445, y: 0.265 } } }
           }
         }
       };
@@ -4644,6 +4656,7 @@
       let photoShown = false;
       let photoSig = '';
       let photoTint = null;
+      let photosLoaded = false;
 
       const photoCanvas = document.createElement('canvas');
       photoCanvas.className = 'studio-photo';
@@ -4716,7 +4729,7 @@
         return { w, h, shade, alpha };
       }
 
-      function tintPhoto(st, hex) {
+      function tintPhoto(st, hex, tintKey) {
         photoBase.width = photoShade.width = st.w;
         photoBase.height = photoShade.height = st.h;
         const col = new THREE.Color(hex);
@@ -4743,14 +4756,15 @@
         }
         ctx.putImageData(out, 0, 0);
         sCtx.putImageData(sImg, 0, 0);
-        photoTint = hex;
+        photoTint = tintKey;
       }
 
       // Logo "impreso": lleva encima las sombras y el tejido de la foto.
-      function drawPhotoLogo(ctx, st, spec, logo) {
-        const zone = spec.logos[logo.placement];
+      function drawPhotoLogo(ctx, photo, logo) {
+        const { st, view, cmPerImage, mirror } = photo;
+        const zone = view.logos[logo.placement];
         if (!zone) return;
-        const dw = Math.round(logo.sizeCm / spec.cmPerImage * st.w);
+        const dw = Math.round(logo.sizeCm / cmPerImage * st.w);
         const dh = Math.round(dw / logo.aspect);
         if (dw < 1 || dh < 1) return;
         const x = Math.round(zone.x * st.w - dw / 2);
@@ -4762,7 +4776,7 @@
         t.imageSmoothingQuality = 'high';
         t.drawImage(logo.texture.image, 0, 0, dw, dh);
         t.globalCompositeOperation = 'multiply';
-        t.drawImage(photoShade, x, y, dw, dh, 0, 0, dw, dh);
+        t.drawImage(photoShade, mirror ? st.w - x - dw : x, y, dw, dh, 0, 0, dw, dh);
         t.globalCompositeOperation = 'destination-in';
         t.drawImage(logo.texture.image, 0, 0, dw, dh);
         // Solo sobre la prenda: un logo grande no se sale al fondo.
@@ -4771,34 +4785,61 @@
         ctx.globalCompositeOperation = 'source-over';
       }
 
-      function composePhoto(st, spec) {
+      // Foto de una vista de la prenda, o null si esa vista no tiene foto.
+      function photoFor(key, viewName) {
+        const spec = PHOTO_VIEWS[key];
+        const view = spec && spec.views[viewName];
+        if (!view) return null;
+        const source = view.mirror || viewName;
+        return {
+          view,
+          source,
+          mirror: !!view.mirror,
+          cmPerImage: spec.views[source].cmPerImage,
+          st: (photoState[key] || {})[source]
+        };
+      }
+
+      function composePhoto(photo) {
+        const { st, source, mirror } = photo;
         const hex = resolveColor(colorKey).hex;
-        if (hex !== photoTint) tintPhoto(st, hex);
+        const tintKey = `${garment.key}-${source}-${hex}`;
+        if (tintKey !== photoTint) tintPhoto(st, hex, tintKey);
         photoCanvas.width = st.w;
         photoCanvas.height = st.h;
         const ctx = photoCanvas.getContext('2d');
+        ctx.save();
+        if (mirror) {
+          ctx.translate(st.w, 0);
+          ctx.scale(-1, 1);
+        }
         ctx.drawImage(photoBase, 0, 0);
-        logos.forEach(l => drawPhotoLogo(ctx, st, spec, l));
+        ctx.restore();
+        logos.forEach(l => drawPhotoLogo(ctx, photo, l));
       }
 
       // Las fotos se cargan de una vez: la imagen de las tarjetas del admin las necesita.
-      const photosReady = Promise.all(Object.keys(PHOTO_VIEWS).map(key => new Promise(resolve => {
-        const img = new Image();
-        img.onload = () => {
-          photoState[key] = preparePhoto(img);
-          resolve();
-        };
-        img.onerror = () => {
-          photoState[key] = null;
-          resolve();
-        };
-        img.src = PHOTO_VIEWS[key].src;
-      })));
+      const photoLoads = [];
+      Object.keys(PHOTO_VIEWS).forEach(key => {
+        photoState[key] = {};
+        Object.entries(PHOTO_VIEWS[key].views).filter(([, view]) => view.src).forEach(([name, view]) => {
+          photoLoads.push(new Promise(resolve => {
+            const img = new Image();
+            img.onload = () => {
+              photoState[key][name] = preparePhoto(img);
+              resolve();
+            };
+            img.onerror = resolve;
+            img.src = view.src;
+          }));
+        });
+      });
+      const photosReady = Promise.all(photoLoads).then(() => { photosLoaded = true; });
 
-      // ¿La prenda, con sus opciones y colores por zona actuales, es la de la foto?
+      // ¿La prenda, con sus opciones y colores por zona actuales, es la de las fotos?
       function photoMatches(key, cfg) {
         const spec = PHOTO_VIEWS[key];
-        if (!spec || photoState[key] === null) return false;
+        if (!spec) return false;
         const opts = (cfg && cfg.options) || {};
         return Object.keys(spec.options).every(k => opts[k] === spec.options[k])
           && !Object.values(zoneColors).some(Boolean);
@@ -4807,13 +4848,12 @@
       // Se llama en cada cuadro. Devuelve true si la foto está a la vista (o por llegar).
       function updatePhotoView() {
         const key = garment.key;
-        const front = activeView === 'front' && !viewAnim && !controls.autoRotate;
-        const wanted = front && photoMatches(key, garment.cfg);
-        const st = wanted ? photoState[key] : null;
-        if (st) {
-          const sig = JSON.stringify([key, colorKey, logos.map(l => [l.id, l.placement, l.sizeCm])]);
+        const photo = !controls.autoRotate && photoMatches(key, garment.cfg) ? photoFor(key, activeView) : null;
+        const wanted = !!photo && (!!photo.st || !photosLoaded);
+        if (photo && photo.st) {
+          const sig = JSON.stringify([key, activeView, colorKey, logos.map(l => [l.id, l.placement, l.sizeCm])]);
           if (sig !== photoSig) {
-            composePhoto(st, PHOTO_VIEWS[key]);
+            composePhoto(photo);
             photoSig = sig;
           }
         }
@@ -4822,7 +4862,7 @@
           viewer.classList.toggle('photo-on', wanted);
           badgeText.textContent = wanted ? 'Foto de producto' : 'Vista 3D · 360°';
         }
-        photoCanvas.classList.toggle('visible', !!st);
+        photoCanvas.classList.toggle('visible', !!(photo && photo.st));
         return wanted;
       }
 
@@ -5950,9 +5990,10 @@
         });
         syncZoneMaterials();
         // La prenda con foto usa la misma foto en la imagen de las tarjetas.
-        if (photoMatches(key, cfg) && photoState[key]) {
-          const st = photoState[key];
-          tintPhoto(st, c.hex);
+        const frontPhoto = photoFor(key, 'front');
+        if (photoMatches(key, cfg) && frontPhoto && frontPhoto.st) {
+          const st = frontPhoto.st;
+          tintPhoto(st, c.hex, null);
           photoSig = '';
           const out = document.createElement('canvas');
           out.width = out.height = 400;
