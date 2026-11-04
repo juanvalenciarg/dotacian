@@ -1798,8 +1798,8 @@
       musloIzq: { label: 'Muslo izquierdo', short: 'Muslo izq.', side: 'front' },
       nuca: { label: 'Nuca', short: 'Nuca', side: 'back' },
       // Mangas: la izquierda de quien la usa queda a la derecha vista de frente (+x).
-      mangaIzq: { label: 'Manga izquierda', short: 'Manga izq.', side: 'right' },
-      mangaDer: { label: 'Manga derecha', short: 'Manga der.', side: 'left' }
+      mangaIzq: { label: 'Manga izquierda', short: 'Manga izq.', side: 'left' },
+      mangaDer: { label: 'Manga derecha', short: 'Manga der.', side: 'right' }
     };
 
     const MAX_LOGOS = 5;
@@ -1823,7 +1823,8 @@
     const MAX_LOGO_BYTES = 5 * 1024 * 1024;
 
     // Ángulo de la cámara (azimut) para cada vista fija.
-    const VIEW_ANGLES = { front: 0, right: Math.PI / 2, back: Math.PI, left: -Math.PI / 2 };
+    // Lado der. / izq.: el costado de quien usa la prenda.
+    const VIEW_ANGLES = { front: 0, right: -Math.PI / 2, back: Math.PI, left: Math.PI / 2 };
 
     // ?embed=1&prenda=<clave>: vista previa de una prenda (DS Hub del admin).
     const URL_PARAMS = new URLSearchParams(window.location.search);
@@ -4621,10 +4622,10 @@
       // --- Foto de producto ---
       // Prendas con foto: se recorta del fondo blanco y se tiñe de cualquier color
       // conservando sus sombras y su tejido. El logo se imprime en zonas definidas
-      // sobre la foto. Lo que las fotos no muestran (otras opciones, colores por zona,
-      // la espalda y el giro) se sigue viendo en 3D.
+      // sobre la foto. Lo que las fotos no muestran (otras opciones, colores por zona
+      // y el giro) se sigue viendo en 3D.
       // options: opciones de la prenda que coinciden con las fotos.
-      // views: foto de cada vista; mirror usa la de otra vista volteada.
+      // views: foto de cada vista.
       // cmPerImage: ancho real en cm que cubre la imagen completa (escala del logo).
       // logos: centro de cada ubicación visible en esa vista, en fracción de la imagen.
       const PHOTO_VIEWS = {
@@ -4642,13 +4643,22 @@
                 mangaDer: { x: 0.192, y: 0.32 }
               }
             },
-            // La cámara de "Lado der." ve el costado izquierdo de quien la usa.
             right: {
-              src: '/assets/images/studio/camiseta_lado.jpg',
+              src: '/assets/images/studio/camiseta_lado_der.jpg',
+              cmPerImage: 49.4,
+              logos: { mangaDer: { x: 0.44, y: 0.26 } }
+            },
+            back: {
+              src: '/assets/images/studio/camiseta_espalda.jpg',
+              cmPerImage: 101,
+              bgMin: 226, // fondo y tela muy parecidos: se recorta con más cuidado
+              logos: { espalda: { x: 0.5, y: 0.366 }, nuca: { x: 0.5, y: 0.154 } }
+            },
+            left: {
+              src: '/assets/images/studio/camiseta_lado_izq.jpg',
               cmPerImage: 58,
               logos: { mangaIzq: { x: 0.555, y: 0.265 } }
-            },
-            left: { mirror: 'right', logos: { mangaDer: { x: 0.445, y: 0.265 } } }
+            }
           }
         }
       };
@@ -4668,7 +4678,7 @@
 
       // Separa la prenda del fondo (claro, sin color y tocando el borde de la imagen)
       // y guarda la sombra de cada pixel respecto al tono típico de la tela.
-      function preparePhoto(img) {
+      function preparePhoto(img, bgMin = 212) {
         const w = img.naturalWidth, h = img.naturalHeight, n = w * h;
         const c = document.createElement('canvas');
         c.width = w;
@@ -4681,7 +4691,7 @@
         const bg = new Uint8Array(n);
         const stack = [];
         const push = i => {
-          if (!bg[i] && lum[i] > 212) {
+          if (!bg[i] && lum[i] > bgMin) {
             bg[i] = 1;
             stack.push(i);
           }
@@ -4761,10 +4771,10 @@
 
       // Logo "impreso": lleva encima las sombras y el tejido de la foto.
       function drawPhotoLogo(ctx, photo, logo) {
-        const { st, view, cmPerImage, mirror } = photo;
+        const { st, view } = photo;
         const zone = view.logos[logo.placement];
         if (!zone) return;
-        const dw = Math.round(logo.sizeCm / cmPerImage * st.w);
+        const dw = Math.round(logo.sizeCm / view.cmPerImage * st.w);
         const dh = Math.round(dw / logo.aspect);
         if (dw < 1 || dh < 1) return;
         const x = Math.round(zone.x * st.w - dw / 2);
@@ -4776,7 +4786,7 @@
         t.imageSmoothingQuality = 'high';
         t.drawImage(logo.texture.image, 0, 0, dw, dh);
         t.globalCompositeOperation = 'multiply';
-        t.drawImage(photoShade, mirror ? st.w - x - dw : x, y, dw, dh, 0, 0, dw, dh);
+        t.drawImage(photoShade, x, y, dw, dh, 0, 0, dw, dh);
         t.globalCompositeOperation = 'destination-in';
         t.drawImage(logo.texture.image, 0, 0, dw, dh);
         // Solo sobre la prenda: un logo grande no se sale al fondo.
@@ -4790,31 +4800,18 @@
         const spec = PHOTO_VIEWS[key];
         const view = spec && spec.views[viewName];
         if (!view) return null;
-        const source = view.mirror || viewName;
-        return {
-          view,
-          source,
-          mirror: !!view.mirror,
-          cmPerImage: spec.views[source].cmPerImage,
-          st: (photoState[key] || {})[source]
-        };
+        return { view, viewName, st: (photoState[key] || {})[viewName] };
       }
 
       function composePhoto(photo) {
-        const { st, source, mirror } = photo;
+        const { st, viewName } = photo;
         const hex = resolveColor(colorKey).hex;
-        const tintKey = `${garment.key}-${source}-${hex}`;
+        const tintKey = `${garment.key}-${viewName}-${hex}`;
         if (tintKey !== photoTint) tintPhoto(st, hex, tintKey);
         photoCanvas.width = st.w;
         photoCanvas.height = st.h;
         const ctx = photoCanvas.getContext('2d');
-        ctx.save();
-        if (mirror) {
-          ctx.translate(st.w, 0);
-          ctx.scale(-1, 1);
-        }
         ctx.drawImage(photoBase, 0, 0);
-        ctx.restore();
         logos.forEach(l => drawPhotoLogo(ctx, photo, l));
       }
 
@@ -4822,11 +4819,11 @@
       const photoLoads = [];
       Object.keys(PHOTO_VIEWS).forEach(key => {
         photoState[key] = {};
-        Object.entries(PHOTO_VIEWS[key].views).filter(([, view]) => view.src).forEach(([name, view]) => {
+        Object.entries(PHOTO_VIEWS[key].views).forEach(([name, view]) => {
           photoLoads.push(new Promise(resolve => {
             const img = new Image();
             img.onload = () => {
-              photoState[key][name] = preparePhoto(img);
+              photoState[key][name] = preparePhoto(img, view.bgMin);
               resolve();
             };
             img.onerror = resolve;
