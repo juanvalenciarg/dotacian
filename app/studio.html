@@ -1872,6 +1872,7 @@
           labels: { manga: { larga: 'Larga' } },
           defaults: { cuello: 'redondo', manga: 'corta', cierre: 'ninguno', bolsillos: 'ninguno' },
           zoneDefaults: {},
+          zones: [], // sin detalles en contraste
           neckDip: { redondo: 0.13, enV: 0.03 },
           neckOval: { redondo: { w: 0.16, dip: 0.13, back: 0.012, start: 4.6 } },
           vNeck: { enV: 0.16 },
@@ -2586,6 +2587,7 @@
       meta: 'Personalizable · Manga larga · Cuello redondo o en V',
       configurable: {
         ...GARMENTS.camiseta.configurable,
+        zones: null,
         choices: { ...GARMENTS.camiseta.configurable.choices, manga: ['larga'] },
         defaults: { ...GARMENTS.camiseta.configurable.defaults, manga: 'larga' }
       },
@@ -4650,9 +4652,9 @@
             },
             back: {
               src: '/assets/images/studio/camiseta_espalda.jpg',
-              cmPerImage: 101,
-              bgMin: 226, // fondo y tela muy parecidos: se recorta con más cuidado
-              logos: { espalda: { x: 0.5, y: 0.366 }, nuca: { x: 0.5, y: 0.154 } }
+              cmPerImage: 95,
+              bgMin: 240, // el hombro iluminado es casi tan claro como el fondo
+              logos: { espalda: { x: 0.5, y: 0.352 }, nuca: { x: 0.5, y: 0.153 } }
             },
             left: {
               src: '/assets/images/studio/camiseta_lado_izq.jpg',
