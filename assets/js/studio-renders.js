@@ -4,7 +4,7 @@
 // navegador no soporta tantos visores). Las fotos se guardan en sessionStorage.
 (function () {
   // Cambia este valor cuando cambien los modelos 3D para regenerar las imágenes.
-  const RENDER_VERSION = '7';
+  const RENDER_VERSION = '8';
   const cache = {};
   let frame = null;
   let studioPromise = null;
@@ -74,6 +74,7 @@
       const again = readCache(key, color, opts);
       if (again) return again;
       const studio = await loadStudio();
+      await studio.ready;
       const url = studio.snapshot(key, color, opts);
       if (url) writeCache(key, color, url, opts);
       await new Promise(r => setTimeout(r, 20));

@@ -222,6 +222,42 @@
       cursor: grabbing;
     }
 
+    /* Foto de producto: reemplaza al visor 3D en las prendas que la tienen. */
+    .studio-viewer canvas.studio-photo {
+      position: absolute;
+      top: 3%;
+      left: 0;
+      height: 94%;
+      object-fit: contain;
+      cursor: default;
+      touch-action: auto;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s;
+      filter: drop-shadow(0 12px 14px rgba(15, 23, 42, 0.16));
+    }
+
+    .studio-viewer canvas.studio-photo.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .studio-viewer.photo-on canvas:not(.studio-photo) {
+      opacity: 0;
+    }
+
+    .studio-viewer.photo-on .studio-toolbar,
+    .studio-viewer.photo-on .studio-hint {
+      display: none;
+    }
+
+    @media (max-width: 640px) {
+      .studio-viewer canvas.studio-photo {
+        top: 3rem;
+        height: calc(100% - 3.5rem);
+      }
+    }
+
     .studio-badge {
       position: absolute;
       top: 1rem;
@@ -1308,7 +1344,7 @@
           <div class="studio-viewer" id="studioViewer">
             <div class="studio-badge">
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"></path><polyline points="21 3 21 9 15 9"></polyline></svg>
-              Vista 3D · 360°
+              <span id="studioBadgeText">Vista 3D · 360°</span>
             </div>
             <div class="studio-hint" id="studioHint">Arrastra para girar la prenda</div>
             <div class="studio-toolbar">
@@ -4532,9 +4568,11 @@
 
       // --- Vistas y giro ---
       let viewAnim = null;
+      let activeView = 'front';
       const viewButtons = document.querySelectorAll('.studio-view-btn');
 
       function setActiveView(name) {
+        activeView = name;
         viewButtons.forEach(b => b.classList.toggle('active', b.dataset.view === name));
       }
 
@@ -4580,6 +4618,214 @@
         camera.position.z = controls.target.z + Math.cos(angle) * radius;
       }
 
+      // --- Foto de producto ---
+      // Prendas con foto: se recorta del fondo blanco y se tiñe de cualquier color
+      // conservando sus sombras y su tejido. El logo se imprime en zonas definidas
+      // sobre la foto. Lo que la foto no muestra (otras opciones, colores por zona,
+      // logos de espalda o nuca) se sigue viendo en 3D.
+      // options: opciones de la prenda que coinciden con la foto.
+      // cmPerImage: ancho real en cm que cubre la imagen completa (escala del logo).
+      // logos: centro de cada ubicación, en fracción de la imagen.
+      const PHOTO_VIEWS = {
+        camiseta: {
+          src: '/assets/images/studio/camiseta_frente.jpg',
+          options: { corte: 'hombre', cuello: 'redondo', manga: 'corta', bolsillos: 'ninguno' },
+          cmPerImage: 101.5,
+          logos: {
+            pechoIzq: { x: 0.61, y: 0.285 },
+            pechoDer: { x: 0.385, y: 0.285 },
+            pechoCentro: { x: 0.497, y: 0.337 },
+            mangaIzq: { x: 0.804, y: 0.32 },
+            mangaDer: { x: 0.192, y: 0.32 }
+          }
+        }
+      };
+      const photoState = {};
+      let photoShown = false;
+      let photoSig = '';
+      let photoTint = null;
+
+      const photoCanvas = document.createElement('canvas');
+      photoCanvas.className = 'studio-photo';
+      photoCanvas.setAttribute('aria-hidden', 'true');
+      renderer.domElement.after(photoCanvas);
+      const photoBase = document.createElement('canvas');
+      const photoShade = document.createElement('canvas');
+      const badgeText = document.getElementById('studioBadgeText');
+
+      // Separa la prenda del fondo (claro, sin color y tocando el borde de la imagen)
+      // y guarda la sombra de cada pixel respecto al tono típico de la tela.
+      function preparePhoto(img) {
+        const w = img.naturalWidth, h = img.naturalHeight, n = w * h;
+        const c = document.createElement('canvas');
+        c.width = w;
+        c.height = h;
+        const ctx = c.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0);
+        const d = ctx.getImageData(0, 0, w, h).data;
+        const lum = new Float32Array(n);
+        for (let i = 0; i < n; i++) lum[i] = 0.3 * d[i * 4] + 0.59 * d[i * 4 + 1] + 0.11 * d[i * 4 + 2];
+        const bg = new Uint8Array(n);
+        const stack = [];
+        const push = i => {
+          if (!bg[i] && lum[i] > 212) {
+            bg[i] = 1;
+            stack.push(i);
+          }
+        };
+        for (let x = 0; x < w; x++) {
+          push(x);
+          push(n - 1 - x);
+        }
+        for (let y = 0; y < h; y++) {
+          push(y * w);
+          push(y * w + w - 1);
+        }
+        while (stack.length) {
+          const i = stack.pop();
+          const x = i % w;
+          if (x > 0) push(i - 1);
+          if (x < w - 1) push(i + 1);
+          if (i >= w) push(i - w);
+          if (i < n - w) push(i + w);
+        }
+        // Borde suave y un poco hacia adentro, para que no quede halo del fondo.
+        const alpha = new Uint8ClampedArray(n);
+        for (let y = 1; y < h - 1; y++) {
+          for (let x = 1; x < w - 1; x++) {
+            const i = y * w + x;
+            let sum = 0;
+            for (let dy = -1; dy <= 1; dy++) {
+              for (let dx = -1; dx <= 1; dx++) sum += bg[i + dy * w + dx] ? 0 : 1;
+            }
+            alpha[i] = sum < 5 ? 0 : (sum - 5) / 4 * 255;
+          }
+        }
+        const hist = new Uint32Array(256);
+        let count = 0;
+        for (let i = 0; i < n; i++) {
+          if (!bg[i]) {
+            hist[lum[i] | 0]++;
+            count++;
+          }
+        }
+        let ref = 0;
+        for (let acc = 0; ref < 255 && acc < count / 2; ref++) acc += hist[ref];
+        const shade = new Float32Array(n);
+        for (let i = 0; i < n; i++) shade[i] = lum[i] / (ref || 1);
+        return { w, h, shade, alpha };
+      }
+
+      function tintPhoto(st, hex) {
+        photoBase.width = photoShade.width = st.w;
+        photoBase.height = photoShade.height = st.h;
+        const col = new THREE.Color(hex);
+        const toByte = v => Math.pow(v, 1 / 2.2) * 255;
+        const r = toByte(col.r), g = toByte(col.g), b = toByte(col.b);
+        // En telas oscuras la multiplicación borra los pliegues: se les devuelve contraste.
+        const boost = 40 * (1 - (0.3 * r + 0.59 * g + 0.11 * b) / 255);
+        const ctx = photoBase.getContext('2d');
+        const out = ctx.createImageData(st.w, st.h);
+        const px = out.data;
+        const sCtx = photoShade.getContext('2d');
+        const sImg = sCtx.createImageData(st.w, st.h);
+        for (let i = 0; i < st.w * st.h; i++) {
+          const s = st.shade[i];
+          const m = 0.94 * (s < 1 ? s : 1 + (s - 1) * 0.55);
+          const add = (s - 1) * boost;
+          px[i * 4] = r * m + add;
+          px[i * 4 + 1] = g * m + add;
+          px[i * 4 + 2] = b * m + add;
+          px[i * 4 + 3] = st.alpha[i];
+          const v = Math.min(1, s * 0.97) * 255;
+          sImg.data[i * 4] = sImg.data[i * 4 + 1] = sImg.data[i * 4 + 2] = v;
+          sImg.data[i * 4 + 3] = 255;
+        }
+        ctx.putImageData(out, 0, 0);
+        sCtx.putImageData(sImg, 0, 0);
+        photoTint = hex;
+      }
+
+      // Logo "impreso": lleva encima las sombras y el tejido de la foto.
+      function drawPhotoLogo(ctx, st, spec, logo) {
+        const zone = spec.logos[logo.placement];
+        if (!zone) return;
+        const dw = Math.round(logo.sizeCm / spec.cmPerImage * st.w);
+        const dh = Math.round(dw / logo.aspect);
+        if (dw < 1 || dh < 1) return;
+        const x = Math.round(zone.x * st.w - dw / 2);
+        const y = Math.round(zone.y * st.h - dh / 2);
+        const tmp = document.createElement('canvas');
+        tmp.width = dw;
+        tmp.height = dh;
+        const t = tmp.getContext('2d');
+        t.imageSmoothingQuality = 'high';
+        t.drawImage(logo.texture.image, 0, 0, dw, dh);
+        t.globalCompositeOperation = 'multiply';
+        t.drawImage(photoShade, x, y, dw, dh, 0, 0, dw, dh);
+        t.globalCompositeOperation = 'destination-in';
+        t.drawImage(logo.texture.image, 0, 0, dw, dh);
+        // Solo sobre la prenda: un logo grande no se sale al fondo.
+        ctx.globalCompositeOperation = 'source-atop';
+        ctx.drawImage(tmp, x, y);
+        ctx.globalCompositeOperation = 'source-over';
+      }
+
+      function composePhoto(st, spec) {
+        const hex = resolveColor(colorKey).hex;
+        if (hex !== photoTint) tintPhoto(st, hex);
+        photoCanvas.width = st.w;
+        photoCanvas.height = st.h;
+        const ctx = photoCanvas.getContext('2d');
+        ctx.drawImage(photoBase, 0, 0);
+        logos.forEach(l => drawPhotoLogo(ctx, st, spec, l));
+      }
+
+      // Las fotos se cargan de una vez: la imagen de las tarjetas del admin las necesita.
+      const photosReady = Promise.all(Object.keys(PHOTO_VIEWS).map(key => new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => {
+          photoState[key] = preparePhoto(img);
+          resolve();
+        };
+        img.onerror = () => {
+          photoState[key] = null;
+          resolve();
+        };
+        img.src = PHOTO_VIEWS[key].src;
+      })));
+
+      // ¿La prenda, con sus opciones y colores por zona actuales, es la de la foto?
+      function photoMatches(key, cfg) {
+        const spec = PHOTO_VIEWS[key];
+        if (!spec || photoState[key] === null) return false;
+        const opts = (cfg && cfg.options) || {};
+        return Object.keys(spec.options).every(k => opts[k] === spec.options[k])
+          && !Object.values(zoneColors).some(Boolean);
+      }
+
+      // Se llama en cada cuadro. Devuelve true si la foto está a la vista (o por llegar).
+      function updatePhotoView() {
+        const key = garment.key;
+        const front = activeView === 'front' && !viewAnim && !controls.autoRotate;
+        const wanted = front && photoMatches(key, garment.cfg);
+        const st = wanted ? photoState[key] : null;
+        if (st) {
+          const sig = JSON.stringify([key, colorKey, logos.map(l => [l.id, l.placement, l.sizeCm])]);
+          if (sig !== photoSig) {
+            composePhoto(st, PHOTO_VIEWS[key]);
+            photoSig = sig;
+          }
+        }
+        if (wanted !== photoShown) {
+          photoShown = wanted;
+          viewer.classList.toggle('photo-on', wanted);
+          badgeText.textContent = wanted ? 'Foto de producto' : 'Vista 3D · 360°';
+        }
+        photoCanvas.classList.toggle('visible', !!st);
+        return wanted;
+      }
+
       function tick(now) {
         if (viewAnim) {
           const k = Math.min(1, (now - viewAnim.start) / viewAnim.duration);
@@ -4594,7 +4840,8 @@
         syncZoneMaterials();
         controls.update();
         aimLights();
-        renderer.render(scene, camera);
+        // Con la foto a la vista no hace falta dibujar el 3D que queda debajo.
+        if (!updatePhotoView()) renderer.render(scene, camera);
         requestAnimationFrame(tick);
       }
       requestAnimationFrame(tick);
@@ -5702,13 +5949,25 @@
           if (z in zoneColors && resolveColor(zoneSource[z])) zoneColors[z] = zoneSource[z];
         });
         syncZoneMaterials();
+        // La prenda con foto usa la misma foto en la imagen de las tarjetas.
+        if (photoMatches(key, cfg) && photoState[key]) {
+          const st = photoState[key];
+          tintPhoto(st, c.hex);
+          photoSig = '';
+          const out = document.createElement('canvas');
+          out.width = out.height = 400;
+          const k = Math.min(400 / st.w, 400 / st.h);
+          const ctx = out.getContext('2d');
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(photoBase, (400 - st.w * k) / 2, (400 - st.h * k) / 2, st.w * k, st.h * k);
+          return out.toDataURL('image/png');
+        }
         viewAnim = null;
         controls.autoRotate = false;
-        // Vista 3/4 para que se lean mangas, cuello y volumen.
-        const azimuth = -0.5;
-        controls.target.set(0, -0.16, 0);
+        // Misma vista de frente que abre el Studio, para que la imagen coincida.
+        controls.target.set(0, -0.14, 0);
         const dist = (GARMENTS[key].cameraDistance || 3.5) * 0.94;
-        camera.position.set(Math.sin(azimuth) * dist, 0.12, Math.cos(azimuth) * dist);
+        camera.position.set(0, 0, dist);
         camera.lookAt(controls.target);
         controls.update();
         aimLights();
@@ -5738,7 +5997,7 @@
         return out.toDataURL('image/png');
       }
 
-      window.dotacianStudio = { scene, camera, controls, shirt, fabric, logos, setGarment, garment, snapshot };
+      window.dotacianStudio = { scene, camera, controls, shirt, fabric, logos, setGarment, garment, snapshot, ready: photosReady };
     }
 
     if (!webglAvailable()) {
