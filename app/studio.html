@@ -884,10 +884,29 @@
       overflow: hidden;
     }
 
-    .studio-design-logo {
-      max-width: 70%;
-      max-height: 70%;
+    .studio-design-preview img {
+      width: 100%;
+      height: 100%;
       object-fit: contain;
+    }
+
+    .ds-render-loading {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid #CBD5E1;
+      border-top-color: var(--color-cyan);
+      animation: studio-render-spin 0.9s linear infinite;
+    }
+
+    @keyframes studio-render-spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .ds-render-missing {
+      font-size: 0.65rem;
+      color: #94A3B8;
+      text-align: center;
     }
 
     .studio-design-info {
@@ -4626,12 +4645,42 @@
       // conservando sus sombras y su tejido. El logo se imprime en zonas definidas
       // sobre la foto. Lo que las fotos no muestran (otras opciones, colores por zona
       // y el giro) se sigue viendo en 3D.
-      // options: opciones de la prenda que coinciden con las fotos.
+      // garment y options: prenda y opciones que coinciden con las fotos.
       // views: foto de cada vista.
       // cmPerImage: ancho real en cm que cubre la imagen completa (escala del logo).
       // logos: centro de cada ubicación visible en esa vista, en fracción de la imagen.
       const PHOTO_VIEWS = {
+        camisetaMujer: {
+          garment: 'camiseta',
+          options: { corte: 'mujer', cuello: 'redondo', manga: 'corta', bolsillos: 'ninguno' },
+          views: {
+            front: {
+              src: '/assets/images/studio/camiseta_mujer_frente.jpg',
+              cmPerImage: 88.7,
+              logos: {
+                pechoIzq: { x: 0.628, y: 0.292 },
+                pechoDer: { x: 0.415, y: 0.292 },
+                pechoCentro: { x: 0.521, y: 0.35 },
+                mangaIzq: { x: 0.825, y: 0.265 },
+                mangaDer: { x: 0.218, y: 0.275 }
+              }
+            },
+            back: {
+              src: '/assets/images/studio/camiseta_mujer_espalda.jpg',
+              cmPerImage: 88.5,
+              bgMin: 240,
+              logos: { espalda: { x: 0.522, y: 0.36 }, nuca: { x: 0.522, y: 0.154 } }
+            },
+            left: {
+              src: '/assets/images/studio/camiseta_mujer_lado_izq.jpg',
+              cmPerImage: 80.7,
+              bgMin: 240,
+              logos: { mangaIzq: { x: 0.54, y: 0.224 } }
+            }
+          }
+        },
         camiseta: {
+          garment: 'camiseta',
           options: { corte: 'hombre', cuello: 'redondo', manga: 'corta', bolsillos: 'ninguno' },
           views: {
             front: {
@@ -4762,7 +4811,8 @@
           px[i * 4 + 1] = g * m + add;
           px[i * 4 + 2] = b * m + add;
           px[i * 4 + 3] = st.alpha[i];
-          const v = Math.min(1, s * 0.97) * 255;
+          // Suave: el jaspeado no debe verse como un estampado gastado.
+          const v = Math.min(1, 0.5 + s * 0.47) * 255;
           sImg.data[i * 4] = sImg.data[i * 4 + 1] = sImg.data[i * 4 + 2] = v;
           sImg.data[i * 4 + 3] = 255;
         }
@@ -4798,17 +4848,17 @@
       }
 
       // Foto de una vista de la prenda, o null si esa vista no tiene foto.
-      function photoFor(key, viewName) {
-        const spec = PHOTO_VIEWS[key];
+      function photoFor(specId, viewName) {
+        const spec = PHOTO_VIEWS[specId];
         const view = spec && spec.views[viewName];
         if (!view) return null;
-        return { view, viewName, st: (photoState[key] || {})[viewName] };
+        return { view, tintId: `${specId}-${viewName}`, st: (photoState[specId] || {})[viewName] };
       }
 
       function composePhoto(photo) {
-        const { st, viewName } = photo;
+        const { st, tintId } = photo;
         const hex = resolveColor(colorKey).hex;
-        const tintKey = `${garment.key}-${viewName}-${hex}`;
+        const tintKey = `${tintId}-${hex}`;
         if (tintKey !== photoTint) tintPhoto(st, hex, tintKey);
         photoCanvas.width = st.w;
         photoCanvas.height = st.h;
@@ -4835,22 +4885,22 @@
       });
       const photosReady = Promise.all(photoLoads).then(() => { photosLoaded = true; });
 
-      // ¿La prenda, con sus opciones y colores por zona actuales, es la de las fotos?
-      function photoMatches(key, cfg) {
-        const spec = PHOTO_VIEWS[key];
-        if (!spec) return false;
+      // Fotos que corresponden a la prenda, con sus opciones y colores por zona actuales.
+      function photoSpecFor(key, cfg) {
         const opts = (cfg && cfg.options) || {};
-        return Object.keys(spec.options).every(k => opts[k] === spec.options[k])
-          && !Object.values(zoneColors).some(Boolean);
+        if (Object.values(zoneColors).some(Boolean)) return null;
+        return Object.keys(PHOTO_VIEWS).find(id => PHOTO_VIEWS[id].garment === key
+          && Object.keys(PHOTO_VIEWS[id].options).every(k => opts[k] === PHOTO_VIEWS[id].options[k])) || null;
       }
 
       // Se llama en cada cuadro. Devuelve true si la foto está a la vista (o por llegar).
       function updatePhotoView() {
         const key = garment.key;
-        const photo = !controls.autoRotate && photoMatches(key, garment.cfg) ? photoFor(key, activeView) : null;
+        const specId = controls.autoRotate ? null : photoSpecFor(key, garment.cfg);
+        const photo = specId ? photoFor(specId, activeView) : null;
         const wanted = !!photo && (!!photo.st || !photosLoaded);
         if (photo && photo.st) {
-          const sig = JSON.stringify([key, activeView, colorKey, logos.map(l => [l.id, l.placement, l.sizeCm])]);
+          const sig = JSON.stringify([specId, activeView, colorKey, logos.map(l => [l.id, l.placement, l.sizeCm])]);
           if (sig !== photoSig) {
             composePhoto(photo);
             photoSig = sig;
@@ -5602,23 +5652,11 @@
           return;
         }
 
-        // Miniaturas de los logos con enlaces temporales (el bucket es privado).
-        const paths = designs.map(d => d.logo_path).filter(Boolean);
-        const thumbs = {};
-        if (paths.length) {
-          const { data } = await window._supabase.storage.from(LOGOS_BUCKET).createSignedUrls(paths, 3600);
-          (data || []).forEach(item => { if (item.signedUrl) thumbs[item.path] = item.signedUrl; });
-        }
-
         designsList.innerHTML = designs.map(d => {
-          const c = SHIRT_COLORS[d.color];
           const active = currentDesign && currentDesign.id === d.id;
-          const thumb = d.logo_path && thumbs[d.logo_path]
-            ? `<img src="${escapeHtml(thumbs[d.logo_path])}" alt="" class="studio-design-logo">`
-            : '';
           return `
             <div class="studio-design-card${active ? ' active' : ''}" data-id="${d.id}">
-              <div class="studio-design-preview" style="background: ${c ? c.hex : '#E2E8F0'};">${thumb}</div>
+              <div class="studio-design-preview"></div>
               <div class="studio-design-info">
                 <div class="studio-design-name">${escapeHtml(d.nombre)}</div>
                 <div class="studio-design-meta">${escapeHtml(designMeta(d))}</div>
@@ -5638,6 +5676,14 @@
             </div>
           `;
         }).join('');
+
+        // Imagen de la prenda de cada diseño, con su color y opciones. El visor
+        // oculto (embed) también carga esta lista: ahí no se genera nada.
+        if (EMBED || !window.DSRenders) return;
+        designs.forEach(d => {
+          const preview = designsList.querySelector(`[data-id="${d.id}"] .studio-design-preview`);
+          window.DSRenders.fillRender(preview, d.prenda, d.color, d.opciones || null);
+        });
       }
 
       async function loadRoleUsage() {
@@ -5989,8 +6035,9 @@
         });
         syncZoneMaterials();
         // La prenda con foto usa la misma foto en la imagen de las tarjetas.
-        const frontPhoto = photoFor(key, 'front');
-        if (photoMatches(key, cfg) && frontPhoto && frontPhoto.st) {
+        const specId = photoSpecFor(key, cfg);
+        const frontPhoto = specId && photoFor(specId, 'front');
+        if (frontPhoto && frontPhoto.st) {
           const st = frontPhoto.st;
           tintPhoto(st, c.hex, null);
           photoSig = '';
@@ -6058,6 +6105,7 @@
     }
   </script>
   <script src="/assets/js/utils.js?v=4"></script>
+  <script src="/assets/js/studio-renders.js"></script>
 </body>
 
 </html>
