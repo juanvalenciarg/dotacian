@@ -1080,6 +1080,22 @@
       gap: 0.4rem;
     }
 
+    /* Mover el logo un poco desde su ubicación */
+    .studio-logo-move {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.35rem;
+    }
+
+    .studio-logo-move .studio-placement {
+      font-size: 0.95rem;
+      line-height: 1;
+    }
+
+    .studio-logo-move .studio-logo-center {
+      font-size: 0.72rem;
+    }
+
     .studio-placement:disabled {
       opacity: 0.4;
       cursor: not-allowed;
@@ -5038,8 +5054,10 @@
         const dw = Math.round(logo.sizeCm / view.cmPerImage * st.w);
         const dh = Math.round(dw / logo.aspect);
         if (dw < 1 || dh < 1) return;
-        const x = Math.round(zone.x * st.w - dw / 2);
-        const y = Math.round(zone.y * st.h - dh / 2);
+        // El corrimiento usa la misma escala en cm de la foto en ambos ejes.
+        const pxPerCm = st.w / view.cmPerImage;
+        const x = Math.round(zone.x * st.w + (logo.dx || 0) * pxPerCm - dw / 2);
+        const y = Math.round(zone.y * st.h - (logo.dy || 0) * pxPerCm - dh / 2);
         const tmp = document.createElement('canvas');
         tmp.width = dw;
         tmp.height = dh;
@@ -5109,7 +5127,7 @@
         const photo = specId ? photoFor(specId, activeView) : null;
         const wanted = !!photo && (!!photo.st || !photosLoaded);
         if (photo && photo.st) {
-          const sig = JSON.stringify([specId, activeView, colorKey, logos.map(l => [l.id, l.placement, l.sizeCm])]);
+          const sig = JSON.stringify([specId, activeView, colorKey, logos.map(l => [l.id, l.placement, l.sizeCm, l.dx, l.dy])]);
           if (sig !== photoSig) {
             composePhoto(photo);
             photoSig = sig;
@@ -5200,14 +5218,19 @@
         const spot = logoSpots(garment.cfg)[logo.placement];
         if (!spot) return;
         let origin, dir, targets;
+        // Corrimiento elegido, en unidades de la escena (visto de frente al logo).
+        const mx = (logo.dx || 0) / CM_PER_UNIT;
+        const my = (logo.dy || 0) / CM_PER_UNIT;
+        const side = viewForPlacement(logo.placement);
         if (spot.sleeve) {
           // Manga: se proyecta desde el costado sobre la parte alta de la manga.
-          origin = new THREE.Vector3(spot.sleeve * 2, spot.y, 0);
+          // De lado, la derecha de la imagen es el frente (lado der.) o la espalda (lado izq.).
+          origin = new THREE.Vector3(spot.sleeve * 2, spot.y + my, side === 'left' ? -mx : mx);
           dir = new THREE.Vector3(-spot.sleeve, 0, 0);
           targets = garment.sleeveMeshes;
         } else {
           const front = LOGO_PLACEMENTS[logo.placement].side === 'front';
-          origin = new THREE.Vector3(spot.x, spot.y, front ? 2 : -2);
+          origin = new THREE.Vector3(spot.x + (front ? mx : -mx), spot.y + my, front ? 2 : -2);
           dir = new THREE.Vector3(0, 0, front ? -1 : 1);
           // El logo se proyecta sobre el torso y, si existe, sobre el bolsillo.
           targets = [garment.torsoMesh, garment.pocketMesh, ...garment.extraMeshes].filter(Boolean);
@@ -5280,6 +5303,8 @@
           }
           l.placement = key;
           l.sizeCm = spots[key].defaultCm;
+          l.dx = 0;
+          l.dy = 0;
           used.add(key);
         });
         renderLogoList();
@@ -5288,6 +5313,22 @@
         showLogoError(removed
           ? `Esta prenda tiene ${Object.keys(spots).length} ubicaciones para logo: se ${removed === 1 ? 'quitó 1 logo' : `quitaron ${removed} logos`}.`
           : '');
+      }
+
+      // Corrimiento del logo: pasos de medio centímetro, hasta 8 cm hacia cada lado.
+      const MOVE_STEP_CM = 0.5;
+      const MOVE_MAX_CM = 8;
+      function clampMove(v) {
+        const n = Number(v) || 0;
+        return Math.max(-MOVE_MAX_CM, Math.min(MOVE_MAX_CM, Math.round(n / MOVE_STEP_CM) * MOVE_STEP_CM));
+      }
+
+      function moveLabel(l) {
+        const cm = v => `${String(Math.abs(v)).replace('.', ',')} cm`;
+        const parts = [];
+        if (l.dx) parts.push(`${cm(l.dx)} ${l.dx > 0 ? 'a la derecha' : 'a la izquierda'}`);
+        if (l.dy) parts.push(`${cm(l.dy)} ${l.dy > 0 ? 'arriba' : 'abajo'}`);
+        return parts.length ? parts.join(' · ') : 'Centrado';
       }
 
       function renderLogoList() {
@@ -5308,6 +5349,14 @@
               </div>
               <div class="studio-field-label"><span>Ancho del logo</span><span data-logo-size-label="${l.id}">${l.sizeCm} cm</span></div>
               <input type="range" class="studio-range" data-logo-size="${l.id}" min="4" max="30" step="1" value="${l.sizeCm}">
+              <div class="studio-field-label"><span>Mover el logo</span><span data-logo-move-label="${l.id}">${moveLabel(l)}</span></div>
+              <div class="studio-logo-move" role="group" aria-label="Mover el logo">
+                <button type="button" class="studio-placement" data-logo-move="${l.id}" data-dx="-1" data-dy="0" title="Mover a la izquierda" aria-label="Mover a la izquierda">←</button>
+                <button type="button" class="studio-placement" data-logo-move="${l.id}" data-dx="0" data-dy="1" title="Mover hacia arriba" aria-label="Mover hacia arriba">↑</button>
+                <button type="button" class="studio-placement" data-logo-move="${l.id}" data-dx="0" data-dy="-1" title="Mover hacia abajo" aria-label="Mover hacia abajo">↓</button>
+                <button type="button" class="studio-placement" data-logo-move="${l.id}" data-dx="1" data-dy="0" title="Mover a la derecha" aria-label="Mover a la derecha">→</button>
+                <button type="button" class="studio-placement studio-logo-center" data-logo-move="${l.id}" data-center="1" title="Volver al centro de la ubicación">Centrar</button>
+              </div>
             </div>`;
         }).join('');
         const full = logos.length >= MAX_LOGOS;
@@ -5480,6 +5529,10 @@
             storedPath: opts.storedPath || null,
             placement: null,
             sizeCm: 0,
+            // Corrimiento desde el centro de la ubicación, en cm, visto de frente al
+            // logo: dx > 0 hacia la derecha, dy > 0 hacia arriba.
+            dx: 0,
+            dy: 0,
             meshes: []
           };
           const wanted = opts.placement && spots[opts.placement] && !logos.some(l => l.placement === opts.placement)
@@ -5493,6 +5546,10 @@
           }
           logo.placement = wanted;
           logo.sizeCm = (opts.placement === wanted && opts.sizeCm) || spots[wanted].defaultCm;
+          if (opts.placement === wanted) {
+            logo.dx = clampMove(opts.dx);
+            logo.dy = clampMove(opts.dy);
+          }
           logos.push(logo);
           logoInput.value = '';
           refreshRecommendations();
@@ -5553,6 +5610,24 @@
           removeLogo(remove.dataset.logoRemove);
           return;
         }
+        const move = e.target.closest('[data-logo-move]');
+        if (move) {
+          const logo = logos.find(l => l.id === move.dataset.logoMove);
+          if (!logo) return;
+          if (move.dataset.center) {
+            logo.dx = 0;
+            logo.dy = 0;
+          } else {
+            logo.dx = clampMove(logo.dx + Number(move.dataset.dx) * MOVE_STEP_CM);
+            logo.dy = clampMove(logo.dy + Number(move.dataset.dy) * MOVE_STEP_CM);
+          }
+          logoList.querySelector(`[data-logo-move-label="${logo.id}"]`).textContent = moveLabel(logo);
+          placeOneLogo(logo);
+          // Se gira hacia el logo si no está a la vista.
+          const side = viewForPlacement(logo.placement);
+          if (activeView !== side) goToView(side);
+          return;
+        }
         const btn = e.target.closest('[data-logo-place]');
         if (!btn || btn.disabled) return;
         const logo = logos.find(l => l.id === btn.dataset.logoPlace);
@@ -5560,6 +5635,8 @@
         if (!spot) return;
         logo.placement = btn.dataset.placement;
         logo.sizeCm = spot.defaultCm;
+        logo.dx = 0;
+        logo.dy = 0;
         renderLogoList();
         placeOneLogo(logo);
         updateLogoSummary();
@@ -5759,7 +5836,7 @@
               path = await uploadLogo(l.file);
               uploadedPaths.push(path);
             }
-            savedLogos.push({ path, nombre: l.name, ubicacion: l.placement, ancho_cm: l.sizeCm });
+            savedLogos.push({ path, nombre: l.name, ubicacion: l.placement, ancho_cm: l.sizeCm, mover_x_cm: l.dx || 0, mover_y_cm: l.dy || 0 });
           }
           const first = savedLogos[0] || null;
 
@@ -6001,7 +6078,7 @@
             continue;
           }
           const file = new File([data], l.nombre || 'logo', { type: data.type });
-          await loadLogoFile(file, { placement: l.ubicacion, sizeCm: l.ancho_cm, storedPath: l.path, silent: true });
+          await loadLogoFile(file, { placement: l.ubicacion, sizeCm: l.ancho_cm, dx: l.mover_x_cm, dy: l.mover_y_cm, storedPath: l.path, silent: true });
         }
         setSaveMsg(failed ? 'El diseño se abrió, pero no pudimos cargar todos sus logos.' : '', !!failed);
         currentDesign = d;
