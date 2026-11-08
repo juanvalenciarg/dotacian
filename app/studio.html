@@ -222,6 +222,12 @@
       cursor: grabbing;
     }
 
+    /* Sobre un logo (o arrastrándolo): se puede mover. */
+    .studio-viewer.logo-hover canvas,
+    .studio-viewer.logo-dragging canvas {
+      cursor: move;
+    }
+
     /* Foto de producto: reemplaza al visor 3D en las prendas que la tienen. */
     .studio-viewer canvas.studio-photo {
       position: absolute;
@@ -5663,6 +5669,129 @@
         placeOneLogo(logo);
         updateLogoSummary();
       });
+
+      // --- Arrastrar el logo con el mouse (o el dedo) sobre la prenda ---
+      // Se agarra el logo y se mueve; fuera del logo, arrastrar sigue girando la prenda.
+      let logoDrag = null;
+      let logoDragFrame = 0;
+
+      // Rectángulo del logo en la foto (mismas cuentas que drawPhotoLogo), en px de la imagen.
+      function photoLogoRect(photo, logo) {
+        const { st, view } = photo;
+        const zone = view.logos[logo.placement];
+        if (!zone) return null;
+        const pxPerCm = st.w / view.cmPerImage;
+        const w = logo.sizeCm * pxPerCm;
+        const h = w / logo.aspect;
+        return {
+          x: zone.x * st.w + (logo.dx || 0) * pxPerCm - w / 2,
+          y: zone.y * st.h - (logo.dy || 0) * pxPerCm - h / 2,
+          w, h
+        };
+      }
+
+      // La foto se muestra con object-fit: contain dentro de su canvas.
+      function pointerOnPhoto(e) {
+        const r = photoCanvas.getBoundingClientRect();
+        const k = Math.min(r.width / photoCanvas.width, r.height / photoCanvas.height);
+        const ox = r.left + (r.width - photoCanvas.width * k) / 2;
+        const oy = r.top + (r.height - photoCanvas.height * k) / 2;
+        return { x: (e.clientX - ox) / k, y: (e.clientY - oy) / k, k };
+      }
+
+      // Logo bajo el puntero y cuántos px de pantalla equivalen a 1 cm ahí.
+      function logoAtPointer(e) {
+        if (!logos.length) return null;
+        if (photoShown) {
+          const specId = photoSpecFor(garment.key, garment.cfg);
+          const photo = specId && photoFor(specId, activeView);
+          if (!photo || !photo.st) return null;
+          const p = pointerOnPhoto(e);
+          for (let i = logos.length - 1; i >= 0; i--) {
+            const r = photoLogoRect(photo, logos[i]);
+            if (r && p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h) {
+              return { logo: logos[i], pxPerCm: photo.st.w / photo.view.cmPerImage * p.k };
+            }
+          }
+          return null;
+        }
+        const rect = renderer.domElement.getBoundingClientRect();
+        const ndc = new THREE.Vector2(
+          ((e.clientX - rect.left) / rect.width) * 2 - 1,
+          -((e.clientY - rect.top) / rect.height) * 2 + 1
+        );
+        raycaster.setFromCamera(ndc, camera);
+        // El logo va pegado a la tela (misma distancia): se toma lo que el rayo toca
+        // primero, con un margen mínimo, para no agarrar un logo tapado por la prenda.
+        const hits = raycaster.intersectObject(shirt, true);
+        if (!hits.length) return null;
+        const near = hits.filter(h => h.distance - hits[0].distance < 0.01);
+        let logo = null, hit = null;
+        for (const h of near) {
+          logo = logos.find(l => l.meshes.includes(h.object));
+          if (logo) { hit = h; break; }
+        }
+        if (!logo) return null;
+        const dist = camera.position.distanceTo(hit.point);
+        const worldPerPx = 2 * dist * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2) / rect.height;
+        return { logo, pxPerCm: 1 / (worldPerPx * CM_PER_UNIT) };
+      }
+
+      function moveDraggedLogo(e) {
+        const d = logoDrag;
+        const dx = clampMove(d.dx0 + (e.clientX - d.x0) / d.pxPerCm);
+        const dy = clampMove(d.dy0 - (e.clientY - d.y0) / d.pxPerCm);
+        if (dx === d.logo.dx && dy === d.logo.dy) return;
+        d.logo.dx = dx;
+        d.logo.dy = dy;
+        const label = logoList.querySelector(`[data-logo-move-label="${d.logo.id}"]`);
+        if (label) label.textContent = moveLabel(d.logo);
+        // En 3D se vuelve a proyectar el logo una vez por cuadro.
+        if (!photoShown && !logoDragFrame) {
+          logoDragFrame = requestAnimationFrame(() => {
+            logoDragFrame = 0;
+            if (logoDrag) placeOneLogo(logoDrag.logo);
+          });
+        }
+      }
+
+      function endLogoDrag() {
+        if (!logoDrag) return;
+        const logo = logoDrag.logo;
+        logoDrag = null;
+        controls.enabled = true;
+        viewer.classList.remove('logo-dragging');
+        placeOneLogo(logo);
+      }
+
+      // En fase de captura: se adelanta a OrbitControls para que no gire la prenda.
+      viewer.addEventListener('pointerdown', e => {
+        if (e.button !== 0) return;
+        const found = logoAtPointer(e);
+        if (!found) return;
+        e.stopPropagation();
+        e.preventDefault();
+        logoDrag = { logo: found.logo, pxPerCm: found.pxPerCm, x0: e.clientX, y0: e.clientY, dx0: found.logo.dx || 0, dy0: found.logo.dy || 0 };
+        controls.enabled = false;
+        viewer.classList.add('logo-dragging');
+      }, true);
+      window.addEventListener('pointermove', e => {
+        if (logoDrag) {
+          moveDraggedLogo(e);
+          return;
+        }
+        // Al pasar sobre un logo, el cursor indica que se puede mover.
+        if (e.pointerType !== 'mouse' || !viewer.contains(e.target)) return;
+        viewer.classList.toggle('logo-hover', !!logoAtPointer(e));
+      });
+      window.addEventListener('pointerup', endLogoDrag);
+      window.addEventListener('pointercancel', endLogoDrag);
+      // En la foto el navegador desplaza la página con el dedo: si el toque empieza
+      // sobre un logo, se evita para poder arrastrarlo.
+      photoCanvas.addEventListener('touchstart', e => {
+        const t = e.touches[0];
+        if (t && logoAtPointer(t)) e.preventDefault();
+      }, { passive: false });
 
       // --- Prenda ---
 
