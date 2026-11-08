@@ -4,7 +4,7 @@
 // navegador no soporta tantos visores). Las fotos se guardan en sessionStorage.
 (function () {
   // Cambia este valor cuando cambien los modelos 3D para regenerar las imágenes.
-  const RENDER_VERSION = '9';
+  const RENDER_VERSION = '10';
   const cache = {};
   let frame = null;
   let studioPromise = null;

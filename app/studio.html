@@ -4620,6 +4620,40 @@
       // cmPerImage: ancho real en cm que cubre la imagen completa (escala del logo).
       // logos: centro de cada ubicación visible en esa vista, en fracción de la imagen.
       const PHOTO_VIEWS = {
+        hoodie: {
+          garment: 'hoodie',
+          options: { corte: 'hombre', cuello: 'capucha', manga: 'larga', cierre: 'ninguno', bolsillos: 'canguro' },
+          views: {
+            front: {
+              src: '/assets/images/studio/hoodie_frente.jpg',
+              cmPerImage: 132,
+              bgMin: 240,
+              logos: {
+                pechoIzq: { x: 0.635, y: 0.3 },
+                // Debajo de los cordones, para que el logo no quede encima de ellos.
+                pechoCentro: { x: 0.504, y: 0.53 }
+              }
+            },
+            back: {
+              src: '/assets/images/studio/hoodie_espalda.jpg',
+              cmPerImage: 132,
+              bgMin: 235, // fondo crema, un poco más oscuro que en las demás fotos
+              logos: { espalda: { x: 0.503, y: 0.43 } }
+            },
+            right: {
+              src: '/assets/images/studio/hoodie_lado_der.jpg',
+              cmPerImage: 132,
+              bgMin: 240,
+              logos: {}
+            },
+            left: {
+              src: '/assets/images/studio/hoodie_lado_izq.jpg',
+              cmPerImage: 132,
+              bgMin: 240,
+              logos: {}
+            }
+          }
+        },
         hoodieMujer: {
           garment: 'hoodie',
           options: { corte: 'mujer', cuello: 'capucha', manga: 'larga', cierre: 'ninguno', bolsillos: 'canguro' },
