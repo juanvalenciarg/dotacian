@@ -1637,6 +1637,9 @@
     function choiceLabel(conf, group, value) {
       return (conf.labels && conf.labels[group] && conf.labels[group][value]) || OPTION_GROUPS[group].choices[value];
     }
+    // Grupos que se muestran en "Personaliza la prenda". Por ahora solo el corte; para
+    // volver a ofrecer los demás basta con agregarlos aquí (la configuración sigue igual).
+    const VISIBLE_OPTION_GROUPS = ['corte'];
     const TOP_GROUPS = ['corte', 'cuello', 'manga', 'cierre', 'bolsillos'];
     const PANTS_GROUPS = ['cintura', 'largo', 'bolsillos'];
     const PANTS_HEM = { largo: -0.83, tobillero: -0.6, bermuda: -0.22 };
@@ -4486,9 +4489,12 @@
           card.hidden = true;
           return;
         }
-        card.hidden = false;
-        document.getElementById('studioOptions').innerHTML = groupsFor(cfg.configurable)
-          .filter(group => choicesFor(cfg.configurable, group).length > 1)
+        const groups = groupsFor(cfg.configurable)
+          .filter(group => VISIBLE_OPTION_GROUPS.includes(group))
+          .filter(group => choicesFor(cfg.configurable, group).length > 1);
+        // El pantalón no tiene corte: sin grupos visibles no se muestra la tarjeta.
+        card.hidden = groups.length === 0;
+        document.getElementById('studioOptions').innerHTML = groups
           .map(group => [group, OPTION_GROUPS[group]]).map(([group, g]) => `
           <div class="studio-field-label"><span>${g.label}</span></div>
           <div class="studio-option-group" role="group" aria-label="${g.label}">
@@ -4650,6 +4656,40 @@
       // cmPerImage: ancho real en cm que cubre la imagen completa (escala del logo).
       // logos: centro de cada ubicación visible en esa vista, en fracción de la imagen.
       const PHOTO_VIEWS = {
+        hoodieMujer: {
+          garment: 'hoodie',
+          options: { corte: 'mujer', cuello: 'capucha', manga: 'larga', cierre: 'ninguno', bolsillos: 'canguro' },
+          views: {
+            front: {
+              src: '/assets/images/studio/hoodie_mujer_frente.jpg',
+              cmPerImage: 128,
+              bgMin: 240,
+              logos: {
+                pechoIzq: { x: 0.625, y: 0.3 },
+                // Debajo de los cordones, para que el logo no quede encima de ellos.
+                pechoCentro: { x: 0.504, y: 0.515 }
+              }
+            },
+            back: {
+              src: '/assets/images/studio/hoodie_mujer_espalda.jpg',
+              cmPerImage: 128,
+              bgMin: 240,
+              logos: { espalda: { x: 0.508, y: 0.43 } }
+            },
+            right: {
+              src: '/assets/images/studio/hoodie_mujer_lado_der.jpg',
+              cmPerImage: 128,
+              bgMin: 240,
+              logos: {}
+            },
+            left: {
+              src: '/assets/images/studio/hoodie_mujer_lado_izq.jpg',
+              cmPerImage: 128,
+              bgMin: 240,
+              logos: {}
+            }
+          }
+        },
         camisetaMujer: {
           garment: 'camiseta',
           options: { corte: 'mujer', cuello: 'redondo', manga: 'corta', bolsillos: 'ninguno' },
@@ -5393,7 +5433,10 @@
         if (!base) return;
         const changing = key !== garment.key;
         if (!changing && !opts && !zones) return;
-        const cfg = garmentConfig(key, opts || chosenOptions);
+        // Al cambiar de prenda solo se conserva lo que se puede elegir en el panel: lo
+        // demás de un diseño abierto no pasa a otra prenda, porque no se podría cambiar.
+        const kept = Object.fromEntries(Object.entries(chosenOptions).filter(([g]) => VISIBLE_OPTION_GROUPS.includes(g)));
+        const cfg = garmentConfig(key, opts || kept);
         buildShirt(key, cfg);
         Object.keys(zoneColors).forEach(z => { zoneColors[z] = null; });
         const zoneSource = zones || (base.configurable && base.configurable.zoneDefaults) || {};
