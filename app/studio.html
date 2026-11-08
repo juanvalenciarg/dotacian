@@ -4621,6 +4621,37 @@
       // cmPerImage: ancho real en cm que cubre la imagen completa (escala del logo).
       // logos: centro de cada ubicación visible en esa vista, en fracción de la imagen.
       const PHOTO_VIEWS = {
+        camisaMujer: {
+          garment: 'camisa',
+          options: { corte: 'mujer', cuello: 'camisero', manga: 'larga', cierre: 'botones', bolsillos: 'pecho' },
+          views: {
+            front: {
+              src: '/assets/images/studio/camisa_mujer_frente.jpg',
+              cmPerImage: 119,
+              bgMin: 240,
+              // El bolsillo ocupa el pecho izquierdo: el logo va en el derecho.
+              logos: { pechoDer: { x: 0.372, y: 0.355 } }
+            },
+            back: {
+              src: '/assets/images/studio/camisa_mujer_espalda.jpg',
+              cmPerImage: 119,
+              bgMin: 240,
+              logos: { espalda: { x: 0.502, y: 0.42 } }
+            },
+            right: {
+              src: '/assets/images/studio/camisa_mujer_lado_der.jpg',
+              cmPerImage: 119,
+              bgMin: 240,
+              logos: {}
+            },
+            left: {
+              src: '/assets/images/studio/camisa_mujer_lado_izq.jpg',
+              cmPerImage: 119,
+              bgMin: 240,
+              logos: {}
+            }
+          }
+        },
         camisa: {
           garment: 'camisa',
           options: { corte: 'hombre', cuello: 'camisero', manga: 'larga', cierre: 'botones', bolsillos: 'pecho' },
