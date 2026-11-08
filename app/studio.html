@@ -2035,6 +2035,7 @@
             bolsillos: ['canguro', 'ninguno']
           },
           defaults: { cuello: 'capucha', manga: 'larga', cierre: 'ninguno', bolsillos: 'canguro' },
+          zones: [], // sin detalles en contraste: solo el color principal
           zoneDefaults: {},
           neckDip: { capucha: 0.04 },
           kangaroo: { yTop: -0.27, yBottom: -0.64, topHalf: 0.165, bottomHalf: 0.255 },
@@ -5440,7 +5441,8 @@
         Object.keys(zoneColors).forEach(z => { zoneColors[z] = null; });
         const zoneSource = zones || (base.configurable && base.configurable.zoneDefaults) || {};
         Object.keys(zoneSource).forEach(z => {
-          if (z in zoneColors && resolveColor(zoneSource[z])) zoneColors[z] = zoneSource[z];
+          // Solo las zonas que la prenda ofrece hoy (ej. el hoodie ya no tiene contraste).
+          if (z in zoneColors && zonesForConfig(cfg).includes(z) && resolveColor(zoneSource[z])) zoneColors[z] = zoneSource[z];
         });
         if (!zones) {
           zonesForConfig(cfg).filter(z => z in chosenZones).forEach(z => { zoneColors[z] = chosenZones[z]; });
@@ -6079,7 +6081,8 @@
         Object.keys(zoneColors).forEach(z => { zoneColors[z] = null; });
         const zoneSource = (opts && opts.zonas) || (cfg.configurable && cfg.configurable.zoneDefaults) || {};
         Object.keys(zoneSource).forEach(z => {
-          if (z in zoneColors && resolveColor(zoneSource[z])) zoneColors[z] = zoneSource[z];
+          // Solo las zonas que la prenda ofrece hoy (ej. el hoodie ya no tiene contraste).
+          if (z in zoneColors && zonesForConfig(cfg).includes(z) && resolveColor(zoneSource[z])) zoneColors[z] = zoneSource[z];
         });
         syncZoneMaterials();
         // La prenda con foto usa la misma foto en la imagen de las tarjetas.
