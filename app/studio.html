@@ -4096,6 +4096,9 @@
       const controls = new OrbitControls(camera, renderer.domElement);
       controls.target.set(0, -0.14, 0);
       controls.enablePan = false;
+      // Sin zoom: la rueda del mouse o el trackpad sobre la prenda baja la página en
+      // vez de acercar la cámara (y no saca de la foto de producto).
+      controls.enableZoom = false;
       controls.enableDamping = true;
       controls.dampingFactor = 0.08;
       controls.minDistance = 1.8;
