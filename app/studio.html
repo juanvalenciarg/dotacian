@@ -1774,8 +1774,11 @@
     }
 
     // Zonas de contraste que existen con las opciones elegidas.
+    // Por ahora ninguna prenda ofrece detalles en contraste: todo va en el color
+    // principal. Con true vuelven las zonas de cada prenda (y sus colores por defecto).
+    const CONTRAST_ZONES = false;
     function zonesForConfig(cfg) {
-      if (!cfg || !cfg.configurable) return [];
+      if (!CONTRAST_ZONES || !cfg || !cfg.configurable) return [];
       if (cfg.configurable.zones) return cfg.configurable.zones.filter(z => z !== 'puno' || cfg.hasCuff);
       const zones = ['cuello'];
       if (cfg.hasCuff) zones.push('puno');
