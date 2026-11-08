@@ -1428,7 +1428,7 @@
                   </span>
                 </button>
               </div>
-              <div class="studio-soon">
+              <div class="studio-soon" hidden>
                 <span>Chaqueta · pronto</span>
               </div>
             </div>
@@ -6171,6 +6171,11 @@
       // DS Hub (admin) define qué prendas ve cada industria; la
       // función studio_garments_for_me() resuelve la empresa del usuario.
       let availableGarments = null; // null = sin restricción (aún no cargado)
+      // Por ahora solo se ofrecen las prendas con foto real; las demás (en 3D) se
+      // ocultan aunque la empresa las tenga habilitadas. Un diseño guardado de una
+      // prenda oculta se sigue pudiendo abrir.
+      const PHOTO_GARMENTS = ['camiseta', 'camisa', 'hoodie', 'polo'];
+      Object.keys(GARMENTS).forEach(k => showGarmentOption(k, PHOTO_GARMENTS.includes(k)));
 
       function showGarmentOption(key, visible) {
         const btn = document.querySelector(`.studio-garment-option[data-garment="${key}"]`);
@@ -6181,11 +6186,11 @@
         if (EMBED || !(await ensureCompany())) return;
         const { data, error } = await window._supabase.rpc('studio_garments_for_me');
         if (error) {
-          // Si el catálogo aún no existe en la base de datos, se muestran todas.
+          // Si el catálogo aún no existe en la base de datos, se muestran todas las de foto.
           console.warn('No se pudo cargar el catálogo de prendas:', error);
           return;
         }
-        let keys = (data || []).map(r => r.garment_key).filter(k => GARMENTS[k]);
+        let keys = (data || []).map(r => r.garment_key).filter(k => GARMENTS[k] && PHOTO_GARMENTS.includes(k));
         if (!keys.length) keys = ['camiseta'];
         availableGarments = new Set(keys);
         Object.keys(GARMENTS).forEach(k => showGarmentOption(k, availableGarments.has(k)));
