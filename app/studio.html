@@ -4624,6 +4624,46 @@
       // cmPerImage: ancho real en cm que cubre la imagen completa (escala del logo).
       // logos: centro de cada ubicación visible en esa vista, en fracción de la imagen.
       const PHOTO_VIEWS = {
+        // Foto en azul marino: el recorte es más bajo para que el borde
+        // claro de la prenda oscura no quede como halo al teñirla.
+        polo: {
+          garment: 'polo',
+          options: { corte: 'hombre', cuello: 'polo', manga: 'corta', cierre: 'botones', bolsillos: 'ninguno' },
+          views: {
+            front: {
+              src: '/assets/images/studio/polo_frente.jpg',
+              cmPerImage: 120,
+              bgMin: 160,
+              contrast: 0.6,
+              smooth: true,
+              logos: { pechoIzq: { x: 0.63, y: 0.3 }, pechoDer: { x: 0.377, y: 0.3 } }
+            },
+            back: {
+              src: '/assets/images/studio/polo_espalda.jpg',
+              cmPerImage: 120,
+              bgMin: 160,
+              contrast: 0.6,
+              smooth: true,
+              logos: { espalda: { x: 0.56, y: 0.4 } }
+            },
+            right: {
+              src: '/assets/images/studio/polo_lado_der.jpg',
+              cmPerImage: 120,
+              bgMin: 160,
+              contrast: 0.6,
+              smooth: true,
+              logos: {}
+            },
+            left: {
+              src: '/assets/images/studio/polo_lado_izq.jpg',
+              cmPerImage: 120,
+              bgMin: 160,
+              contrast: 0.6,
+              smooth: true,
+              logos: {}
+            }
+          }
+        },
         camisaMujer: {
           garment: 'camisa',
           options: { corte: 'mujer', cuello: 'camisero', manga: 'larga', cierre: 'botones', bolsillos: 'pecho' },
@@ -4840,7 +4880,9 @@
 
       // Separa la prenda del fondo (claro, sin color y tocando el borde de la imagen)
       // y guarda la sombra de cada pixel respecto al tono típico de la tela.
-      function preparePhoto(img, bgMin = 212) {
+      // contrast < 1 suaviza las sombras y smooth quita el grano: para fotos de prendas
+      // oscuras, donde al teñirlas de claro se exageran.
+      function preparePhoto(img, bgMin = 212, contrast = 1, smooth = false) {
         const w = img.naturalWidth, h = img.naturalHeight, n = w * h;
         const c = document.createElement('canvas');
         c.width = w;
@@ -4897,7 +4939,25 @@
         let ref = 0;
         for (let acc = 0; ref < 255 && acc < count / 2; ref++) acc += hist[ref];
         const shade = new Float32Array(n);
-        for (let i = 0; i < n; i++) shade[i] = lum[i] / (ref || 1);
+        let src = lum;
+        if (smooth) {
+          src = new Float32Array(n);
+          for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+              let sum = 0, cnt = 0;
+              for (let dy = -1; dy <= 1; dy++) {
+                for (let dx = -1; dx <= 1; dx++) {
+                  const yy = y + dy, xx = x + dx;
+                  if (yy < 0 || yy >= h || xx < 0 || xx >= w || bg[yy * w + xx]) continue;
+                  sum += lum[yy * w + xx];
+                  cnt++;
+                }
+              }
+              src[y * w + x] = cnt ? sum / cnt : lum[y * w + x];
+            }
+          }
+        }
+        for (let i = 0; i < n; i++) shade[i] = Math.pow(src[i] / (ref || 1), contrast);
         return { w, h, shade, alpha };
       }
 
@@ -4986,7 +5046,7 @@
           photoLoads.push(new Promise(resolve => {
             const img = new Image();
             img.onload = () => {
-              photoState[key][name] = preparePhoto(img, view.bgMin);
+              photoState[key][name] = preparePhoto(img, view.bgMin, view.contrast, view.smooth);
               resolve();
             };
             img.onerror = resolve;
