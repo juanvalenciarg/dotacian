@@ -1107,35 +1107,6 @@
       height: 26px;
     }
 
-    .studio-color-custom {
-      position: relative;
-      display: block;
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      background: conic-gradient(#EF4444, #F59E0B, #22C55E, #06B6D4, #6366F1, #EC4899, #EF4444);
-      border: 1px solid rgba(15, 23, 42, 0.15);
-      cursor: pointer;
-      overflow: hidden;
-    }
-
-    .studio-color-custom input {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      cursor: pointer;
-      border: none;
-      padding: 0;
-    }
-
-    .studio-swatch-custom {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
     .studio-zone {
       margin-top: 0.6rem;
     }
@@ -1163,17 +1134,7 @@
       cursor: pointer;
     }
 
-    .studio-zone-dot.studio-zone-custom {
-      border: none;
-    }
-
-    .studio-zone-dot.studio-zone-custom .studio-color-custom {
-      width: 20px;
-      height: 20px;
-    }
-
-    .studio-zone-dot.active,
-    .studio-swatch-custom.active .studio-color-custom {
+    .studio-zone-dot.active {
       box-shadow: 0 0 0 2px white, 0 0 0 4px var(--color-cyan);
     }
 
@@ -1606,14 +1567,33 @@
       amarillo: { label: 'Amarillo', hex: '#E8B930' },
       morado: { label: 'Morado', hex: '#5B3E8E' },
       rosado: { label: 'Rosado', hex: '#E79BB5' },
-      cafe: { label: 'Café', hex: '#6A4A35' }
+      cafe: { label: 'Café', hex: '#6A4A35' },
+      hueso: { label: 'Hueso', hex: '#E8E0CC' },
+      grisClaro: { label: 'Gris claro', hex: '#A7ACB3' },
+      azulRey: { label: 'Azul rey', hex: '#2A56C6' },
+      azulPetroleo: { label: 'Azul petróleo', hex: '#1E4D5C' },
+      verdeLima: { label: 'Verde lima', hex: '#9CC53F' },
+      verdeBotella: { label: 'Verde botella', hex: '#1E3D2C' },
+      verdeOliva: { label: 'Verde oliva', hex: '#5C5E36' },
+      caqui: { label: 'Caqui', hex: '#A28B5F' },
+      mostaza: { label: 'Mostaza', hex: '#C4922A' },
+      amarilloAV: { label: 'Amarillo alta visibilidad', hex: '#D9EA22' },
+      naranjaAV: { label: 'Naranja alta visibilidad', hex: '#FF6B14' },
+      terracota: { label: 'Terracota', hex: '#B0573B' },
+      fucsia: { label: 'Fucsia', hex: '#C2185B' },
+      lila: { label: 'Lila', hex: '#B5A0D8' }
     };
 
     // Paleta completa de las prendas configurables (cuerpo y zonas de contraste).
-    const FULL_PALETTE = ['blanco', 'negro', 'grafito', 'gris', 'azulMarino', 'azul', 'celeste', 'turquesa',
-      'verde', 'menta', 'beige', 'cafe', 'amarillo', 'naranja', 'rojo', 'vinotinto', 'rosado', 'morado'];
+    // Solo colores de la paleta: no hay color personalizado.
+    const FULL_PALETTE = ['blanco', 'hueso', 'grisClaro', 'gris', 'grafito', 'negro',
+      'celeste', 'azulRey', 'azul', 'azulMarino', 'turquesa', 'azulPetroleo',
+      'menta', 'verdeLima', 'verde', 'verdeBotella', 'verdeOliva',
+      'beige', 'caqui', 'cafe', 'amarillo', 'mostaza', 'amarilloAV',
+      'naranja', 'naranjaAV', 'terracota', 'rojo', 'vinotinto', 'rosado', 'fucsia', 'lila', 'morado'];
 
     // Color guardado: una clave de SHIRT_COLORS o un HEX personalizado (#RRGGBB).
+    // El HEX ya no se puede elegir, pero los diseños guardados con uno siguen abriendo.
     function resolveColor(value) {
       if (SHIRT_COLORS[value]) return SHIRT_COLORS[value];
       if (/^#[0-9a-f]{6}$/i.test(value || '')) return { label: `Personalizado ${value.toUpperCase()}`, hex: value };
@@ -4423,16 +4403,7 @@
         colorKey = key;
         targetColor.set(c.hex);
         document.querySelectorAll('#studioSwatches .studio-swatch').forEach(b => b.classList.toggle('active', b.dataset.color === key));
-        const custom = document.querySelector('#studioSwatches .studio-swatch-custom');
-        if (custom) custom.classList.toggle('active', !SHIRT_COLORS[key]);
         document.getElementById('studioSummaryColor').textContent = c.label;
-      }
-
-      // Selector "otro color" (HEX libre) para el cuerpo o una zona.
-      function customColorHtml(attrs, value) {
-        return `<label class="studio-color-custom" title="Otro color">
-          <input type="color" ${attrs} value="${/^#[0-9a-f]{6}$/i.test(value || '') ? value : '#888888'}">
-        </label>`;
       }
 
       // Colores recomendados según el contraste con el logo (claves de FULL_PALETTE).
@@ -4467,9 +4438,6 @@
           html += '<div class="studio-swatch-heading">Todos los colores</div>';
         }
         html += rest.map(k => swatchHtml(k, configurable)).join('');
-        if (configurable) {
-          html += `<span class="studio-swatch studio-swatch-custom">${customColorHtml('data-body-color', colorKey)}</span>`;
-        }
         wrap.innerHTML = html;
         const keep = keys.includes(colorKey) || (configurable && resolveColor(colorKey));
         setColor(keep ? colorKey : keys[0]);
@@ -4478,9 +4446,6 @@
       document.getElementById('studioSwatches').addEventListener('click', e => {
         const btn = e.target.closest('button.studio-swatch');
         if (btn) setColor(btn.dataset.color);
-      });
-      document.getElementById('studioSwatches').addEventListener('input', e => {
-        if (e.target.matches('input[data-body-color]')) setColor(e.target.value);
       });
       syncColorSwatches();
 
@@ -4542,7 +4507,6 @@
               <div class="studio-zone-dots">
                 <button type="button" class="studio-zone-same${current ? '' : ' active'}" data-zone="${z}" data-zone-color="">Igual</button>
                 ${FULL_PALETTE.map(k => `<button type="button" class="studio-zone-dot${current === k ? ' active' : ''}" data-zone="${z}" data-zone-color="${k}" title="${SHIRT_COLORS[k].label}" style="background: ${SHIRT_COLORS[k].hex};"></button>`).join('')}
-                <span class="studio-zone-dot studio-zone-custom${current && !SHIRT_COLORS[current] ? ' active' : ''}">${customColorHtml(`data-zone-custom="${z}"`, current)}</span>
               </div>
             </div>`;
         }).join('') : '';
@@ -4562,9 +4526,6 @@
       document.getElementById('studioZones').addEventListener('click', e => {
         const btn = e.target.closest('button[data-zone]');
         if (btn) setZoneColor(btn.dataset.zone, btn.dataset.zoneColor);
-      });
-      document.getElementById('studioZones').addEventListener('change', e => {
-        if (e.target.matches('input[data-zone-custom]')) setZoneColor(e.target.dataset.zoneCustom, e.target.value);
       });
 
       function zonesSummary() {
