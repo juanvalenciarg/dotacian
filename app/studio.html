@@ -4624,6 +4624,44 @@
       // cmPerImage: ancho real en cm que cubre la imagen completa (escala del logo).
       // logos: centro de cada ubicación visible en esa vista, en fracción de la imagen.
       const PHOTO_VIEWS = {
+        poloMujer: {
+          garment: 'polo',
+          options: { corte: 'mujer', cuello: 'polo', manga: 'corta', cierre: 'botones', bolsillos: 'ninguno' },
+          views: {
+            front: {
+              src: '/assets/images/studio/polo_mujer_frente.jpg',
+              cmPerImage: 108,
+              bgMin: 160,
+              contrast: 0.6,
+              smooth: true,
+              logos: { pechoIzq: { x: 0.64, y: 0.32 }, pechoDer: { x: 0.362, y: 0.32 } }
+            },
+            back: {
+              src: '/assets/images/studio/polo_mujer_espalda.jpg',
+              cmPerImage: 108,
+              bgMin: 160,
+              contrast: 0.6,
+              smooth: true,
+              logos: { espalda: { x: 0.5, y: 0.36 } }
+            },
+            right: {
+              src: '/assets/images/studio/polo_mujer_lado_der.jpg',
+              cmPerImage: 108,
+              bgMin: 160,
+              contrast: 0.6,
+              smooth: true,
+              logos: {}
+            },
+            left: {
+              src: '/assets/images/studio/polo_mujer_lado_izq.jpg',
+              cmPerImage: 108,
+              bgMin: 160,
+              contrast: 0.6,
+              smooth: true,
+              logos: {}
+            }
+          }
+        },
         // Foto en azul marino: el recorte es más bajo para que el borde
         // claro de la prenda oscura no quede como halo al teñirla.
         polo: {
