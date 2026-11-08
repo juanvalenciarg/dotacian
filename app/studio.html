@@ -1990,7 +1990,7 @@
             cierre: ['botones'],
             bolsillos: ['ninguno', 'pecho']
           },
-          defaults: { cuello: 'camisero', manga: 'larga', cierre: 'botones', bolsillos: 'ninguno' },
+          defaults: { cuello: 'camisero', manga: 'larga', cierre: 'botones', bolsillos: 'pecho' },
           zoneDefaults: {},
           placket: { halfWidth: 0.032, buttons: 6, spacing: 0.155, firstOffset: 0.17 },
           sleeves: {
@@ -4621,6 +4621,37 @@
       // cmPerImage: ancho real en cm que cubre la imagen completa (escala del logo).
       // logos: centro de cada ubicación visible en esa vista, en fracción de la imagen.
       const PHOTO_VIEWS = {
+        camisa: {
+          garment: 'camisa',
+          options: { corte: 'hombre', cuello: 'camisero', manga: 'larga', cierre: 'botones', bolsillos: 'pecho' },
+          views: {
+            front: {
+              src: '/assets/images/studio/camisa_frente.jpg',
+              cmPerImage: 130,
+              bgMin: 240,
+              // El bolsillo ocupa el pecho izquierdo: el logo va en el derecho.
+              logos: { pechoDer: { x: 0.368, y: 0.36 } }
+            },
+            back: {
+              src: '/assets/images/studio/camisa_espalda.jpg',
+              cmPerImage: 130,
+              bgMin: 240,
+              logos: { espalda: { x: 0.502, y: 0.42 } }
+            },
+            right: {
+              src: '/assets/images/studio/camisa_lado_der.jpg',
+              cmPerImage: 130,
+              bgMin: 240,
+              logos: {}
+            },
+            left: {
+              src: '/assets/images/studio/camisa_lado_izq.jpg',
+              cmPerImage: 130,
+              bgMin: 240,
+              logos: {}
+            }
+          }
+        },
         hoodie: {
           garment: 'hoodie',
           options: { corte: 'hombre', cuello: 'capucha', manga: 'larga', cierre: 'ninguno', bolsillos: 'canguro' },
