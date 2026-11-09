@@ -5670,3 +5670,106 @@ ul {
     font-size: 1.3rem;
   }
 }
+
+/* Manufacturing section (index) */
+.fab-section {
+  padding: 7rem 0;
+  background: var(--color-white);
+}
+
+.fab-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.fab-copy h2 {
+  font-size: 3rem;
+  line-height: 1.1;
+  color: var(--color-navy);
+  letter-spacing: -0.02em;
+  margin-bottom: 1.25rem;
+}
+
+.fab-lead {
+  font-size: 1.15rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.fab-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.fab-list li {
+  padding-left: 1.25rem;
+  border-left: 3px solid var(--color-cyan);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.fab-list strong {
+  color: var(--color-navy);
+}
+
+.fab-claim {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-navy);
+  margin-bottom: 1.75rem;
+}
+
+.fab-gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.fab-gallery figure {
+  margin: 0;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--color-smoke);
+  aspect-ratio: 1 / 1;
+}
+
+.fab-gallery img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.fab-gallery figcaption {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 0.75rem;
+  background: rgba(15, 23, 42, 0.85);
+  color: var(--color-white);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 100px;
+}
+
+@media (max-width: 900px) {
+  .fab-section {
+    padding: 5rem 0;
+  }
+
+  .fab-wrapper {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .fab-copy h2 {
+    font-size: 2.25rem;
+  }
+}
