@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Dotacian AI — Home agéntico (/app/home)
+   DotacIAn — Home agéntico (/app/home)
    Barra de chat para empezar a diseñar uniformes. Entiende el pedido
    (prenda, color, rol, cantidad, logo e intención), responde y propone
    acciones que llevan al usuario a Studio, Cotizaciones, Roles, etc.
@@ -13,7 +13,6 @@
   const sendBtn = document.getElementById('agent-send');
   const thread = document.getElementById('agent-thread');
   const agent = document.getElementById('agent');
-  const chipsEl = document.getElementById('agent-chips');
   const STORE_KEY = 'dotacian_agent_thread_v1';
 
   const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -192,7 +191,7 @@
   function renderTyping() {
     const el = document.createElement('div');
     el.className = 'msg ai';
-    el.innerHTML = `<span class="av">${SPARK}</span><div class="bubble"><span class="typing" aria-label="Dotacian AI está pensando"><span></span><span></span><span></span></span></div>`;
+    el.innerHTML = `<span class="av">${SPARK}</span><div class="bubble"><span class="typing" aria-label="DotacIAn está pensando"><span></span><span></span><span></span></span></div>`;
     thread.appendChild(el);
     return el;
   }
@@ -281,30 +280,9 @@
   });
   form.addEventListener('submit', (e) => { e.preventDefault(); send(input.value); });
 
-  // ---------- Sugerencias (según la industria de la empresa) ----------
-  const PROMPTS = {
-    default: ['Polo azul marino con logo para 20 meseros', 'Camisa oxford blanca para recepción', 'Hoodie negro con logo para el equipo de bodega', 'Cotizar overoles para 50 operarios'],
-    restaurantes: ['Polo negro con logo para 15 meseros', 'Chaquetas de chef blancas para cocina', 'Delantales con logo para baristas', 'Camisa oxford para gerentes de sala'],
-    hoteleria: ['Camisa oxford blanca para recepción', 'Polo azul marino para botones', 'Uniformes para housekeeping', 'Hoodie gris para mantenimiento'],
-    salud: ['Antifluidos azul rey para enfermería', 'Batas blancas para médicos', 'Polo blanco con logo para recepción', 'Cotizar uniformes para 40 auxiliares'],
-    industrial: ['Overoles con logo para 50 operarios', 'Camiseta gris con logo para planta', 'Hoodie azul marino para turno de noche', 'Cotizar botas y EPP para bodega'],
-    construccion: ['Chalecos y cascos para obra', 'Camiseta naranja con logo para 30 obreros', 'Overoles para maestros de obra', 'Cotizar botas de seguridad'],
-    logistica: ['Hoodie negro con logo para bodega', 'Polo gris para conductores', 'Chalecos reflectivos para patio', 'Cotizar botas para 25 operarios'],
-    retail: ['Polo rojo con logo para cajeros', 'Camiseta negra para piso de venta', 'Delantales para reposición', 'Camisa oxford para gerentes de tienda'],
-    limpieza: ['Uniformes de limpieza para 20 personas', 'Camiseta celeste con logo para el equipo', 'Cotizar guantes y EPP', 'Polo gris para supervisores'],
-    seguridad: ['Camisa azul marino para guardias', 'Chalecos para vigilantes', 'Hoodie negro para turno de noche', 'Cotizar botas para 30 guardias'],
-  };
-  function renderChips(list) {
-    chipsEl.innerHTML = list.map(p => `<button type="button" class="chip-prompt">${SPARK}${esc(p)}</button>`).join('');
-    chipsEl.querySelectorAll('.chip-prompt').forEach((b, i) => b.addEventListener('click', () => send(list[i])));
-  }
-  // dashboard.html llama a updateDotPrompts(company.industry) al cargar la empresa.
-  window.updateDotPrompts = function (industry) {
-    const k = norm(industry).replace(/[^a-z]/g, '');
-    renderChips(PROMPTS[k] || PROMPTS.default);
-  };
+  // dashboard.html llama a updateDotPrompts(company.industry); ya no hay sugerencias rápidas.
+  window.updateDotPrompts = function () {};
 
-  renderChips(PROMPTS.default);
   restore();
   syncBtn();
   if (!history.length && window.matchMedia('(min-width: 769px)').matches) input.focus();
