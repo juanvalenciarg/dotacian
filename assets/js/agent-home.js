@@ -314,13 +314,33 @@
     input.style.height = 'auto';
     input.style.height = Math.min(input.scrollHeight, 200) + 'px';
   }
-  function syncBtn() { sendBtn.disabled = busy || !input.value.trim(); }
+  function syncBtn() {
+    sendBtn.disabled = busy || !input.value.trim();
+    const nb = document.getElementById('agent-new');
+    if (nb) nb.disabled = busy;
+  }
 
   input.addEventListener('input', () => { autosize(); syncBtn(); });
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); send(input.value); }
   });
   form.addEventListener('submit', (e) => { e.preventDefault(); send(input.value); });
+
+  // ---------- Nueva conversación ----------
+  const newBtn = document.getElementById('agent-new');
+  function newConversation() {
+    if (busy) return;
+    history = [];
+    try { sessionStorage.removeItem(STORE_KEY); } catch (e) { /* sin storage */ }
+    thread.innerHTML = '';
+    agent.classList.remove('started');
+    input.value = '';
+    autosize();
+    syncBtn();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    input.focus();
+  }
+  if (newBtn) newBtn.addEventListener('click', newConversation);
 
   // dashboard.html llama a updateDotPrompts(company.industry); ya no hay sugerencias rápidas.
   window.updateDotPrompts = function () {};

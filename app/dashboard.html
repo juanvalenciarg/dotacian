@@ -714,6 +714,13 @@
     .chip-prompt svg { color: #1F7BFF; }
     .agent.started .chips { display: none; }
     .agent.started .agent-intro { display: none; }
+    .new-chat { display: none;
+    }
+    .agent.started .new-chat { display: inline-flex; }
+    .agent.started .composer-hint { display: none; }
+    .new-chat { align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; border: 1.5px solid #E3E8F0; background: #fff; align-items: center; color: #0F172A; font: inherit; font-size: .88rem; font-weight: 600; cursor: pointer; transition: border-color .2s, color .2s, transform .2s; }
+    .new-chat:hover { border-color: #1F7BFF; color: #1F7BFF; transform: translateY(-1px); }
+    .new-chat:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 
     .ops-head { display: flex; align-items: baseline; justify-content: space-between; margin: 0 0 1.25rem; }
     .ops-head h2 { font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; color: #0F172A; margin: 0; }
@@ -869,6 +876,9 @@
             <textarea id="agent-input" rows="2" maxlength="1200"
               placeholder="Describe lo que necesitas: prenda, color, para qué rol y cuántas personas…"></textarea>
             <div class="composer-bar">
+              <button type="button" class="new-chat" id="agent-new" title="Borra esta conversación y empieza otra">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Nueva conversación
+              </button>
               <span class="composer-hint"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.8L20 10l-6.1 2.2L12 18l-1.9-5.8L4 10l6.1-2.2z"/></svg>Enter para enviar · Shift + Enter para nueva línea</span>
               <button type="submit" class="send" id="agent-send" aria-label="Enviar" disabled>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
@@ -1395,7 +1405,7 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
-  <script src="/assets/js/agent-home.js?v=4"></script>
+  <script src="/assets/js/agent-home.js?v=5"></script>
 </body>
 
 </html>
