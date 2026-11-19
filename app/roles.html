@@ -1318,6 +1318,21 @@
       initPortal();
     });
 
+    // ?nuevo=1 abre "Crear rol" al entrar (ej. desde "Asignar a roles" en Studio).
+    // ?volver=studio&diseno=<id> regresa a Studio con el modal de asignación abierto.
+    const ROLES_URL_PARAMS = new URLSearchParams(window.location.search);
+    if (ROLES_URL_PARAMS.get('nuevo') === '1') {
+      window.addEventListener('load', () => setTimeout(() => {
+        if (typeof openNewRoleModal === 'function') openNewRoleModal();
+      }, 300));
+    }
+    function returnToStudioAfterRoleCreated() {
+      if (ROLES_URL_PARAMS.get('volver') !== 'studio') return;
+      const diseno = ROLES_URL_PARAMS.get('diseno');
+      const qs = diseno ? '?' + new URLSearchParams({ diseno, asignar: '1' }).toString() : '';
+      setTimeout(() => { window.location.href = '/app/studio' + qs; }, 1200);
+    }
+
     // Listener independiente: si initPortal() falla, no debe impedir que los
     // dropdowns se inicialicen.
     document.addEventListener('DOMContentLoaded', () => {
@@ -2212,6 +2227,7 @@
         showToast(t('toast.roleCreatedTitle'), t('toast.roleCreatedMsg', { name }));
         closeNewRoleModal();
         renderRoles();
+        returnToStudioAfterRoleCreated();
       } catch (err) {
         console.error("Error creating role:", err);
         showToast(t('toast.errorTitle'), t('toast.errorCreatingRole'), 'error');

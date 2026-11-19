@@ -1036,6 +1036,30 @@
       border-radius: 0.75rem;
     }
 
+    .studio-assign-first {
+      padding: 1.75rem 1.25rem;
+      text-align: center;
+      background: #F8FAFC;
+      border: 1.5px dashed #D5DDE8;
+      border-radius: 1rem;
+    }
+    .studio-assign-first .ic {
+      width: 44px; height: 44px; margin: 0 auto 0.75rem; border-radius: 12px;
+      display: grid; place-items: center; background: rgba(31, 123, 255, 0.1); color: #1F7BFF;
+    }
+    .studio-assign-first strong { display: block; font-size: 1rem; color: var(--color-navy); margin-bottom: 0.25rem; }
+    .studio-assign-first p { font-size: 0.85rem; color: #64748B; margin: 0 0 1rem; line-height: 1.5; }
+    .studio-assign-first .btn { display: inline-flex; align-items: center; gap: 0.4rem; text-decoration: none; }
+
+    .studio-assign-more {
+      margin: 0.85rem 0 0;
+      font-size: 0.85rem;
+      color: #64748B;
+      text-align: center;
+    }
+    .studio-assign-more a { color: #1F7BFF; font-weight: 600; text-decoration: none; }
+    .studio-assign-more a:hover { text-decoration: underline; }
+
     .studio-design-actions {
       display: flex;
       flex-direction: column;
@@ -6269,12 +6293,40 @@
       const assignList = document.getElementById('studioAssignList');
       let assigningDesign = null;
 
-      function openAssignModal(d) {
+      // Enlace a Roles que abre "Crear rol" y, al crearlo, vuelve aquí con este
+      // diseño y el modal de asignación abiertos.
+      function newRoleUrl(d) {
+        const qs = new URLSearchParams({ nuevo: '1', volver: 'studio' });
+        if (d && d.id) qs.set('diseno', d.id);
+        return '/app/roles?' + qs.toString();
+      }
+
+      async function openAssignModal(d) {
         assigningDesign = d;
+        const saveBtnEl = document.getElementById('studioAssignSave');
         document.getElementById('studioAssignTitle').textContent = `Asignar "${d.nombre}" a roles`;
+        document.getElementById('studioAssignMsg').hidden = true;
+        assignList.innerHTML = '<div class="studio-assign-empty">Cargando roles…</div>';
+        saveBtnEl.style.display = 'none';
+        assignModal.classList.add('active');
+        // Siempre se recargan: el usuario pudo crear roles en otra pestaña.
+        try { await loadRoleUsage(); } catch (e) { console.error('Error recargando roles:', e); }
+        if (assigningDesign !== d) return; // se cerró o cambió mientras cargaba
+
         if (companyRoles.length === 0) {
-          assignList.innerHTML = '<div class="studio-assign-empty">Aún no tienes roles creados. <a href="/app/roles">Crea uno en Roles</a>.</div>';
-        } else {
+          assignList.innerHTML = `
+            <div class="studio-assign-first">
+              <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+              <strong>Crea tu primer rol</strong>
+              <p>Los roles agrupan a tus empleados por cargo (ej. Meseros, Operarios). Crea uno y vuelve aquí para asignarle este diseño.</p>
+              <a class="btn btn-primary" href="${newRoleUrl(d)}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Crear rol
+              </a>
+            </div>`;
+          return;
+        }
+        saveBtnEl.style.display = '';
+        {
           assignList.innerHTML = companyRoles.map((r, i) => {
             const def = roleDefinitions[r.role_name.toLowerCase()];
             const current = def && (def.items || []).find(item => item.design_id === d.id);
@@ -6291,10 +6343,9 @@
                 </span>
               </div>
             `;
-          }).join('');
+          }).join('') + `
+            <p class="studio-assign-more">¿No está el rol que estás buscando? <a href="${newRoleUrl(d)}">Crea un nuevo rol</a></p>`;
         }
-        document.getElementById('studioAssignMsg').hidden = true;
-        assignModal.classList.add('active');
       }
 
       function closeAssignModal() {
@@ -6438,7 +6489,12 @@
         Promise.all([loadDesigns(), loadAvailableGarments()]).then(() => {
           const wanted = URL_PARAMS.get('diseno');
           const d = wanted && designs.find(x => x.id === wanted);
-          if (d) { openDesign(d); return; }
+          if (d) {
+            openDesign(d);
+            // ?asignar=1: viene de crear un rol desde el modal de asignación.
+            if (URL_PARAMS.get('asignar') === '1') openAssignModal(d);
+            return;
+          }
           // ?prenda=<key>&color=<key> (desde el chat de Dotacian AI en Home):
           // abre Studio con esa prenda y ese color ya elegidos, si la empresa la tiene.
           const prenda = URL_PARAMS.get('prenda');
