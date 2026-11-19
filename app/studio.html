@@ -5133,6 +5133,38 @@
         logos.forEach(l => drawPhotoLogo(ctx, photo, l));
       }
 
+      // Imagen del diseño tal cual lo dejó el cliente (prenda, color y logos), para
+      // mostrarla en el Catálogo. Usa la vista de frente; si todos los logos están
+      // solo en la espalda, usa la espalda. Devuelve un Blob PNG o null si la
+      // prenda no tiene foto (vista 3D).
+      function capturePreviewBlob(size = 800) {
+        const specId = garment.key && photoSpecFor(garment.key, garment.cfg);
+        if (!specId) return Promise.resolve(null);
+        const front = photoFor(specId, 'front');
+        const back = photoFor(specId, 'back');
+        const onView = p => p && p.view && p.view.logos && logos.some(l => p.view.logos[l.placement]);
+        const photo = (!onView(front) && onView(back) && back.st) ? back : front;
+        if (!photo || !photo.st) return Promise.resolve(null);
+        const { st, tintId } = photo;
+        const hex = resolveColor(colorKey).hex;
+        const tintKey = `${tintId}-${hex}`;
+        if (tintKey !== photoTint) tintPhoto(st, hex, tintKey);
+        const src = document.createElement('canvas');
+        src.width = st.w;
+        src.height = st.h;
+        const sctx = src.getContext('2d');
+        sctx.drawImage(photoBase, 0, 0);
+        logos.forEach(l => { if (l.texture && l.texture.image) drawPhotoLogo(sctx, photo, l); });
+        photoSig = ''; // la vista visible se vuelve a componer en el siguiente cuadro
+        const out = document.createElement('canvas');
+        out.width = out.height = size;
+        const k = Math.min(size / st.w, size / st.h) * 0.92;
+        const octx = out.getContext('2d');
+        octx.imageSmoothingQuality = 'high';
+        octx.drawImage(src, (size - st.w * k) / 2, (size - st.h * k) / 2, st.w * k, st.h * k);
+        return new Promise(res => out.toBlob(res, 'image/png'));
+      }
+
       // Las fotos se cargan de una vez: la imagen de las tarjetas del admin las necesita.
       const photoLoads = [];
       Object.keys(PHOTO_VIEWS).forEach(key => {
@@ -5970,6 +6002,37 @@
         if (error) console.warn('No se pudo borrar el logo anterior:', error);
       }
 
+      // Imagen del diseño para el Catálogo: <empresa>/previews/<id diseño>.png en
+      // el mismo bucket privado de los logos. Si falla no bloquea nada.
+      function previewPath(designId) { return `${companyId}/previews/${designId}.png`; }
+
+      async function savePreview(designId) {
+        if (!designId || !companyId) return false;
+        try {
+          await photosReady;
+          const blob = await capturePreviewBlob();
+          if (!blob) return false;
+          const { error } = await window._supabase.storage.from(LOGOS_BUCKET)
+            .upload(previewPath(designId), blob, { contentType: 'image/png', upsert: true, cacheControl: '60' });
+          if (error) { console.warn('No se pudo guardar la imagen del diseño:', error); return false; }
+          return true;
+        } catch (e) {
+          console.warn('No se pudo generar la imagen del diseño:', e);
+          return false;
+        }
+      }
+
+      // Diseños guardados antes de esta función: al abrirlos se les crea la imagen.
+      async function ensurePreview(designId) {
+        if (!designId || !companyId) return;
+        try {
+          const { data } = await window._supabase.storage.from(LOGOS_BUCKET)
+            .list(`${companyId}/previews`, { search: `${designId}.png`, limit: 1 });
+          if (data && data.some(f => f.name === `${designId}.png`)) return;
+          await savePreview(designId);
+        } catch (e) { /* sin imagen: el Catálogo usa la foto sin logo */ }
+      }
+
       async function saveDesign(asNew) {
         const nombre = designNameInput.value.trim();
         if (!nombre) {
@@ -6044,6 +6107,7 @@
 
           currentDesign = data;
           logos.forEach((l, i) => { l.storedPath = savedLogos[i].path; });
+          await savePreview(data.id);
           setSaveMsg('');
           const syncedRoles = updating ? await syncDesignInRoles(data) : [];
           if (window.showToast) {
@@ -6249,6 +6313,7 @@
         renderDesigns();
         goToView('front');
         viewer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (!failed) ensurePreview(d.id);
       }
 
       // "Eliminar" archiva el diseño: deja de listarse y se quita de los roles,

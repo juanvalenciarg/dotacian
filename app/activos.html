@@ -528,6 +528,7 @@
     let catalogDesigns = [];
     let rolesByDesign = {};
     let logoUrls = {};
+    let previewUrls = {};   // id de diseño → imagen con logo (Studio)
 
     function escapeHtml(str) {
       return String(str == null ? '' : str)
@@ -568,6 +569,25 @@
         if (paths.length) {
           const { data } = await _supabase.storage.from('studio-logos').createSignedUrls(paths, 3600);
           (data || []).forEach(item => { if (item.signedUrl) logoUrls[item.path] = item.signedUrl; });
+        }
+
+        // Imagen del diseño tal cual se guardó en Studio (prenda + logos):
+        // studio-logos/<empresa>/previews/<id>.png. Si no existe, se usa la foto sin logo.
+        previewUrls = {};
+        try {
+          const { data: files } = await _supabase.storage.from('studio-logos')
+            .list(`${companyId}/previews`, { limit: 1000 });
+          const have = new Set((files || []).map(f => f.name));
+          const withPreview = catalogDesigns.filter(d => have.has(`${d.id}.png`));
+          if (withPreview.length) {
+            const { data } = await _supabase.storage.from('studio-logos')
+              .createSignedUrls(withPreview.map(d => `${companyId}/previews/${d.id}.png`), 3600);
+            (data || []).forEach((item, i) => {
+              if (item.signedUrl) previewUrls[withPreview[i].id] = item.signedUrl + '&v=' + encodeURIComponent(withPreview[i].updated_at || '');
+            });
+          }
+        } catch (e) {
+          console.warn('No se pudieron cargar las imágenes de los diseños:', e);
         }
 
         renderSavedDesigns();
@@ -611,8 +631,10 @@
         return `
           <article class="catalog-card">
             <a class="catalog-render" href="/app/uniformes/studio?diseno=${encodeURIComponent(d.id)}" aria-label="Abrir ${escapeHtml(d.nombre)} en Dotacian Studio">
-              <span class="catalog-render-img" data-render="${escapeHtml(d.prenda)}" data-color="${escapeHtml(d.color)}" data-opciones="${escapeHtml(d.opciones ? JSON.stringify(d.opciones) : '')}"></span>
-              ${d.logo_path && logoUrls[d.logo_path] ? `<span class="catalog-logo"><img src="${escapeHtml(logoUrls[d.logo_path])}" alt="Logo"></span>` : ''}
+              ${previewUrls[d.id]
+                ? `<span class="catalog-render-img"><img src="${escapeHtml(previewUrls[d.id])}" alt="${escapeHtml(d.nombre)} con logo" loading="lazy"></span>`
+                : `<span class="catalog-render-img" data-render="${escapeHtml(d.prenda)}" data-color="${escapeHtml(d.color)}" data-opciones="${escapeHtml(d.opciones ? JSON.stringify(d.opciones) : '')}"></span>
+              ${d.logo_path && logoUrls[d.logo_path] ? `<span class="catalog-logo"><img src="${escapeHtml(logoUrls[d.logo_path])}" alt="Logo"></span>` : ''}`}
             </a>
             <div class="catalog-body">
               <div class="catalog-name">${escapeHtml(d.nombre)}</div>
