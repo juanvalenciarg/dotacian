@@ -1,0 +1,350 @@
+/* ==========================================================================
+   Dotacian App Theme — WorkwearTech
+   Se carga después de styles.css y de los estilos de cada pantalla en /app/*.
+   Solo afecta al portal cliente (no a seller ni admin).
+   ========================================================================== */
+
+:root {
+  --wt-ink: #05080F;
+  --wt-ink-2: #0A101C;
+  --wt-ink-3: #111A2B;
+  --wt-blue: #1F7BFF;
+  --wt-blue-hover: #1366E6;
+  --wt-blue-soft: rgba(31, 123, 255, 0.10);
+  --wt-blue-ring: rgba(31, 123, 255, 0.16);
+  --wt-cyan: #06B6D4;
+  --wt-mist: #F4F7FB;
+  --wt-line: #E3E8F0;
+  --wt-text: #0F172A;
+  --wt-text-2: #475569;
+  --wt-text-3: #94A3B8;
+  --wt-grad: linear-gradient(100deg, #3B8CFF 0%, #06B6D4 100%);
+  --wt-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 32px -18px rgba(15, 23, 42, 0.18);
+  --wt-shadow-hover: 0 1px 2px rgba(15, 23, 42, 0.04), 0 20px 44px -18px rgba(15, 23, 42, 0.26);
+
+  /* Re-mapeo de tokens existentes: el acento pasa de cian a azul eléctrico */
+  --color-cyan: #1F7BFF;
+  --color-cyan-hover: #1366E6;
+  --color-cyan-dim: rgba(31, 123, 255, 0.10);
+  --color-cyan-glow: rgba(31, 123, 255, 0.22);
+  --color-brand-accent: #1F7BFF;
+  --color-brand-accent-hover: #1366E6;
+  --color-smoke: #F4F7FB;
+  --color-surface-light: #F4F7FB;
+  --color-border: #E3E8F0;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+}
+
+body,
+.app-layout,
+.main-content {
+  background: var(--wt-mist) !important;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  background:
+    radial-gradient(420px 320px at 0% 0%, rgba(31, 123, 255, 0.22), transparent 70%),
+    var(--wt-ink) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-header {
+  padding-top: 1.75rem !important;
+  padding-bottom: 1.5rem !important;
+}
+
+.sidebar-nav {
+  padding: 0.5rem 0.9rem 1rem !important;
+}
+
+.nav-item {
+  color: rgba(230, 236, 245, 0.62) !important;
+  border-radius: 12px !important;
+  padding: 0.78rem 1rem !important;
+  margin-bottom: 0.3rem !important;
+  gap: 0.85rem !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 0.95rem;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: background-color .2s, color .2s !important;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #fff !important;
+}
+
+.nav-item.active {
+  background: rgba(31, 123, 255, 0.16) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+
+.nav-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 22%;
+  bottom: 22%;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--wt-grad);
+}
+
+.nav-item .nav-icon { color: rgba(230, 236, 245, 0.5); transition: color .2s; }
+.nav-item:hover .nav-icon { color: #fff; }
+.nav-item.active .nav-icon { color: #6FB1FF !important; }
+
+.nav-sub-item {
+  border-radius: 10px !important;
+}
+
+.sidebar-avatar-badge {
+  background: var(--wt-grad) !important;
+  color: #fff !important;
+  border: 2px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 10px 24px -10px rgba(31, 123, 255, 0.8) !important;
+  font-family: 'Outfit', sans-serif !important;
+}
+
+/* ---------- Header / títulos ---------- */
+.app-header {
+  background: transparent !important;
+  border-bottom: 0 !important;
+}
+
+.dot-greeting,
+.welcome-title,
+.page-title {
+  background: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  -webkit-text-fill-color: var(--wt-text) !important;
+  color: var(--wt-text) !important;
+  font-family: 'Outfit', sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.035em !important;
+  line-height: 1.05 !important;
+}
+
+.welcome-banner {
+  background:
+    radial-gradient(700px 400px at 85% 0%, rgba(31, 123, 255, 0.35), transparent 65%),
+    var(--wt-ink) !important;
+}
+.welcome-banner .welcome-title,
+.welcome-banner h1 {
+  -webkit-text-fill-color: #fff !important;
+  color: #fff !important;
+}
+
+.main-content h2,
+.main-content h3 {
+  letter-spacing: -0.02em;
+}
+
+/* ---------- Tarjetas ---------- */
+.app-card,
+.stat-card-premium,
+.setup-card-premium,
+.insight-card,
+.kpi-card {
+  background: #fff !important;
+  border: 1px solid var(--wt-line) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--wt-shadow) !important;
+  backdrop-filter: none !important;
+}
+
+.stat-card-premium {
+  transition: box-shadow .25s, transform .25s !important;
+}
+.stat-card-premium:hover {
+  box-shadow: var(--wt-shadow-hover) !important;
+  transform: translateY(-2px) !important;
+}
+.stat-card-premium::before { display: none !important; }
+
+.stat-icon-box {
+  background: var(--wt-blue-soft) !important;
+  color: var(--wt-blue) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 12px !important;
+}
+
+.stat-label-p,
+.kpi-label {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  color: var(--wt-text-3) !important;
+}
+
+.stat-value-p,
+.kpi-value {
+  font-family: 'Outfit', sans-serif !important;
+  color: var(--wt-text) !important;
+  letter-spacing: -0.03em;
+}
+
+/* ---------- Botones ---------- */
+.main-content .btn,
+.modal-overlay .btn {
+  border-radius: 999px !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 600 !important;
+  transition: background-color .2s, border-color .2s, color .2s, box-shadow .2s, transform .2s !important;
+}
+
+.btn-primary {
+  background: var(--wt-blue) !important;
+  border-color: var(--wt-blue) !important;
+  color: #fff !important;
+  box-shadow: 0 10px 24px -12px rgba(31, 123, 255, 0.8) !important;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--wt-blue-hover) !important;
+  border-color: var(--wt-blue-hover) !important;
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: #fff !important;
+  border: 1.5px solid var(--wt-line) !important;
+  color: var(--wt-text) !important;
+}
+.btn-outline:hover:not(:disabled) {
+  border-color: var(--wt-text) !important;
+  background: #fff !important;
+  color: var(--wt-text) !important;
+}
+
+.filter-chip {
+  border-radius: 999px !important;
+  border: 1.5px solid var(--wt-line) !important;
+  background: #fff !important;
+  color: var(--wt-text-2) !important;
+  font-weight: 600 !important;
+}
+.filter-chip.active,
+.filter-chip:hover {
+  background: var(--wt-ink) !important;
+  border-color: var(--wt-ink) !important;
+  color: #fff !important;
+}
+
+/* ---------- Formularios ---------- */
+.main-content input[type="text"],
+.main-content input[type="email"],
+.main-content input[type="number"],
+.main-content input[type="search"],
+.main-content input[type="tel"],
+.main-content input[type="date"],
+.main-content input[type="password"],
+.main-content select,
+.main-content textarea,
+.modal-overlay input[type="text"],
+.modal-overlay input[type="email"],
+.modal-overlay input[type="number"],
+.modal-overlay input[type="search"],
+.modal-overlay input[type="tel"],
+.modal-overlay input[type="date"],
+.modal-overlay select,
+.modal-overlay textarea {
+  border-radius: 12px !important;
+  border-color: var(--wt-line) !important;
+  font-family: 'Inter', sans-serif;
+  transition: border-color .2s, box-shadow .2s, background-color .2s;
+}
+
+.main-content input:focus,
+.main-content select:focus,
+.main-content textarea:focus,
+.modal-overlay input:focus,
+.modal-overlay select:focus,
+.modal-overlay textarea:focus {
+  outline: none !important;
+  border-color: var(--wt-blue) !important;
+  box-shadow: 0 0 0 4px var(--wt-blue-ring) !important;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--wt-blue);
+}
+
+/* ---------- Tablas ---------- */
+.data-table th {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  color: var(--wt-text-3) !important;
+  border-bottom: 1px solid var(--wt-line) !important;
+  background: transparent !important;
+}
+.data-table td {
+  border-bottom-color: #EEF2F7 !important;
+}
+.data-table tbody tr:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  background: #F8FAFD !important;
+}
+
+.status-badge {
+  border-radius: 999px !important;
+  font-family: 'Inter', sans-serif !important;
+  letter-spacing: 0.02em;
+}
+
+/* ---------- Modales y popovers ---------- */
+.modal-overlay {
+  background: rgba(5, 8, 15, 0.55) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+}
+
+.modal-content,
+.modal-content-lg {
+  border-radius: 24px !important;
+  border: 1px solid var(--wt-line) !important;
+  box-shadow: 0 40px 100px -30px rgba(2, 8, 23, 0.45) !important;
+}
+
+.user-popover {
+  border-radius: 18px !important;
+  border: 1px solid var(--wt-line) !important;
+  box-shadow: 0 30px 70px -24px rgba(2, 8, 23, 0.4) !important;
+}
+.popover-profile-avatar {
+  background: var(--wt-grad) !important;
+  color: #fff !important;
+}
+.popover-menu-item {
+  border-radius: 10px !important;
+}
+.popover-menu-item:hover {
+  background: var(--wt-mist) !important;
+}
+
+/* ---------- Toasts ---------- */
+.toast {
+  border-radius: 16px !important;
+  box-shadow: 0 24px 60px -20px rgba(2, 8, 23, 0.45) !important;
+}
+
+/* ---------- Scrollbar en sidebar ---------- */
+.sidebar-nav::-webkit-scrollbar { width: 6px; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 6px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .stat-card-premium:hover { transform: none !important; }
+}
