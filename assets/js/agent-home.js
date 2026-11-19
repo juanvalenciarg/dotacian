@@ -204,12 +204,33 @@
       </a>`).join('')}</div></div>`;
   }
 
-  // dot-chat fue pensado para buscar en el catálogo: si su mensaje promete
-  // resultados de catálogo que aquí no mostramos, se usa la respuesta local.
+  // Contexto de negocio que acompaña cada mensaje, para que el agente responda
+  // como Dotacian (fabricante + plataforma) y no como un buscador de proveedores.
+  const DOTACIAN_CONTEXT = [
+    'Eres DotacIAn, el asistente de inteligencia artificial de Dotacian dentro de su plataforma.',
+    'Dotacian es la primera WorkwearTech de LATAM: una empresa todo en uno que fabrica uniformes empresariales y ofrece la plataforma para gestionarlos.',
+    'El cliente diseña el 100% de su uniforme en Dotacian Studio (prenda, color, cortes, detalles y su logo), solicita la cotización en la plataforma, y Dotacian lo fabrica, lo entrega a cada empleado con firma digital y le ayuda a controlar tallas, stock, renovaciones y gasto.',
+    'Dotacian diseña y fabrica todo: nunca sugieras buscar otros proveedores, tiendas, fabricantes o compras en línea.',
+    'Responde en español, en máximo 3 frases, con tono cálido y concreto. Si falta información, pregunta por prenda, color, rol, cantidad o tallas.',
+    'Debajo de tu respuesta la plataforma muestra botones de acción (diseñar en Studio, cotizar, crear rol), así que no inventes enlaces ni precios.',
+  ].join(' ');
+
+  function buildPrompt(text) {
+    const prev = history.slice(0, -1).slice(-6)
+      .map(m => (m.role === 'user' ? 'Cliente: ' + m.text : 'DotacIAn: ' + String(m.message || '').slice(0, 300)))
+      .join('\n');
+    return `[Contexto (no lo repitas al cliente)]\n${DOTACIAN_CONTEXT}\n` +
+      (prev ? `\n[Conversación previa]\n${prev}\n` : '') +
+      `\n[Mensaje del cliente]\n${text}`;
+  }
+
+  // Si el agente responde fuera del modelo de Dotacian (resultados de catálogo
+  // que aquí no mostramos, o mandar a buscar otros proveedores), se usa la respuesta local.
   function usableAiMessage(m) {
     if (!m || typeof m !== 'string') return null;
     const n = norm(m);
     if (/encontre|estas opciones|en el catalogo|resultados/.test(n)) return null;
+    if (/proveedor|en linea|tiendas?\b|fabricantes?|mercado ?libre|amazon|otras empresas/.test(n)) return null;
     return m.trim().slice(0, 1200);
   }
 
@@ -218,7 +239,9 @@
     if (!client || !client.functions) return {};
     try {
       const timeout = new Promise(res => setTimeout(() => res({ timeout: true }), 12000));
-      const call = client.functions.invoke('dot-chat', { body: { text } });
+      // `text` lleva el contexto + el mensaje; `context` y `message` van aparte
+      // por si la función los lee directamente.
+      const call = client.functions.invoke('dot-chat', { body: { text: buildPrompt(text), message: text, context: DOTACIAN_CONTEXT } });
       const r = await Promise.race([call, timeout]);
       if (!r || r.timeout || r.error || !r.data) return {};
       return { message: r.data.message, keywords: Array.isArray(r.data.keywords) ? r.data.keywords : [] };
@@ -243,6 +266,23 @@
     });
   }
 
+  // Lo que el cliente ya dijo en mensajes anteriores (prenda, color, rol,
+  // cantidad, logo) se conserva si el mensaje nuevo no lo cambia.
+  function mergeWithPrevious(p) {
+    const last = [...history].reverse().find(m => m.role === 'ai' && m.parsed);
+    if (!last) return p;
+    const q = last.parsed;
+    return {
+      ...p,
+      studio: p.studio || (p.others.length ? null : q.studio),
+      others: p.others.length || p.studio ? p.others : (q.others || []),
+      color: p.color || q.color,
+      role: p.role || q.role,
+      qty: p.qty || q.qty,
+      logo: p.logo || q.logo,
+    };
+  }
+
   let busy = false;
   async function send(text) {
     text = String(text || '').trim();
@@ -257,7 +297,9 @@
     typing.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
     const dot = await askDot(text);
-    const parsed = parse(text, dot.keywords);
+    // Solo el mensaje del cliente decide prenda/color/rol: las palabras clave del
+    // agente ahora salen también del contexto y podrían confundir la detección.
+    const parsed = mergeWithPrevious(parse(text));
     const message = usableAiMessage(dot.message) || localReply(parsed);
     renderAi(typing, message, parsed);
     history.push({ role: 'ai', message, parsed });
