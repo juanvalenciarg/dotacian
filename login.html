@@ -41,7 +41,7 @@
     /* Brand side */
     .brand {
       position: relative; overflow: hidden; color: #fff; padding: 48px 56px;
-      display: flex; flex-direction: column; justify-content: space-between;
+      display: flex; flex-direction: column;
       background:
         radial-gradient(700px 520px at 85% 35%, rgba(31, 123, 255, .3), transparent 60%),
         radial-gradient(500px 400px at 0% 100%, rgba(6, 182, 212, .14), transparent 60%),
@@ -59,7 +59,7 @@
     .back { font-size: .9rem; color: var(--on-dark-2); display: inline-flex; gap: 6px; align-items: center; }
     .back:hover { color: #fff; }
 
-    .brand-mid { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr; max-width: 620px; align-items: center; margin: 40px 0; }
+    .brand-mid { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr; max-width: 620px; align-items: center; margin: auto 0; padding: 40px 0; }
     .badge { display: inline-flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border-radius: 999px; background: rgba(255, 255, 255, .06); border: 1px solid var(--line-dark); margin-bottom: 26px; }
     .badge i { width: 24px; height: 24px; border-radius: 7px; display: grid; place-items: center; background: var(--blue); }
     .badge span { font-family: var(--font-head); font-weight: 700; letter-spacing: .06em; font-size: .78rem; text-transform: uppercase; }
@@ -84,9 +84,6 @@
     .fc-sign .ok { width: 34px; height: 34px; border-radius: 50%; background: #DCFCE7; color: #15803D; display: grid; place-items: center; flex: none; }
     @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
-    .brand-bottom { position: relative; z-index: 2; display: flex; gap: 28px; flex-wrap: wrap; font-size: .85rem; color: var(--on-dark-2); }
-    .brand-bottom span { display: inline-flex; gap: 8px; align-items: center; }
-    .brand-bottom i { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); }
 
     /* Form side */
     .form-side { display: flex; flex-direction: column; padding: 40px 56px; background: #fff; }
@@ -182,11 +179,6 @@
 
       </div>
 
-      <div class="brand-bottom">
-        <span><i></i>Uniforms made with your brand</span>
-        <span><i></i>AI-powered platform</span>
-        <span><i></i>Mexico and Colombia</span>
-      </div>
     </aside>
 
     <!-- Form side -->
