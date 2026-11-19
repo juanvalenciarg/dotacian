@@ -6,367 +6,260 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Iniciar Sesión | dotacian</title>
-  <link rel="preload" href="assets/images/banner_login.jpg" as="image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://images.unsplash.com">
   <style>
-    body,
-    html {
-      height: 100%;
-      margin: 0;
-      background-color: var(--color-smoke);
+    :root {
+      --ink: #05080F;
+      --ink-2: #0A101C;
+      --blue: #1F7BFF;
+      --cyan: #06B6D4;
+      --mint: #10B981;
+      --amber: #F59E0B;
+      --line: #E3E8F0;
+      --line-dark: rgba(255, 255, 255, 0.09);
+      --text: #0F172A;
+      --text-2: #475569;
+      --text-3: #94A3B8;
+      --on-dark-2: rgba(230, 236, 245, 0.68);
+      --grad: linear-gradient(100deg, #3B8CFF 0%, #06B6D4 100%);
+      --font-head: 'Outfit', system-ui, sans-serif;
+      --font-body: 'Inter', system-ui, sans-serif;
     }
 
-    .client-auth-container {
-      display: flex;
-      min-height: 100vh;
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body { font-family: var(--font-body); color: var(--text); background: #fff; -webkit-font-smoothing: antialiased; }
+    a { color: inherit; text-decoration: none; }
+    h1, h2 { font-family: var(--font-head); margin: 0; letter-spacing: -0.03em; line-height: 1.02; }
+    p { margin: 0; }
+
+    .auth { display: grid; grid-template-columns: 1.1fr 1fr; min-height: 100vh; }
+
+    /* Brand side */
+    .brand {
+      position: relative; overflow: hidden; color: #fff; padding: 48px 56px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      background:
+        radial-gradient(700px 520px at 85% 35%, rgba(31, 123, 255, .3), transparent 60%),
+        radial-gradient(500px 400px at 0% 100%, rgba(6, 182, 212, .14), transparent 60%),
+        var(--ink);
     }
-
-    .client-auth-brand {
-      flex: 1.2;
-      background-color: var(--color-navy);
-      background-image:
-        linear-gradient(135deg, rgba(10, 25, 47, 0.88) 0%, rgba(10, 25, 47, 0.75) 100%),
-        url('./assets/images/banner_login.jpg');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 4rem 6rem;
-      color: white;
+    .brand::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .25;
+      background-image: radial-gradient(rgba(255, 255, 255, .16) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(ellipse at 70% 40%, #000 0%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse at 70% 40%, #000 0%, transparent 70%);
     }
+    .brand-top { position: relative; display: flex; justify-content: space-between; align-items: center; z-index: 2; }
+    .brand-top img { height: 40px; width: auto; filter: brightness(0) invert(1); }
+    .back { font-size: .9rem; color: var(--on-dark-2); display: inline-flex; gap: 6px; align-items: center; }
+    .back:hover { color: #fff; }
 
-    .client-auth-brand::before {
-      content: '';
-      position: absolute;
-      width: 800px;
-      height: 800px;
-      background: radial-gradient(circle, var(--color-cyan-dim) 0%, transparent 60%);
-      top: -200px;
-      left: -200px;
-      border-radius: 50%;
+    .brand-mid { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 250px; gap: 56px; align-items: center; margin: 40px 0; }
+    .badge { display: inline-flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border-radius: 999px; background: rgba(255, 255, 255, .06); border: 1px solid var(--line-dark); margin-bottom: 26px; }
+    .badge i { width: 24px; height: 24px; border-radius: 7px; display: grid; place-items: center; background: var(--blue); }
+    .badge span { font-family: var(--font-head); font-weight: 700; letter-spacing: .06em; font-size: .78rem; text-transform: uppercase; }
+    .brand h1 { font-size: clamp(2.3rem, 3.3vw, 3.4rem); font-weight: 700; }
+    .brand h1 em { font-style: italic; font-weight: 600; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; padding-right: 4px; }
+    .brand-sub { margin-top: 20px; font-size: 1.08rem; line-height: 1.6; color: var(--on-dark-2); max-width: 440px; }
+
+    .visual { position: relative; height: 400px; }
+    .orbit { position: absolute; width: 380px; height: 380px; border: 1px solid rgba(111, 177, 255, .22); border-radius: 50%; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+    .photo { position: absolute; inset: 0 20px; border-radius: 160px 160px 24px 24px; overflow: hidden; background: #0d1626; box-shadow: 0 40px 80px -30px rgba(31, 123, 255, .55), inset 0 0 0 1px rgba(255, 255, 255, .08); }
+    .photo img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; display: block; }
+    .photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgba(5, 8, 15, .6) 100%); }
+    .fcard { position: absolute; background: #fff; color: var(--text); border-radius: 16px; padding: 12px 14px; box-shadow: 0 24px 60px -20px rgba(2, 8, 23, .6); font-size: .76rem; animation: bob 7s ease-in-out infinite; }
+    .fcard small { display: block; color: var(--text-3); font-size: .68rem; }
+    .fcard b { font-family: var(--font-head); font-size: .98rem; }
+    .fc-ai { right: -44px; top: 36px; width: 180px; }
+    .ai-tag { display: inline-flex; align-items: center; gap: 5px; font-size: .64rem; font-weight: 700; color: var(--blue); background: rgba(31, 123, 255, .1); padding: 3px 8px; border-radius: 999px; margin-bottom: 8px; }
+    .fc-ai .row { display: flex; align-items: baseline; gap: 8px; }
+    .fc-ai .row b { font-size: 1.6rem; }
+    .fc-ai .row span { color: var(--mint); font-weight: 700; font-size: .7rem; }
+    .fc-sign { left: -36px; bottom: 44px; width: 200px; display: flex; gap: 10px; align-items: center; animation-delay: -3s; }
+    .fc-sign .ok { width: 34px; height: 34px; border-radius: 50%; background: #DCFCE7; color: #15803D; display: grid; place-items: center; flex: none; }
+    @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+    .brand-bottom { position: relative; z-index: 2; display: flex; gap: 28px; flex-wrap: wrap; font-size: .85rem; color: var(--on-dark-2); }
+    .brand-bottom span { display: inline-flex; gap: 8px; align-items: center; }
+    .brand-bottom i { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); }
+
+    /* Form side */
+    .form-side { display: flex; flex-direction: column; padding: 40px 56px; background: #fff; }
+    .form-top { display: flex; justify-content: flex-end; gap: 18px; align-items: center; font-size: .9rem; color: var(--text-2); }
+    .form-top .lang { font-weight: 700; font-size: .82rem; letter-spacing: .04em; color: var(--text-3); }
+    .form-top .lang:hover { color: var(--text); }
+    .form-top .demo { font-weight: 600; color: var(--text); border: 1.5px solid var(--line); padding: 9px 18px; border-radius: 999px; transition: border-color .2s; }
+    .form-top .demo:hover { border-color: var(--text); }
+    .form-wrap { flex: 1; display: flex; align-items: center; justify-content: center; }
+    .box { width: 100%; max-width: 420px; }
+    .box .logo-mobile { display: none; margin-bottom: 28px; }
+    .box .logo-mobile img { height: 40px; width: auto; }
+    .box h2 { font-size: 2.4rem; }
+    .box .lead { color: var(--text-2); margin: 10px 0 34px; font-size: 1.02rem; }
+
+    .field { margin-bottom: 18px; position: relative; }
+    .field label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: 8px; }
+    .modern-input { width: 100%; padding: 15px 16px; border: 1.5px solid var(--line); border-radius: 14px; font: inherit; font-size: 1rem; background: #FAFBFD; color: var(--text); transition: border-color .2s, box-shadow .2s, background .2s; }
+    .modern-input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(31, 123, 255, .14); background: #fff; }
+    .modern-input::placeholder { color: var(--text-3); }
+    .toggle-password { position: absolute; right: 14px; top: 40px; background: none; border: 0; cursor: pointer; color: var(--text-3); display: grid; place-items: center; padding: 4px; }
+    .toggle-password:hover { color: var(--text); }
+    .row-opts { display: flex; justify-content: space-between; align-items: center; margin: 6px 0 26px; font-size: .88rem; gap: 12px; flex-wrap: wrap; }
+    .row-opts label { display: flex; align-items: center; gap: 8px; color: var(--text-2); cursor: pointer; font-weight: 500; }
+    .row-opts input { accent-color: var(--blue); width: 17px; height: 17px; cursor: pointer; }
+    .row-opts a { color: var(--blue); font-weight: 600; }
+    .row-opts a:hover { text-decoration: underline; }
+
+    .modern-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 7px 7px 7px 26px; border: 0; border-radius: 999px; background: var(--blue); color: #fff; font: inherit; font-weight: 700; font-size: 1.05rem; cursor: pointer; box-shadow: 0 12px 30px -10px rgba(31, 123, 255, .7); transition: transform .2s, box-shadow .2s; }
+    .modern-btn .arrow { width: 44px; height: 44px; border-radius: 50%; background: rgba(255, 255, 255, .18); display: grid; place-items: center; transition: transform .2s; }
+    .modern-btn:hover { transform: translateY(-2px); box-shadow: 0 18px 40px -12px rgba(31, 123, 255, .85); }
+    .modern-btn:hover .arrow { transform: translateX(3px); }
+    .modern-btn:disabled { opacity: .7; cursor: not-allowed; transform: none; }
+
+    .alt { margin-top: 30px; padding-top: 24px; border-top: 1px solid var(--line); font-size: .92rem; color: var(--text-2); text-align: center; }
+    .alt a { color: var(--blue); font-weight: 600; }
+    .alt a:hover { text-decoration: underline; }
+    .form-foot { font-size: .78rem; color: var(--text-3); text-align: center; }
+
+    .error-alert { display: none; background: #FEF2F2; border: 1.5px solid #FCA5A5; color: #991B1B; padding: 14px 16px; border-radius: 14px; margin-bottom: 20px; font-size: .88rem; font-weight: 500; align-items: center; gap: 10px; animation: fadeIn .3s ease; }
+    .error-alert svg { flex: none; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+
+    /* Toasts (utils.js showToast) */
+    .toast-container { position: fixed; right: 24px; bottom: 24px; z-index: 100; display: grid; gap: 10px; }
+    .toast { display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 16px; padding: 14px 16px; box-shadow: 0 24px 60px -20px rgba(2, 8, 23, .45); min-width: 260px; animation: toastSlideIn .4s cubic-bezier(.16, 1, .3, 1) forwards; }
+    .toast-icon { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: #DCFCE7; color: #15803D; flex: none; }
+    .toast.toast-error .toast-icon { background: #FFE4E6; color: #E11D48; }
+    .toast-title { font-weight: 700; font-size: .92rem; }
+    .toast-message { color: var(--text-2); font-size: .84rem; }
+    .toast-close { margin-left: auto; background: none; border: 0; color: var(--text-3); cursor: pointer; }
+    @keyframes toastSlideIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+    @keyframes toastSlideOut { to { opacity: 0; transform: translateY(16px); } }
+
+    @media (prefers-reduced-motion: reduce) { .fcard { animation: none; } }
+
+    @media (max-width: 1280px) {
+      .brand-mid { grid-template-columns: 1fr; }
+      .visual { display: none; }
     }
-
-    .client-auth-brand::after {
-      content: '';
-      position: absolute;
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, transparent 60%);
-      bottom: -100px;
-      right: -100px;
-      border-radius: 50%;
-    }
-
-    .brand-glass-panel {
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      padding: 3rem;
-      border-radius: var(--radius-xl);
-      position: relative;
-      z-index: 2;
-      max-width: 500px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    }
-
-    .brand-content h1 {
-      font-size: 3.5rem;
-      line-height: 1.1;
-      margin-bottom: 1.5rem;
-      letter-spacing: -0.02em;
-    }
-
-    .brand-content h1 span {
-      color: var(--color-cyan);
-    }
-
-    .brand-content p {
-      font-size: 1.125rem;
-      color: var(--color-text-on-dark);
-      opacity: 0.9;
-      line-height: 1.6;
-    }
-
-    .client-auth-form-container {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-      background: var(--color-background);
-      box-shadow: -20px 0 40px rgba(0, 0, 0, 0.05);
-      position: relative;
-      z-index: 999;
-    }
-
-    .client-auth-box {
-      width: 100%;
-      max-width: 440px;
-    }
-
-    .client-logo {
-      margin-bottom: 2.5rem;
-      display: block;
-    }
-
-    .client-logo img {
-      height: 85px;
-      width: auto;
-    }
-
-    .form-header {
-      margin-bottom: 2.5rem;
-    }
-
-    .form-header h2 {
-      font-size: 2rem;
-      color: var(--color-navy);
-      margin-bottom: 0.5rem;
-      letter-spacing: -0.02em;
-    }
-
-    .form-header p {
-      color: var(--color-text-secondary);
-      font-size: 1rem;
-    }
-
-    .modern-input-group {
-      margin-bottom: 1.5rem;
-      position: relative;
-    }
-
-    .modern-input-group label {
-      display: block;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--color-navy);
-      margin-bottom: 0.5rem;
-    }
-
-    .modern-input {
-      width: 100%;
-      padding: 1rem 1.25rem;
-      border: 1.5px solid var(--color-border);
-      border-radius: var(--radius-md);
-      font-size: 1rem;
-      transition: all 0.2s;
-      background: var(--color-smoke);
-      color: var(--color-navy);
-    }
-
-    .modern-input:focus {
-      outline: none;
-      border-color: var(--color-cyan);
-      box-shadow: 0 0 0 4px var(--color-cyan-dim);
-      background: white;
-    }
-
-    .modern-input::placeholder {
-      color: var(--color-text-muted);
-    }
-
-    .modern-btn {
-      width: 100%;
-      padding: 1rem;
-      background: var(--color-cyan);
-      color: var(--color-navy);
-      border: none;
-      border-radius: var(--radius-md);
-      font-weight: 700;
-      font-size: 1.125rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin-top: 1rem;
-      box-shadow: 0 4px 14px 0 rgba(6, 182, 212, 0.39);
-    }
-
-    .modern-btn:hover {
-      background: var(--color-cyan-hover);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.5);
-    }
-
-    .modern-btn:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .footer-links {
-      margin-top: 2rem;
-      text-align: center;
-      font-size: 0.9rem;
-      color: var(--color-text-secondary);
-    }
-
-    .footer-links a {
-      color: var(--color-cyan-hover);
-      font-weight: 600;
-      transition: color 0.2s;
-    }
-
-    .footer-links a:hover {
-      color: var(--color-cyan);
-      text-decoration: underline;
-    }
-
-    .toggle-password {
-      position: absolute;
-      right: 1.25rem;
-      top: 2.35rem;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--color-text-muted);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      transition: color 0.2s;
-    }
-
-    .toggle-password:hover {
-      color: var(--color-navy);
-    }
-
-    .error-alert {
-      display: none;
-      background: #FEF2F2;
-      border: 1.5px solid #FCA5A5;
-      color: #991B1B;
-      padding: 1rem 1.25rem;
-      border-radius: var(--radius-md);
-      margin-bottom: 1.5rem;
-      font-size: 0.875rem;
-      font-weight: 500;
-      align-items: center;
-      gap: 0.75rem;
-      animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @media (max-width: 968px) {
-      .client-auth-container {
-        flex-direction: column-reverse;
-      }
-
-      .client-auth-brand {
-        padding: 2rem 1rem;
-        flex: none;
-        min-height: 40vh;
-      }
-
-      .brand-glass-panel {
-        padding: 1.5rem;
-      }
-
-      .brand-content h1 {
-        font-size: 2.25rem;
-        word-wrap: break-word;
-        hyphens: auto;
-      }
-
-      .brand-content p {
-        font-size: 1rem;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .brand-content h1 {
-        font-size: 1.8rem;
-      }
+    @media (max-width: 900px) {
+      .auth { grid-template-columns: 1fr; }
+      .brand { display: none; }
+      .form-side { padding: 24px 16px 32px; min-height: 100vh; }
+      .form-top { justify-content: space-between; }
+      .box .logo-mobile { display: block; }
+      .box h2 { font-size: 2rem; }
+      .form-wrap { padding: 32px 0; }
     }
   </style>
 </head>
 
 <body>
-  <div class="client-auth-container">
+  <div class="auth">
 
-    <!-- Left Branding Section -->
-    <div class="client-auth-brand">
-      <div class="brand-glass-panel">
-        <div class="brand-content">
-          <h1>Cada uniforme. Siempre <span>a tiempo</span>.</h1>
-          <p>Diseña, compra y entrega los uniformes de cada rol — desde la primera prenda hasta cada reposición.</p>
+    <!-- Brand side -->
+    <aside class="brand">
+      <div class="brand-top">
+        <a href="index.html"><img src="assets/logos/logo_dotacian.png" alt="Dotacian"></a>
+        <a href="index.html" class="back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 19l-7-7 7-7"/></svg>Volver al inicio</a>
+      </div>
+
+      <div class="brand-mid">
+        <div>
+          <div class="badge">
+            <i><svg width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l1.9 5.8L20 10l-6.1 2.2L12 18l-1.9-5.8L4 10l6.1-2.2z"/></svg></i>
+            <span>La primera WorkwearTech de LATAM</span>
+          </div>
+          <h1>Tu dotación, <em>bajo control.</em></h1>
+          <p class="brand-sub">Tallas, pedidos, entregas firmadas y gasto de cada empleado en un solo lugar, con la ayuda de la IA.</p>
+        </div>
+
+        <div class="visual" aria-hidden="true">
+          <div class="orbit"></div>
+          <div class="photo">
+            <!-- Stock (Unsplash). Reemplazar por foto propia en assets/images/ -->
+            <img src="https://images.unsplash.com/photo-1735494032948-14ef288fc9d3?w=700&q=75&auto=format&fit=crop" alt="">
+          </div>
+          <div class="fcard fc-ai">
+            <span class="ai-tag"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.8L20 10l-6.1 2.2L12 18l-1.9-5.8L4 10l6.1-2.2z"/></svg>Dotacian AI</span>
+            <small>Talla sugerida · Carlos R.</small>
+            <div class="row"><b>L</b><span>96% de ajuste</span></div>
+          </div>
+          <div class="fcard fc-sign">
+            <span class="ok"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            <div><b>Dotación firmada</b><small>Laura G. · hace 2 min</small></div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Right Form Section -->
-    <div class="client-auth-form-container">
-      <div class="client-auth-box">
+      <div class="brand-bottom">
+        <span><i></i>Uniformes fabricados con tu marca</span>
+        <span><i></i>Plataforma con IA</span>
+        <span><i></i>México y Colombia</span>
+      </div>
+    </aside>
 
-        <a href="index.html" class="client-logo">
-          <img src="assets/logos/logo_dotacian.png" alt="dotacian logo">
-        </a>
+    <!-- Form side -->
+    <main class="form-side">
+      <div class="form-top">
+        <a href="login.html" class="lang" hreflang="en">EN</a>
+        <a href="index.html#agendar-demo" class="demo">Agendar demo</a>
+      </div>
 
-        <div class="form-header">
+      <div class="form-wrap">
+        <div class="box">
+          <a href="index.html" class="logo-mobile"><img src="assets/logos/logo_dotacian.png" alt="Dotacian"></a>
           <h2>Bienvenido de vuelta</h2>
-          <p>Ingresa a tu portal corporativo.</p>
-        </div>
+          <p class="lead">Ingresa a tu portal corporativo.</p>
 
-        <form class="auth-form" id="client-login-form" onsubmit="return false;">
-          <div id="login-error-alert" class="error-alert">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="12"></line>
-              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-            <span id="error-message-text">Credenciales inválidas.</span>
-          </div>
-
-          <div class="modern-input-group">
-            <label for="email">Correo Electrónico</label>
-            <input type="email" id="email" class="modern-input" placeholder="ejemplo@empresa.com" required>
-          </div>
-
-          <div class="modern-input-group">
-            <label for="password">Contraseña</label>
-            <input type="password" id="password" class="modern-input" placeholder="••••••••" required
-              style="padding-right: 3rem;">
-            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('password', this)">
-              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
+          <form class="auth-form" id="client-login-form" onsubmit="return false;">
+            <div id="login-error-alert" class="error-alert" role="alert">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
               </svg>
-            </button>
-          </div>
+              <span id="error-message-text">Credenciales inválidas.</span>
+            </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-            <label
-              style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--color-text-secondary); cursor: pointer; font-weight: 500;">
-              <input type="checkbox" id="remember"
-                style="accent-color: var(--color-brand-accent); width: 1.1rem; height: 1.1rem; cursor: pointer;">
-              Recordarme
-            </label>
-            <a href="recuperar.html"
-              style="font-size: 0.875rem; color: var(--color-cyan-hover); font-weight: 600;">¿Olvidaste tu
-              contraseña?</a>
-          </div>
+            <div class="field">
+              <label for="email">Correo electrónico</label>
+              <input type="email" id="email" class="modern-input" placeholder="ejemplo@empresa.com" autocomplete="email" required>
+            </div>
 
-          <button type="submit" class="modern-btn">Iniciar Sesión</button>
-        </form>
+            <div class="field">
+              <label for="password">Contraseña</label>
+              <input type="password" id="password" class="modern-input" placeholder="••••••••" autocomplete="current-password" required
+                style="padding-right: 3rem;">
+              <button type="button" class="toggle-password" aria-label="Mostrar contraseña" onclick="togglePasswordVisibility('password', this)">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+
+            <div class="row-opts">
+              <label><input type="checkbox" id="remember">Recordarme</label>
+              <a href="recuperar.html">¿Olvidaste tu contraseña?</a>
+            </div>
+
+            <button type="submit" class="modern-btn"><span class="btn-label">Iniciar sesión</span><span class="arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span></button>
+          </form>
+
+          <p class="alt">¿Aún no eres cliente? <a href="index.html#agendar-demo">Agenda una demo</a></p>
+        </div>
       </div>
-    </div>
+
+      <p class="form-foot">&copy; 2026 Dotacian · Made in LATAM</p>
+    </main>
 
   </div>
 
@@ -410,7 +303,7 @@
         const submitBtn = loginForm.querySelector('button[type="submit"]');
 
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Iniciando sesión...';
+        submitBtn.querySelector('.btn-label').textContent = 'Iniciando sesión...';
 
         const errorAlert = document.getElementById('login-error-alert');
         const errorText = document.getElementById('error-message-text');
@@ -420,7 +313,7 @@
           errorText.textContent = 'Error de conexión. Asegúrate de estar conectado a internet y de no tener bloqueadores de red activos.';
           errorAlert.style.display = 'flex';
           submitBtn.disabled = false;
-          submitBtn.textContent = 'Iniciar Sesión';
+          submitBtn.querySelector('.btn-label').textContent = 'Iniciar sesión';
           return;
         }
 
@@ -445,7 +338,7 @@
             errorAlert.style.display = 'flex';
 
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Iniciar Sesión';
+            submitBtn.querySelector('.btn-label').textContent = 'Iniciar sesión';
             return;
           }
 
@@ -478,7 +371,7 @@
             errorAlert.style.display = 'flex';
           }
           submitBtn.disabled = false;
-          submitBtn.textContent = 'Iniciar Sesión';
+          submitBtn.querySelector('.btn-label').textContent = 'Iniciar sesión';
         }
       });
     }
