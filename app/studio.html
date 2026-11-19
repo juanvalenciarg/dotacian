@@ -6434,7 +6434,15 @@
         Promise.all([loadDesigns(), loadAvailableGarments()]).then(() => {
           const wanted = URL_PARAMS.get('diseno');
           const d = wanted && designs.find(x => x.id === wanted);
-          if (d) openDesign(d);
+          if (d) { openDesign(d); return; }
+          // ?prenda=<key>&color=<key> (desde el chat de Dotacian AI en Home):
+          // abre Studio con esa prenda y ese color ya elegidos, si la empresa la tiene.
+          const prenda = URL_PARAMS.get('prenda');
+          const okPrenda = prenda && GARMENTS[prenda] && PHOTO_GARMENTS.includes(prenda) &&
+            (!availableGarments || availableGarments.has(prenda));
+          if (okPrenda && garment.key !== prenda) setGarment(prenda);
+          const color = URL_PARAMS.get('color');
+          if (color && document.querySelector(`#studioSwatches .studio-swatch[data-color="${CSS.escape(color)}"]`)) setColor(color);
         });
       }
 
