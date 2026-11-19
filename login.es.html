@@ -10,7 +10,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
     rel="stylesheet">
-  <link rel="preconnect" href="https://images.unsplash.com">
   <style>
     :root {
       --ink: #05080F;
@@ -60,11 +59,11 @@
     .back { font-size: .9rem; color: var(--on-dark-2); display: inline-flex; gap: 6px; align-items: center; }
     .back:hover { color: #fff; }
 
-    .brand-mid { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 250px; gap: 56px; align-items: center; margin: 40px 0; }
+    .brand-mid { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr; max-width: 620px; align-items: center; margin: 40px 0; }
     .badge { display: inline-flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border-radius: 999px; background: rgba(255, 255, 255, .06); border: 1px solid var(--line-dark); margin-bottom: 26px; }
     .badge i { width: 24px; height: 24px; border-radius: 7px; display: grid; place-items: center; background: var(--blue); }
     .badge span { font-family: var(--font-head); font-weight: 700; letter-spacing: .06em; font-size: .78rem; text-transform: uppercase; }
-    .brand h1 { font-size: clamp(2.3rem, 3.3vw, 3.4rem); font-weight: 700; }
+    .brand h1 { font-size: clamp(2.6rem, 4.6vw, 4.6rem); font-weight: 700; }
     .brand h1 em { font-style: italic; font-weight: 600; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; padding-right: 4px; }
     .brand-sub { margin-top: 20px; font-size: 1.08rem; line-height: 1.6; color: var(--on-dark-2); max-width: 440px; }
 
@@ -181,22 +180,6 @@
           <p class="brand-sub">Tallas, pedidos, entregas firmadas y gasto de cada empleado en un solo lugar, con la ayuda de la IA.</p>
         </div>
 
-        <div class="visual" aria-hidden="true">
-          <div class="orbit"></div>
-          <div class="photo">
-            <!-- Stock (Unsplash). Reemplazar por foto propia en assets/images/ -->
-            <img src="https://images.unsplash.com/photo-1735494032948-14ef288fc9d3?w=700&q=75&auto=format&fit=crop" alt="">
-          </div>
-          <div class="fcard fc-ai">
-            <span class="ai-tag"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.8L20 10l-6.1 2.2L12 18l-1.9-5.8L4 10l6.1-2.2z"/></svg>Dotacian AI</span>
-            <small>Talla sugerida · Carlos R.</small>
-            <div class="row"><b>L</b><span>96% de ajuste</span></div>
-          </div>
-          <div class="fcard fc-sign">
-            <span class="ok"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-            <div><b>Dotación firmada</b><small>Laura G. · hace 2 min</small></div>
-          </div>
-        </div>
       </div>
 
       <div class="brand-bottom">
