@@ -185,7 +185,7 @@
       </div>
       <div style="display: flex; align-items: center; gap: 2rem;">
         <nav class="nav-links" style="display: flex; gap: 1.5rem;">
-          <a href="index.en.html#como-funciona" id="nav-product" style="color: white; font-weight: 600;">Producto</a>
+          <a href="index.en.html#workweartech" id="nav-product" style="color: white; font-weight: 600;">Producto</a>
           <a href="blog.html" id="nav-resources" style="color: white; font-weight: 600;">Recursos</a>
         </nav>
         <div class="header-actions">
@@ -211,7 +211,7 @@
       <button class="drawer-close" id="drawer-close">&times;</button>
     </div>
     <nav class="drawer-nav">
-      <a href="index.en.html#como-funciona" id="drawer-product" style="font-weight: 600;">Producto</a>
+      <a href="index.en.html#workweartech" id="drawer-product" style="font-weight: 600;">Producto</a>
       <a href="blog.html" id="drawer-resources" style="font-weight: 600;">Recursos</a>
       <div class="drawer-divider"></div>
       <a href="index.en.html#agendar-demo" id="drawer-demo" class="btn"
@@ -264,7 +264,7 @@
     const STRINGS = {
       es: {
         product: 'Producto', resources: 'Recursos', demo: 'Agendar Demo',
-        indexHref: 'index.html', blogHref: 'blog.es.html',
+        indexHref: '/', blogHref: 'blog.es.html',
         back: 'Volver', by: 'Por', dateLocale: 'es-ES',
         switchLangLabel: 'Read in English',
         notFound: 'Artículo no encontrado.', backToBlog: 'Volver al blog',
@@ -273,7 +273,7 @@
       },
       en: {
         product: 'Product', resources: 'Resources', demo: 'Book a demo',
-        indexHref: 'index.html', blogHref: 'blog.html',
+        indexHref: 'index.en.html', blogHref: 'blog.html',
         back: 'Back', by: 'By', dateLocale: 'en-US',
         switchLangLabel: 'Leer en Español',
         notFound: 'Article not found.', backToBlog: 'Back to blog',
@@ -286,13 +286,13 @@
       const s = STRINGS[lang] || STRINGS.es;
       document.documentElement.lang = lang;
       document.getElementById('logo-link').href = s.indexHref;
-      document.getElementById('nav-product').href = `${s.indexHref}#como-funciona`;
+      document.getElementById('nav-product').href = `${s.indexHref}#workweartech`;
       document.getElementById('nav-product').textContent = s.product;
       document.getElementById('nav-resources').href = s.blogHref;
       document.getElementById('nav-resources').textContent = s.resources;
       document.getElementById('nav-demo').href = `${s.indexHref}#agendar-demo`;
       document.getElementById('nav-demo').textContent = s.demo;
-      document.getElementById('drawer-product').href = `${s.indexHref}#como-funciona`;
+      document.getElementById('drawer-product').href = `${s.indexHref}#workweartech`;
       document.getElementById('drawer-product').textContent = s.product;
       document.getElementById('drawer-resources').href = s.blogHref;
       document.getElementById('drawer-resources').textContent = s.resources;
