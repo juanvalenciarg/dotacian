@@ -15,7 +15,7 @@
   <!-- Language Alternates -->
   <link rel="alternate" hreflang="en" href="https://www.dotacian.com/blog.html">
   <link rel="alternate" hreflang="es" href="https://www.dotacian.com/blog.es.html">
-  <link rel="alternate" hreflang="x-default" href="https://www.dotacian.com/blog.html">
+  <link rel="alternate" hreflang="x-default" href="https://www.dotacian.com/blog.es.html">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -361,9 +361,12 @@
 
           const imageSrc = post.image_url ? post.image_url : 'assets/images/hero_image.png';
 
-          const card = document.createElement('div');
+          const card = document.createElement('a');
           card.className = 'blog-card';
-          card.onclick = () => window.location.href = `articulo.html?slug=${post.slug}`;
+          card.href = `articulo.html?slug=${encodeURIComponent(post.slug)}`;
+          card.style.textDecoration = 'none';
+          card.style.color = 'inherit';
+          card.style.display = 'block';
 
           card.innerHTML = `
             <div class="blog-image-wrapper">

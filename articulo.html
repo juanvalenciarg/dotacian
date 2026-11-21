@@ -6,6 +6,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Artículo | Dotacian</title>
+  <meta name="description" content="Artículos de The Dot, el blog de Dotacian, sobre compra, entrega y control de uniformes empresariales.">
+  <meta name="robots" content="index, follow">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -298,6 +300,42 @@
       document.getElementById('drawer-demo').textContent = s.demo;
     }
 
+    // SEO por artículo: URL canónica propia (con su slug), descripción, Open Graph
+    // y la versión en el otro idioma (hreflang). Google ejecuta este JS al indexar.
+    function setArticleSeo(post, sibling) {
+      const BASE = 'https://www.dotacian.com/articulo.html?slug=';
+      const url = BASE + encodeURIComponent(post.slug);
+      const head = document.head;
+      const upsert = (selector, make) => {
+        let el = head.querySelector(selector);
+        if (!el) { el = make(); head.appendChild(el); }
+        return el;
+      };
+      const link = (rel, extra = {}) => {
+        const sel = `link[rel="${rel}"]` + Object.entries(extra).map(([k, v]) => `[${k}="${v}"]`).join('');
+        return upsert(sel, () => { const l = document.createElement('link'); l.rel = rel; Object.entries(extra).forEach(([k, v]) => l.setAttribute(k, v)); return l; });
+      };
+      const meta = (attr, name) => upsert(`meta[${attr}="${name}"]`, () => { const m = document.createElement('meta'); m.setAttribute(attr, name); return m; });
+
+      const tmp = document.createElement('div');
+      tmp.innerHTML = post.content || '';
+      const desc = (tmp.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 155);
+      const lang = post.lang === 'en' ? 'en' : 'es';
+
+      link('canonical').href = url;
+      if (desc) meta('name', 'description').setAttribute('content', desc);
+      meta('property', 'og:type').setAttribute('content', 'article');
+      meta('property', 'og:url').setAttribute('content', url);
+      meta('property', 'og:title').setAttribute('content', post.title);
+      if (desc) meta('property', 'og:description').setAttribute('content', desc);
+      if (post.image_url) meta('property', 'og:image').setAttribute('content', post.image_url);
+      link('alternate', { hreflang: lang }).href = url;
+      if (sibling) {
+        const otherLang = sibling.lang === 'en' ? 'en' : 'es';
+        link('alternate', { hreflang: otherLang }).href = BASE + encodeURIComponent(sibling.slug);
+      }
+    }
+
     async function loadArticle() {
       const container = document.getElementById('article-container');
       const urlParams = new URLSearchParams(window.location.search);
@@ -328,6 +366,7 @@
         applyHeaderLang(lang);
 
         let translationLink = '';
+        let siblingPost = null;
         if (post.translation_group_id) {
           const { data: sibling } = await _supabaseBlog
             .from('blog_posts')
@@ -336,6 +375,7 @@
             .neq('id', post.id)
             .maybeSingle();
           if (sibling) {
+            siblingPost = sibling;
             const label = sibling.lang === 'en' ? STRINGS.es.switchLangLabel : STRINGS.en.switchLangLabel;
             translationLink = `
               <a href="articulo.html?slug=${sibling.slug}" class="article-lang-switch">
@@ -382,6 +422,7 @@
         const defaultAuthor = lang === 'en' ? 'Dotacian Team' : 'Equipo Dotacian';
 
         document.title = `${post.title} | ${s.titleSuffix}`;
+        setArticleSeo(post, siblingPost);
 
         container.innerHTML = `
           <section class="article-header">

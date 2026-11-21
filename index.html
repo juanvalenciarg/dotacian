@@ -619,7 +619,7 @@
   <!-- Header -->
   <header class="header" id="site-header">
     <div class="container">
-      <a href="index.html" class="logo"><img src="assets/logos/logo_dotacian.png" alt="Dotacian"></a>
+      <a href="/" class="logo"><img src="assets/logos/logo_dotacian.png" alt="Dotacian"></a>
       <nav class="nav" aria-label="Principal">
         <a href="#workweartech">WorkwearTech</a>
         <a href="#ia">Dotacian AI</a>
@@ -1351,9 +1351,9 @@
           const excerpt = (tmp.textContent || '').substring(0, 100) + '...';
           const imageSrc = post.image_url || 'assets/images/hero_image.png';
 
-          const card = document.createElement('div');
+          const card = document.createElement('a');
           card.className = 'blog-card';
-          card.onclick = () => window.location.href = `articulo.html?slug=${encodeURIComponent(post.slug)}`;
+          card.href = `articulo.html?slug=${encodeURIComponent(post.slug)}`;
           card.innerHTML = `
             <div class="blog-image-wrapper"><img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(post.title)}" class="blog-image" loading="lazy"></div>
             <div class="blog-content">

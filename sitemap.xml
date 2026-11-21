@@ -2,14 +2,115 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://www.dotacian.com/</loc>
+    <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="es" href="https://www.dotacian.com/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.dotacian.com/index.en.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.dotacian.com/"/>
   </url>
   <url>
     <loc>https://www.dotacian.com/index.en.html</loc>
+    <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="es" href="https://www.dotacian.com/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.dotacian.com/index.en.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.dotacian.com/"/>
   </url>
-  <url><loc>https://www.dotacian.com/blog.es.html</loc></url>
-  <url><loc>https://www.dotacian.com/blog.html</loc></url>
+  <url>
+    <loc>https://www.dotacian.com/blog.es.html</loc>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.dotacian.com/blog.es.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.dotacian.com/blog.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.dotacian.com/blog.es.html"/>
+  </url>
+  <url>
+    <loc>https://www.dotacian.com/blog.html</loc>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.dotacian.com/blog.es.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.dotacian.com/blog.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.dotacian.com/blog.es.html"/>
+  </url>
+  <url>
+    <loc>https://www.dotacian.com/articulo.html?slug=cuntos-uniformes-tienes-realmente-tres-pasos-para-averiguarlo</loc>
+    <lastmod>2026-11-02</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.dotacian.com/articulo.html?slug=the-end-of-uniform-chaos-why-corporate-apparel-management-must-enter-the-tech-era</loc>
+    <lastmod>2026-08-09</lastmod>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.dotacian.com/articulo.html?slug=the-end-of-uniform-chaos-why-corporate-apparel-management-must-enter-the-tech-era"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.dotacian.com/articulo.html?slug=el-fin-del-caos-de-los-uniformes-por-qu-la-gestin-de-dotaciones-corporativas-debe-evolucionar-a-la-era-tech"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.dotacian.com/articulo.html?slug=el-fin-del-caos-de-los-uniformes-por-qu-la-gestin-de-dotaciones-corporativas-debe-evolucionar-a-la-era-tech"/>
+  </url>
+  <url>
+    <loc>https://www.dotacian.com/articulo.html?slug=the-numbers-game-how-much-money-your-company-loses-on-uniforms-due-to-employee-turnover</loc>
+    <lastmod>2026-08-09</lastmod>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.dotacian.com/articulo.html?slug=the-numbers-game-how-much-money-your-company-loses-on-uniforms-due-to-employee-turnover"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.dotacian.com/articulo.html?slug=el-juego-de-los-nmeros-cunto-dinero-pierde-tu-empresa-en-uniformes-debido-a-la-rotacin-de-personal"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.dotacian.com/articulo.html?slug=el-juego-de-los-nmeros-cunto-dinero-pierde-tu-empresa-en-uniformes-debido-a-la-rotacin-de-personal"/>
+  </url>
+  <url>
+    <loc>https://www.dotacian.com/articulo.html?slug=from-intuition-to-data-how-ai-can-predict-your-uniform-inventory-for-next-quarter</loc>
+    <lastmod>2026-08-09</lastmod>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.dotacian.com/articulo.html?slug=from-intuition-to-data-how-ai-can-predict-your-uniform-inventory-for-next-quarter"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.dotacian.com/articulo.html?slug=de-la-intuicin-a-la-data-cmo-la-inteligencia-artificial-puede-predecir-tu-inventario-de-uniformes-para-el-prximo-trimestre"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.dotacian.com/articulo.html?slug=de-la-intuicin-a-la-data-cmo-la-inteligencia-artificial-puede-predecir-tu-inventario-de-uniformes-para-el-prximo-trimestre"/>
+  </url>
+  <url>
+    <loc>https://www.dotacian.com/articulo.html?slug=round-the-clock-and-out-of-stock-the-hidden-cost-of-outfitting-a-high-turnover-private-security-workforce</loc>
+    <lastmod>2026-08-09</lastmod>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.dotacian.com/articulo.html?slug=round-the-clock-and-out-of-stock-the-hidden-cost-of-outfitting-a-high-turnover-private-security-workforce"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.dotacian.com/articulo.html?slug=operativos-247-y-sin-stock-el-costo-oculto-de-vestir-a-una-fuerza-laboral-de-seguridad-privada-con-alta-rotacin"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.dotacian.com/articulo.html?slug=operativos-247-y-sin-stock-el-costo-oculto-de-vestir-a-una-fuerza-laboral-de-seguridad-privada-con-alta-rotacin"/>
+  </url>
+  <url>
+    <loc>https://www.dotacian.com/articulo.html?slug=the-ghost-inventory-the-financial-black-hole-where-your-uniform-budget-disappears</loc>
+    <lastmod>2026-08-09</lastmod>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.dotacian.com/articulo.html?slug=the-ghost-inventory-the-financial-black-hole-where-your-uniform-budget-disappears"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.dotacian.com/articulo.html?slug=el-inventario-fantasma-el-agujero-negro-financiero-donde-se-pierde-el-presupuesto-de-tus-uniformes"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.dotacian.com/articulo.html?slug=el-inventario-fantasma-el-agujero-negro-financiero-donde-se-pierde-el-presupuesto-de-tus-uniformes"/>
+  </url>
+  <url>
+    <loc>https://www.dotacian.com/articulo.html?slug=el-inventario-fantasma-el-agujero-negro-financiero-donde-se-pierde-el-presupuesto-de-tus-uniformes</loc>
+    <lastmod>2026-06-28</lastmod>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.dotacian.com/articulo.html?slug=the-ghost-inventory-the-financial-black-hole-where-your-uniform-budget-disappears"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.dotacian.com/articulo.html?slug=el-inventario-fantasma-el-agujero-negro-financiero-donde-se-pierde-el-presupuesto-de-tus-uniformes"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.dotacian.com/articulo.html?slug=el-inventario-fantasma-el-agujero-negro-financiero-donde-se-pierde-el-presupuesto-de-tus-uniformes"/>
+  </url>
+  <url>
+    <loc>https://www.dotacian.com/articulo.html?slug=operativos-247-y-sin-stock-el-costo-oculto-de-vestir-a-una-fuerza-laboral-de-seguridad-privada-con-alta-rotacin</loc>
+    <lastmod>2026-06-25</lastmod>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.dotacian.com/articulo.html?slug=round-the-clock-and-out-of-stock-the-hidden-cost-of-outfitting-a-high-turnover-private-security-workforce"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.dotacian.com/articulo.html?slug=operativos-247-y-sin-stock-el-costo-oculto-de-vestir-a-una-fuerza-laboral-de-seguridad-privada-con-alta-rotacin"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.dotacian.com/articulo.html?slug=operativos-247-y-sin-stock-el-costo-oculto-de-vestir-a-una-fuerza-laboral-de-seguridad-privada-con-alta-rotacin"/>
+  </url>
+  <url>
+    <loc>https://www.dotacian.com/articulo.html?slug=de-la-intuicin-a-la-data-cmo-la-inteligencia-artificial-puede-predecir-tu-inventario-de-uniformes-para-el-prximo-trimestre</loc>
+    <lastmod>2026-06-16</lastmod>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.dotacian.com/articulo.html?slug=from-intuition-to-data-how-ai-can-predict-your-uniform-inventory-for-next-quarter"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.dotacian.com/articulo.html?slug=de-la-intuicin-a-la-data-cmo-la-inteligencia-artificial-puede-predecir-tu-inventario-de-uniformes-para-el-prximo-trimestre"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.dotacian.com/articulo.html?slug=de-la-intuicin-a-la-data-cmo-la-inteligencia-artificial-puede-predecir-tu-inventario-de-uniformes-para-el-prximo-trimestre"/>
+  </url>
+  <url>
+    <loc>https://www.dotacian.com/articulo.html?slug=el-juego-de-los-nmeros-cunto-dinero-pierde-tu-empresa-en-uniformes-debido-a-la-rotacin-de-personal</loc>
+    <lastmod>2026-06-11</lastmod>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.dotacian.com/articulo.html?slug=the-numbers-game-how-much-money-your-company-loses-on-uniforms-due-to-employee-turnover"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.dotacian.com/articulo.html?slug=el-juego-de-los-nmeros-cunto-dinero-pierde-tu-empresa-en-uniformes-debido-a-la-rotacin-de-personal"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.dotacian.com/articulo.html?slug=el-juego-de-los-nmeros-cunto-dinero-pierde-tu-empresa-en-uniformes-debido-a-la-rotacin-de-personal"/>
+  </url>
+  <url>
+    <loc>https://www.dotacian.com/articulo.html?slug=el-fin-del-caos-de-los-uniformes-por-qu-la-gestin-de-dotaciones-corporativas-debe-evolucionar-a-la-era-tech</loc>
+    <lastmod>2026-06-09</lastmod>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.dotacian.com/articulo.html?slug=the-end-of-uniform-chaos-why-corporate-apparel-management-must-enter-the-tech-era"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.dotacian.com/articulo.html?slug=el-fin-del-caos-de-los-uniformes-por-qu-la-gestin-de-dotaciones-corporativas-debe-evolucionar-a-la-era-tech"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.dotacian.com/articulo.html?slug=el-fin-del-caos-de-los-uniformes-por-qu-la-gestin-de-dotaciones-corporativas-debe-evolucionar-a-la-era-tech"/>
+  </url>
 </urlset>
