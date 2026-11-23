@@ -901,7 +901,10 @@
             </div>
           </div>
 
-          <div style="margin-bottom: 1.25rem;">
+          <!-- Entrega a domicilio desactivada por ahora: se oculta la pregunta y
+               queda siempre en "No", así la sección de dirección nunca se muestra.
+               Para reactivarla, quitar el display: none de este bloque. -->
+          <div style="display: none; margin-bottom: 1.25rem;">
             <label>¿Se le entrega algo en su domicilio?</label>
             <div style="display: flex; gap: 1.25rem; margin-top: 0.5rem;">
               <label style="display: flex; align-items: center; gap: 0.4rem; font-weight: 500; cursor: pointer;">
