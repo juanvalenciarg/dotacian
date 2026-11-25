@@ -4734,7 +4734,7 @@
       // trims: partes en contraste (zona y polígono en fracción de la imagen). Dentro del
       // polígono se tiñe con el color de la zona lo que es más claro que la tela.
       const PHOTO_VIEWS = {
-        // Camisa de aseo: solo hay foto de frente; espalda y lados se ven en 3D.
+        // Camisa de aseo: lo que no tiene foto (espalda y, en mujer, los lados) se ve en 3D.
         camisaAseo: {
           garment: 'camisa_aseo',
           options: { corte: 'hombre', cuello: 'camisero', manga: 'corta', cierre: 'cremallera', bolsillos: 'inferiores' },
@@ -4760,6 +4760,36 @@
                 mangaIzq: { x: 0.778, y: 0.31 },
                 mangaDer: { x: 0.272, y: 0.31 }
               }
+            },
+            right: {
+              src: '/assets/images/studio/camisa_aseo_lado_der.jpg',
+              cmPerImage: 114,
+              bgMin: 210,
+              contrast: 0.5,
+              erode: 3,
+              maxShade: 1.08,
+              smooth: true,
+              trims: [
+                { zone: 'vivos', poly: [[0.4484, 0.075], [0.4712, 0.075], [0.5556, 0.1394], [0.5516, 0.1558], [0.5258, 0.1423], [0.4484, 0.0981]] },
+                { zone: 'vivos', poly: [[0.4048, 0.4404], [0.4464, 0.4212], [0.496, 0.4106], [0.5407, 0.4183], [0.5853, 0.4385], [0.5853, 0.4615], [0.5506, 0.4385], [0.5159, 0.4288], [0.4762, 0.4298], [0.4365, 0.4423], [0.4048, 0.4567]] },
+                { zone: 'detalle', poly: [[0.5635, 0.6885], [0.6349, 0.6692], [0.6706, 0.6327], [0.6706, 0.6692], [0.6448, 0.6962], [0.5635, 0.7308]] }
+              ],
+              logos: { mangaDer: { x: 0.487, y: 0.3 } }
+            },
+            left: {
+              src: '/assets/images/studio/camisa_aseo_lado_izq.jpg',
+              cmPerImage: 114,
+              bgMin: 210,
+              contrast: 0.5,
+              erode: 3,
+              maxShade: 1.08,
+              smooth: true,
+              trims: [
+                { zone: 'vivos', poly: [[0.5952, 0.0865], [0.5754, 0.0846], [0.4861, 0.1519], [0.4901, 0.1731], [0.5159, 0.1519], [0.5952, 0.1077]] },
+                { zone: 'vivos', poly: [[0.4762, 0.4538], [0.5655, 0.4212], [0.6587, 0.4519], [0.6587, 0.475], [0.5655, 0.4481], [0.4762, 0.4769]] },
+                { zone: 'detalle', poly: [[0.375, 0.6442], [0.3929, 0.6481], [0.4266, 0.6865], [0.496, 0.7038], [0.496, 0.7462], [0.4167, 0.7212], [0.375, 0.6846]] }
+              ],
+              logos: { mangaIzq: { x: 0.566, y: 0.31 } }
             }
           }
         },
