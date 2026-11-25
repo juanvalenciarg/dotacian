@@ -21,6 +21,7 @@
 
   // Prendas que Studio puede abrir (claves de GARMENTS con foto en app/studio.html)
   const STUDIO_GARMENTS = [
+    { key: 'camisa_aseo', label: 'Camisa antifluido para aseo', re: /\bcamisas?\b.*\b(aseo|antifluidos?|limpieza|servicios generales)\b|\bantifluidos?\b.*\b(aseo|limpieza|servicios generales)\b/ },
     { key: 'polo', label: 'Camiseta tipo polo', re: /\bpolos?\b|tipo polo|camibusos?/ },
     { key: 'camiseta', label: 'Camiseta', re: /\bcamisetas?\b|\bplayeras?\b|t-?shirts?|\bremeras?\b/ },
     { key: 'camisa', label: 'Camisa', re: /\bcamisas?\b|oxford/ },
@@ -74,7 +75,8 @@
     const raw = String(text || '');
     const t = norm(raw + ' ' + (extraKeywords || []).join(' '));
     const studio = STUDIO_GARMENTS.find(g => g.re.test(t)) || null;
-    const others = OTHER_GARMENTS.filter(g => g.re.test(t)).map(g => g.label);
+    // La camisa antifluido de aseo sí está en Studio: no se repite como prenda por cotizar.
+    const others = OTHER_GARMENTS.filter(g => g.re.test(t) && !(studio && studio.key === 'camisa_aseo' && g.label === 'Antifluido')).map(g => g.label);
     const color = COLORS.find(c => c[3].test(t));
 
     let qty = null;

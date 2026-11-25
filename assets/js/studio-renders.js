@@ -4,7 +4,7 @@
 // navegador no soporta tantos visores). Las fotos se guardan en sessionStorage.
 (function () {
   // Cambia este valor cuando cambien los modelos 3D para regenerar las imágenes.
-  const RENDER_VERSION = '17';
+  const RENDER_VERSION = '18';
   const cache = {};
   let frame = null;
   let studioPromise = null;
@@ -13,7 +13,7 @@
   // Las prendas configurables (camisa, bata) incluyen sus opciones en la clave.
   function optsKey(opts) {
     if (!opts) return '';
-    const str = JSON.stringify(opts, Object.keys(opts).sort().concat(['cuello', 'puno', 'detalle']));
+    const str = JSON.stringify(opts, Object.keys(opts).sort().concat(['cuello', 'puno', 'detalle', 'vivos']));
     let h = 0;
     for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
     return `-o${(h >>> 0).toString(36)}`;

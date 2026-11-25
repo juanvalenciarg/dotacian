@@ -1462,6 +1462,15 @@
                     <span class="studio-garment-name">Bata</span>
                   </span>
                 </button>
+                <button type="button" class="studio-garment studio-garment-option" data-garment="camisa_aseo" aria-pressed="false">
+                  <span class="studio-garment-icon">
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 3 4 5.5 2.5 11l3 .8L7 9v12h10V9l1.5 2.8 3-.8L20 5.5 15 3"></path><path d="M9 3l3 3 3-3"></path><path d="M12 6v15"></path><path d="M7 15.5l3-1M17 15.5l-3-1"></path></svg>
+                  </span>
+                  <span>
+                    <span class="studio-garment-name">Camisa antifluido</span>
+                    <span class="studio-garment-tag">Personal de aseo</span>
+                  </span>
+                </button>
                 <button type="button" class="studio-garment studio-garment-option" data-garment="camibuso" aria-pressed="false">
                   <span class="studio-garment-icon">
                     <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 3a3 3 0 0 0 6 0l3.5 1.2a2 2 0 0 1 1.3 1.6L21.5 20a1 1 0 0 1-1 1h-1.2a1 1 0 0 1-1-.9L17 10v10a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V10L5.700 20.100a1 1 0 0 1-1 .9H3.500a1 1 0 0 1-1-1L4.200 5.800a2 2 0 0 1 1.300-1.600z"></path></svg>
@@ -1736,6 +1745,7 @@
       t.pocket = chest ? conf.chestPocket : null;
       t.lowerPockets = lower ? conf.lowerPockets : null;
       t.kangaroo = o.bolsillos === 'canguro' ? conf.kangaroo : null;
+      if (conf.seamsByCut) t.princessSeams = conf.seamsByCut[o.corte] || null;
       if (o.corte === 'mujer') {
         t.fit = true;
         const sl = t.sleeve;
@@ -1829,7 +1839,9 @@
     // principal. Con true vuelven las zonas de cada prenda (y sus colores por defecto).
     const CONTRAST_ZONES = false;
     function zonesForConfig(cfg) {
-      if (!CONTRAST_ZONES || !cfg || !cfg.configurable) return [];
+      if (!cfg || !cfg.configurable) return [];
+      // Excepción: prendas cuyo contraste es parte del modelo (configurable.contrast).
+      if (!CONTRAST_ZONES && !cfg.configurable.contrast) return [];
       if (cfg.configurable.zones) return cfg.configurable.zones.filter(z => z !== 'puno' || cfg.hasCuff);
       const zones = ['cuello'];
       if (cfg.hasCuff) zones.push('puno');
@@ -2636,6 +2648,47 @@
           pechoDer: { x: -0.16, y: 0.17, defaultCm: 7 },
           espalda: { x: 0, y: 0.06, defaultCm: 24 }
         }
+      }
+    };
+
+    // Camisa antifluido para personal de aseo: cuello camisero, cremallera, manga corta
+    // con vivo y bolsillos inferiores con franja inclinada. El corte de hombre es recto; el
+    // de mujer es entallado y lleva costuras princesa.
+    GARMENTS.camisa_aseo = {
+      ...GARMENTS.camisa,
+      label: 'Camisa antifluido para aseo',
+      meta: 'Antifluido · Cremallera · Vivos y bolsillos con franja',
+      summary: { cuello: 'Camisero', manga: 'Corta con vivo', bolsillo: 'Inferiores con franja' },
+      hemCurve: 0, // ruedo recto
+      yoke: false,
+      pearlButtons: false,
+      groundY: -0.75,
+      configurable: {
+        seamsByCut: { mujer: GARMENTS.bata.princessSeams },
+        contrast: true, // los vivos y las franjas llevan su propio color
+        choices: { cuello: ['camisero'], manga: ['corta'], cierre: ['cremallera'], bolsillos: ['inferiores'] },
+        labels: { manga: { corta: 'Corta con vivo' } },
+        defaults: { corte: 'hombre', cuello: 'camisero', manga: 'corta', cierre: 'cremallera', bolsillos: 'inferiores' },
+        zones: ['vivos', 'detalle'],
+        zoneDefaults: { vivos: 'grisClaro', detalle: 'grisClaro' },
+        sleeves: {
+          corta: {
+            ...GARMENTS.camisa.configurable.sleeves.corta,
+            cuff: { length: 0.04, scale: 1.02, button: false, piping: true }
+          }
+        },
+        lowerPockets: { yTop: -0.3, yBottom: -0.56, x0: 0.085, x1: 0.215, accentBand: 0.036, slope: 0.026 },
+        logoPlacements: {
+          pechoIzq: { x: 0.13, y: 0.17, defaultCm: 7 },
+          pechoDer: { x: -0.13, y: 0.17, defaultCm: 7 },
+          espalda: { x: 0, y: 0.06, defaultCm: 24 }
+        }
+      },
+      defaultPlacement: 'pechoIzq',
+      logoPlacements: {
+        pechoIzq: { x: 0.13, y: 0.17, defaultCm: 7 },
+        pechoDer: { x: -0.13, y: 0.17, defaultCm: 7 },
+        espalda: { x: 0, y: 0.06, defaultCm: 24 }
       }
     };
 
@@ -3635,8 +3688,10 @@
         const offset = 0.0045;
         [1, -1].forEach(sg => {
           const rows = 16, cols = 16;
+          // slope: la boca del bolsillo sube hacia el centro de la prenda.
+          const topY = j => lp.yTop + (lp.slope || 0) * (1 - j / cols);
           const at = (i, j) => {
-            const y = THREE.MathUtils.lerp(lp.yBottom, lp.yTop, i / rows);
+            const y = THREE.MathUtils.lerp(lp.yBottom, topY(j), i / rows);
             const x = sg * THREE.MathUtils.lerp(lp.x0, lp.x1, j / cols);
             const { point, normal } = frontPointAt(cfg, frontV(cfg, y), x);
             return point.addScaledVector(normal, offset);
@@ -3650,7 +3705,7 @@
           if (lp.accentBand) {
             // Franja en color de contraste en la boca del bolsillo (bata).
             const bandAt = (i, j) => {
-              const y = THREE.MathUtils.lerp(lp.yTop - lp.accentBand, lp.yTop, i / 4);
+              const y = THREE.MathUtils.lerp(topY(j) - lp.accentBand, topY(j), i / 4);
               const x = sg * THREE.MathUtils.lerp(lp.x0 - 0.004, lp.x1 + 0.004, j / cols);
               const { point, normal } = frontPointAt(cfg, frontV(cfg, y), x);
               return point.addScaledVector(normal, offset + 0.0018);
@@ -3869,7 +3924,7 @@
     // popelina (camisa, antifluido) y dril en sarga (bata, filipina, pantalón).
     const GARMENT_WEAVE = {
       camiseta: 'jersey', camibuso: 'jersey', polo: 'pique', hoodie: 'fleece', buzo: 'fleece',
-      camisa: 'poplin', limpieza: 'poplin', bata: 'twill', filipina: 'twill', pantalon: 'twill'
+      camisa: 'poplin', camisa_aseo: 'poplin', limpieza: 'poplin', bata: 'twill', filipina: 'twill', pantalon: 'twill'
     };
     // scale: repeticiones del tejido por metro (un poco más grande que el real para
     // que se lea en pantalla); strength: relieve del hilo; tone: contraste de color
@@ -4676,7 +4731,66 @@
       // views: foto de cada vista.
       // cmPerImage: ancho real en cm que cubre la imagen completa (escala del logo).
       // logos: centro de cada ubicación visible en esa vista, en fracción de la imagen.
+      // trims: partes en contraste (zona y polígono en fracción de la imagen). Dentro del
+      // polígono se tiñe con el color de la zona lo que es más claro que la tela.
       const PHOTO_VIEWS = {
+        // Camisa de aseo: solo hay foto de frente; espalda y lados se ven en 3D.
+        camisaAseo: {
+          garment: 'camisa_aseo',
+          options: { corte: 'hombre', cuello: 'camisero', manga: 'corta', cierre: 'cremallera', bolsillos: 'inferiores' },
+          zones: ['vivos', 'detalle'],
+          views: {
+            front: {
+              src: '/assets/images/studio/camisa_aseo_frente.jpg',
+              cmPerImage: 128,
+              bgMin: 210,
+              contrast: 0.5,
+              erode: 3,
+              maxShade: 1.08,
+              smooth: true,
+              trims: [
+                { zone: 'vivos', poly: [[0.2024, 0.3731], [0.3423, 0.4096], [0.3423, 0.4385], [0.2024, 0.3962]] },
+                { zone: 'vivos', poly: [[0.7093, 0.4135], [0.8552, 0.3731], [0.8552, 0.3962], [0.7093, 0.4385]] },
+                { zone: 'detalle', poly: [[0.3224, 0.6231], [0.4504, 0.6038], [0.4504, 0.6481], [0.3224, 0.6673]] },
+                { zone: 'detalle', poly: [[0.6012, 0.6038], [0.7282, 0.625], [0.7282, 0.6692], [0.6012, 0.6481]] }
+              ],
+              logos: {
+                pechoIzq: { x: 0.618, y: 0.315 },
+                pechoDer: { x: 0.43, y: 0.315 },
+                mangaIzq: { x: 0.778, y: 0.31 },
+                mangaDer: { x: 0.272, y: 0.31 }
+              }
+            }
+          }
+        },
+        camisaAseoMujer: {
+          garment: 'camisa_aseo',
+          options: { corte: 'mujer', cuello: 'camisero', manga: 'corta', cierre: 'cremallera', bolsillos: 'inferiores' },
+          zones: ['vivos', 'detalle'],
+          views: {
+            front: {
+              src: '/assets/images/studio/camisa_aseo_mujer_frente.jpg',
+              cmPerImage: 112,
+              bgMin: 210,
+              contrast: 0.5,
+              erode: 3,
+              maxShade: 1.08, // sin brillos: la foto es oscura y su borde claro dejaría halo
+              smooth: true,
+              trims: [
+                { zone: 'vivos', poly: [[0.1835, 0.3596], [0.3373, 0.4038], [0.3373, 0.4308], [0.1835, 0.3808]] },
+                { zone: 'vivos', poly: [[0.6944, 0.4115], [0.8532, 0.3596], [0.8532, 0.3788], [0.6944, 0.4346]] },
+                { zone: 'detalle', poly: [[0.3155, 0.6231], [0.4345, 0.6038], [0.4345, 0.6538], [0.3155, 0.6712]] },
+                { zone: 'detalle', poly: [[0.5933, 0.6038], [0.7163, 0.6288], [0.7163, 0.6731], [0.5933, 0.6538]] }
+              ],
+              logos: {
+                pechoIzq: { x: 0.597, y: 0.31 },
+                pechoDer: { x: 0.43, y: 0.31 },
+                mangaIzq: { x: 0.762, y: 0.295 },
+                mangaDer: { x: 0.27, y: 0.295 }
+              }
+            }
+          }
+        },
         poloMujer: {
           garment: 'polo',
           options: { corte: 'mujer', cuello: 'polo', manga: 'corta', cierre: 'botones', bolsillos: 'ninguno' },
@@ -4975,7 +5089,8 @@
       // y guarda la sombra de cada pixel respecto al tono típico de la tela.
       // contrast < 1 suaviza las sombras y smooth quita el grano: para fotos de prendas
       // oscuras, donde al teñirlas de claro se exageran.
-      function preparePhoto(img, bgMin = 212, contrast = 1, smooth = false) {
+      // trims separa las partes en contraste (vivos, franjas), que se tiñen aparte.
+      function preparePhoto(img, bgMin = 212, contrast = 1, smooth = false, trims = null, maxShade = Infinity, erode = 0) {
         const w = img.naturalWidth, h = img.naturalHeight, n = w * h;
         const c = document.createElement('canvas');
         c.width = w;
@@ -5008,6 +5123,16 @@
           if (x < w - 1) push(i + 1);
           if (i >= w) push(i - w);
           if (i < n - w) push(i + w);
+        }
+        // erode: pixeles de más que se quitan al contorno (fotos con borde difuso).
+        for (let e = 0; e < erode; e++) {
+          const prev = bg.slice();
+          for (let y = 1; y < h - 1; y++) {
+            for (let x = 1; x < w - 1; x++) {
+              const i = y * w + x;
+              if (prev[i - 1] || prev[i + 1] || prev[i - w] || prev[i + w]) bg[i] = 1;
+            }
+          }
         }
         // Borde suave y un poco hacia adentro, para que no quede halo del fondo.
         const alpha = new Uint8ClampedArray(n);
@@ -5050,9 +5175,37 @@
             }
           }
         }
-        for (let i = 0; i < n; i++) shade[i] = Math.pow(src[i] / (ref || 1), contrast);
-        return { w, h, shade, alpha };
+        for (let i = 0; i < n; i++) shade[i] = Math.min(maxShade, Math.pow(src[i] / (ref || 1), contrast));
+        return { w, h, shade, alpha, trims: (trims || []).map(t => trimMask(t, w, h, lum, bg, ref || 1)) };
       }
+
+      // Máscara de una parte en contraste: cuánto es franja (0 a 1) y su sombra, por pixel.
+      function trimMask({ zone, poly }, w, h, lum, bg, ref) {
+        const c = document.createElement('canvas');
+        c.width = w;
+        c.height = h;
+        const ctx = c.getContext('2d', { willReadFrequently: true });
+        ctx.beginPath();
+        poly.forEach(([x, y]) => ctx.lineTo(x * w, y * h));
+        ctx.fill();
+        const a = ctx.getImageData(0, 0, w, h).data;
+        const idx = [], mask = [], solid = [];
+        for (let i = 0; i < w * h; i++) {
+          if (a[i * 4 + 3] < 128 || bg[i]) continue;
+          const k = Math.max(0, Math.min(1, (lum[i] / ref - 1.15) / 0.25));
+          if (!k) continue;
+          idx.push(i);
+          mask.push(k * k * (3 - 2 * k));
+          if (k === 1) solid.push(lum[i]);
+        }
+        solid.sort((p, q) => p - q);
+        const tone = solid[solid.length >> 1] || ref * 1.6;
+        // En el borde de la franja la mezcla con la tela ya oscurece: no se sombrea dos veces.
+        const shade = idx.map(i => Math.max(0.9, Math.min(1.08, lum[i] / tone)));
+        return { zone, idx, mask, shade };
+      }
+
+      const zoneTintKey = () => Object.keys(zoneColors).map(z => zoneColors[z] || '').join(',');
 
       function tintPhoto(st, hex, tintKey) {
         photoBase.width = photoShade.width = st.w;
@@ -5080,6 +5233,20 @@
           sImg.data[i * 4] = sImg.data[i * 4 + 1] = sImg.data[i * 4 + 2] = v;
           sImg.data[i * 4 + 3] = 255;
         }
+        // Sin color propio, la franja va en el color de la prenda.
+        st.trims.forEach(t => {
+          const zc = zoneColors[t.zone] && resolveColor(zoneColors[t.zone]);
+          const tc = zc ? new THREE.Color(zc.hex) : col;
+          const rgb = [toByte(tc.r), toByte(tc.g), toByte(tc.b)];
+          t.idx.forEach((i, j) => {
+            const k = t.mask[j];
+            const under = Math.min(1, st.shade[i]); // tela debajo, sin el brillo de la franja
+            const m = 0.94 * under, add = (under - 1) * boost;
+            [r, g, b].forEach((v, ch) => {
+              px[i * 4 + ch] = (v * m + add) * (1 - k) + rgb[ch] * 0.97 * t.shade[j] * k;
+            });
+          });
+        });
         ctx.putImageData(out, 0, 0);
         sCtx.putImageData(sImg, 0, 0);
         photoTint = tintKey;
@@ -5124,7 +5291,7 @@
       function composePhoto(photo) {
         const { st, tintId } = photo;
         const hex = resolveColor(colorKey).hex;
-        const tintKey = `${tintId}-${hex}`;
+        const tintKey = `${tintId}-${hex}-${zoneTintKey()}`;
         if (tintKey !== photoTint) tintPhoto(st, hex, tintKey);
         photoCanvas.width = st.w;
         photoCanvas.height = st.h;
@@ -5145,9 +5312,13 @@
         const onView = p => p && p.view && p.view.logos && logos.some(l => p.view.logos[l.placement]);
         const photo = (!onView(front) && onView(back) && back.st) ? back : front;
         if (!photo || !photo.st) return Promise.resolve(null);
+        // Prenda sin foto de espalda y con todos los logos atrás: se captura la espalda en 3D.
+        if (!back && logos.length && !onView(front) && logos.every(l => LOGO_PLACEMENTS[l.placement].side === 'back')) {
+          return captureBack3D(size);
+        }
         const { st, tintId } = photo;
         const hex = resolveColor(colorKey).hex;
-        const tintKey = `${tintId}-${hex}`;
+        const tintKey = `${tintId}-${hex}-${zoneTintKey()}`;
         if (tintKey !== photoTint) tintPhoto(st, hex, tintKey);
         const src = document.createElement('canvas');
         src.width = st.w;
@@ -5165,6 +5336,29 @@
         return new Promise(res => out.toBlob(res, 'image/png'));
       }
 
+      function captureBack3D(size) {
+        const prevPos = camera.position.clone();
+        fabric.color.copy(targetColor);
+        ribMaterial.color.copy(fabric.color);
+        shadeMaterial.color.copy(fabric.color).multiplyScalar(0.35);
+        syncZoneMaterials();
+        applyAzimuth(VIEW_ANGLES.back);
+        camera.lookAt(controls.target);
+        aimLights();
+        renderer.render(scene, camera);
+        const src = renderer.domElement;
+        const out = document.createElement('canvas');
+        out.width = out.height = size;
+        const k = 1.2 * size / src.height; // el lienzo es más ancho que alto: se recorta a los lados
+        const octx = out.getContext('2d');
+        octx.imageSmoothingQuality = 'high';
+        octx.drawImage(src, (size - src.width * k) / 2, (size - src.height * k) / 2, src.width * k, src.height * k);
+        camera.position.copy(prevPos);
+        controls.update();
+        aimLights();
+        return new Promise(res => out.toBlob(res, 'image/png'));
+      }
+
       // Las fotos se cargan de una vez: la imagen de las tarjetas del admin las necesita.
       const photoLoads = [];
       Object.keys(PHOTO_VIEWS).forEach(key => {
@@ -5173,7 +5367,7 @@
           photoLoads.push(new Promise(resolve => {
             const img = new Image();
             img.onload = () => {
-              photoState[key][name] = preparePhoto(img, view.bgMin, view.contrast, view.smooth);
+              photoState[key][name] = preparePhoto(img, view.bgMin, view.contrast, view.smooth, view.trims, view.maxShade, view.erode);
               resolve();
             };
             img.onerror = resolve;
@@ -5186,8 +5380,10 @@
       // Fotos que corresponden a la prenda, con sus opciones y colores por zona actuales.
       function photoSpecFor(key, cfg) {
         const opts = (cfg && cfg.options) || {};
-        if (Object.values(zoneColors).some(Boolean)) return null;
+        // Colores por zona: solo si la foto los puede mostrar (zones de PHOTO_VIEWS).
+        const zones = Object.keys(zoneColors).filter(z => zoneColors[z]);
         return Object.keys(PHOTO_VIEWS).find(id => PHOTO_VIEWS[id].garment === key
+          && zones.every(z => (PHOTO_VIEWS[id].zones || []).includes(z))
           && Object.keys(PHOTO_VIEWS[id].options).every(k => opts[k] === PHOTO_VIEWS[id].options[k])) || null;
       }
 
@@ -5198,7 +5394,7 @@
         const photo = specId ? photoFor(specId, activeView) : null;
         const wanted = !!photo && (!!photo.st || !photosLoaded);
         if (photo && photo.st) {
-          const sig = JSON.stringify([specId, activeView, colorKey, logos.map(l => [l.id, l.placement, l.sizeCm, l.dx, l.dy])]);
+          const sig = JSON.stringify([specId, activeView, colorKey, zoneTintKey(), logos.map(l => [l.id, l.placement, l.sizeCm, l.dx, l.dy])]);
           if (sig !== photoSig) {
             composePhoto(photo);
             photoSig = sig;
@@ -5879,7 +6075,8 @@
           if (z in zoneColors && zonesForConfig(cfg).includes(z) && resolveColor(zoneSource[z])) zoneColors[z] = zoneSource[z];
         });
         if (!zones) {
-          zonesForConfig(cfg).filter(z => z in chosenZones).forEach(z => { zoneColors[z] = chosenZones[z]; });
+          // Solo colores elegidos: un diseño sin contraste no borra el de la prenda.
+          zonesForConfig(cfg).filter(z => chosenZones[z]).forEach(z => { zoneColors[z] = chosenZones[z]; });
         }
         // Los logos se acomodan a las ubicaciones de la nueva prenda.
         reassignLogoPlacements(cfg);
@@ -6505,7 +6702,7 @@
       // Por ahora solo se ofrecen las prendas con foto real; las demás (en 3D) se
       // ocultan aunque la empresa las tenga habilitadas. Un diseño guardado de una
       // prenda oculta se sigue pudiendo abrir.
-      const PHOTO_GARMENTS = ['camiseta', 'camisa', 'hoodie', 'polo'];
+      const PHOTO_GARMENTS = ['camiseta', 'camisa', 'hoodie', 'polo', 'camisa_aseo'];
       Object.keys(GARMENTS).forEach(k => showGarmentOption(k, PHOTO_GARMENTS.includes(k)));
 
       function showGarmentOption(key, visible) {
