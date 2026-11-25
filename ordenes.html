@@ -753,7 +753,7 @@
       try {
         const { data: { session } } = await _supabase.auth.getSession();
         if (!session) {
-          window.location.href = 'login.html';
+          window.location.href = localStorage.getItem('dotacian_lang') === 'en' ? '/login.html' : '/login.es.html';
           return;
         }
         currentCompanyId = session.user.id;
@@ -1891,7 +1891,7 @@
       window._supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, { auth: { storageKey: window.location.pathname.includes('.seller.html') || window.location.pathname.includes('seller') ? 'dotacian-seller-token' : 'dotacian-client-token', multiTab: false } });
     }
   </script>
-  <script src="assets/js/utils.js?v=4"></script>
+  <script src="assets/js/utils.js?v=6"></script>
   <script>
     function toggleSidebar() {
       const layout = document.getElementById('app-layout-wrapper');

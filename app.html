@@ -937,7 +937,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/utils.js?v=4"></script>
+  <script src="assets/js/utils.js?v=6"></script>
   <script>
 
 
@@ -951,7 +951,7 @@
         const { data: { session } } = await _supabase.auth.getSession();
         if (!session) {
           console.warn('No session found on app.html, redirecting to login');
-          window.location.href = 'login.html?reason=no_session';
+          window.location.href = window.clientLoginUrl() + '?reason=no_session';
           return;
         }
 

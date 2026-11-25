@@ -1133,7 +1133,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/utils.js?v=4"></script>
+  <script src="assets/js/utils.js?v=6"></script>
   <script>
     if (typeof window._supabase === 'undefined') {
       window.SUPABASE_URL = 'https://awuhvewotmwelurmjvmu.supabase.co';
@@ -1148,7 +1148,7 @@
       try {
         const { data: sessionData } = await _supabase.auth.getSession();
         if (!sessionData?.session?.user) {
-          window.location.href = 'login.html';
+          window.location.href = window.clientLoginUrl();
           return;
         }
         currentCompanyId = sessionData.session.user.id;

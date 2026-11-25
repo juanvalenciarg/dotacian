@@ -840,7 +840,7 @@
       const productId = localStorage.getItem('selected_product_id');
       if (!productId) { window.location.href = 'marketplace.html'; return; }
       const { data: { session } } = await _supabase.auth.getSession();
-      if (!session) { window.location.href = 'login.html'; return; }
+      if (!session) { window.location.href = localStorage.getItem('dotacian_lang') === 'en' ? '/login.html' : '/login.es.html'; return; }
 
       let companyId = session.user.id;
       const { data: profile } = await _supabase.from('user_profile').select('role, company_id').eq('id', session.user.id).maybeSingle();
@@ -1201,7 +1201,7 @@
       init();
     });
   </script>
-  <script src="assets/js/utils.js?v=4"></script>
+  <script src="assets/js/utils.js?v=6"></script>
 
   <!-- Success Modal -->
   <div id="success-modal"

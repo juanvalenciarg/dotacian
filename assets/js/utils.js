@@ -233,7 +233,15 @@ async function populateHeaderProfile(supabaseClient) {
 
     renderCompanyLogo(comp && comp.logo_url ? comp.logo_url : null);
 
-    const userLanguage = (comp && comp.language) || null;
+    let userLanguage = (comp && comp.language) || null;
+    // Miembros de equipo: el idioma es el de la empresa a la que pertenecen.
+    if (!userLanguage && profile) {
+      const companyId = await resolveCompanyId(supabaseClient, session.user.id);
+      if (companyId && companyId !== session.user.id) {
+        const { data: companyLang } = await supabaseClient.from('company_profile').select('language').eq('id', companyId).maybeSingle();
+        userLanguage = (companyLang && companyLang.language) || null;
+      }
+    }
     if (userLanguage) localStorage.setItem('dotacian_lang', userLanguage);
 
     window.dispatchEvent(new CustomEvent('userProfileLoaded', { detail: { industry, companyName, userCountry, language: userLanguage } }));
@@ -342,11 +350,40 @@ window.keepSessionActive = function() {
   resetInactivityTimer();
 };
 
+// Login del portal de clientes en el idioma de la cuenta (login.html es inglés).
+// populateHeaderProfile sincroniza dotacian_lang con company_profile.language.
+window.clientLoginUrl = function () {
+  return localStorage.getItem('dotacian_lang') === 'en' ? '/login.html' : '/login.es.html';
+};
+
+// "Cerrar sesión" del portal de clientes: termina la sesión en este dispositivo
+// y lleva al login en el idioma de la cuenta.
+document.addEventListener('click', async (e) => {
+  const link = e.target.closest && e.target.closest('a[href="login.html"], a[href="/login.html"]');
+  if (!link) return;
+  const path = window.location.pathname;
+  const file = path.split('/').pop();
+  // Páginas públicas: ahí el enlace es "Iniciar sesión", no un cierre de sesión.
+  if (/^(index|login|recuperar|restablecer|onboarding|blog|articulo)/.test(file) || path === '/') return;
+
+  e.preventDefault();
+  try {
+    const client = typeof _supabase !== 'undefined' ? _supabase : window._supabase;
+    // Studio en vista admin usa la sesión de administrador: esa no se cierra aquí.
+    if (client && client.auth.storageKey === 'dotacian-client-token') {
+      await client.auth.signOut({ scope: 'local' });
+    }
+  } catch (err) {
+    console.error('Error al cerrar sesión:', err);
+  }
+  window.location.href = window.clientLoginUrl();
+}, true);
+
 async function logoutUser() {
   if (typeof _supabase !== 'undefined') {
     await _supabase.auth.signOut();
     const path = window.location.pathname;
-    let target = 'login.html';
+    let target = window.clientLoginUrl();
     if (path.includes('seller')) target = 'login.seller.html';
     else if (path.includes('mi_') || path.includes('mi-')) target = 'mi-login.html';
     else if (path.includes('admin')) target = 'login.admin.html';

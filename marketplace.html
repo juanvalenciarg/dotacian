@@ -12,7 +12,7 @@
     rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/utils.js?v=4"></script>
+  <script src="assets/js/utils.js?v=6"></script>
   <style>
     :root {
       --sidebar-width: 280px;
@@ -717,7 +717,7 @@
     async function init() {
       const { data: { session } } = await _supabase.auth.getSession();
       if (!session) {
-        window.location.href = 'login.html';
+        window.location.href = window.clientLoginUrl();
         return;
       }
       currentUser = session.user;
