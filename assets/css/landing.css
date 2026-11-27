@@ -161,6 +161,8 @@ button { font: inherit; }
 .hero-badge span { font-family: var(--font-head); font-weight: 700; letter-spacing: .06em; font-size: .9rem; text-transform: uppercase; }
 .hero h1 { font-size: clamp(2.8rem, 6.4vw, 5.6rem); font-weight: 700; line-height: .98; letter-spacing: -0.035em; }
 .hero h1 em { font-style: italic; font-weight: 600; }
+/* La cursiva sobresale de su caja; el relleno evita que el degradado la recorte */
+.hero h1 em.grad-text { padding: 0 .12em 0 .06em; margin: 0 -.12em 0 -.06em; }
 .hero-sub { margin-top: 28px; font-size: clamp(1.05rem, 1.5vw, 1.28rem); color: var(--on-dark-2); max-width: 560px; line-height: 1.6; }
 .hero-actions { display: flex; align-items: center; gap: 36px; margin-top: 44px; flex-wrap: wrap; }
 
