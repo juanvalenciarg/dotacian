@@ -27,7 +27,9 @@
     :root {
       --ink: #05080F;
       --ink-2: #0A101C;
-      --blue: #1F7BFF;
+      --blue: #06B6D4;
+      --brand: #06B6D4;
+      --brand-deep: #0E7490;
       --cyan: #06B6D4;
       --mint: #10B981;
       --amber: #F59E0B;
@@ -37,7 +39,7 @@
       --text-2: #475569;
       --text-3: #94A3B8;
       --on-dark-2: rgba(230, 236, 245, 0.68);
-      --grad: linear-gradient(100deg, #3B8CFF 0%, #06B6D4 100%);
+      --grad: linear-gradient(100deg, #A5F3FC 0%, #22D3EE 45%, #06B6D4 100%);
       --font-head: 'Outfit', system-ui, sans-serif;
       --font-body: 'Inter', system-ui, sans-serif;
     }
@@ -56,7 +58,7 @@
       position: relative; overflow: hidden; color: #fff; padding: 48px 56px;
       display: flex; flex-direction: column;
       background:
-        radial-gradient(700px 520px at 85% 35%, rgba(31, 123, 255, .3), transparent 60%),
+        radial-gradient(700px 520px at 85% 35%, rgba(6, 182, 212, .3), transparent 60%),
         radial-gradient(500px 400px at 0% 100%, rgba(6, 182, 212, .14), transparent 60%),
         var(--ink);
     }
@@ -68,7 +70,7 @@
       -webkit-mask-image: radial-gradient(ellipse at 70% 40%, #000 0%, transparent 70%);
     }
     .brand-top { position: relative; display: flex; justify-content: space-between; align-items: center; z-index: 2; }
-    .brand-top img { height: 40px; width: auto; filter: brightness(0) invert(1); }
+    .brand-top .wordmark { width: 138px; color: #fff; }
     .back { font-size: .9rem; color: var(--on-dark-2); display: inline-flex; gap: 6px; align-items: center; }
     .back:hover { color: #fff; }
 
@@ -77,19 +79,19 @@
     .badge i { width: 24px; height: 24px; border-radius: 7px; display: grid; place-items: center; background: var(--blue); }
     .badge span { font-family: var(--font-head); font-weight: 700; letter-spacing: .06em; font-size: .78rem; text-transform: uppercase; }
     .brand h1 { font-size: clamp(2.6rem, 4.6vw, 4.6rem); font-weight: 700; }
-    .brand h1 em { font-style: italic; font-weight: 600; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; padding-right: 4px; }
+    .brand h1 em { font-style: italic; font-weight: 600; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; padding: 0 .12em 0 .06em; margin: 0 -.12em 0 -.06em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
     .brand-sub { margin-top: 20px; font-size: 1.08rem; line-height: 1.6; color: var(--on-dark-2); max-width: 440px; }
 
     .visual { position: relative; height: 400px; }
     .orbit { position: absolute; width: 380px; height: 380px; border: 1px solid rgba(111, 177, 255, .22); border-radius: 50%; left: 50%; top: 50%; transform: translate(-50%, -50%); }
-    .photo { position: absolute; inset: 0 20px; border-radius: 160px 160px 24px 24px; overflow: hidden; background: #0d1626; box-shadow: 0 40px 80px -30px rgba(31, 123, 255, .55), inset 0 0 0 1px rgba(255, 255, 255, .08); }
+    .photo { position: absolute; inset: 0 20px; border-radius: 160px 160px 24px 24px; overflow: hidden; background: #0d1626; box-shadow: 0 40px 80px -30px rgba(6, 182, 212, .55), inset 0 0 0 1px rgba(255, 255, 255, .08); }
     .photo img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; display: block; }
     .photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgba(5, 8, 15, .6) 100%); }
     .fcard { position: absolute; background: #fff; color: var(--text); border-radius: 16px; padding: 12px 14px; box-shadow: 0 24px 60px -20px rgba(2, 8, 23, .6); font-size: .76rem; animation: bob 7s ease-in-out infinite; }
     .fcard small { display: block; color: var(--text-3); font-size: .68rem; }
     .fcard b { font-family: var(--font-head); font-size: .98rem; }
     .fc-ai { right: -44px; top: 36px; width: 180px; }
-    .ai-tag { display: inline-flex; align-items: center; gap: 5px; font-size: .64rem; font-weight: 700; color: var(--blue); background: rgba(31, 123, 255, .1); padding: 3px 8px; border-radius: 999px; margin-bottom: 8px; }
+    .ai-tag { display: inline-flex; align-items: center; gap: 5px; font-size: .64rem; font-weight: 700; color: var(--brand-deep); background: rgba(6, 182, 212, .12); padding: 3px 8px; border-radius: 999px; margin-bottom: 8px; }
     .fc-ai .row { display: flex; align-items: baseline; gap: 8px; }
     .fc-ai .row b { font-size: 1.6rem; }
     .fc-ai .row span { color: var(--mint); font-weight: 700; font-size: .7rem; }
@@ -108,31 +110,31 @@
     .form-wrap { flex: 1; display: flex; align-items: center; justify-content: center; }
     .box { width: 100%; max-width: 420px; }
     .box .logo-mobile { display: none; margin-bottom: 28px; }
-    .box .logo-mobile img { height: 40px; width: auto; }
+    .box .logo-mobile .wordmark { width: 132px; color: var(--text); }
     .box h2 { font-size: 2.4rem; }
     .box .lead { color: var(--text-2); margin: 10px 0 34px; font-size: 1.02rem; }
 
     .field { margin-bottom: 18px; position: relative; }
     .field label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: 8px; }
     .modern-input { width: 100%; padding: 15px 16px; border: 1.5px solid var(--line); border-radius: 14px; font: inherit; font-size: 1rem; background: #FAFBFD; color: var(--text); transition: border-color .2s, box-shadow .2s, background .2s; }
-    .modern-input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(31, 123, 255, .14); background: #fff; }
+    .modern-input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(6, 182, 212, .14); background: #fff; }
     .modern-input::placeholder { color: var(--text-3); }
     .toggle-password { position: absolute; right: 14px; top: 40px; background: none; border: 0; cursor: pointer; color: var(--text-3); display: grid; place-items: center; padding: 4px; }
     .toggle-password:hover { color: var(--text); }
     .row-opts { display: flex; justify-content: space-between; align-items: center; margin: 6px 0 26px; font-size: .88rem; gap: 12px; flex-wrap: wrap; }
     .row-opts label { display: flex; align-items: center; gap: 8px; color: var(--text-2); cursor: pointer; font-weight: 500; }
     .row-opts input { accent-color: var(--blue); width: 17px; height: 17px; cursor: pointer; }
-    .row-opts a { color: var(--blue); font-weight: 600; }
+    .row-opts a { color: var(--brand-deep); font-weight: 600; }
     .row-opts a:hover { text-decoration: underline; }
 
-    .modern-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 7px 7px 7px 26px; border: 0; border-radius: 999px; background: var(--blue); color: #fff; font: inherit; font-weight: 700; font-size: 1.05rem; cursor: pointer; box-shadow: 0 12px 30px -10px rgba(31, 123, 255, .7); transition: transform .2s, box-shadow .2s; }
-    .modern-btn .arrow { width: 44px; height: 44px; border-radius: 50%; background: rgba(255, 255, 255, .18); display: grid; place-items: center; transition: transform .2s; }
-    .modern-btn:hover { transform: translateY(-2px); box-shadow: 0 18px 40px -12px rgba(31, 123, 255, .85); }
+    .modern-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 7px 7px 7px 26px; border: 0; border-radius: 999px; background: var(--brand); color: var(--ink); font: inherit; font-weight: 700; font-size: 1.05rem; cursor: pointer; box-shadow: 0 12px 30px -10px rgba(6, 182, 212, .7); transition: transform .2s, box-shadow .2s; }
+    .modern-btn .arrow { width: 44px; height: 44px; border-radius: 50%; background: rgba(5, 8, 15, .12); display: grid; place-items: center; transition: transform .2s; }
+    .modern-btn:hover { transform: translateY(-2px); box-shadow: 0 18px 40px -12px rgba(6, 182, 212, .85); }
     .modern-btn:hover .arrow { transform: translateX(3px); }
     .modern-btn:disabled { opacity: .7; cursor: not-allowed; transform: none; }
 
     .alt { margin-top: 30px; padding-top: 24px; border-top: 1px solid var(--line); font-size: .92rem; color: var(--text-2); text-align: center; }
-    .alt a { color: var(--blue); font-weight: 600; }
+    .alt a { color: var(--brand-deep); font-weight: 600; }
     .alt a:hover { text-decoration: underline; }
     .form-foot { font-size: .78rem; color: var(--text-3); text-align: center; }
 
@@ -166,6 +168,17 @@
       .box h2 { font-size: 2rem; }
       .form-wrap { padding: 32px 0; }
     }
+
+    /* Marca: wordmark con punto cian y punto de cierre */
+    .wordmark {
+      display: block; aspect-ratio: 1935 / 343;
+      background: linear-gradient(90deg, currentColor 0 94.9%, var(--brand) 94.9% 100%);
+      -webkit-mask: url('/assets/logos/wordmark.png') center / contain no-repeat;
+      mask: url('/assets/logos/wordmark.png') center / contain no-repeat;
+    }
+    .bdot { color: var(--brand); -webkit-text-fill-color: var(--brand); }
+    .brand-dot { position: absolute; z-index: 1; width: 380px; height: 380px; right: -130px; bottom: -130px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 120px 10px rgba(6, 182, 212, .35); pointer-events: none; }
+    .brand-dot::after { content: ""; position: absolute; inset: -70px; border-radius: 50%; border: 1px solid rgba(103, 232, 249, .25); }
   </style>
 </head>
 
@@ -175,7 +188,7 @@
     <!-- Brand side -->
     <aside class="brand">
       <div class="brand-top">
-        <a href="/"><img src="assets/logos/logo_dotacian.png" alt="Dotacian"></a>
+        <a href="/" aria-label="Dotacian"><span class="wordmark" aria-hidden="true"></span></a>
         <a href="/" class="back">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 19l-7-7 7-7"/></svg>Volver al inicio</a>
       </div>
@@ -186,12 +199,13 @@
             <i><svg width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l1.9 5.8L20 10l-6.1 2.2L12 18l-1.9-5.8L4 10l6.1-2.2z"/></svg></i>
             <span>La primera WorkwearTech de LATAM</span>
           </div>
-          <h1>Tu dotación, <em>bajo control.</em></h1>
+          <h1>Tu dotación, <em>bajo control</em><span class="bdot">.</span></h1>
           <p class="brand-sub">Tallas, pedidos, entregas firmadas y gasto de cada empleado en un solo lugar, con la ayuda de la IA.</p>
         </div>
 
       </div>
 
+      <div class="brand-dot" aria-hidden="true"></div>
     </aside>
 
     <!-- Form side -->
@@ -203,8 +217,8 @@
 
       <div class="form-wrap">
         <div class="box">
-          <a href="/" class="logo-mobile"><img src="assets/logos/logo_dotacian.png" alt="Dotacian"></a>
-          <h2>Bienvenido de vuelta</h2>
+          <a href="/" class="logo-mobile" aria-label="Dotacian"><span class="wordmark" aria-hidden="true"></span></a>
+          <h2>Bienvenido de vuelta<span class="bdot">.</span></h2>
           <p class="lead">Ingresa a tu portal corporativo.</p>
 
           <form class="auth-form" id="client-login-form" onsubmit="return false;">
