@@ -8,27 +8,32 @@
   --wt-ink: #05080F;
   --wt-ink-2: #0A101C;
   --wt-ink-3: #111A2B;
-  --wt-blue: #1F7BFF;
-  --wt-blue-hover: #1366E6;
-  --wt-blue-soft: rgba(31, 123, 255, 0.10);
-  --wt-blue-ring: rgba(31, 123, 255, 0.16);
+  --wt-blue: #06B6D4;            /* cian de marca (fondos, con texto tinta) */
+  --wt-blue-hover: #22D3EE;
+  --wt-blue-soft: rgba(6, 182, 212, 0.12);
+  --wt-blue-ring: rgba(6, 182, 212, 0.18);
   --wt-cyan: #06B6D4;
+  --wt-deep: #0E7490;            /* cian profundo: texto y acentos sobre blanco */
+  --wt-deep-hover: #155E75;
+  --wt-soft: #67E8F9;
   --wt-mist: #F4F7FB;
   --wt-line: #E3E8F0;
   --wt-text: #0F172A;
   --wt-text-2: #475569;
   --wt-text-3: #94A3B8;
-  --wt-grad: linear-gradient(100deg, #3B8CFF 0%, #06B6D4 100%);
+  --wt-grad: linear-gradient(100deg, #22D3EE 0%, #06B6D4 100%);
   --wt-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 32px -18px rgba(15, 23, 42, 0.18);
   --wt-shadow-hover: 0 1px 2px rgba(15, 23, 42, 0.04), 0 20px 44px -18px rgba(15, 23, 42, 0.26);
 
-  /* Re-mapeo de tokens existentes: el acento pasa de cian a azul eléctrico */
-  --color-cyan: #1F7BFF;
-  --color-cyan-hover: #1366E6;
-  --color-cyan-dim: rgba(31, 123, 255, 0.10);
-  --color-cyan-glow: rgba(31, 123, 255, 0.22);
-  --color-brand-accent: #1F7BFF;
-  --color-brand-accent-hover: #1366E6;
+  /* Re-mapeo de tokens existentes al cian de Dotacian. Se usan como texto
+     sobre blanco y como fondo con texto blanco: el cian profundo cumple
+     contraste en ambos casos. */
+  --color-cyan: #0E7490;
+  --color-cyan-hover: #155E75;
+  --color-cyan-dim: rgba(6, 182, 212, 0.12);
+  --color-cyan-glow: rgba(6, 182, 212, 0.24);
+  --color-brand-accent: #0E7490;
+  --color-brand-accent-hover: #155E75;
   --color-smoke: #F4F7FB;
   --color-surface-light: #F4F7FB;
   --color-border: #E3E8F0;
@@ -45,8 +50,12 @@ body,
 
 /* ---------- Sidebar ---------- */
 .sidebar {
+  /* El punto de la marca asoma en la esquina inferior (círculo, anillo y brillo) */
   background:
-    radial-gradient(420px 320px at 0% 0%, rgba(31, 123, 255, 0.22), transparent 70%),
+    radial-gradient(circle 108px at calc(100% + 12px) calc(100% + 6px), var(--wt-cyan) 99%, transparent 100%),
+    radial-gradient(circle 134px at calc(100% + 12px) calc(100% + 6px), rgba(6, 182, 212, 0.12) 99%, transparent 100%),
+    radial-gradient(circle 260px at calc(100% + 12px) calc(100% + 6px), rgba(6, 182, 212, 0.28), transparent 70%),
+    radial-gradient(420px 320px at 0% 0%, rgba(6, 182, 212, 0.20), transparent 70%),
     var(--wt-ink) !important;
   border-right: 1px solid rgba(255, 255, 255, 0.06);
 }
@@ -80,7 +89,7 @@ body,
 }
 
 .nav-item.active {
-  background: rgba(31, 123, 255, 0.16) !important;
+  background: rgba(6, 182, 212, 0.14) !important;
   color: #fff !important;
   font-weight: 600 !important;
 }
@@ -98,19 +107,31 @@ body,
 
 .nav-item .nav-icon { color: rgba(230, 236, 245, 0.5); transition: color .2s; }
 .nav-item:hover .nav-icon { color: #fff; }
-.nav-item.active .nav-icon { color: #6FB1FF !important; }
+.nav-item.active .nav-icon { color: var(--wt-soft) !important; }
 
 .nav-sub-item {
   border-radius: 10px !important;
 }
 
 .sidebar-avatar-badge {
-  background: var(--wt-grad) !important;
-  color: #fff !important;
+  background: var(--wt-blue) !important;
+  color: var(--wt-ink) !important;
   border: 2px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow: 0 10px 24px -10px rgba(31, 123, 255, 0.8) !important;
+  box-shadow: 0 10px 24px -10px rgba(6, 182, 212, 0.8) !important;
   font-family: 'Outfit', sans-serif !important;
 }
+
+/* ---------- Marca: wordmark con el punto cian ---------- */
+.wordmark {
+  display: block;
+  aspect-ratio: 1935 / 343;
+  color: inherit;
+  background: linear-gradient(90deg, currentColor 0 94.9%, var(--wt-cyan) 94.9% 100%);
+  -webkit-mask: url('/assets/logos/wordmark.png') center / contain no-repeat;
+  mask: url('/assets/logos/wordmark.png') center / contain no-repeat;
+}
+.sidebar-header .wordmark { width: 112px; color: #fff; }
+.bdot { color: var(--wt-cyan); -webkit-text-fill-color: var(--wt-cyan); }
 
 /* ---------- Header / títulos ---------- */
 .app-header {
@@ -132,9 +153,16 @@ body,
   line-height: 1.05 !important;
 }
 
+/* Títulos de cada pantalla terminan con el punto cian de la marca */
+.main-content h1.dot-greeting::after {
+  content: ".";
+  color: var(--wt-cyan);
+  -webkit-text-fill-color: var(--wt-cyan);
+}
+
 .welcome-banner {
   background:
-    radial-gradient(700px 400px at 85% 0%, rgba(31, 123, 255, 0.35), transparent 65%),
+    radial-gradient(700px 400px at 85% 0%, rgba(6, 182, 212, 0.30), transparent 65%),
     var(--wt-ink) !important;
 }
 .welcome-banner .welcome-title,
@@ -172,7 +200,7 @@ body,
 
 .stat-icon-box {
   background: var(--wt-blue-soft) !important;
-  color: var(--wt-blue) !important;
+  color: var(--wt-deep) !important;
   border: 0 !important;
   box-shadow: none !important;
   border-radius: 12px !important;
@@ -206,12 +234,13 @@ body,
 .btn-primary {
   background: var(--wt-blue) !important;
   border-color: var(--wt-blue) !important;
-  color: #fff !important;
-  box-shadow: 0 10px 24px -12px rgba(31, 123, 255, 0.8) !important;
+  color: var(--wt-ink) !important;
+  box-shadow: 0 10px 24px -12px rgba(6, 182, 212, 0.8) !important;
 }
 .btn-primary:hover:not(:disabled) {
   background: var(--wt-blue-hover) !important;
   border-color: var(--wt-blue-hover) !important;
+  color: var(--wt-ink) !important;
   transform: translateY(-1px);
 }
 
@@ -277,7 +306,7 @@ body,
 
 input[type="checkbox"],
 input[type="radio"] {
-  accent-color: var(--wt-blue);
+  accent-color: var(--wt-deep);
 }
 
 /* ---------- Tablas ---------- */
@@ -325,8 +354,8 @@ input[type="radio"] {
   box-shadow: 0 30px 70px -24px rgba(2, 8, 23, 0.4) !important;
 }
 .popover-profile-avatar {
-  background: var(--wt-grad) !important;
-  color: #fff !important;
+  background: var(--wt-blue) !important;
+  color: var(--wt-ink) !important;
 }
 .popover-menu-item {
   border-radius: 10px !important;
