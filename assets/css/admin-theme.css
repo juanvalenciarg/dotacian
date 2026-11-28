@@ -1,0 +1,251 @@
+/* ==========================================================================
+   Dotacian Admin Theme
+   Se carga al final del <head> de cada admin.*.html (después de styles.css y
+   de los estilos propios de la pantalla). Misma marca que el login de admin:
+   tinta oscura, cian de Dotacian y el punto de la marca.
+   ========================================================================== */
+
+:root {
+  --ad-ink: #05080F;
+  --ad-ink-2: #0A101C;
+  --ad-ink-3: #111A2B;
+  --ad-line: rgba(255, 255, 255, 0.08);
+  --ad-brand: #06B6D4;
+  --ad-brand-hi: #22D3EE;
+  --ad-brand-soft: #67E8F9;
+  --ad-brand-deep: #0E7490;
+  --ad-text-muted: #94A3B8;
+
+  /* Tokens globales que usan las pantallas de admin */
+  --color-cyan: #06B6D4;
+  --color-cyan-hover: #22D3EE;
+  --color-cyan-dim: rgba(6, 182, 212, 0.12);
+  --color-cyan-glow: rgba(6, 182, 212, 0.28);
+  --color-primary: #0E7490;
+  --color-navy-deep: #05080F;
+  --color-navy-mid: #0A101C;
+}
+
+/* ---------- Fondo general ---------- */
+body,
+.app-layout,
+.app-layout.admin-dark,
+.admin-dark .main-content {
+  background-color: var(--ad-ink) !important;
+}
+
+.app-layout .main-content {
+  background:
+    radial-gradient(900px 500px at 100% 0%, rgba(6, 182, 212, 0.07), transparent 70%),
+    var(--ad-ink) !important;
+}
+
+/* ---------- Sidebar ---------- */
+.app-layout .sidebar {
+  /* El punto de la marca asoma en la esquina inferior (círculo, anillo y brillo) */
+  background:
+    radial-gradient(circle 108px at calc(100% + 12px) calc(100% + 6px), var(--ad-brand) 99%, transparent 100%),
+    radial-gradient(circle 134px at calc(100% + 12px) calc(100% + 6px), rgba(6, 182, 212, 0.12) 99%, transparent 100%),
+    radial-gradient(circle 260px at calc(100% + 12px) calc(100% + 6px), rgba(6, 182, 212, 0.26), transparent 70%),
+    radial-gradient(420px 320px at 0% 0%, rgba(6, 182, 212, 0.16), transparent 70%),
+    var(--ad-ink-2) !important;
+  border-right: 1px solid var(--ad-line);
+  padding: 0 !important;   /* Facturación traía su propio padding: igualamos todas */
+}
+
+.sidebar .sidebar-brand {
+  margin-bottom: 0 !important;
+  padding: 1.75rem 1.75rem 1.5rem !important;
+  border-bottom: 0 !important;
+}
+
+.sidebar-brand a {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.sidebar-brand .wordmark {
+  display: block;
+  width: 124px;
+  aspect-ratio: 1935 / 343;
+  color: #fff;
+  background: linear-gradient(90deg, currentColor 0 94.9%, var(--ad-brand) 94.9% 100%);
+  -webkit-mask: url('/assets/logos/wordmark.png') center / contain no-repeat;
+  mask: url('/assets/logos/wordmark.png') center / contain no-repeat;
+}
+
+.sidebar-brand .admin-tag {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(103, 232, 249, 0.35);
+  color: var(--ad-brand-soft) !important;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
+.sidebar .sidebar-nav {
+  padding-left: 0.9rem !important;
+  padding-right: 0.9rem !important;
+}
+
+.sidebar .nav-item {
+  color: rgba(230, 236, 245, 0.62) !important;
+  border-radius: 12px !important;
+  padding: 0.75rem 1rem !important;
+  margin-bottom: 0.25rem !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 0.93rem !important;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: background-color .2s, color .2s !important;
+}
+
+.sidebar .nav-item:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #fff !important;
+}
+
+.sidebar .nav-item.active {
+  background: rgba(6, 182, 212, 0.14) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+
+.sidebar .nav-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 22%;
+  bottom: 22%;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--ad-brand);
+}
+
+.sidebar-nav::-webkit-scrollbar { width: 6px; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 6px; }
+
+/* ---------- Header ---------- */
+.app-layout .app-header {
+  background: rgba(5, 8, 15, 0.72) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--ad-line) !important;
+}
+
+.app-layout .app-header h1 {
+  color: #fff !important;
+  font-family: 'Outfit', sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.035em !important;
+}
+
+/* Cada título termina con el punto cian de la marca */
+.app-layout .app-header h1::after {
+  content: ".";
+  color: var(--ad-brand);
+}
+
+/* El logo de Dotacian ya está en el menú: no se repite arriba a la derecha */
+.app-layout .app-header #company-logo-img { display: none !important; }
+
+#header-company-badge {
+  border-radius: 999px !important;
+  border: 1px solid var(--ad-line) !important;
+  background: var(--ad-ink-3) !important;
+  box-shadow: none !important;
+}
+#header-company-badge #admin-name-display { color: #fff !important; }
+#header-company-badge span[style*="uppercase"],
+#header-company-badge > div:last-child { color: var(--ad-text-muted) !important; }
+#badge-industry-icon {
+  background: var(--ad-brand) !important;
+  color: var(--ad-ink) !important;
+}
+
+/* ---------- Tarjetas ---------- */
+.metric-card,
+.status-grid,
+.app-layout .main-content .app-card,
+.search-container,
+.user-card {
+  border-radius: 20px !important;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 24px 48px -28px rgba(0, 0, 0, 0.7) !important;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 30px 60px -26px rgba(6, 182, 212, 0.35) !important;
+}
+
+.metric-header {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.08em !important;
+  color: #64748B !important;
+}
+
+.metric-value {
+  letter-spacing: -0.03em;
+}
+
+.metric-icon {
+  background: rgba(6, 182, 212, 0.10) !important;
+  border-radius: 12px !important;
+}
+
+/* Enlaces "Ir a…" dentro de las tarjetas: cian profundo, legible sobre blanco */
+.metric-card [style*="var(--color-primary)"] {
+  color: var(--ad-brand-deep) !important;
+  font-weight: 600;
+}
+
+/* ---------- Botones ---------- */
+.app-layout .btn-primary {
+  background: var(--ad-brand) !important;
+  border-color: var(--ad-brand) !important;
+  color: var(--ad-ink) !important;
+  border-radius: 999px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 10px 24px -12px rgba(6, 182, 212, 0.8) !important;
+}
+.app-layout .btn-primary:hover:not(:disabled) {
+  background: var(--ad-brand-hi) !important;
+  border-color: var(--ad-brand-hi) !important;
+  color: var(--ad-ink) !important;
+}
+
+/* ---------- Formularios ---------- */
+.app-layout input:focus,
+.app-layout select:focus,
+.app-layout textarea:focus {
+  border-color: var(--ad-brand) !important;
+  box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.18) !important;
+  outline: none !important;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--ad-brand-deep);
+}
+
+/* ---------- Popover y modales ---------- */
+.user-popover {
+  border-radius: 16px !important;
+  box-shadow: 0 30px 70px -24px rgba(0, 0, 0, 0.6) !important;
+}
+
+.modal-overlay {
+  background: rgba(5, 8, 15, 0.6) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
