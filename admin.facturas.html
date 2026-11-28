@@ -504,11 +504,17 @@
       // 1. Traer todas las órdenes que están completed
       const { data: pos, error } = await _supabase
         .from('company_purchase_orders')
-        .select('id, po_number, order_number, total_amount, company_id, company_profile(company_name, nit_rfc)')
+        .select('id, po_number, order_number, total_amount, company_id, company_profile(company_name, tax_id, dv)')
         .eq('status', 'completed')
         .order('created_at', { ascending: false });
 
-      if (error) return console.error(error);
+      if (error) {
+        console.error(error);
+        const msg = '<tr><td colspan="5" style="text-align:center; color:#F87171;">No se pudieron cargar las órdenes. Recarga la página o revisa la consola.</td></tr>';
+        document.getElementById('pending-body').innerHTML = msg;
+        document.getElementById('invoiced-body').innerHTML = msg;
+        return;
+      }
 
       // 2. Traer facturas existentes
       const { data: invoices } = await _supabase.from('company_invoices').select('*');
@@ -573,7 +579,9 @@
       document.getElementById('m-amount').textContent = `$${po.total_amount}`;
 
       document.getElementById('f-amount').value = po.total_amount;
-      document.getElementById('f-tax-id').value = po.company_profile?.nit_rfc || '';
+      // NIT/RFC del cliente: tax_id y, en Colombia, el dígito de verificación (dv)
+      const cp = po.company_profile || {};
+      document.getElementById('f-tax-id').value = cp.tax_id ? `${cp.tax_id}${cp.dv ? '-' + cp.dv : ''}` : '';
 
       files = { pdf: null, xml: null };
       document.getElementById('f-pdf').value = '';
